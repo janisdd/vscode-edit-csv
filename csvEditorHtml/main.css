@@ -1,4 +1,29 @@
 
 .options-bar {
 	padding: 1em;
+	border: 1px solid black;
+	border-radius: 10px;
+}
+
+.all-options {
+	display: flex
+}
+
+.options-title {
+	font-size: 1.5rem;
+}
+
+.clickable {
+	opacity: 0.7;
+	cursor: pointer
+}
+
+.clickable:hover {
+	opacity: 1;
+}
+
+#read-options-content {
+	height: auto;
+	opacity: 1;
+	transition: all 0.3s;
 }

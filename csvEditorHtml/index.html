@@ -5,59 +5,77 @@
 	<script src="../node_modules/handsontable/dist/handsontable.js"></script>
 	<script src="../node_modules/papaparse/papaparse.js"></script>
 
+	<link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
+
 	<link rel="stylesheet" href="../node_modules/bulma/css/bulma.min.css">
 	<link rel="stylesheet" href="../node_modules/bulma-extensions/dist/css/bulma-extensions.min.css">
 	<link rel="stylesheet" href="./main.css">
+	<link rel="stylesheet" href="./dark.css">
 </head>
 <body>
 
+
+<div class="all-options">
+
+		<div class="options-bar">
+
+			<div  class="options-title clickable" onclick="toggleReadOptions()">Read options <i id="read-options-icon" class="fas fa-chevron-right"></i></div>
+
+			<div id="read-options-content">
+				<div class="field">
+						<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked" onchange="setHasHeader()">
+						<label for="has-header">Has header</label>
+					</div>
+			
+					<label>Delimiter</label> TODO \t
+					<input id="delimiter-string" class="input" type="text" placeholder="empty for auto detect" oninput="setDelimiterString()">
+			
+					<label>Comment</label> help ... preserved before and after data
+					<input id="comment-string" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentString()">
+			
+					<div class="field">
+						help ... not for comemnts
+							<input id="skip-empty-lines" type="checkbox" name="skip-empty-lines" class="switch is-rounded" checked="checked" onchange="setSkipEmptyLines()">
+							<label for="skip-empty-lines">Skip empty lines</label>
+					</div>
+					<button class="button" onclick="rereadData(t1)">reread</button>
+			
+					TODO hint dialog?
+			</div>
+
+	</div>
+	
 	<div class="options-bar">
-		<div class="field">
-			<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked" onchange="setHasHeader()">
-			<label for="has-header">Has header</label>
-		</div>
-
-		<label>Delimiter</label> TODO \t
-		<input id="delimiter-string" class="input" type="text" placeholder="empty for auto detect" oninput="setDelimiterString()">
-
-		<label>Comment</label> help ... preserved before and after data
-		<input id="comment-string" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentString()">
-
-		<div class="field">
-			help ... not for comemnts
-				<input id="skip-empty-lines" type="checkbox" name="skip-empty-lines" class="switch is-rounded" checked="checked" onchange="setSkipEmptyLines()">
-				<label for="skip-empty-lines">Skip empty lines</label>
-		</div>
-		<button class="button" onclick="rereadData(t1)">reread</button>
-
-		TODO hint dialog?
+	
+			<div class="field">
+					<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded" checked="checked" onchange="setHasHeaderWrite()">
+					<label for="has-header-write">Write header</label>
+				</div>
+	
+			<label for="delimiter-string-write">Delimiter</label> TODO \t
+			<input id="delimiter-string-write" class="input" type="text" placeholder="empty to use read delimiter" oninput="setDelimiterStringWrite()">
+	
+			<label for="comment-string-write">Comment</label> help ... preserved before and after data
+			<input id="comment-string-write" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()">
+	
+			<label for="comment-string-write">NewLine</label> 
+			<div class="select">
+					<select id="newline-select-write" onchange="setNewLineWrite()">
+						<option value="">Same as input</option>
+						<option value="crlf">Windows (CRLF)</option>
+						<option value="lf">Linux/Mac (LF)</option>
+					</select>
+				</div>
+	
+	</div>
 </div>
 
-<div class="options-bar">
 
-		<div class="field">
-				<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded" checked="checked" onchange="setHasHeaderWrite()">
-				<label for="has-header-write">Write header</label>
-			</div>
 
-		<label for="delimiter-string-write">Delimiter</label> TODO \t
-		<input id="delimiter-string-write" class="input" type="text" placeholder="empty to use read delimiter" oninput="setDelimiterStringWrite()">
-
-		<label for="comment-string-write">Comment</label> help ... preserved before and after data
-		<input id="comment-string-write" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()">
-
-		<label for="comment-string-write">NewLine</label> 
-		<div class="select">
-				<select id="newline-select-write" onchange="setNewLineWrite()">
-					<option value="">Same as input</option>
-					<option value="crlf">Windows (CRLF)</option>
-					<option value="lf">Linux/Mac (LF)</option>
-				</select>
-			</div>
-
-</div>
-
+<div style="padding: 1em;background-color: black;">
 	<div id="csv-editor"></div>
+</div>
+	
 
 	<div>
 		<button class="button" onclick="updateCsvPreview()">Preview</button>

@@ -174,6 +174,8 @@ function displayData(data) {
 		rowHeaders: true,
 		fillHandle: false,
 		colHeaders: !csvReadOptions._hasHeader ? true : data[0],
+		currentColClassName: 'foo',
+		currentRowClassName: 'foo',
 		//plugins
 		comments: false, //don't know how this is handled
 		manualRowMove: true,
@@ -323,18 +325,11 @@ function getDataAsCsv() {
 	if (csvWriteOptions.comments) {
 
 		if (commentLinesBefore.length > 0) {
-			for (let i = 0; i < commentLinesBefore.length; i++) {
-				commentLinesBefore[i] = csvWriteOptions.comments + commentLinesBefore[i]
-			}
-			dataAsString = commentLinesBefore.join(csvWriteOptions.newline) + csvWriteOptions.newline + dataAsString
+			dataAsString = commentLinesBefore.map(p => csvWriteOptions.comments + p).join(csvWriteOptions.newline) + csvWriteOptions.newline + dataAsString
 		}
 		
-
 		if (commentLinesAfter.length > 0) {
-			for (let i = 0; i < commentLinesAfter.length; i++) {
-				commentLinesAfter[i] = csvWriteOptions.comments + commentLinesAfter[i]
-			}
-			dataAsString = dataAsString + csvWriteOptions.newline + commentLinesAfter.join(csvWriteOptions.newline)
+			dataAsString = dataAsString + csvWriteOptions.newline + commentLinesAfter.map(p => csvWriteOptions.comments + p).join(csvWriteOptions.newline)
 		}
 		
 	}
@@ -363,3 +358,26 @@ setCsvReadOptionsInitial(csvReadOptions)
 setCsvWriteOptionsInitial({ newline: '\n' })
 const _data = parseCsv(t1)
 displayData(_data)
+
+
+
+/* -- ui helper functions */
+
+function toggleReadOptions() {
+	const el = _getById('read-options-icon')
+	const content = _getById('read-options-content')
+
+	if (el.classList.contains('fa-chevron-right')) {
+		el.classList.replace('fa-chevron-right', 'fa-chevron-down')
+
+		//expand
+		content.style.opacity = 1;
+
+		return
+	}
+
+	//collapse
+	el.classList.replace( 'fa-chevron-down','fa-chevron-right')
+	content.style.opacity = 0;
+	
+}
