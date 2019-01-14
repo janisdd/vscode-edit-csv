@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="../node_modules/handsontable/dist/handsontable.css">
+	<script src="../node_modules/handsontable/dist/handsontable.js"></script>
+	<script src="../node_modules/papaparse/papaparse.js"></script>
+
+	<link rel="stylesheet" href="../node_modules/bulma/css/bulma.min.css">
+	<link rel="stylesheet" href="../node_modules/bulma-extensions/dist/css/bulma-extensions.min.css">
+	<link rel="stylesheet" href="./main.css">
+</head>
+<body>
+
+	<div class="options-bar">
+		<div class="field">
+			<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked" onchange="setHasHeader()">
+			<label for="has-header">Has header</label>
+		</div>
+
+		<label>Delimiter</label> TODO \t
+		<input id="delimiter-string" class="input" type="text" placeholder="empty for auto detect" oninput="setDelimiterString()">
+
+		<label>Comment</label> help ... preserved before and after data
+		<input id="comment-string" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentString()">
+
+		<div class="field">
+			help ... not for comemnts
+				<input id="skip-empty-lines" type="checkbox" name="skip-empty-lines" class="switch is-rounded" checked="checked" onchange="setSkipEmptyLines()">
+				<label for="skip-empty-lines">Skip empty lines</label>
+		</div>
+		<button class="button" onclick="rereadData(t1)">reread</button>
+
+		TODO hint dialog?
+</div>
+
+<div class="options-bar">
+
+		<div class="field">
+				<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded" checked="checked" onchange="setHasHeaderWrite()">
+				<label for="has-header-write">Write header</label>
+			</div>
+
+		<label for="delimiter-string-write">Delimiter</label> TODO \t
+		<input id="delimiter-string-write" class="input" type="text" placeholder="empty to use read delimiter" oninput="setDelimiterStringWrite()">
+
+		<label for="comment-string-write">Comment</label> help ... preserved before and after data
+		<input id="comment-string-write" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()">
+
+		<label for="comment-string-write">NewLine</label> 
+		<div class="select">
+				<select id="newline-select-write" onchange="setNewLineWrite()">
+					<option value="">Same as input</option>
+					<option value="crlf">Windows (CRLF)</option>
+					<option value="lf">Linux/Mac (LF)</option>
+				</select>
+			</div>
+
+</div>
+
+	<div id="csv-editor"></div>
+
+	<div>
+		<button class="button" onclick="updateCsvPreview()">Preview</button>
+		<textarea id="csv-preview" class="textarea"></textarea>
+	</div>
+
+	<script src="main.js"></script>
+</body>
