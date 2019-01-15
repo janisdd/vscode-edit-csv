@@ -4,8 +4,8 @@
 https://bulma.io/documentation/form/select/
 - ui
 
-- add columns
-- add row
+- add columns --> scroll to right?
+- add row --> scroll to bottom
 
 http://jsfiddle.net/7ocaxmox/
 

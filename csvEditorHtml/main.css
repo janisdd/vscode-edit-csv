@@ -1,16 +1,32 @@
 
 .options-bar {
-	padding: 1em;
-	border: 1px solid black;
+	padding: 0.5em;
+	border: 1px solid#adadad;
 	border-radius: 10px;
+	/* display: flex;
+	flex-direction: column; */
 }
 
 .all-options {
-	display: flex
+	display: flex;
+	align-items: baseline;
 }
+
+
 
 .options-title {
 	font-size: 1.5rem;
+	/* transform: rotate(180deg);
+	writing-mode: vertical-rl; */
+}
+
+.options-title i {
+	vertical-align: text-bottom
+}
+
+
+.hoverable {
+	opacity: 0.7;
 }
 
 .clickable {
@@ -22,8 +38,37 @@
 	opacity: 1;
 }
 
-#read-options-content {
-	height: auto;
+.options-content {
+	/* transition: all 0.3s; */
+	margin-top: 0.5em;
+	height: 170px;
+}
+
+#read-options-content > div {
 	opacity: 1;
 	transition: all 0.3s;
+}
+
+input.input {
+	width: 110px;
+}
+
+.field > label  {
+	display: block
+}
+
+.flexed {
+	display: flex
+}
+
+.mar-left {
+	margin-left: 1em;
+}
+
+.mar-left-half {
+	margin-left: 0.5em;
+}
+
+.mar-bot {
+	margin-bottom: 1em;
 }

@@ -16,7 +16,7 @@ let csvReadOptions = {
 	delimiter: '', //auto detect
 	newline: '', //auto detect
 	quoteChar: '"',
-	skipEmptyLines: false,
+	skipEmptyLines: true, //if false we have invalid rows ... always only 1 col
 	dynamicTyping: false,
 	//ui props, not part of papaparse options
 	_hasHeader: false
@@ -56,7 +56,11 @@ function setCsvReadOptionsInitial(options) {
 
 
 	const el2 = _getById('skip-empty-lines')
-	el2.checked = csvReadOptions.skipEmptyLines
+	if (el2) {
+		//currently disabled...
+		el2.checked = csvReadOptions.skipEmptyLines
+	}
+	
 
 	const el3 = _getById('has-header')
 	el3.checked = csvReadOptions._hasHeader
@@ -131,6 +135,10 @@ function parseCsv(content) {
 
 				if (line.startsWith(csvReadOptions.comments)) {
 					commentLinesBefore.push(line.substring(csvReadOptions.comments.length))
+					continue
+				}
+
+				if (line === '') {
 					continue
 				}
 
@@ -342,7 +350,8 @@ function getDataAsCsv() {
 /* ---- END export options  */
 
 const t1 =
-	`#test
+`#test
+
 #test3
 col1, col2, col3
 1, test,t2
@@ -366,18 +375,38 @@ displayData(_data)
 function toggleReadOptions() {
 	const el = _getById('read-options-icon')
 	const content = _getById('read-options-content')
+		_toggleCollapse(el, content)
+}
+
+function toggleWriteOptions() {
+	const el = _getById('write-options-icon')
+	const content = _getById('write-options-content')
+	_toggleCollapse(el, content)
+}
+
+function _toggleCollapse(el, content) {
 
 	if (el.classList.contains('fa-chevron-right')) {
 		el.classList.replace('fa-chevron-right', 'fa-chevron-down')
 
 		//expand
-		content.style.opacity = 1;
-
+		content.style.display = 'block'
 		return
 	}
 
 	//collapse
+
 	el.classList.replace( 'fa-chevron-down','fa-chevron-right')
-	content.style.opacity = 0;
-	
+	content.style.display = 'none'
+}
+
+function setReadDelimiter(delimiter) {
+	const el = _getById('delimiter-string')
+	el.value = delimiter
+	csvReadOptions.delimiter = delimiter
+}
+function setWriteDelimiter(delimiter) {
+	const el = _getById('delimiter-string-write')
+	el.value = delimiter
+	csvWriteOptions.delimiter = delimiter
 }
