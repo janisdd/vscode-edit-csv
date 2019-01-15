@@ -1,10 +1,35 @@
 
+html, body {
+	height: 100%;
+}
+
+.page {
+	display: flex;
+	flex-direction: column;
+}
+
+.full-h {
+	height: 100%;
+}
+
+.csv-editor-wrapper {
+	background-color: black;
+	/* flex: 1; */
+}
+
+#csv-editor {
+	overflow: hidden;
+	width: 500px;
+	height: 500px;
+}
+
 .options-bar {
 	padding: 0.5em;
 	border: 1px solid#adadad;
 	border-radius: 10px;
 	/* display: flex;
 	flex-direction: column; */
+	min-width: 180px;
 }
 
 .all-options {
@@ -39,14 +64,8 @@
 }
 
 .options-content {
-	/* transition: all 0.3s; */
 	margin-top: 0.5em;
 	height: 170px;
-}
-
-#read-options-content > div {
-	opacity: 1;
-	transition: all 0.3s;
 }
 
 input.input {
@@ -71,4 +90,24 @@ input.input {
 
 .mar-bot {
 	margin-bottom: 1em;
+}
+
+.handsontable th .remove-col,
+.handsontable th .remove-row {
+	visibility: hidden;
+}
+
+.handsontable th:hover .remove-col,
+.handsontable th:hover .remove-row {
+	visibility: visible;
+}
+.handsontable th .remove-col:hover,
+.handsontable th .remove-row:hover {
+	visibility: visible;
+	opacity: 1;
+}
+
+.remove-col,
+.remove-row {
+	margin-right: 4px; /*we need this else the sorting arrow will intersect this and causes flickering*/
 }

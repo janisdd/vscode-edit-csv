@@ -179,9 +179,18 @@ function displayData(data) {
 
 	hot = new Handsontable(container, {
 		data,
-		rowHeaders: true,
+		rowHeaders: function(row) {
+			let text = (row+1).toString()
+			return `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
+		},
 		fillHandle: false,
-		colHeaders: !csvReadOptions._hasHeader ? true : data[0],
+		colHeaders: function(col) {
+			let text = getSpreadsheetColumnLabel(col)
+			if (csvReadOptions._hasHeader) {
+				text = data[0][col]
+			}
+			return `${text} <span class="remove-col clickable" onclick="removeColumn(${col})"><i class="fas fa-trash"></i></span>`
+		},
 		currentColClassName: 'foo',
 		currentRowClassName: 'foo',
 		//plugins
@@ -190,7 +199,7 @@ function displayData(data) {
 		manualRowResize: true,
 		manualColumnMove: true,
 		manualColumnResize: true,
-		columnSorting: true
+		columnSorting: true,
 	})
 
 	lastDisplayedDataString = JSON.stringify(getData())
@@ -281,6 +290,29 @@ function _getById(id) {
 
 /* --- END options --- */
 
+function addRow() {
+
+	// const headerCells = hot.getColHeader()
+	const numRows = hot.countRows()
+	hot.alter('insert_row', numRows) //inserted data contains null but papaparse correctly unparses it as ''
+	// hot.populateFromArray(numRows, 0, [headerCells.map(p => '')])
+}
+
+function addColumn() {
+
+	const numCols = hot.countCols()
+	hot.alter('insert_col', numCols) //inserted data contains null but papaparse correctly unparses it as ''
+}
+
+function removeRow(index) {
+	hot.alter('remove_row', index)
+}
+
+function removeColumn(index) {
+	hot.alter('remove_col', index)
+}
+
+
 
 function setHasHeaderWrite() {
 	const el = _getById('has-header-write')
@@ -349,6 +381,111 @@ function getDataAsCsv() {
 
 /* ---- END export options  */
 
+
+/* -- ui helper functions */
+
+function toggleReadOptions(shouldCollapse) {
+	const el = _getById('read-options-icon')
+	const content = _getById('read-options-content')
+
+	if (shouldCollapse !== undefined) {
+		_setCollapsed(shouldCollapse, el, content)
+		return
+	}
+
+		_toggleCollapse(el, content)
+}
+
+function toggleWriteOptions(shouldCollapse) {
+	const el = _getById('write-options-icon')
+	const content = _getById('write-options-content')
+
+	if (shouldCollapse !== undefined) {
+		_setCollapsed(shouldCollapse, el, content)
+		return
+	}
+
+	_toggleCollapse(el, content)
+}
+
+function togglePreview(shouldCollapse) {
+	const el = _getById('preview-icon')
+	const content = _getById('preview-content')
+
+	if (shouldCollapse !== undefined) {
+		_setCollapsed(shouldCollapse, el, content)
+		return
+	}
+
+	_toggleCollapse(el, content)
+}
+
+function _toggleCollapse(el, content) {
+
+	if (el.classList.contains('fa-chevron-right')) {
+		//expand
+		_setCollapsed(false, el, content)
+		return
+	}
+
+	//collapse
+	_setCollapsed(true, el, content)
+}
+
+function _setCollapsed(shouldCollapsed, el, content) {
+
+	if(shouldCollapsed) {
+		el.classList.remove('fa-chevron-down')
+		el.classList.add('fa-chevron-right')
+		// el.classList.replace( 'fa-chevron-down','fa-chevron-right')
+		content.style.display = 'none'
+		return
+	}
+
+	el.classList.add('fa-chevron-down')
+	el.classList.remove('fa-chevron-right')
+
+	// el.classList.replace('fa-chevron-right', 'fa-chevron-down')
+
+	content.style.display = 'block'
+}
+
+function setReadDelimiter(delimiter) {
+	const el = _getById('delimiter-string')
+	el.value = delimiter
+	csvReadOptions.delimiter = delimiter
+}
+function setWriteDelimiter(delimiter) {
+	const el = _getById('delimiter-string-write')
+	el.value = delimiter
+	csvWriteOptions.delimiter = delimiter
+}
+
+//partly from handsontable data.js
+const COLUMN_LABEL_BASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const COLUMN_LABEL_BASE_LENGTH = COLUMN_LABEL_BASE.length;
+/**
+ * Generates spreadsheet-like column names: A, B, C, ..., Z, AA, AB, etc.
+ *
+ * @param {Number} index Column index. 0 based
+ * @returns {String}
+ */
+function getSpreadsheetColumnLabel(index) {
+  let dividend = index + 1;
+  let columnLabel = '';
+  let modulo;
+
+  while (dividend > 0) {
+    modulo = (dividend - 1) % COLUMN_LABEL_BASE_LENGTH;
+    columnLabel = String.fromCharCode(65 + modulo) + columnLabel;
+    dividend = parseInt((dividend - modulo) / COLUMN_LABEL_BASE_LENGTH, 10);
+  }
+
+  return columnLabel;
+}
+
+/* main */
+
 const t1 =
 `#test
 
@@ -365,48 +502,12 @@ col1, col2, col3
 
 setCsvReadOptionsInitial(csvReadOptions)
 setCsvWriteOptionsInitial({ newline: '\n' })
-const _data = parseCsv(t1)
+let _data = parseCsv(t1)
+_data = Handsontable.helper.createSpreadsheetData(5, 5)
 displayData(_data)
 
 
 
-/* -- ui helper functions */
-
-function toggleReadOptions() {
-	const el = _getById('read-options-icon')
-	const content = _getById('read-options-content')
-		_toggleCollapse(el, content)
-}
-
-function toggleWriteOptions() {
-	const el = _getById('write-options-icon')
-	const content = _getById('write-options-content')
-	_toggleCollapse(el, content)
-}
-
-function _toggleCollapse(el, content) {
-
-	if (el.classList.contains('fa-chevron-right')) {
-		el.classList.replace('fa-chevron-right', 'fa-chevron-down')
-
-		//expand
-		content.style.display = 'block'
-		return
-	}
-
-	//collapse
-
-	el.classList.replace( 'fa-chevron-down','fa-chevron-right')
-	content.style.display = 'none'
-}
-
-function setReadDelimiter(delimiter) {
-	const el = _getById('delimiter-string')
-	el.value = delimiter
-	csvReadOptions.delimiter = delimiter
-}
-function setWriteDelimiter(delimiter) {
-	const el = _getById('delimiter-string-write')
-	el.value = delimiter
-	csvWriteOptions.delimiter = delimiter
-}
+toggleReadOptions(true)
+toggleWriteOptions(true)
+togglePreview(true)
