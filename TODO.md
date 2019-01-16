@@ -1,19 +1,6 @@
 # TODO
 
 
-https://bulma.io/documentation/form/select/
-- ui
-
-- add columns --> scroll to right?
-- add row --> scroll to bottom
-
-http://jsfiddle.net/7ocaxmox/
-
-
-- copy respect delimiter?
-
-http://jsfiddle.net/fet1928r/ (Stat footer)
-
 - help dialog (+ shortcuts?)
 	- undo working
 	- click row header then drag
@@ -31,10 +18,6 @@ http://jsfiddle.net/fet1928r/ (Stat footer)
 	https://handsontable.com/docs/6.2.2/tutorial-keyboard-navigation.html
 
 
-- read agaun tooltip
-
-- todo both empty comments --> comments??
-
 
 
 - ask if source file changed... changes are lost
@@ -46,3 +29,21 @@ Handsontable.helper.createSpreadsheetData(1000, 1000)
 
 
 - default theme alternating row color
+
+
+
+--- add
+
+
+retainContextWhenHidden
+
+get theme
+
+store collapse states
+https://code.visualstudio.com/api/extension-guides/webview
+
+- trim whitespaces
+
+- change indicator
+
+//	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource:; script-src vscode-resource:; style-src vscode-resource:;">
