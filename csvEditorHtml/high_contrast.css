@@ -1,0 +1,84 @@
+body.vscode-high-contrast {
+	color: white;
+}
+
+.vscode-high-contrast input.input,
+.vscode-high-contrast .textarea {
+	color: black;
+}
+
+.vscode-high-contrast .button.is-light {
+	color: black;
+}
+
+.vscode-high-contrast .select select {
+	color: black;
+}
+
+* handson table styles */
+
+.vscode-high-contrast .ht_master,
+.vscode-high-contrast .handsontable th {
+	color: #d0d0d0 !important;
+}
+
+
+/* Edit mode */
+.vscode-high-contrast .handsontableInput {
+	background-color: #504f4f!important;
+	color: #d0d0d0;
+}
+
+/* All headers */
+.vscode-high-contrast .handsontable th {
+	background-color: rgb(26, 29, 29);
+	color: white;
+}
+
+.vscode-high-contrast .handsontable span.colHeader.columnSorting::before {
+	filter: invert(100%);
+}
+
+.vscode-high-contrast .ht_clone_top th {
+  border-color: #5c5c5c;
+}
+
+.vscode-high-contrast .ht_master tr:nth-of-type(odd) > td {
+	background-color: black;
+	border-color: #5c5c5c;
+}
+
+.vscode-high-contrast .ht_master tr:nth-of-type(even) > td {
+	background-color: #1d1d1d;
+	border-color: #5c5c5c;
+}
+
+.vscode-high-contrast .ht_clone_left th {
+	background-color:rgb(26, 29, 29);
+	border-color: #5c5c5c !important;
+}
+
+.vscode-high-contrast .ht_clone_top th {
+	background-color: rgb(26, 29, 29);
+	border-color: #5c5c5c !important;
+}
+
+.vscode-high-contrast .handsontable tbody th.ht__highlight.foo,
+.vscode-high-contrast .handsontable thead th.ht__highlight.foo {
+  background-color: red;
+}
+
+.vscode-high-contrast .handsontable th:nth-child(2) {
+	border-left: 1px solid #5c5c5c !important;
+}
+.vscode-high-contrast .ht_clone_top thead tr:nth-child(2) {
+	border: 0 !important;
+}
+
+.vscode-high-contrast .ht_clone_top_left_corner th {
+  border-color: #5c5c5c!important;
+}
+
+.vscode-high-contrast .ht_clone_top_left_corner thead tr:nth-child(1) {
+	border-right: 0 !important;
+}

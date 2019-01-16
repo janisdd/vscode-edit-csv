@@ -1,0 +1,46 @@
+body.vscode-light {
+	color: #657b83;
+}
+
+.vscode-light input.input,
+.vscode-light .textarea {
+	color: #657b83;
+}
+
+.vscode-light .button.is-light {
+	color: #657b83;
+}
+
+.vscode-light .select select {
+	color: #657b83;
+}
+
+.vscode-light .button.is-white.is-outlined {
+	border-color:#657b83;
+	border-radius: 4px;
+	color:#657b83;
+}
+
+.vscode-light .button.is-white.is-outlined:hover {
+	border-color: white;
+	background-color:#657b83;
+	border-radius: 4px;
+	color:white;
+}
+
+/* handson table styles */
+
+.vscode-light .ht_master,
+.vscode-light .handsontable th {
+	color: #657b83 !important;
+}
+
+.vscode-light .ht_master tr:nth-of-type(odd) > td {
+	background-color: white;
+}
+
+.vscode-light .ht_master tr:nth-of-type(even) > td {
+	background-color: #f7f7f7;
+}
+
+

@@ -94,6 +94,8 @@ function createHtml(context: vscode.ExtensionContext, content: string): string {
 
 	const mainCss = _getResourcePath('csvEditorHtml/main.css')
 	const darkThemeCss = _getResourcePath('csvEditorHtml/dark.css')
+	const lightThemeCss = _getResourcePath('csvEditorHtml/light.css')
+	const hightContrastThemeCss = _getResourcePath('csvEditorHtml/high_contrast.css')
 	
 	//scripts
 	const ioJs = _getResourcePath('csvEditorHtml/io.js')
@@ -117,6 +119,8 @@ function createHtml(context: vscode.ExtensionContext, content: string): string {
 		<link rel="stylesheet" href="${bulmaExtensionCss}">
 		<link rel="stylesheet" href="${mainCss}">
 		<link rel="stylesheet" href="${darkThemeCss}">
+		<link rel="stylesheet" href="${lightThemeCss}">
+		<link rel="stylesheet" href="${hightContrastThemeCss}">
 	</head>
 	<body>
 	
@@ -262,7 +266,7 @@ function createHtml(context: vscode.ExtensionContext, content: string): string {
 	
 	
 		<div class="csv-editor-wrapper">
-	
+			<div class="table-action-buttons">
 				<button class="button is-white is-outlined is-small" onclick="addRow()">
 						<span class="icon is-small">
 								<i class="fas fa-plus"></i>
@@ -271,11 +275,12 @@ function createHtml(context: vscode.ExtensionContext, content: string): string {
 					</button>
 	
 					<button class="button is-white is-outlined is-small" onclick="addColumn()">
-							<span class="icon is-small">
-									<i class="fas fa-plus"></i>
-								</span>
-							<span>Add column</span>
-						</button>
+						<span class="icon is-small">
+								<i class="fas fa-plus"></i>
+							</span>
+						<span>Add column</span>
+					</button>
+				</div>
 	
 			<div id="csv-editor"></div>
 			

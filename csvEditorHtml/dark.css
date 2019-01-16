@@ -3,69 +3,108 @@ body.vscode-dark {
 	color: #d0d0d0;
 }
 
-.ht_master,
-.handsontable th {
+.vscode-dark input.input,
+.vscode-dark .textarea {
+	background-color: #504f4f;
+	color: #d0d0d0;
+	border-color: #8e8e8e;
+}
+
+.vscode-dark input.input::placeholder {
+	color: #7d7d7d;
+}
+
+.vscode-dark .button.is-light {
+	background-color: #404040;
+	color: #d0d0d0;
+}
+
+.vscode-dark .select select {
+	border-color: #8e8e8e;
+	background-color: #404040;
+	color: #d0d0d0;
+}
+
+.vscode-dark .select:not(.is-multiple):not(.is-loading)::after {
+	border-color: #d0d0d0;
+}
+.vscode-dark .select:not(.is-multiple):not(.is-loading):hover::after {
+	border-color: #888888;
+}
+
+.vscode-dark .switch[type=checkbox]+label::after,
+.vscode-dark.switch[type=checkbox]+label:after{
+	background-color:#5b5a5a;
+}
+
+.vscode-dark .switch[type=checkbox]:checked+label::before,
+.vscode-dark.switch[type=checkbox]:checked+label:before {
+	background-color: #00a78e;
+}
+
+/* handson table styles */
+
+.vscode-dark .ht_master,
+.vscode-dark .handsontable th {
 	color: #d0d0d0 !important;
 }
 
 
 /* Edit mode */
-.handsontableInput {
+.vscode-dark .handsontableInput {
 	background-color: #504f4f!important;
 	color: #d0d0d0;
 }
 
 /* All headers */
-.handsontable th {
+.vscode-dark .handsontable th {
 	background-color: rgb(26, 29, 29);
 }
 
-.handsontable span.colHeader.columnSorting::before {
+.vscode-dark .handsontable span.colHeader.columnSorting::before {
 	filter: invert(100%);
 }
 
-.ht_clone_top th {
+.vscode-dark .ht_clone_top th {
   border-color: #5c5c5c;
 }
 
-.ht_master tr:nth-of-type(odd) > td {
+.vscode-dark .ht_master tr:nth-of-type(odd) > td {
 	background-color: #262c2e;
 	border-color: #5c5c5c;
 }
 
-
-.ht_master tr:nth-of-type(even) > td {
+.vscode-dark .ht_master tr:nth-of-type(even) > td {
 	background-color: #2d3436;
 	border-color: #5c5c5c;
 }
 
-
-.ht_clone_left th {
+.vscode-dark .ht_clone_left th {
 	background-color:rgb(26, 29, 29);
 	border-color: #5c5c5c !important;
-
 }
 
-.ht_clone_top th {
+.vscode-dark .ht_clone_top th {
 	background-color: rgb(26, 29, 29);
 	border-color: #5c5c5c !important;
 }
 
-.handsontable tbody th.ht__highlight.foo, .handsontable thead th.ht__highlight.foo {
+.vscode-dark .handsontable tbody th.ht__highlight.foo,
+.vscode-dark .handsontable thead th.ht__highlight.foo {
   background-color: #0251b5;
 }
 
-.handsontable th:nth-child(2) {
+.vscode-dark .handsontable th:nth-child(2) {
 	border-left: 1px solid #5c5c5c !important;
 }
-.ht_clone_top thead tr:nth-child(2) {
+.vscode-dark .ht_clone_top thead tr:nth-child(2) {
 	border: 0 !important;
 }
 
-.ht_clone_top_left_corner th {
+.vscode-dark .ht_clone_top_left_corner th {
   border-color: #5c5c5c!important;
 }
 
-.ht_clone_top_left_corner thead tr:nth-child(1) {
+.vscode-dark .ht_clone_top_left_corner thead tr:nth-child(1) {
 	border-right: 0 !important;
 }

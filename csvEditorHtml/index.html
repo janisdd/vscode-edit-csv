@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<link rel="stylesheet" href="../node_modules/handsontable/dist/handsontable.css">
-	<script src="../node_modules/handsontable/dist/handsontable.js"></script>
-	<script src="../node_modules/papaparse/papaparse.js"></script>
+	<link rel="stylesheet" href="../node_modules/handsontable/dist/handsontable.min.css">
+	<script src="../node_modules/handsontable/dist/handsontable.min.js"></script>
+	<script src="../node_modules/papaparse/papaparse.min.js"></script>
 
-	<link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
+	<link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
 
 	<link rel="stylesheet" href="../node_modules/bulma/css/bulma.min.css">
 	<link rel="stylesheet" href="../node_modules/bulma-extensions/dist/css/bulma-extensions.min.css">
 	<link rel="stylesheet" href="./main.css">
 	<link rel="stylesheet" href="./dark.css">
+	<link rel="stylesheet" href="./light.css">
+	<link rel="stylesheet" href="./high_contrast.css">
 </head>
-<body>
-
+<body class="vscode-light"> 
 
 	<div class="page full-h">
 
@@ -153,10 +154,9 @@
 
 	</div>
 
-
-
 	<div class="csv-editor-wrapper">
 
+		<div class="table-action-buttons">
 			<button class="button is-white is-outlined is-small" onclick="addRow()">
 					<span class="icon is-small">
 							<i class="fas fa-plus"></i>
@@ -170,6 +170,7 @@
 							</span>
 						<span>Add column</span>
 					</button>
+		</div>
 
 		<div id="csv-editor"></div>
 		
