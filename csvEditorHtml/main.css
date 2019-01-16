@@ -111,3 +111,15 @@ input.input {
 .remove-row {
 	margin-right: 4px; /*we need this else the sorting arrow will intersect this and causes flickering*/
 }
+
+/* --- vs code --- */
+
+
+body.vscode-light {
+	color: black;
+}
+
+
+body.vscode-high-contrast {
+	color: red;
+}

@@ -1,4 +1,10 @@
 
+let vscode
+
+if (typeof acquireVsCodeApi !== 'undefined') {
+	vscode = acquireVsCodeApi()
+}
+
 const csvEditorId = 'csv-editor'
 const csv = window.Papa
 //handsontable instance
@@ -59,7 +65,7 @@ col1, col2, col3
 #test3`
 
 setCsvReadOptionsInitial(csvReadOptions)
-setCsvWriteOptionsInitial({ newline: '\n' })
+setCsvWriteOptionsInitial(csvWriteOptions)
 let _data = parseCsv(t1, csvReadOptions)
 _data = Handsontable.helper.createSpreadsheetData(100, 100)
 displayData(_data)

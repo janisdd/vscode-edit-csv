@@ -3,7 +3,8 @@ function _getById(id) {
 	const el = document.getElementById(id)
 
 	if (!el) {
-		//TODO warn
+		_error(`could not find element with id '${id}'`)
+		return null
 	}
 
 	return el
@@ -129,8 +130,11 @@ function setCommentString() {
 }
 
 function setSkipEmptyLines() {
-	const el = _getById('skip-empty-lines')
-	csvReadOptions.skipEmptyLines = el.checked
+	// const el = _getById('skip-empty-lines')
+	// if (el) {
+	// 	//currently disabled...
+	// 	csvReadOptions.skipEmptyLines = el.checked
+	// }
 }
 
 /**

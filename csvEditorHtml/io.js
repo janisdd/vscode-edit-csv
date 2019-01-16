@@ -117,3 +117,19 @@ function parseCsv(content, csvReadOptions) {
 
 	return parseResult.data
 }
+
+/* --- messages back to vs code --- */
+
+function postVsError(text) {
+	vscode.postMessage({
+		command: 'error',
+		content
+	})
+}
+
+function postOverwriteFile(csvContent) {
+	vscode.postMessage({
+		command: 'overwrite',
+		csvContent
+	})
+}

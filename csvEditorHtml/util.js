@@ -89,13 +89,13 @@ function _setOption(targetOptions, options, optionName) {
 	if (options.hasOwnProperty(optionName)) {
 
 		if (targetOptions.hasOwnProperty(optionName) === false) {
-			//TODO warn
+			_error(`target options object has not property '${optionName}'`)
 			return
 		}
 
 		targetOptions[optionName] = options[optionName]
 	} else {
-		//TODO warn
+		_error(`options object has not property '${optionName}'`)
 	}
 }
 
@@ -123,11 +123,12 @@ function setCsvReadOptionsInitial(options) {
 	el1.value = csvReadOptions.delimiter
 
 
-	const el2 = _getById('skip-empty-lines')
-	if (el2) {
-		//currently disabled...
-		el2.checked = csvReadOptions.skipEmptyLines
-	}
+	//disabled
+	// const el2 = _getById('skip-empty-lines')
+	// if (el2) {
+	// 	//currently disabled...
+	// 	el2.checked = csvReadOptions.skipEmptyLines
+	// }
 
 
 	const el3 = _getById('has-header')
@@ -195,4 +196,9 @@ function checkIfHasHeaderReadOptionIsAvailable() {
 	} else {
 		el.setAttribute('disabled','')
 	}
+}
+
+
+function _error(text) {
+	throw new Error(text)
 }

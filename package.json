@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:edit-csv.preview"
+		"onCommand:edit-csv.edit"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
