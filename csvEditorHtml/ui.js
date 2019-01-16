@@ -84,23 +84,38 @@ function setHasHeader() {
 	const el = _getById('has-header')
 	const data = getData()
 
+	if (data.length === 0) {
+		return
+	}
+
+	const elWrite = _getById('has-header-write')
+
 	if (el.checked) {
+
+		//this checked state is set from csvReadOptions._hasHeader
+
+		//use header row from data
 		hot.updateSettings({
-			colHeaders: data[0]
+			colHeaders: data[0].map((col, index) => defaultColHeaderFunc(index, col))
 		})
 
 		headerRow = data[0]
 
 		hot.alter('remove_row', 0)
+
+		
+		elWrite.checked = true
 		return
 	}
 
+	//use default headers
 	hot.updateSettings({
-		colHeaders: true
+		colHeaders: defaultColHeaderFunc
 	})
 
 	hot.alter('insert_row', 0)
 	hot.populateFromArray(0, 0, [headerRow])
+	elWrite.checked = false
 
 }
 function setDelimiterString() {
@@ -168,4 +183,78 @@ function setWriteDelimiter(delimiter) {
 	const el = _getById('delimiter-string-write')
 	el.value = delimiter
 	csvWriteOptions.delimiter = delimiter
+}
+
+
+/* --- preview --- */
+
+/**
+ * updates the preview
+ */
+function updateCsvPreview() {
+	const value = getDataAsCsv(csvWriteOptions)
+	const el = _getById('csv-preview')
+	el.value = value
+}
+
+
+/* --- other --- */
+
+/**
+ * display the given data in the handson table
+ * also sets the headerRow if we have more than 
+ * @param {string[][]} data array with the rows or null to just destroy the old table
+ */
+function displayData(data) {
+
+	if (data === null) {
+		if (hot) {
+			hot.destroy()
+		}
+		return
+	}
+
+	if (data.length > 0) {
+		headerRow = data[0]
+	}
+
+	const container = document.getElementById(csvEditorId)
+
+	if (hot) {
+		hot.destroy()
+	}
+
+	hot = new Handsontable(container, {
+		data,
+		rowHeaders: function(row) {
+			let text = (row+1).toString()
+			return `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
+		},
+		fillHandle: false,
+		colHeaders: defaultColHeaderFunc,
+		currentColClassName: 'foo',
+		currentRowClassName: 'foo',
+		//plugins
+		comments: false, //don't know how this is handled
+		manualRowMove: true,
+		manualRowResize: true,
+		manualColumnMove: true,
+		manualColumnResize: true,
+		columnSorting: true,
+	})
+
+	checkIfHasHeaderReadOptionIsAvailable()
+}
+
+/**
+ * 
+ * @param {number} colIndex 
+ * @param {string | undefined} colName 
+ */
+function defaultColHeaderFunc(colIndex, colName) {
+	let text = getSpreadsheetColumnLabel(colIndex)
+	if (colName !== undefined) {
+		text = colName
+	}
+	return `${text} <span class="remove-col clickable" onclick="removeColumn(${colIndex})"><i class="fas fa-trash"></i></span>`
 }

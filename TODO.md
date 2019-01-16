@@ -31,6 +31,7 @@ Handsontable.helper.createSpreadsheetData(1000, 1000)
 - default theme alternating row color
 
 
+- on past/cut checkIfHasHeaderReadOptionIsAvailable() ??
 
 --- add
 

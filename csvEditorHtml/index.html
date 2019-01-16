@@ -31,7 +31,7 @@
 									<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked" onchange="setHasHeader()">
 									<label for="has-header">
 										<span>Has header</span>
-										<span class="tooltip is-tooltip-bottom" data-tooltip="The first row is used as header">
+										<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="The first row is used as header. Note that changing this option will also change the write header option.">
 												<i class="fas fa-question-circle"></i>
 										</span>
 									</label>
@@ -72,9 +72,9 @@
 						</div>
 					
 
-						<button class="button is-light" onclick="rereadData(t1)">
+						<button class="button is-light" onclick="readDataAgain(t1, csvReadOptions)">
 							<span>Read again</span>
-							<span class="tooltip  mar-left-half" data-tooltip="The input file content is saved locally and read again. Thus this view is independent of the source file">
+							<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right" data-tooltip="The input file content is saved locally and read again. Thus this view is independent of the source file">
 									<i class="fas fa-question-circle"></i>
 							</span>
 						</button>
@@ -177,5 +177,8 @@
 	
 </div>
 
+ <script src="io.js"></script>
+ <script src="ui.js"></script>
+ <script src="util.js"></script>
 	<script src="main.js"></script>
 </body>
