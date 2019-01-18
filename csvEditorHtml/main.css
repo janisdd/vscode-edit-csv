@@ -119,9 +119,9 @@ input.input {
 }
 
 .preview-csv-textarea {
-	resize: horizontal
-	;min-width: 200px;
-	max-height: 120px;
+	resize: horizontal;
+	min-width: 200px;
+	height: 100%;
 }
 
 .help-modal {

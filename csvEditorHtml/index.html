@@ -142,11 +142,17 @@
 
 		<div class="options-bar" style="flex: 1%;">
 			<div>
-					<div  class="options-title clickable" onclick="togglePreview()">Preview <i id="preview-icon" class="fas fa-chevron-right"></i></div>
+					<div  class="options-title">
+						<span class="clickable" onclick="togglePreview()">Preview</span> 
+						<span><button class="button is-light is-small" style="vertical-align: middle;" onclick="generateCsvPreview()">Generate</button></span>
+						<span class="clickable" onclick="togglePreview()">
+								<i id="preview-icon" class="fas fa-chevron-right"></i>
+						</span>
+					</div>
+					
 			</div>
 
 			<div id="preview-content" class="options-content">
-				<button class="button is-light mar-bot" onclick="generateCsvPreview()">Generate</button>
 				<textarea id="csv-preview" class="textarea preview-csv-textarea"></textarea>
 			</div>
 

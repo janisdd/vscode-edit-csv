@@ -59,7 +59,7 @@ setCsvWriteOptionsInitial(csvWriteOptions)
 let _data = parseCsv(t1, csvReadOptions)
 console.log(_data);
 
-// _data = Handsontable.helper.createSpreadsheetData(50, 50)
+_data = Handsontable.helper.createSpreadsheetData(100, 20)
 displayData(_data)
 
 

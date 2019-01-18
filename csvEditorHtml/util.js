@@ -74,11 +74,10 @@ function addColumn() {
 	//we could get 0 cols...
 	checkIfHasHeaderReadOptionIsAvailable()
 
-	//not working because when we click outside of the table we lose selection...
-	// const pos = hot.getSelected() //undefined or [[startRow, startCol, endRow, endCol], ...] (could select not connected cells...)
-	// if (pos && pos.length === 1) { //only 1 row selected
-	// 	hot.selectCell(pos[0][0], numCols)
-	// }
+	const pos = hot.getSelected() //undefined or [[startRow, startCol, endRow, endCol], ...] (could select not connected cells...)
+	if (pos && pos.length === 1) { //only 1 row selected
+		hot.selectCell(pos[0][0], numCols)
+	}
 }
 
 

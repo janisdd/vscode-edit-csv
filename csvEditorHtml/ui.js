@@ -199,6 +199,9 @@ function generateCsvPreview() {
 	const value = getDataAsCsv(csvWriteOptions)
 	const el = _getById('csv-preview')
 	el.value = value
+
+	//open preview
+	togglePreview(false)
 }
 
 
@@ -245,6 +248,8 @@ function displayData(data) {
 		manualColumnMove: true,
 		manualColumnResize: true,
 		columnSorting: true,
+
+		outsideClickDeselects: false, //keep selection
 	})
 
 	Handsontable.dom.addEvent(window, 'resize', throttle(onResize, 200))
