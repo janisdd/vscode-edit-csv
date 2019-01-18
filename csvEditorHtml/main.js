@@ -46,15 +46,13 @@ let commentLinesAfter = []
 
 const csvEditorWrapper = _getById('csv-editor-wrapper')
 const csvEditorDiv = _getById('csv-editor')
+const helModalDiv = _getById('help-modal')
 
 
 /* main */
 
 const t1 =
-`1,2
-2;3
-
-`
+`1,32`
 
 setCsvReadOptionsInitial(csvReadOptions)
 setCsvWriteOptionsInitial(csvWriteOptions)

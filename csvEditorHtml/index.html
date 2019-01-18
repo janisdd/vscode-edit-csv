@@ -2,7 +2,7 @@
 <html>
 <head>
 	<link rel="stylesheet" href="../node_modules/handsontable/dist/handsontable.min.css">
-	<script src="../node_modules/handsontable/dist/handsontable.min.js"></script>
+	<script src="../node_modules/handsontable/dist/handsontable.js"></script>
 	<script src="../node_modules/papaparse/papaparse.min.js"></script>
 
 	<link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
@@ -155,24 +155,72 @@
 	
 	<div class="table-action-buttons">
 		<button class="button is-white is-outlined is-small" onclick="addRow()">
-				<span class="icon is-small">
-						<i class="fas fa-plus"></i>
-					</span>
-				<span>Add row</span>
-			</button>
+			<span class="icon is-small">
+					<i class="fas fa-plus"></i>
+				</span>
+			<span>Add row</span>
+		</button>
 
-			<button class="button is-white is-outlined is-small" onclick="addColumn()">
-					<span class="icon is-small">
-							<i class="fas fa-plus"></i>
-						</span>
-					<span>Add column</span>
-				</button>
+		<button class="button is-white is-outlined is-small" onclick="addColumn()">
+			<span class="icon is-small">
+					<i class="fas fa-plus"></i>
+				</span>
+			<span>Add column</span>
+		</button>
+
+		<button class="button is-white is-outlined is-small" onclick="toggleHelpModal(true)">
+			<span class="icon is-small">
+					<i class="fas fa-question"></i>
+				</span>
+			<span>Help</span>
+		</button>
 	</div>
 
 	<div id="csv-editor-wrapper" class="csv-editor-wrapper">
 		<div id="csv-editor"></div>
 	</div>
 	
+</div>
+
+<div id="help-modal" class="modal help-modal">
+  <div class="modal-background"></div>
+  <div class="modal-content">
+		<div class="box">
+			
+			<h3 class="title is-3">Features/Shortcuts</h3>
+			<div class="content">
+					<ul>
+						<li>Undo/Redo</li>
+						<li>Click on column header text to sort</li>
+						<li>Click row/column header (not the text) to select then drag to rearrange</li>
+						<li>Resize row/column</li>
+						<li><div class="keys">Home</div> to move to the first cell in a row</li>
+						<li><div class="keys">End</div> to move to the last cell in a row</li>
+
+						<li><div class="keys">Ctrl</div>+<div class="keys">Home</div> to move to the first cell in a column</li>
+						<li><div class="keys">Ctrl</div>+<div class="keys">End</div> to move to the last cell in a column</li>
+						<li><div class="keys">Esc</div> to cancel editing and close cell editor</li>
+						<li><div class="keys">Ctrl</div>+<div class="keys">Enter</div> to add a line break</li>
+
+						<li>To delete a row/column hover over it and click the trash-icon</li>
+
+					</ul>
+
+					For a full list of shortcuts see <a target="_blank" href="https://handsontable.com/docs/6.2.2/tutorial-keyboard-navigation.html">https://handsontable.com/docs/6.2.2/tutorial-keyboard-navigation.html</a>
+			</div>
+
+			<h3 class="title is-3">Hints</h3>
+			<div class="content">
+					<ul>
+							<li>Sorting state is exported</li>
+						<li>Copy & Past use tab (<div class="keys">⇥</div>) as separator (same as excel)</li>
+					</ul>
+			</div>
+				
+
+		</div>
+  </div>
+  <button class="modal-close is-large" aria-label="close" onclick="toggleHelpModal()"></button>
 </div>
 
  <script src="io.js"></script>

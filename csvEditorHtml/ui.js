@@ -280,3 +280,13 @@ function defaultColHeaderFunc(colIndex, colName) {
 	}
 	return `${text} <span class="remove-col clickable" onclick="removeColumn(${colIndex})"><i class="fas fa-trash"></i></span>`
 }
+
+function toggleHelpModal(isVisible) {
+	
+	if (isVisible) {
+		helModalDiv.classList.add('is-active')
+		return
+	}
+	
+	helModalDiv.classList.remove('is-active')
+}

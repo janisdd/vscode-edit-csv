@@ -1,38 +1,16 @@
 # TODO
 
 
-- help dialog (+ shortcuts?)
-	- undo working
-	- click row header then drag
-	- resize row
-	- resize col
-	- click col header (not text) then drag
-	- click col header to sort
-	- sorting is respected when exporting
-	- f2 to edit cell / esc to cancel edit
-	- enter: apply edit & next row
-	- shift enter: apply edit & previous row
-	- tab apply & next col
-	- shift tab apply & previous col
-	- alt + enter in edit mode for multi line edit
-	https://handsontable.com/docs/6.2.2/tutorial-keyboard-navigation.html
-
-
-
 - ask if source file changed... changes are lost
 
 - shortcut for preview?
 - shortcut to save ?
 
-Handsontable.helper.createSpreadsheetData(1000, 1000)
-
-
-- on past/cut checkIfHasHeaderReadOptionIsAvailable() ??
-
 --- add
 
 retainContextWhenHidden
 
+- scroll to right on col add
 
 store collapse states
 https://code.visualstudio.com/api/extension-guides/webview
@@ -42,3 +20,6 @@ https://code.visualstudio.com/api/extension-guides/webview
 
 
 //	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource:; script-src vscode-resource:; style-src vscode-resource:;">
+
+
+- make typescript...
