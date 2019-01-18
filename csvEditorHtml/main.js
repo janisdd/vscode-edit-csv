@@ -1,11 +1,9 @@
 
-let vscode
+let vscode = undefined
 
 if (typeof acquireVsCodeApi !== 'undefined') {
 	vscode = acquireVsCodeApi()
 }
-
-const csvEditorId = 'csv-editor'
 const csv = window.Papa
 //handsontable instance
 let hot
@@ -26,7 +24,7 @@ let csvReadOptions = {
 	delimiter: '', //auto detect
 	newline: '', //auto detect
 	quoteChar: '"',
-	skipEmptyLines: true, //if false we have invalid rows ... always only 1 col
+	skipEmptyLines: false, //if false we have invalid rows ... always only 1 col
 	dynamicTyping: false,
 	//ui props, not part of papaparse options
 	_hasHeader: false
@@ -46,28 +44,24 @@ let newLineFromInput = '\n'
 let commentLinesBefore = []
 let commentLinesAfter = []
 
+const csvEditorWrapper = _getById('csv-editor-wrapper')
+const csvEditorDiv = _getById('csv-editor')
 
 
 /* main */
 
 const t1 =
-`#test
+`1,2
+2;3
 
-#test3
-col1, col2, col3
-1, test,t2
-2, t3, t4
-
-20,,
-10,,
-9,,
-#test2
-#test3`
+`
 
 setCsvReadOptionsInitial(csvReadOptions)
 setCsvWriteOptionsInitial(csvWriteOptions)
 let _data = parseCsv(t1, csvReadOptions)
-_data = Handsontable.helper.createSpreadsheetData(100, 100)
+console.log(_data);
+
+// _data = Handsontable.helper.createSpreadsheetData(50, 50)
 displayData(_data)
 
 
@@ -75,3 +69,5 @@ displayData(_data)
 toggleReadOptions(true)
 toggleWriteOptions(true)
 togglePreview(true)
+
+onResize();

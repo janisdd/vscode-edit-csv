@@ -25,11 +25,7 @@ function getDataAsCsv(csvWriteOptions) {
 		csvWriteOptions.newline = newLineFromInput
 	}
 
-	console.log(csvWriteOptions);
-
-
 	if (csvWriteOptions.header) {
-
 
 		//write the header...
 		if (hot.getSettings().colHeaders === defaultColHeaderFunc) {
@@ -39,11 +35,6 @@ function getDataAsCsv(csvWriteOptions) {
 		else {
 			data.unshift(hot.getColHeader())
 		}
-		
-
-
-		
-		
 	}
 	
 	
@@ -78,7 +69,17 @@ function parseCsv(content, csvReadOptions) {
 	const parseResult = csv.parse(content, csvReadOptions)
 
 	if (parseResult.errors.length > 0) {
-		//TODO display
+		for (let i = 0; i < parseResult.errors.length; i++) {
+			const error = parseResult.errors[i];
+
+			if (error.row) {
+				_error(`${error.message} on line ${error.row}`)
+				continue
+			}
+
+			_error(`${error.message}`)
+		}
+
 		return null
 	}
 	csvWriteOptions.delimiter = parseResult.meta.delimiter
@@ -121,13 +122,19 @@ function parseCsv(content, csvReadOptions) {
 /* --- messages back to vs code --- */
 
 function postVsError(text) {
+	
+	if (!vscode) return
+
 	vscode.postMessage({
 		command: 'error',
-		content
+		content: text
 	})
 }
 
 function postOverwriteFile(csvContent) {
+
+	if (!vscode) return
+
 	vscode.postMessage({
 		command: 'overwrite',
 		csvContent

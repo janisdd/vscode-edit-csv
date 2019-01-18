@@ -146,34 +146,31 @@
 			</div>
 
 			<div id="preview-content" class="options-content">
-				<button class="button is-light mar-bot" onclick="updateCsvPreview()">Generate</button>
-				<textarea id="csv-preview" style="resize: horizontal;min-width: 200px;max-height: 120px;" class="textarea"></textarea>
+				<button class="button is-light mar-bot" onclick="generateCsvPreview()">Generate</button>
+				<textarea id="csv-preview" class="textarea preview-csv-textarea"></textarea>
 			</div>
 
 		</div>
-
 	</div>
+	
+	<div class="table-action-buttons">
+		<button class="button is-white is-outlined is-small" onclick="addRow()">
+				<span class="icon is-small">
+						<i class="fas fa-plus"></i>
+					</span>
+				<span>Add row</span>
+			</button>
 
-	<div class="csv-editor-wrapper">
-
-		<div class="table-action-buttons">
-			<button class="button is-white is-outlined is-small" onclick="addRow()">
+			<button class="button is-white is-outlined is-small" onclick="addColumn()">
 					<span class="icon is-small">
 							<i class="fas fa-plus"></i>
 						</span>
-					<span>Add row</span>
+					<span>Add column</span>
 				</button>
+	</div>
 
-				<button class="button is-white is-outlined is-small" onclick="addColumn()">
-						<span class="icon is-small">
-								<i class="fas fa-plus"></i>
-							</span>
-						<span>Add column</span>
-					</button>
-		</div>
-
+	<div id="csv-editor-wrapper" class="csv-editor-wrapper">
 		<div id="csv-editor"></div>
-		
 	</div>
 	
 </div>
@@ -183,3 +180,4 @@
  <script src="util.js"></script>
 	<script src="main.js"></script>
 </body>
+</html>

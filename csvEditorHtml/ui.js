@@ -195,7 +195,7 @@ function setWriteDelimiter(delimiter) {
 /**
  * updates the preview
  */
-function updateCsvPreview() {
+function generateCsvPreview() {
 	const value = getDataAsCsv(csvWriteOptions)
 	const el = _getById('csv-preview')
 	el.value = value
@@ -222,7 +222,7 @@ function displayData(data) {
 		headerRow = data[0]
 	}
 
-	const container = document.getElementById(csvEditorId)
+	const container = csvEditorDiv
 
 	if (hot) {
 		hot.destroy()
@@ -247,7 +247,25 @@ function displayData(data) {
 		columnSorting: true,
 	})
 
+	Handsontable.dom.addEvent(window, 'resize', throttle(onResize, 200))
+
 	checkIfHasHeaderReadOptionIsAvailable()
+}
+
+/**
+ * updates the handson table to fill available space (will trigger scrollbars)
+ */
+function onResize() {
+	const widthString = getComputedStyle(csvEditorWrapper).width
+	const width = parseInt(widthString.substring(0, widthString.length-2))
+
+	const heightString = getComputedStyle(csvEditorWrapper).height
+	const height = parseInt(heightString.substring(0, heightString.length-2))
+
+	hot.updateSettings({
+		width: width,
+		height: height,
+	})
 }
 
 /**

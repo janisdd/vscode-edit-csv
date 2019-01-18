@@ -19,7 +19,6 @@
 
 
 
-
 - ask if source file changed... changes are lost
 
 - shortcut for preview?
@@ -28,23 +27,18 @@
 Handsontable.helper.createSpreadsheetData(1000, 1000)
 
 
-- default theme alternating row color
-
-
 - on past/cut checkIfHasHeaderReadOptionIsAvailable() ??
 
 --- add
 
-
 retainContextWhenHidden
 
-get theme
 
 store collapse states
 https://code.visualstudio.com/api/extension-guides/webview
 
-- trim whitespaces
 
-- change indicator
+- param max col width? good for multi line cols...
+
 
 //	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource:; script-src vscode-resource:; style-src vscode-resource:;">

@@ -15,17 +15,18 @@ html, body {
 }
 
 .csv-editor-wrapper {
-	padding-top: 0.5em;
+	overflow: hidden;
+	flex: 1;
 }
 
 #csv-editor {
 	overflow: hidden;
-	width: 500px;
-	height: 500px;
+	/* width: 1500px; */
+	/* height: 300px; */
 }
 
 .options-bar {
-	padding: 0.5em;
+	padding: 0.3em;
 	border: 1px solid#adadad;
 	border-radius: 10px;
 	/* display: flex;
@@ -41,7 +42,7 @@ html, body {
 
 
 .options-title {
-	font-size: 1.5rem;
+	font-size: 1.3rem;
 	/* transform: rotate(180deg);
 	writing-mode: vertical-rl; */
 }
@@ -114,5 +115,11 @@ input.input {
 }
 
 .table-action-buttons {
-	margin-bottom: 0.5em;
+	margin: 0.5em 0;
+}
+
+.preview-csv-textarea {
+	resize: horizontal
+	;min-width: 200px;
+	max-height: 120px;
 }
