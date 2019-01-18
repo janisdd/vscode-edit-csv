@@ -1,48 +1,49 @@
 
-let vscode = undefined
+declare var acquireVsCodeApi: any
+declare var initialContent: string | undefined
+
+let vscode: VsExtension | undefined  = undefined 
 
 if (typeof acquireVsCodeApi !== 'undefined') {
 	vscode = acquireVsCodeApi()
 }
-const csv = window.Papa
+
+const csv: typeof import('papaparse') = (window as any).Papa
 //handsontable instance
-let hot
+let hot: import('../node_modules/handsontable/handsontable')
 
 let lastDoubleClickedColumnWidthBefore = null
 
 /**
+ * TODO check
  * stores the header row after initial parse...
  * if we have header rows in data (checked) we set this to the header row
  * if we uncheck header row read option then we use this to insert the header row again as data row
  * can be null if we have 0 rows
  * {string[] | null}
  */
-let headerRow = null
+let headerRow: string[] | null = null
 
-let miscOptions = {
-	//then we double click on the resize handle auto size is used...
-	//if we have a large column and double click on that we want to shrink it to this value...
-	//use falsy value to not change the column size
-	//double click again will use auto size
+let miscOptions: MiscOptions = {
 	doubleClickMinColWidth: 200
 }
 
 
+
 //csv reader options + some ui options
-let csvReadOptions = {
+let csvReadOptions: CsvReadOptions = {
 	header: false, //always use false to get an array of arrays
 	comments: '#',
 	delimiter: '', //auto detect
 	newline: '', //auto detect
 	quoteChar: '"',
-	skipEmptyLines: false, //if false we have invalid rows ... always only 1 col
+	skipEmptyLines: true,
 	dynamicTyping: false,
-	//ui props, not part of papaparse options
 	_hasHeader: false
 }
 
 
-let csvWriteOptions = {
+let csvWriteOptions: CsvWriteOptions = {
 	header: false,
 	comments: '#',
 	delimiter: '', //'' = use from input, will be set from empty to string when exporting (or earlier)
@@ -52,8 +53,8 @@ let csvWriteOptions = {
 let newLineFromInput = '\n'
 
 //before csv content
-let commentLinesBefore = []
-let commentLinesAfter = []
+let commentLinesBefore: string[] = []
+let commentLinesAfter: string[] = []
 
 const csvEditorWrapper = _getById('csv-editor-wrapper')
 const csvEditorDiv = _getById('csv-editor')
@@ -62,17 +63,20 @@ const helModalDiv = _getById('help-modal')
 
 /* main */
 
-const t1 =
-`1,32`
-
 setCsvReadOptionsInitial(csvReadOptions)
 setCsvWriteOptionsInitial(csvWriteOptions)
-let _data = parseCsv(t1, csvReadOptions)
-console.log(_data);
 
-_data = Handsontable.helper.createSpreadsheetData(100, 20)
+if (typeof initialContent === 'undefined' || initialContent === undefined) {
+	initialContent = ''
+}
+
+console.log("initialContent: " + initialContent);
+
+//see readDataAgain
+let _data = parseCsv(initialContent, csvReadOptions)
+//@ts-ignore
+// _data = Handsontable.helper.createSpreadsheetData(100, 20)
 displayData(_data)
-
 
 
 toggleReadOptions(true)
@@ -80,3 +84,7 @@ toggleWriteOptions(true)
 togglePreview(true)
 
 onResize();
+
+window.addEventListener('message', (event) => {
+	handleVsCodeMessage(event)
+})

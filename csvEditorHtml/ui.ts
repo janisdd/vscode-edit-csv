@@ -1,21 +1,15 @@
 
-function _getById(id) {
-	const el = document.getElementById(id)
-
-	if (!el) {
-		_error(`could not find element with id '${id}'`)
-		return null
-	}
-
-	return el
-}
 
 /* --- common helpers --- */
 
 
-function toggleReadOptions(shouldCollapse) {
+/**
+ * displayed or hides the read options
+ * @param shouldCollapse 
+ */
+function toggleReadOptions(shouldCollapse: boolean) {
 	const el = _getById('read-options-icon')
-	const content = _getById('read-options-content')
+	const content = _getById('read-options-content') //the wrapper
 
 	if (shouldCollapse !== undefined) {
 		_setCollapsed(shouldCollapse, el, content)
@@ -25,9 +19,13 @@ function toggleReadOptions(shouldCollapse) {
 		_toggleCollapse(el, content)
 }
 
-function toggleWriteOptions(shouldCollapse) {
+/**
+ * displayed or hides the write options
+ * @param shouldCollapse 
+ */
+function toggleWriteOptions(shouldCollapse: boolean) {
 	const el = _getById('write-options-icon')
-	const content = _getById('write-options-content')
+	const content = _getById('write-options-content') //the wrapper
 
 	if (shouldCollapse !== undefined) {
 		_setCollapsed(shouldCollapse, el, content)
@@ -37,9 +35,13 @@ function toggleWriteOptions(shouldCollapse) {
 	_toggleCollapse(el, content)
 }
 
-function togglePreview(shouldCollapse) {
+/**
+ * displayed or hides the preview
+ * @param shouldCollapse 
+ */
+function togglePreview(shouldCollapse: boolean) {
 	const el = _getById('preview-icon')
-	const content = _getById('preview-content')
+	const content = _getById('preview-content') //the wrapper
 
 	if (shouldCollapse !== undefined) {
 		_setCollapsed(shouldCollapse, el, content)
@@ -49,25 +51,25 @@ function togglePreview(shouldCollapse) {
 	_toggleCollapse(el, content)
 }
 
-function _toggleCollapse(el, content) {
+function _toggleCollapse(el: HTMLElement, wrapper: HTMLElement) {
 
 	if (el.classList.contains('fa-chevron-right')) {
 		//expand
-		_setCollapsed(false, el, content)
+		_setCollapsed(false, el, wrapper)
 		return
 	}
 
 	//collapse
-	_setCollapsed(true, el, content)
+	_setCollapsed(true, el, wrapper)
 }
 
-function _setCollapsed(shouldCollapsed, el, content) {
+function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLElement) {
 
 	if(shouldCollapsed) {
 		el.classList.remove('fa-chevron-down')
 		el.classList.add('fa-chevron-right')
 		// el.classList.replace( 'fa-chevron-down','fa-chevron-right')
-		content.style.display = 'none'
+		wrapper.style.display = 'none'
 		return
 	}
 
@@ -76,20 +78,20 @@ function _setCollapsed(shouldCollapsed, el, content) {
 
 	// el.classList.replace('fa-chevron-right', 'fa-chevron-down')
 
-	content.style.display = 'block'
+	wrapper.style.display = 'block'
 }
 
 /* --- read options --- */
 
 function setHasHeader() {
-	const el = _getById('has-header')
+	const el = _getById('has-header') as HTMLInputElement
 	const data = getData()
 
 	if (data.length === 0) {
 		return
 	}
 
-	const elWrite = _getById('has-header-write')
+	const elWrite = _getById('has-header-write') as HTMLInputElement
 
 	if (el.checked) {
 
@@ -98,7 +100,7 @@ function setHasHeader() {
 		//use header row from data
 		hot.updateSettings({
 			colHeaders: data[0].map((col, index) => defaultColHeaderFunc(index, col))
-		})
+		}, false)
 
 		headerRow = data[0]
 
@@ -111,8 +113,8 @@ function setHasHeader() {
 
 	//use default headers
 	hot.updateSettings({
-		colHeaders: defaultColHeaderFunc
-	})
+		colHeaders: defaultColHeaderFunc as any
+	}, false)
 
 	hot.alter('insert_row', 0)
 	hot.populateFromArray(0, 0, [headerRow])
@@ -120,12 +122,12 @@ function setHasHeader() {
 
 }
 function setDelimiterString() {
-	const el = _getById('delimiter-string')
+	const el = _getById('delimiter-string') as HTMLInputElement
 	csvReadOptions.delimiter = el.value
 
 }
 function setCommentString() {
-	const el = _getById('comment-string')
+	const el = _getById('comment-string')  as HTMLInputElement
 	csvReadOptions.comments = el.value === '' ? false : el.value
 }
 
@@ -141,8 +143,8 @@ function setSkipEmptyLines() {
  * sets the read delimiter programmatically
  * @param {string} delimiter 
  */
-function setReadDelimiter(delimiter) {
-	const el = _getById('delimiter-string')
+function setReadDelimiter(delimiter: string) {
+	const el = _getById('delimiter-string')  as HTMLInputElement
 	el.value = delimiter
 	csvReadOptions.delimiter = delimiter
 }
@@ -151,22 +153,22 @@ function setReadDelimiter(delimiter) {
 
 
 function setHasHeaderWrite() {
-	const el = _getById('has-header-write')
+	const el = _getById('has-header-write') as HTMLInputElement
 	csvWriteOptions.header = el.checked
 }
 
 function setDelimiterStringWrite() {
-	const el = _getById('delimiter-string-write')
+	const el = _getById('delimiter-string-write') as HTMLInputElement
 	csvWriteOptions.delimiter = el.value
 }
 
 function setCommentStringWrite() {
-	const el = _getById('comment-string-write')
+	const el = _getById('comment-string-write') as HTMLInputElement
 	csvWriteOptions.comments = el.value === '' ? false : el.value
 }
 
 function setNewLineWrite() {
-	const el = _getById('newline-select-write')
+	const el = _getById('newline-select-write') as HTMLInputElement
 
 	if (el.value === '') {
 		csvWriteOptions.newline = newLineFromInput
@@ -183,8 +185,8 @@ function setNewLineWrite() {
  * sets the write delimiter programmatically
  * @param {string} delimiter 
  */
-function setWriteDelimiter(delimiter) {
-	const el = _getById('delimiter-string-write')
+function setWriteDelimiter(delimiter: string) {
+	const el = _getById('delimiter-string-write') as HTMLInputElement
 	el.value = delimiter
 	csvWriteOptions.delimiter = delimiter
 }
@@ -197,7 +199,7 @@ function setWriteDelimiter(delimiter) {
  */
 function generateCsvPreview() {
 	const value = getDataAsCsv(csvWriteOptions)
-	const el = _getById('csv-preview')
+	const el = _getById('csv-preview') as HTMLTextAreaElement
 	el.value = value
 
 	//open preview
@@ -212,7 +214,7 @@ function generateCsvPreview() {
  * also sets the headerRow if we have more than 
  * @param {string[][]} data array with the rows or null to just destroy the old table
  */
-function displayData(data) {
+function displayData(data: string[][]) {
 
 	if (data === null) {
 		if (hot) {
@@ -231,14 +233,15 @@ function displayData(data) {
 		hot.destroy()
 	}
 
+	//@ts-ignore
 	hot = new Handsontable(container, {
 		data,
-		rowHeaders: function(row) {
+		rowHeaders: function(row: number) {
 			let text = (row+1).toString()
 			return `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
-		},
+		} as any,
 		fillHandle: false,
-		colHeaders: defaultColHeaderFunc,
+		colHeaders: defaultColHeaderFunc as any,
 		currentColClassName: 'foo',
 		currentRowClassName: 'foo',
 		//plugins
@@ -267,7 +270,8 @@ function displayData(data) {
 		},
 	})
 
-	Handsontable.dom.addEvent(window, 'resize', throttle(onResize, 200))
+	//@ts-ignore
+	Handsontable.dom.addEvent(window as any, 'resize', throttle(onResize, 200))
 
 	checkIfHasHeaderReadOptionIsAvailable()
 }
@@ -280,15 +284,27 @@ let allColSizes = []
  */
 function onResize() {
 	const widthString = getComputedStyle(csvEditorWrapper).width
+
+	if (!widthString) {
+		_error(`could not resize table, width string was null`)
+		return
+	}
+
 	const width = parseInt(widthString.substring(0, widthString.length-2))
 
 	const heightString = getComputedStyle(csvEditorWrapper).height
+
+	if (!heightString) {
+		_error(`could not resize table, height string was null`)
+		return
+	}
+
 	const height = parseInt(heightString.substring(0, heightString.length-2))
 
 	hot.updateSettings({
 		width: width,
 		height: height,
-	})
+	}, false)
 
 	//get all col sizes
 	allColSizes = []
@@ -301,11 +317,12 @@ function onResize() {
 }
 
 /**
- * 
+ * generates the default html wrapper code for the given column name
+ * we add a delete icon
  * @param {number} colIndex 
  * @param {string | undefined} colName 
  */
-function defaultColHeaderFunc(colIndex, colName) {
+function defaultColHeaderFunc(colIndex: number, colName: string | undefined) {
 	let text = getSpreadsheetColumnLabel(colIndex)
 	if (colName !== undefined) {
 		text = colName
@@ -313,7 +330,11 @@ function defaultColHeaderFunc(colIndex, colName) {
 	return `${text} <span class="remove-col clickable" onclick="removeColumn(${colIndex})"><i class="fas fa-trash"></i></span>`
 }
 
-function toggleHelpModal(isVisible) {
+/**
+ * displays or hides the help modal
+ * @param isVisible 
+ */
+function toggleHelpModal(isVisible: boolean) {
 	
 	if (isVisible) {
 		helModalDiv.classList.add('is-active')

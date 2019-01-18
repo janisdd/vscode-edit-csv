@@ -3,11 +3,11 @@
  * everything for communication or read / write
  */
 
- /**
-	* 
-	* @returns {string[][]} the current data in the handson table
-	*/
-function getData() {
+/**
+ * 
+ * @returns {string[][]} the current data in the handson table
+ */
+function getData(): string[][] {
 	//hot.getSourceData() returns the original data (e.g. not sorted...)
 	return hot.getData()
 }
@@ -18,7 +18,7 @@ function getData() {
  * @param {any} csvWriteOptions 
  * @returns {string} 
  */
-function getDataAsCsv(csvWriteOptions) {
+function getDataAsCsv(csvWriteOptions: CsvWriteOptions): string {
 	const data = getData()
 
 	if (csvWriteOptions.newline === '') {
@@ -28,16 +28,19 @@ function getDataAsCsv(csvWriteOptions) {
 	if (csvWriteOptions.header) {
 
 		//write the header...
+
+		const colHeaderCells = hot.getColHeader() as string[]
+		//@ts-ignore
 		if (hot.getSettings().colHeaders === defaultColHeaderFunc) {
 			//default headers... because the actual header string is html we need to generate the string only column headers
-			data.unshift(hot.getColHeader().map((p, index) => getSpreadsheetColumnLabel(index)))
+			data.unshift(colHeaderCells.map((p: string, index: number) => getSpreadsheetColumnLabel(index)))
 		}
 		else {
-			data.unshift(hot.getColHeader())
+			data.unshift(colHeaderCells)
 		}
 	}
-	
-	
+
+
 	let dataAsString = csv.unparse(data, csvWriteOptions)
 
 	if (csvWriteOptions.comments) {
@@ -45,11 +48,11 @@ function getDataAsCsv(csvWriteOptions) {
 		if (commentLinesBefore.length > 0) {
 			dataAsString = commentLinesBefore.map(p => csvWriteOptions.comments + p).join(csvWriteOptions.newline) + csvWriteOptions.newline + dataAsString
 		}
-		
+
 		if (commentLinesAfter.length > 0) {
 			dataAsString = dataAsString + csvWriteOptions.newline + commentLinesAfter.map(p => csvWriteOptions.comments + p).join(csvWriteOptions.newline)
 		}
-		
+
 	}
 
 	return dataAsString
@@ -64,9 +67,12 @@ function getDataAsCsv(csvWriteOptions) {
  * @param {string} content 
  * @returns {string[][] | null}
  */
-function parseCsv(content, csvReadOptions) {
+function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] | null {
 
-	const parseResult = csv.parse(content, csvReadOptions)
+	const parseResult = csv.parse(content, {
+		...csvReadOptions,
+		comments: csvReadOptions.comments === false ? '' : csvReadOptions.comments,
+	})
 
 	if (parseResult.errors.length > 0) {
 		for (let i = 0; i < parseResult.errors.length; i++) {
@@ -121,17 +127,25 @@ function parseCsv(content, csvReadOptions) {
 
 /* --- messages back to vs code --- */
 
-function postVsError(text) {
-	
-	if (!vscode) return
+/**
+ * called to display the given text in vs code 
+ * @param text 
+ */
+function postVsError(text: string) {
 
+	if (!vscode) return
+	
 	vscode.postMessage({
 		command: 'error',
 		content: text
 	})
 }
 
-function postOverwriteFile(csvContent) {
+/**
+ * called to save the current edit state back to the file
+ * @param csvContent 
+ */
+function postOverwriteFile(csvContent: string) {
 
 	if (!vscode) return
 
@@ -139,4 +153,32 @@ function postOverwriteFile(csvContent) {
 		command: 'overwrite',
 		csvContent
 	})
+}
+
+function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
+	const message = event.data
+
+	console.log('received message: ', message);
+	
+
+	switch (message.command) {
+
+		case 'csvUpdate': {
+
+			initialContent = message.csvContent
+			readDataAgain(initialContent, csvReadOptions)
+			
+			break
+		}
+
+		case 'message': {
+
+			break
+		}
+		default: {
+			_error('received unknown message from vs code')
+			break
+		}
+	}
+
 }

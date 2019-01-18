@@ -1,39 +1,34 @@
 
+/**
+ * returns the html element with the given id
+ * if not found throws and returns null
+ * @param id 
+ */
+function _getById(id: string): HTMLElement {
+	const el = document.getElementById(id)
 
-//partly from handsontable data.js
-const COLUMN_LABEL_BASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const COLUMN_LABEL_BASE_LENGTH = COLUMN_LABEL_BASE.length;
+	if (!el) {
+		_error(`could not find element with id '${id}'`)
+		return null as any
+	}
+
+	return el
+}
 
 /**
  * generates column labels: column 1, column 2, ....
- * 
- * OLD: Generates spreadsheet-like column names: A, B, C, ..., Z, AA, AB, etc.
- *
- * @param {Number} index Column index (0 based)
- * @returns {String}
+ * @param index 0 based
  */
-function getSpreadsheetColumnLabel(index) {
-	let dividend = index + 1;
-	let columnLabel = '';
-	let modulo;
-
-	// while (dividend > 0) {
-	//   modulo = (dividend - 1) % COLUMN_LABEL_BASE_LENGTH;
-	//   columnLabel = String.fromCharCode(65 + modulo) + columnLabel;
-	//   dividend = parseInt((dividend - modulo) / COLUMN_LABEL_BASE_LENGTH, 10);
-	// }
-
+function getSpreadsheetColumnLabel(index: number) {
 	return `column ${index}`
-
-	// return columnLabel;
 }
 
 
 /**
  * removes a row by index
- * @param {number} index 
+ * @param {number} index 0 based
  */
-function removeRow(index) {
+function removeRow(index: number) {
 	hot.alter('remove_row', index)
 	checkIfHasHeaderReadOptionIsAvailable()
 }
@@ -42,7 +37,7 @@ function removeRow(index) {
  * removes a column by index
  * @param {number} index 
  */
-function removeColumn(index) {
+function removeColumn(index: number) {
 	hot.alter('remove_col', index)
 
 	//we could get 0 cols...
@@ -88,7 +83,7 @@ function addColumn() {
  * @param {*} options the option to take the value from
  * @param {*} optionName the option name
  */
-function _setOption(targetOptions, options, optionName) {
+function _setOption<T>(targetOptions: T, options: T, optionName: keyof T) {
 
 	if (options.hasOwnProperty(optionName)) {
 
@@ -108,22 +103,16 @@ function _setOption(targetOptions, options, optionName) {
  * also updates the ui to display the new options
  * @param {*} options 
  */
-function setCsvReadOptionsInitial(options) {
+function setCsvReadOptionsInitial(options: CsvReadOptions) {
 
-	const keys = [
-		'comments',
-		'delimiter',
-		'quoteChar',
-		'skipEmptyLines',
-		'_hasHeader',
-	]
+	const keys = Object.keys(csvReadOptions)
 
 	for (const key of keys) {
-		_setOption(csvReadOptions, options, key)
+		_setOption(csvReadOptions, options, key as keyof CsvReadOptions)
 	}
 
 	//set ui from (maybe updated) options
-	const el1 = _getById('delimiter-string')
+	const el1 = _getById('delimiter-string') as HTMLInputElement
 	el1.value = csvReadOptions.delimiter
 
 
@@ -134,13 +123,11 @@ function setCsvReadOptionsInitial(options) {
 	// 	el2.checked = csvReadOptions.skipEmptyLines
 	// }
 
-
-	const el3 = _getById('has-header')
+	const el3 = _getById('has-header') as HTMLInputElement
 	el3.checked = csvReadOptions._hasHeader
 
-	const el4 = _getById('comment-string')
-	el4.value = csvReadOptions.comments
-
+	const el4 = _getById('comment-string') as HTMLInputElement
+	el4.value = csvReadOptions.comments === false ? '' : csvReadOptions.comments
 }
 
 /**
@@ -148,28 +135,23 @@ function setCsvReadOptionsInitial(options) {
  * also updates the ui to display the new options
  * @param {*} options 
  */
-function setCsvWriteOptionsInitial(options) {
+function setCsvWriteOptionsInitial(options: CsvWriteOptions) {
 
-	const keys = [
-		'comments',
-		'delimiter',
-		'quoteChar',
-		'header',
-	]
+	const keys = Object.keys(csvWriteOptions)
 
 	for (const key of keys) {
-		_setOption(csvWriteOptions, options, key)
+		_setOption(csvWriteOptions, options, key as keyof CsvWriteOptions)
 	}
 
 	//set ui from (maybe updated) options
-	const el1 = _getById('has-header-write')
+	const el1 = _getById('has-header-write') as HTMLInputElement
 	el1.checked = csvWriteOptions.header
 
-	const el2 = _getById('delimiter-string-write')
+	const el2 = _getById('delimiter-string-write') as HTMLInputElement
 	el2.value = csvWriteOptions.delimiter
 
-	const el3 = _getById('comment-string-write')
-	el3.value = csvWriteOptions.comments
+	const el3 = _getById('comment-string-write') as HTMLInputElement
+	el3.value = csvWriteOptions.comments === false ? '' : csvWriteOptions.comments
 }
 
 
@@ -177,9 +159,11 @@ function setCsvWriteOptionsInitial(options) {
  * parses and displays the given data (csv)
  * @param {string} content 
  */
-function readDataAgain(content, csvReadOptions) {
-	const _data = parseCsv(content, csvReadOptions)
+function readDataAgain(content: string, csvReadOptions: CsvReadOptions) {
+	const _data = parseCsv(content, csvReadOptions) as string[][]
 	displayData(_data)
+	//might be bigger than the current view
+	onResize()
 }
 
 
@@ -198,43 +182,42 @@ function checkIfHasHeaderReadOptionIsAvailable() {
 	if (canSetOption) {
 		el.removeAttribute('disabled')
 	} else {
-		el.setAttribute('disabled','')
+		el.setAttribute('disabled', '')
 	}
 }
 
 //from https://stackoverflow.com/questions/27078285/simple-throttle-in-js ... from underscore
-function throttle(func, wait, options) {
-  var context, args, result;
-  var timeout = null;
-  var previous = 0;
-  if (!options) options = {};
-  var later = function() {
-    previous = Date.now();
-    timeout = null;
-    result = func.apply(context, args);
-    if (!timeout) context = args = null;
-  };
-  return function() {
-    var now = Date.now();
-    var remaining = wait - (now - previous);
-    context = this;
-    args = arguments;
-    if (remaining <= 0 || remaining > wait) {
-      if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-      previous = now;
-      result = func.apply(context, args);
-      if (!timeout) context = args = null;
-    } else if (!timeout) {
-      timeout = setTimeout(later, remaining);
-    }
-    return result
-  }
+function throttle(func: Function, wait: number) {
+	var context: any, args: any, result: any;
+	var timeout: any = null;
+	var previous = 0;
+	var later = function () {
+		previous = Date.now();
+		timeout = null;
+		result = func.apply(context, args);
+		if (!timeout) context = args = null;
+	};
+	return function (this: any) {
+		var now = Date.now();
+		var remaining = wait - (now - previous);
+		context = this;
+		args = arguments;
+		if (remaining <= 0 || remaining > wait) {
+			if (timeout) {
+				clearTimeout(timeout);
+				timeout = null;
+			}
+			previous = now;
+			result = func.apply(context, args);
+			if (!timeout) context = args = null;
+		} else if (!timeout) {
+			timeout = setTimeout(later, remaining);
+		}
+		return result
+	}
 }
 
-function _error(text) {
+function _error(text: string) {
 	postVsError(text)
 	throw new Error(text)
 }

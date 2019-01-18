@@ -19,6 +19,15 @@ body.vscode-dark {
 	color: #d0d0d0;
 }
 
+.vscode-dark .button.is-outlined {
+	background-color: #404040;
+	color: #d0d0d0;
+}
+.vscode-dark .button.is-outlined:hover {
+	background-color: #d0d0d0;
+	color: #404040;
+}
+
 .vscode-dark .select select {
 	border-color: #8e8e8e;
 	background-color: #404040;

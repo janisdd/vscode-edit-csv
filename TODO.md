@@ -13,8 +13,3 @@ retainContextWhenHidden
 store collapse states
 https://code.visualstudio.com/api/extension-guides/webview
 
-
-//	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource:; script-src vscode-resource:; style-src vscode-resource:;">
-
-
-- make typescript...
