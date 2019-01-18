@@ -250,6 +250,21 @@ function displayData(data) {
 		columnSorting: true,
 
 		outsideClickDeselects: false, //keep selection
+		//TODO see https://github.com/handsontable/handsontable/issues/3328
+		//only working because first argument is actually the old size
+		beforeColumnResize: function(oldSize, newSize, isDoubleClick) { //after change but before render
+			
+			if (allColSizes.length > 0 && isDoubleClick) {
+				// const oldSize = allColSizes[currentColumn]
+
+				if (oldSize === newSize) {
+					//e.g. we have a large column and the auto size is too large...
+					if (miscOptions.doubleClickMinColWidth) {
+						return miscOptions.doubleClickMinColWidth
+					}
+				}
+			}
+		},
 	})
 
 	Handsontable.dom.addEvent(window, 'resize', throttle(onResize, 200))
@@ -257,6 +272,9 @@ function displayData(data) {
 	checkIfHasHeaderReadOptionIsAvailable()
 }
 
+//not needed really now because of bug in handson table, see https://github.com/handsontable/handsontable/issues/3328
+//just used to check if we have columns
+let allColSizes = []
 /**
  * updates the handson table to fill available space (will trigger scrollbars)
  */
@@ -271,6 +289,15 @@ function onResize() {
 		width: width,
 		height: height,
 	})
+
+	//get all col sizes
+	allColSizes = []
+	for (let i = 0; i < hot.countCols(); i++) {
+		allColSizes.push(hot.getColWidth(i))
+	}
+	// console.log(allColSizes);
+	
+
 }
 
 /**

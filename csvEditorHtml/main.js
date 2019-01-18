@@ -8,6 +8,8 @@ const csv = window.Papa
 //handsontable instance
 let hot
 
+let lastDoubleClickedColumnWidthBefore = null
+
 /**
  * stores the header row after initial parse...
  * if we have header rows in data (checked) we set this to the header row
@@ -16,6 +18,15 @@ let hot
  * {string[] | null}
  */
 let headerRow = null
+
+let miscOptions = {
+	//then we double click on the resize handle auto size is used...
+	//if we have a large column and double click on that we want to shrink it to this value...
+	//use falsy value to not change the column size
+	//double click again will use auto size
+	doubleClickMinColWidth: 200
+}
+
 
 //csv reader options + some ui options
 let csvReadOptions = {
