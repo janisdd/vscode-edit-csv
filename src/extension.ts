@@ -47,8 +47,6 @@ export function activate(context: vscode.ExtensionContext) {
 			retainContextWhenHidden: true
 		})
 
-		panel.onDidDispose(() => {
-		}, null, context.subscriptions)
 
 		panel.webview.onDidReceiveMessage((message) => {
 
@@ -70,12 +68,18 @@ export function activate(context: vscode.ExtensionContext) {
 
 		}, undefined, context.subscriptions)
 
+		panel.onDidDispose(() => {
+			delete InstanceManager[uri.toString()]
+		}, null, context.subscriptions)
+
+
 		panel.webview.html = createHtml(context, initialText)
 
 		InstanceManager[uri.toString()] = {
 			panel,
 			uri
 		}
+
 
 	})
 
@@ -95,7 +99,19 @@ export function activate(context: vscode.ExtensionContext) {
 
 				//update
 				console.log('update');
-				if (!vscode.window.activeTextEditor) return
+
+				if (!vscode.window.activeTextEditor) {
+
+					vscode.workspace.openTextDocument(instance.uri)
+					.then((document) => {
+	
+						const newContent = document.getText()
+						instance.panel.webview.html = createHtml(context, newContent)
+
+					})
+
+					return
+				}
 
 				const newContent = vscode.window.activeTextEditor.document.getText()
 
@@ -112,6 +128,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 	vscode.workspace.onDidChangeTextDocument(debounce((args: vscode.TextDocumentChangeEvent) => {
 
+		//see https://github.com/Microsoft/vscode/issues/50344
+		//when dirty flag changes this is called
+		if (args.contentChanges.length === 0) {
+			return
+		}
+
 		if (!isCsvFile(args.document)) return
 
 		const instance = InstanceManager[args.document.uri .toString()]
@@ -119,6 +141,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 		const cop = args
 
+		
+		console.log('change: ' + args.contentChanges[0].text);
+		
 		askRefresh(instance)
 
 	}, debounceDocumentChangeInMs));
@@ -132,13 +157,24 @@ export function activate(context: vscode.ExtensionContext) {
 		const instance = InstanceManager[args.document.uri .toString()]
 		if (!instance) return
 
+		console.log('save');
 		askRefresh(instance)
 
 	}, debounceDocumentChangeInMs))
 
+	vscode.workspace.onDidCloseTextDocument((args) => {
+		
+		const instance = InstanceManager[args.uri .toString()]
+		if (!instance) return
+
+		instance.panel.dispose()
+	})
+
 	vscode.workspace.onDidChangeConfiguration((args) => {
 		//not needed because this changes only initial configuration...
 	})
+
+
 
 
 	context.subscriptions.push(editCsvCommand)

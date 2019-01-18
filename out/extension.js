@@ -26,8 +26,6 @@ function activate(context) {
             enableScripts: true,
             retainContextWhenHidden: true
         });
-        panel.onDidDispose(() => {
-        }, null, context.subscriptions);
         panel.webview.onDidReceiveMessage((message) => {
             switch (message.command) {
                 case "error": {
@@ -43,6 +41,9 @@ function activate(context) {
                 }
             }
         }, undefined, context.subscriptions);
+        panel.onDidDispose(() => {
+            delete InstanceManager[uri.toString()];
+        }, null, context.subscriptions);
         panel.webview.html = createHtml(context, initialText);
         InstanceManager[uri.toString()] = {
             panel,
@@ -62,8 +63,14 @@ function activate(context) {
                 return;
             //update
             console.log('update');
-            if (!vscode.window.activeTextEditor)
+            if (!vscode.window.activeTextEditor) {
+                vscode.workspace.openTextDocument(instance.uri)
+                    .then((document) => {
+                    const newContent = document.getText();
+                    instance.panel.webview.html = createHtml(context, newContent);
+                });
                 return;
+            }
             const newContent = vscode.window.activeTextEditor.document.getText();
             //see https://github.com/Microsoft/vscode/issues/47534
             // const msg = {
@@ -75,12 +82,18 @@ function activate(context) {
         });
     };
     vscode.workspace.onDidChangeTextDocument(debounce((args) => {
+        //see https://github.com/Microsoft/vscode/issues/50344
+        //when dirty flag changes this is called
+        if (args.contentChanges.length === 0) {
+            return;
+        }
         if (!isCsvFile(args.document))
             return;
         const instance = InstanceManager[args.document.uri.toString()];
         if (!instance)
             return;
         const cop = args;
+        console.log('change: ' + args.contentChanges[0].text);
         askRefresh(instance);
     }, debounceDocumentChangeInMs));
     vscode.workspace.onDidSaveTextDocument(debounce((args) => {
@@ -91,8 +104,15 @@ function activate(context) {
         const instance = InstanceManager[args.document.uri.toString()];
         if (!instance)
             return;
+        console.log('save');
         askRefresh(instance);
     }, debounceDocumentChangeInMs));
+    vscode.workspace.onDidCloseTextDocument((args) => {
+        const instance = InstanceManager[args.uri.toString()];
+        if (!instance)
+            return;
+        instance.panel.dispose();
+    });
     vscode.workspace.onDidChangeConfiguration((args) => {
         //not needed because this changes only initial configuration...
     });

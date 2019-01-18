@@ -160,6 +160,8 @@ function setCsvWriteOptionsInitial(options: CsvWriteOptions) {
  * @param {string} content 
  */
 function readDataAgain(content: string, csvReadOptions: CsvReadOptions) {
+	console.log('read data again: ' + content);
+	
 	const _data = parseCsv(content, csvReadOptions) as string[][]
 	displayData(_data)
 	//might be bigger than the current view
