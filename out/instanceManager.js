@@ -42,7 +42,11 @@ class InstanceManager {
             return null;
         return instance;
     }
-    getActiveEditor() {
+    hasActiveEditorInstance() {
+        const activeInstances = this.getAllInstances().filter(p => p.panel.active);
+        return activeInstances.length > 0; // or === 1 ?
+    }
+    getActiveEditorInstance() {
         const activeInstances = this.getAllInstances().filter(p => p.panel.active);
         if (activeInstances.length === 0) {
             throw new Error('no active editor found');

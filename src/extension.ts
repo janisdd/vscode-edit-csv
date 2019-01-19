@@ -31,24 +31,19 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showInformationMessage("Open a csv editor first to show the source csv file")
 			return
 		}
-		let instance: Instance 
-		try {
-			instance = instanceManager.getActiveEditor()
-		} catch (error) {
-			vscode.window.showErrorMessage(`Could not find the source file for the editor (no instance found), error: ${error.message}`)
-			return
-		}
-		vscode.workspace.openTextDocument(instance.sourceUri)
-			.then(document => {
-				
-				vscode.window.showTextDocument(document)
-			})
 
+		openSourceFileFunc()
 	})
 
 	const editCsvCommand = vscode.commands.registerCommand('edit-csv.edit', (url) => {
 
-		if (!vscode.window.activeTextEditor || isCsvFile(vscode.window.activeTextEditor.document) === false) {
+		if (!vscode.window.activeTextEditor && instanceManager.hasActiveEditorInstance()) {
+			//open source file ... probably better for usability when we use recently used
+			openSourceFileFunc()
+			return
+		}
+
+		if (!vscode.window.activeTextEditor || !isCsvFile(vscode.window.activeTextEditor.document)) {
 			vscode.window.showInformationMessage("Open a csv file first to show the csv editor")
 			return
 		}
@@ -72,6 +67,24 @@ export function activate(context: vscode.ExtensionContext) {
 		//we have no old editor -> create new one
 		createNewEditorInstance(context, vscode.window.activeTextEditor, instanceManager)
 	})
+
+
+	const openSourceFileFunc = () => {
+
+		let instance: Instance
+		try {
+			instance = instanceManager.getActiveEditorInstance()
+		} catch (error) {
+			vscode.window.showErrorMessage(`Could not find the source file for the editor (no instance found), error: ${error.message}`)
+			return
+		}
+		vscode.workspace.openTextDocument(instance.sourceUri)
+			.then(document => {
+
+				vscode.window.showTextDocument(document)
+			})
+
+	}
 
 	const askRefresh = function (instance: Instance) {
 		const options = ['Yes', 'No']
@@ -182,7 +195,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	const initialText = activeTextEditor.document.getText()
 
 	const title = `CSV edit ${activeTextEditor.document.fileName}`
-	
+
 	let panel = vscode.window.createWebviewPanel('csv-editor', title, getCurrentViewColumn(), {
 		enableFindWidget: true,
 		enableCommandUris: true,

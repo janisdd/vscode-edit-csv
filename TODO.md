@@ -1,29 +1,22 @@
 # TODO
 
 
-- ask if source file changed... changes are lost
 
-- shortcut for preview?
-- shortcut to save ?
 
 --- add
 
-- only allow for ...
-https://github.com/jjuback/gc-excelviewer/pull/89/files
-in package (should be same as isCsvFile func)
+- ask if source file changed... changes are lost
 
-
-- not open editor for same file... find old instance...
 - can uri change? other file opened or saved?
-
-
-- edit cmd auf editor --> show original file
-
-
-- clear command --> delete all instances
-
 
 ## Maybe
 
 store collapse states
 https://code.visualstudio.com/api/extension-guides/webview
+
+
+- starting with goto command not working
+
+- goto source, resourceScheme == csv-edit ... not displayed
+
+- clear command --> delete all instances ?

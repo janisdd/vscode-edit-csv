@@ -22,21 +22,15 @@ function activate(context) {
             vscode.window.showInformationMessage("Open a csv editor first to show the source csv file");
             return;
         }
-        let instance;
-        try {
-            instance = instanceManager.getActiveEditor();
-        }
-        catch (error) {
-            vscode.window.showErrorMessage(`Could not find the source file for the editor (no instance found), error: ${error.message}`);
-            return;
-        }
-        vscode.workspace.openTextDocument(instance.sourceUri)
-            .then(document => {
-            vscode.window.showTextDocument(document);
-        });
+        openSourceFileFunc();
     });
     const editCsvCommand = vscode.commands.registerCommand('edit-csv.edit', (url) => {
-        if (!vscode.window.activeTextEditor || util_1.isCsvFile(vscode.window.activeTextEditor.document) === false) {
+        if (!vscode.window.activeTextEditor && instanceManager.hasActiveEditorInstance()) {
+            //open source file ... probably better for usability when we use recently used
+            openSourceFileFunc();
+            return;
+        }
+        if (!vscode.window.activeTextEditor || !util_1.isCsvFile(vscode.window.activeTextEditor.document)) {
             vscode.window.showInformationMessage("Open a csv file first to show the csv editor");
             return;
         }
@@ -56,6 +50,20 @@ function activate(context) {
         //we have no old editor -> create new one
         createNewEditorInstance(context, vscode.window.activeTextEditor, instanceManager);
     });
+    const openSourceFileFunc = () => {
+        let instance;
+        try {
+            instance = instanceManager.getActiveEditorInstance();
+        }
+        catch (error) {
+            vscode.window.showErrorMessage(`Could not find the source file for the editor (no instance found), error: ${error.message}`);
+            return;
+        }
+        vscode.workspace.openTextDocument(instance.sourceUri)
+            .then(document => {
+            vscode.window.showTextDocument(document);
+        });
+    };
     const askRefresh = function (instance) {
         const options = ['Yes', 'No'];
         vscode.window.showInformationMessage('The source file changed or was saved. Would you like to overwrite your csv edits with the new content?', {

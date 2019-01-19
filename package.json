@@ -14,7 +14,8 @@
 		"CSV"
 	],
 	"activationEvents": [
-		"onCommand:edit-csv.edit"
+		"onCommand:edit-csv.edit",
+		"onCommand:edit-csv.goto-source"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -75,6 +76,65 @@
 				},
 				{
 					"when": "resourceLangId == 'CSV (semicolon)'",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				}
+			],
+			"editor/title": [
+				{
+					"when": "editorLangId == csv && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == tsv && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == CSV && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == TSV && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'CSV (semicolon)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceScheme == csv-edit",
+					"command": "edit-csv.goto-source",
+					"group": "navigation"
+				}
+			],
+			"editor/title/context": [
+				{
+					"when": "resourceLangId == csv && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == tsv && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == CSV && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == TSV && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'CSV (semicolon)' && resourceScheme != csv-edit",
 					"command": "edit-csv.edit",
 					"group": "navigation"
 				}

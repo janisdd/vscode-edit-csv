@@ -79,7 +79,12 @@ export class InstanceManager {
 		return instance
 	}
 
-	public getActiveEditor(): Instance {
+	public hasActiveEditorInstance(): boolean {
+		const activeInstances = this.getAllInstances().filter(p => p.panel.active)
+		return activeInstances.length > 0 // or === 1 ?
+	}
+
+	public getActiveEditorInstance(): Instance {
 		const activeInstances = this.getAllInstances().filter(p => p.panel.active)
 
 		if (activeInstances.length === 0) {
