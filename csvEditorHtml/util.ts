@@ -159,9 +159,7 @@ function setCsvWriteOptionsInitial(options: CsvWriteOptions) {
  * parses and displays the given data (csv)
  * @param {string} content 
  */
-function readDataAgain(content: string, csvReadOptions: CsvReadOptions) {
-	console.log('read data again: ' + content);
-	
+function readDataAgain(content: string, csvReadOptions: CsvReadOptions) {	
 	const _data = parseCsv(content, csvReadOptions) as string[][]
 	displayData(_data)
 	//might be bigger than the current view

@@ -1,7 +1,7 @@
 
 html, body {
 	height: 100%;
-	/* background-color:black; */
+	background-color:rgb(19, 23, 87);
 }
 
 .page {
@@ -135,11 +135,7 @@ input.input {
 /* from https://gist.github.com/jeromyanglim/3952143 */
 /*usage:  <div className="keys">A</div> */
 .keys {
-  white-space: nowrap;
-  color: #000;
   background: #eee;
-  border-style: solid;
-  border-color: #ccc #aaa #888 #bbb;
   padding: 2px 6px;
   -moz-border-radius: 4px;
   -webkit-border-radius: 4px;

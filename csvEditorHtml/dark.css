@@ -51,6 +51,28 @@ body.vscode-dark {
 	background-color: #00a78e;
 }
 
+.vscode-dark .title {
+	color: #d0d0d0;
+}
+
+.vscode-dark .box {
+	background-color: #404040;
+	color: #d0d0d0;
+}
+
+.vscode-dark .keys {
+	color: #d0d0d0;
+	background: #404040;
+	border-color: #ccc #aaa #888 #bbb;
+	-moz-box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px #888 inset;
+  -webkit-box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px #888 inset;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px #888 inset;
+}
+
+.vscode-dark a:hover {
+	color: #9a9a9a;
+}
+
 /* handson table styles */
 
 .vscode-dark .ht_master,

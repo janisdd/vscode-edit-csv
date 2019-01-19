@@ -69,11 +69,18 @@ function getDataAsCsv(csvWriteOptions: CsvWriteOptions): string {
  */
 function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] | null {
 
+
+	if (content === '') {
+		content = defaultCsvContentIfEmpty
+	}
+
 	const parseResult = csv.parse(content, {
 		...csvReadOptions,
 		comments: csvReadOptions.comments === false ? '' : csvReadOptions.comments,
 	})
+	
 
+	//we allow empty content for newly created files
 	if (parseResult.errors.length > 0) {
 		for (let i = 0; i < parseResult.errors.length; i++) {
 			const error = parseResult.errors[i];
@@ -88,6 +95,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] |
 
 		return null
 	}
+
 	csvWriteOptions.delimiter = parseResult.meta.delimiter
 	newLineFromInput = parseResult.meta.linebreak
 
@@ -157,9 +165,6 @@ function postOverwriteFile(csvContent: string) {
 
 function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 	const message = event.data
-
-	console.log('received message: ', message);
-	
 
 	switch (message.command) {
 

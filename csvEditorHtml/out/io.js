@@ -28,6 +28,9 @@ function getDataAsCsv(csvWriteOptions) {
     return dataAsString;
 }
 function parseCsv(content, csvReadOptions) {
+    if (content === '') {
+        content = defaultCsvContentIfEmpty;
+    }
     const parseResult = csv.parse(content, Object.assign({}, csvReadOptions, { comments: csvReadOptions.comments === false ? '' : csvReadOptions.comments }));
     if (parseResult.errors.length > 0) {
         for (let i = 0; i < parseResult.errors.length; i++) {
@@ -87,7 +90,6 @@ function postOverwriteFile(csvContent) {
 }
 function handleVsCodeMessage(event) {
     const message = event.data;
-    console.log('received message: ', message);
     switch (message.command) {
         case 'csvUpdate': {
             initialContent = message.csvContent;

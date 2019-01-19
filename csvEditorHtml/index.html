@@ -14,7 +14,7 @@
 	<link rel="stylesheet" href="./light.css">
 	<link rel="stylesheet" href="./high_contrast.css">
 </head>
-<body class="vscode-light"> 
+<body class="vscode-high-contrast"> 
 
 	<div class="page full-h">
 
@@ -32,10 +32,10 @@
 									<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked" onchange="setHasHeader()">
 									<label for="has-header">
 										<span>Has header</span>
-										<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="The first row is used as header. Note that changing this option will also change the write header option.">
-												<i class="fas fa-question-circle"></i>
-										</span>
 									</label>
+									<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="The first row is used as header. Note that changing this option will also change the write header option.">
+										<i class="fas fa-question-circle"></i>
+								</span>
 								</div>
 
 						<!-- this makes the row data invalid if we have more than 1 col-->
@@ -94,10 +94,10 @@
 							<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded" checked="checked" onchange="setHasHeaderWrite()">
 							<label for="has-header-write">
 								<span>Write header</span>
-								<span class="tooltip is-tooltip-bottom" data-tooltip="Checked: writes the header row, unchecked: not">
-										<i class="fas fa-question-circle"></i>
-								</span>
 							</label>
+							<span class="tooltip is-tooltip-bottom" data-tooltip="Checked: writes the header row, unchecked: not">
+								<i class="fas fa-question-circle"></i>
+						</span>
 						</div>
 				
 						<div class="flexed">

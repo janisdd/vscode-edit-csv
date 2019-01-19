@@ -5,7 +5,7 @@ if (typeof acquireVsCodeApi !== 'undefined') {
 }
 const csv = window.Papa;
 let hot;
-let lastDoubleClickedColumnWidthBefore = null;
+const defaultCsvContentIfEmpty = ',';
 let headerRow = null;
 let miscOptions = {
     doubleClickMinColWidth: 200
@@ -35,7 +35,10 @@ const csvEditorDiv = _getById('csv-editor');
 const helModalDiv = _getById('help-modal');
 setCsvReadOptionsInitial(csvReadOptions);
 setCsvWriteOptionsInitial(csvWriteOptions);
-if (typeof initialContent === 'undefined' || initialContent === undefined) {
+if (typeof initialContent === 'undefined') {
+    var initialContent = '';
+}
+if (initialContent === undefined) {
     initialContent = '';
 }
 console.log("initialContent: " + initialContent);

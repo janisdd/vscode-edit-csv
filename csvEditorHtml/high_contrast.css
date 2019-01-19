@@ -15,6 +15,32 @@ body.vscode-high-contrast {
 	color: black;
 }
 
+.vscode-high-contrast .title {
+	color: white;
+}
+
+.vscode-high-contrast .box {
+	background-color: black;
+	color: white;
+}
+
+.vscode-high-contrast .keys {
+	color: white;
+	background: #404040;
+	border-color: #ccc #aaa #888 #bbb;
+	-moz-box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px #888 inset;
+  -webkit-box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px #888 inset;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px #888 inset;
+}
+
+.vscode-high-contrast a {
+	color: #f9f500;
+}
+
+.vscode-high-contrast a:hover {
+	color: red;
+}
+
 * handson table styles */
 
 .vscode-high-contrast .ht_master,

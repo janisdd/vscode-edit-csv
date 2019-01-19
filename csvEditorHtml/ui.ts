@@ -311,8 +311,6 @@ function onResize() {
 	for (let i = 0; i < hot.countCols(); i++) {
 		allColSizes.push(hot.getColWidth(i))
 	}
-	// console.log(allColSizes);
-	
 
 }
 

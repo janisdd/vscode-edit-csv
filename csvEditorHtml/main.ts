@@ -1,6 +1,6 @@
 
 declare var acquireVsCodeApi: any
-declare var initialContent: string | undefined
+declare var initialContent: string
 
 let vscode: VsExtension | undefined  = undefined 
 
@@ -12,7 +12,11 @@ const csv: typeof import('papaparse') = (window as any).Papa
 //handsontable instance
 let hot: import('../node_modules/handsontable/handsontable')
 
-let lastDoubleClickedColumnWidthBefore = null
+/**
+ * the default csv content to used if we get empty content
+ * handson table will throw if we pass in a 1D array because it expects an object?
+ */
+const defaultCsvContentIfEmpty = ','
 
 /**
  * TODO check
@@ -66,7 +70,11 @@ const helModalDiv = _getById('help-modal')
 setCsvReadOptionsInitial(csvReadOptions)
 setCsvWriteOptionsInitial(csvWriteOptions)
 
-if (typeof initialContent === 'undefined' || initialContent === undefined) {
+if (typeof initialContent === 'undefined') {
+	var initialContent = ''
+}
+
+if (initialContent === undefined) {
 	initialContent = ''
 }
 
