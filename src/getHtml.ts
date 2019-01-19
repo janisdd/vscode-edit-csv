@@ -1,21 +1,63 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<link rel="stylesheet" href="../node_modules/handsontable/dist/handsontable.min.css">
-	<script src="../node_modules/handsontable/dist/handsontable.js"></script>
-	<script src="../node_modules/papaparse/papaparse.min.js"></script>
+import * as vscode from 'vscode';
+import * as path from 'path';
 
-	<link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+/**
+ * returns a local file path relative to the extension root dir
+ * @param filePath 
+ */
+export function getResourcePath(context: vscode.ExtensionContext, filePath: string): string {
+	return `vscode-resource:${path.join(context.extensionPath, filePath)}`
+}
 
-	<link rel="stylesheet" href="../node_modules/bulma/css/bulma.min.css">
-	<link rel="stylesheet" href="../node_modules/bulma-extensions/dist/css/bulma-extensions.min.css">
-	<link rel="stylesheet" href="./main.css">
-	<link rel="stylesheet" href="./dark.css">
-	<link rel="stylesheet" href="./light.css">
-	<link rel="stylesheet" href="./high_contrast.css">
-</head>
-<body class="vscode-dark"> 
+/**
+ * creates the html for the csv editor
+ * @param context 
+ * @param initialContent 
+ */
+export function createEditorHtml(context: vscode.ExtensionContext, initialContent: string): string {
 
+	const _getResourcePath = getResourcePath.bind(undefined, context)
+
+	let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.css')
+	let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js')
+	let papaparseJs = _getResourcePath('node_modules/papaparse/papaparse.js')
+	let fontAwesomeCss = _getResourcePath('node_modules/@fortawesome/fontawesome-free/css/all.css')
+	let bulmaCss = _getResourcePath('node_modules/bulma/css/bulma.min.css')
+	let bulmaExtensionCss = _getResourcePath('node_modules/bulma-extensions/dist/css/bulma-extensions.min.css')
+
+	const mainCss = _getResourcePath('csvEditorHtml/main.css')
+	const darkThemeCss = _getResourcePath('csvEditorHtml/dark.css')
+	const lightThemeCss = _getResourcePath('csvEditorHtml/light.css')
+	const hightContrastThemeCss = _getResourcePath('csvEditorHtml/high_contrast.css')
+
+	//scripts
+	const ioJs = _getResourcePath('csvEditorHtml/out/io.js')
+	const uiJs = _getResourcePath('csvEditorHtml/out/ui.js')
+	const utilJs = _getResourcePath('csvEditorHtml/out/util.js')
+	const mainJs = _getResourcePath('csvEditorHtml/out/main.js')
+
+	return `
+	<!DOCTYPE html>
+	<html>
+	<head>
+		<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource:; script-src vscode-resource: 'unsafe-inline'; style-src vscode-resource: 'unsafe-inline'; font-src vscode-resource:;">
+
+		<link rel="stylesheet" href="${handsontableCss}">
+		<script src="${handsontableJs}"></script>
+		<script src="${papaparseJs}"></script>
+	
+		<link rel="stylesheet" href="${fontAwesomeCss}">
+	
+		<link rel="stylesheet" href="${bulmaCss}">
+		<link rel="stylesheet" href="${bulmaExtensionCss}">
+		<link rel="stylesheet" href="${mainCss}">
+		<link rel="stylesheet" href="${darkThemeCss}">
+		<link rel="stylesheet" href="${lightThemeCss}">
+		<link rel="stylesheet" href="${hightContrastThemeCss}">
+	</head>
+	<body>
+	
+	
 	<div class="page full-h">
 
 	<div class="all-options">
@@ -231,9 +273,15 @@
   <button class="modal-close is-large" aria-label="close" onclick="toggleHelpModal()"></button>
 </div>
 
- <script src="out/io.js"></script>
- <script src="out/ui.js"></script>
- <script src="out/util.js"></script>
-	<script src="out/main.js"></script>
-</body>
-</html>
+</div>
+	<script>
+		//make sure we escape here via json e.g. if we have $\{\} in a csv file...
+		var initialContent = ${JSON.stringify(initialContent)};
+	</script>
+	 <script src="${ioJs}"></script>
+	 <script src="${uiJs}"></script>
+	 <script src="${utilJs}"></script>
+		<script src="${mainJs}"></script>
+	</body>
+	`
+}

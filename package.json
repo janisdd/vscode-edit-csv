@@ -2,25 +2,84 @@
 	"name": "vscode-edit-csv",
 	"displayName": "vscode-edit-csv",
 	"description": "extension to edit csv files",
-	"version": "0.0.1",
+	"version": "1.0.0",
+	"license": "MIT",
 	"engines": {
 		"vscode": "^1.30.0"
 	},
 	"categories": [
 		"Other"
 	],
+	"keywords": [
+		"CSV"
+	],
 	"activationEvents": [
 		"onCommand:edit-csv.edit"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"languages": [
+			{
+				"id": "csv",
+				"extensions": [
+					".csv"
+				],
+				"aliases": [
+					"CSV"
+				]
+			},
+			{
+				"id": "tsv",
+				"extensions": [
+					".tsv",
+					".tab"
+				],
+				"aliases": [
+					"TSV"
+				]
+			}
+		],
 		"commands": [
 			{
 				"command": "edit-csv.edit",
 				"category": "CSV",
 				"title": "Edit as csv"
+			},
+			{
+				"command": "edit-csv.goto-source",
+				"category": "CSV",
+				"title": "Go to csv source file"
 			}
 		],
+		"menus": {
+			"explorer/context": [
+				{
+					"when": "resourceLangId == csv",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == tsv",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == CSV",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == TSV",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'CSV (semicolon)'",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				}
+			]
+		},
 		"configuration": {
 			"title": "Edit csv configuration",
 			"properties": {}
@@ -43,7 +102,6 @@
 	"dependencies": {
 		"@fortawesome/fontawesome-free": "^5.6.3",
 		"@types/papaparse": "^4.5.6",
-		"ag-grid-community": "^20.0.0",
 		"bulma": "^0.7.2",
 		"bulma-extensions": "^4.0.1",
 		"handsontable": "^6.2.2",
