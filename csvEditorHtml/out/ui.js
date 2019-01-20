@@ -4,27 +4,38 @@ function toggleReadOptions(shouldCollapse) {
     const content = _getById('read-options-content');
     if (shouldCollapse !== undefined) {
         _setCollapsed(shouldCollapse, el, content);
+        _setReadOptionCollapsedVsState(shouldCollapse);
         return;
     }
-    _toggleCollapse(el, content);
+    _toggleCollapse(el, content, _setReadOptionCollapsedVsState);
 }
 function toggleWriteOptions(shouldCollapse) {
     const el = _getById('write-options-icon');
     const content = _getById('write-options-content');
+    if (vscode) {
+        const lastState = _getVsState();
+        vscode.setState(Object.assign({}, lastState, { writeOptionIsCollapsed: shouldCollapse }));
+    }
     if (shouldCollapse !== undefined) {
         _setCollapsed(shouldCollapse, el, content);
+        _setWriteOptionCollapsedVsState(shouldCollapse);
         return;
     }
-    _toggleCollapse(el, content);
+    _toggleCollapse(el, content, _setWriteOptionCollapsedVsState);
 }
 function togglePreview(shouldCollapse) {
     const el = _getById('preview-icon');
     const content = _getById('preview-content');
+    if (vscode) {
+        const lastState = _getVsState();
+        vscode.setState(Object.assign({}, lastState, { previewIsCollapsed: shouldCollapse }));
+    }
     if (shouldCollapse !== undefined) {
         _setCollapsed(shouldCollapse, el, content);
+        _setPreviewCollapsedVsState(shouldCollapse);
         return;
     }
-    _toggleCollapse(el, content);
+    _toggleCollapse(el, content, _setPreviewCollapsedVsState);
 }
 function toggleBeforeComments(shouldCollapse) {
     const el = _getById('comments-before-content-icon');
@@ -62,12 +73,16 @@ function displayOrHideAfterComments(shouldHide) {
     const div = _getById(commentsAfterOptionId);
     div.style.display = shouldHide ? 'none' : 'block';
 }
-function _toggleCollapse(el, wrapper) {
+function _toggleCollapse(el, wrapper, afterToggled) {
     if (el.classList.contains('fa-chevron-right')) {
         _setCollapsed(false, el, wrapper);
+        if (afterToggled)
+            afterToggled(false);
         return;
     }
     _setCollapsed(true, el, wrapper);
+    if (afterToggled)
+        afterToggled(true);
 }
 function _setCollapsed(shouldCollapsed, el, wrapper) {
     if (shouldCollapsed) {
@@ -191,8 +206,8 @@ function displayData(data, commentLinesBefore, commentLinesAfter) {
         beforeColumnResize: function (oldSize, newSize, isDoubleClick) {
             if (allColSizes.length > 0 && isDoubleClick) {
                 if (oldSize === newSize) {
-                    if (miscOptions.doubleClickMinColWidth) {
-                        return miscOptions.doubleClickMinColWidth;
+                    if (initialConfig) {
+                        return initialConfig.doubleClickColumnHandleForcedWith;
                     }
                 }
             }

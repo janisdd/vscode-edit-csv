@@ -11,12 +11,16 @@ function toggleReadOptions(shouldCollapse: boolean) {
 	const el = _getById('read-options-icon')
 	const content = _getById('read-options-content') //the wrapper
 
+
+
 	if (shouldCollapse !== undefined) {
 		_setCollapsed(shouldCollapse, el, content)
+
+		_setReadOptionCollapsedVsState(shouldCollapse)
 		return
 	}
 
-	_toggleCollapse(el, content)
+	_toggleCollapse(el, content, _setReadOptionCollapsedVsState)
 }
 
 /**
@@ -27,12 +31,22 @@ function toggleWriteOptions(shouldCollapse: boolean) {
 	const el = _getById('write-options-icon')
 	const content = _getById('write-options-content') //the wrapper
 
+	if (vscode) {
+		const lastState = _getVsState()
+		vscode.setState({
+			...lastState,
+			writeOptionIsCollapsed: shouldCollapse
+		})
+	}
+
 	if (shouldCollapse !== undefined) {
 		_setCollapsed(shouldCollapse, el, content)
+
+		_setWriteOptionCollapsedVsState(shouldCollapse)
 		return
 	}
 
-	_toggleCollapse(el, content)
+	_toggleCollapse(el, content, _setWriteOptionCollapsedVsState)
 }
 
 /**
@@ -43,12 +57,22 @@ function togglePreview(shouldCollapse: boolean) {
 	const el = _getById('preview-icon')
 	const content = _getById('preview-content') //the wrapper
 
+	if (vscode) {
+		const lastState = _getVsState()
+		vscode.setState({
+			...lastState,
+			previewIsCollapsed: shouldCollapse
+		})
+	}
+
 	if (shouldCollapse !== undefined) {
 		_setCollapsed(shouldCollapse, el, content)
+
+		_setPreviewCollapsedVsState(shouldCollapse)
 		return
 	}
 
-	_toggleCollapse(el, content)
+	_toggleCollapse(el, content, _setPreviewCollapsedVsState)
 }
 
 
@@ -101,16 +125,20 @@ function displayOrHideAfterComments(shouldHide: boolean) {
 	div.style.display = shouldHide ? 'none' : 'block'
 }
 
-function _toggleCollapse(el: HTMLElement, wrapper: HTMLElement) {
+function _toggleCollapse(el: HTMLElement, wrapper: HTMLElement, afterToggled?: (isCollapsed: boolean) => void) {
 
 	if (el.classList.contains('fa-chevron-right')) {
 		//expand
 		_setCollapsed(false, el, wrapper)
+
+		if (afterToggled) afterToggled(false)
 		return
 	}
 
 	//collapse
 	_setCollapsed(true, el, wrapper)
+
+	if (afterToggled) afterToggled(true)
 }
 
 function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLElement) {
@@ -315,16 +343,18 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 
 		outsideClickDeselects: false, //keep selection
 		//TODO see https://github.com/handsontable/handsontable/issues/3328
-		//only working because first argument is actually the old size
+		//only working because first argument is actually the old size, which is a bug
 		beforeColumnResize: function (oldSize, newSize, isDoubleClick) { //after change but before render
+
+			//allColSizes is not always up to date... only set on window resize... when the bug is fixed we need to change this...
 
 			if (allColSizes.length > 0 && isDoubleClick) {
 				// const oldSize = allColSizes[currentColumn]
 
 				if (oldSize === newSize) {
 					//e.g. we have a large column and the auto size is too large...
-					if (miscOptions.doubleClickMinColWidth) {
-						return miscOptions.doubleClickMinColWidth
+					if (initialConfig) {
+						return initialConfig.doubleClickColumnHandleForcedWith
 					}
 				}
 			}
@@ -362,7 +392,7 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 			}
 
 			// console.log(initialConfig.lastColumnTabBehavior);
-			
+
 			if (!initialConfig || initialConfig.lastColumnTabBehavior !== 'createColumn') return _default
 
 			if (!selection || selection.length == 0) return _default

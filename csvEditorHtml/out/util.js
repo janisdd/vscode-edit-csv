@@ -153,10 +153,6 @@ function setupAndApplyInitialConfigPart1(initialConfig) {
             toggleReadOptions(true);
             break;
         }
-        case 'remember': {
-            toggleReadOptions(true);
-            break;
-        }
         default: {
             _error(`unknown readOptionsAppearance: ${initialConfig.readOptionsAppearance}`);
             break;
@@ -171,10 +167,6 @@ function setupAndApplyInitialConfigPart1(initialConfig) {
             toggleWriteOptions(true);
             break;
         }
-        case 'remember': {
-            toggleWriteOptions(true);
-            break;
-        }
         default: {
             _error(`unknown writeOptionsAppearance: ${initialConfig.writeOptionsAppearance}`);
             break;
@@ -186,10 +178,6 @@ function setupAndApplyInitialConfigPart1(initialConfig) {
             break;
         }
         case 'collapsed': {
-            togglePreview(true);
-            break;
-        }
-        case 'remember': {
             togglePreview(true);
             break;
         }
@@ -253,6 +241,39 @@ function setupAndApplyInitialConfigPart2(beforeComments, afterComments, initialC
             _error(`unknown afterCommentsAppearance: ${initialConfig.afterCommentsAppearance}`);
             break;
         }
+    }
+}
+function _getVsState() {
+    if (!vscode)
+        return _createDefaultVsState();
+    const state = vscode.getState();
+    if (!state)
+        return _createDefaultVsState();
+    return state;
+}
+function _createDefaultVsState() {
+    return {
+        previewIsCollapsed: true,
+        readOptionIsCollapsed: true,
+        writeOptionIsCollapsed: true
+    };
+}
+function _setReadOptionCollapsedVsState(isCollapsed) {
+    if (vscode) {
+        const lastState = _getVsState();
+        const newState = Object.assign({}, lastState, { readOptionIsCollapsed: isCollapsed });
+    }
+}
+function _setWriteOptionCollapsedVsState(isCollapsed) {
+    if (vscode) {
+        const lastState = _getVsState();
+        const newState = Object.assign({}, lastState, { writeOptionIsCollapsed: isCollapsed });
+    }
+}
+function _setPreviewCollapsedVsState(isCollapsed) {
+    if (vscode) {
+        const lastState = _getVsState();
+        const newState = Object.assign({}, lastState, { previewIsCollapsed: isCollapsed });
     }
 }
 //# sourceMappingURL=util.js.map

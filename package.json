@@ -175,24 +175,24 @@
 				},
 				"csv-edit.readOptionsAppearance": {
 					"type": "string",
-					"default": "remember",
+					"default": "collapsed",
 					"description": "the appearance of the read option section",
-					"enum": ["expanded", "collapsed", "remember"],
-					"enumDescriptions": ["read options will always start expanded", "read options will always start collapsed", "read options will use the last state (across all edit session, we use the latest)"]
+					"enum": ["expanded", "collapsed"],
+					"enumDescriptions": ["read options will always start expanded", "read options will always start collapsed"]
 				},
 				"csv-edit.writeOptionsAppearance": {
 					"type": "string",
-					"default": "remember",
+					"default": "collapsed",
 					"description": "the appearance of the write option section",
-					"enum": ["expanded", "collapsed", "remember"],
-					"enumDescriptions": ["write options will always start expanded", "write options will always start collapsed", "write options will use the last state (across all edit session, we use the latest)"]
+					"enum": ["expanded", "collapsed"],
+					"enumDescriptions": ["write options will always start expanded", "write options will always start collapsed"]
 				},
 				"csv-edit.previewOptionsAppearance": {
 					"type": "string",
-					"default": "remember",
+					"default": "collapsed",
 					"description": "the appearance of the preview section",
-					"enum": ["expanded", "collapsed", "remember"],
-					"enumDescriptions": ["preview section will always start expanded", "preview section will always start collapsed", "preview section will use the last state (across all edit session, we use the latest)"]
+					"enum": ["expanded", "collapsed"],
+					"enumDescriptions": ["preview section will always start expanded", "preview section will always start collapsed"]
 				},
 
 				"csv-edit.readOption_hasHeader": {
@@ -229,6 +229,12 @@
 					"type": "string",
 					"default": "#",
 					"description": "the string used as comment, empty string to exclude comments"
+				},
+
+				"csv-edit.doubleClickColumnHandleForcedWith": {
+					"type": "number",
+					"default": "200",
+					"description": "normally the columns are auto sized, if we click on the handle when it has auto size then its with is set to this value (in px). Useful if we have a very wide column (wider than the screen and quickly want to shrink it)"
 				}
 			}
 		}

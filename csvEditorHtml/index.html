@@ -238,11 +238,11 @@
 			<div class="options-title clickable" onclick="toggleAfterComments()"">
 				<span> Comments after</span> 
 				<span>
-						<i id="comments-after-content-icon" class="fas fa-chevron-right"></i>
+					<i id="comments-after-content-icon" class="fas fa-chevron-right"></i>
 				</span>
 			</div>
 			<div id="comments-after-content">
-				<textarea  id="comments-after" rows="3" class="textarea"></textarea>
+				<textarea id="comments-after" rows="3" class="textarea"></textarea>
 			</div>
 		</div>
 
@@ -283,7 +283,7 @@
 						<li>To delete a row/column hover over it and click the trash-icon</li>
 
 						<li>Double click on a column resize handle to fit content, double click on an auto sized column to set width to
-							200px</li>
+							200px (good for very wide columns)</li>
 
 					</ul>
 
@@ -299,6 +299,7 @@
 						<li>Comment between csv rows get removed</li>
 						<li>Comments before and after csv content is preserved (if write comment option has a value)</li>
 						<li>You cannot change the new line character because vs code automatically converts it to the file setting</li>
+						<li>If a row has more cell than the others the additional cells are ignored</li>
 					</ul>
 				</div>
 

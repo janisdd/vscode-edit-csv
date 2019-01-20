@@ -58,7 +58,7 @@ function addRow(selectNewRow = true) {
 	if (selectNewRow) {
 		hot.selectCell(numRows, 0)
 	}
-	
+
 	checkIfHasHeaderReadOptionIsAvailable()
 }
 
@@ -293,11 +293,11 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 			toggleReadOptions(true)
 			break
 		}
-		case 'remember': {
-			//TODO
-			toggleReadOptions(true)
-			break
-		}
+		// case 'remember': {
+		// 	//TODO
+		// 	toggleReadOptions(true)
+		// 	break
+		// }
 		default: {
 			_error(`unknown readOptionsAppearance: ${initialConfig.readOptionsAppearance}`)
 			break;
@@ -313,11 +313,11 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 			toggleWriteOptions(true)
 			break
 		}
-		case 'remember': {
-			//TODO
-			toggleWriteOptions(true)
-			break
-		}
+		// case 'remember': {
+		// 	//TODO
+		// 	toggleWriteOptions(true)
+		// 	break
+		// }
 		default: {
 			_error(`unknown writeOptionsAppearance: ${initialConfig.writeOptionsAppearance}`)
 			break;
@@ -333,11 +333,11 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 			togglePreview(true)
 			break
 		}
-		case 'remember': {
-			//TODO
-			togglePreview(true)
-			break
-		}
+		// case 'remember': {
+		// 	//TODO
+		// 	togglePreview(true)
+		// 	break
+		// }
 		default: {
 			_error(`unknown previewOptionsAppearance: ${initialConfig.previewOptionsAppearance}`)
 			break;
@@ -419,4 +419,61 @@ function setupAndApplyInitialConfigPart2(beforeComments: string[], afterComments
 		}
 	}
 
+}
+
+/* - maybe we get the collapse states and store them across sessions see
+CsvEditSettings
+ .readOptionsAppearance: remember option
+ .writeOptionsAppearance: remember option
+ .previewOptionsAppearance: remember option
+ --- */
+
+function _getVsState(): VsState {
+	if (!vscode) return _createDefaultVsState()
+	const state = vscode.getState()
+
+	if (!state) return _createDefaultVsState()
+
+	return state
+}
+function _createDefaultVsState(): VsState {
+	return {
+		previewIsCollapsed: true,
+		readOptionIsCollapsed: true,
+		writeOptionIsCollapsed: true
+	}
+}
+
+function _setReadOptionCollapsedVsState(isCollapsed: boolean) {
+	if (vscode) {
+		const lastState = _getVsState()
+		const newState = {
+			...lastState,
+			readOptionIsCollapsed: isCollapsed
+		}
+		// console.log(JSON.stringify(newState));
+		// vscode.setState(newState)
+	}
+}
+
+function _setWriteOptionCollapsedVsState(isCollapsed: boolean) {
+	if (vscode) {
+		const lastState = _getVsState()
+		const newState: VsState = {
+			...lastState,
+			writeOptionIsCollapsed: isCollapsed
+		}
+		// vscode.setState(newState)
+	}
+}
+
+function _setPreviewCollapsedVsState(isCollapsed: boolean) {
+	if (vscode) {
+		const lastState = _getVsState()
+		const newState: VsState = {
+			...lastState,
+			previewIsCollapsed: isCollapsed
+		}
+		// vscode.setState(newState)
+	}
 }

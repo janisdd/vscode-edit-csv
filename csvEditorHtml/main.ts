@@ -33,11 +33,6 @@ const defaultCsvContentIfEmpty = `,\n,`
  */
 let headerRow: string[] | null = null
 
-let miscOptions: MiscOptions = {
-	doubleClickMinColWidth: 200
-}
-
-
 
 //csv reader options + some ui options
 let defaultCsvReadOptions: CsvReadOptions = {
@@ -90,14 +85,14 @@ if (initialContent === undefined) {
 	initialContent = ''
 }
 
-// initialContent =
-// 	`
-// #test
-// 1,2,3
-// 4,5,6
+initialContent =
+	`
+#test
+1,2,3
+4,5,6,7,8
 
-// #after
-// `
+#after
+`
 
 console.log("initialConfig: ", initialConfig);
 console.log("initialContent: " + initialContent);
@@ -115,3 +110,6 @@ if (_data) {
 	setupAndApplyInitialConfigPart2(_data[0], _data[2], initialConfig)
 }
 
+if (vscode) {
+	console.log(JSON.stringify(vscode.getState()))
+}

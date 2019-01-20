@@ -23,8 +23,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 	let instanceManager = new InstanceManager()
 
+
+	// const initCommand = vscode.window.registerWebviewPanelSerializer('csv-edit.init', new CsvEditStateSerializer())
+
 	//called to get from an editor to the source file
-	const gotoSourceCsvCommand = vscode.commands.registerCommand('edit-csv.goto-source', (url) => {
+	const gotoSourceCsvCommand = vscode.commands.registerCommand('edit-csv.goto-source', () => {
 
 
 		if (vscode.window.activeTextEditor) { //a web view is no text editor...
@@ -35,7 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
 		openSourceFileFunc()
 	})
 
-	const editCsvCommand = vscode.commands.registerCommand('edit-csv.edit', (url) => {
+	const editCsvCommand = vscode.commands.registerCommand('edit-csv.edit', () => {
 
 		if (!vscode.window.activeTextEditor && instanceManager.hasActiveEditorInstance()) {
 			//open source file ... probably better for usability when we use recently used
@@ -312,3 +315,18 @@ function _afterEditsApplied(document: vscode.TextDocument, editsApplied: boolean
 		})
 
 }
+
+// class CsvEditStateSerializer  implements vscode.WebviewPanelSerializer{
+
+// 	static state: VsState = {
+// 		previewIsCollapsed: true,
+// 		readOptionIsCollapsed: true,
+// 		writeOptionIsCollapsed: true
+// 	}
+
+// 	async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: VsState) {
+// 		// `state` is the state persisted using `setState` inside the webview
+// 		console.log(`Got state: ${state}`);
+// 		CsvEditStateSerializer.state = state
+// 	}
+// }

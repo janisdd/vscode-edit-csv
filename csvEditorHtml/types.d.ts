@@ -43,21 +43,21 @@ type CsvEditSettings = {
 	 * collapsed: read options will always start collapsed
 	 * remember: read options will use the last state (across all edit session, we use the latest)
 	 */
-	readOptionsAppearance: 'expanded' | 'collapsed' | 'remember'
+	readOptionsAppearance: 'expanded' | 'collapsed' //| 'remember'
 	/**
 	 * the appearance of the write option section
 	 * 
 	 * 
 	 * same as readOptionsAppearance but for write options
 	 */
-	writeOptionsAppearance: 'expanded' | 'collapsed' | 'remember'
+	writeOptionsAppearance: 'expanded' | 'collapsed' //| 'remember'
 	/**
 	 * the appearance of the preview section
 	 * 
 	 * 
 	  same as readOptionsAppearance but for preview
 	 */
-	previewOptionsAppearance: 'expanded' | 'collapsed' | 'remember'
+	previewOptionsAppearance: 'expanded' | 'collapsed' //| 'remember'
 
 
 
@@ -80,8 +80,6 @@ type CsvEditSettings = {
 	readOption_hasHeader: 'true' | 'false'
 
 
-
-
 	/**
 	 * true: export header as row
 	 * false: not
@@ -100,6 +98,11 @@ type CsvEditSettings = {
 	 */
 	writeOption_comment: string 
 
+
+	/**
+	 * normally the columns are auto sized, if we click on the handle when it has auto size then its with is set to this value (in px). Useful if we have a very wide column (wider than the screen and quickly want to shrink it)
+	 */
+	doubleClickColumnHandleForcedWith: number
 }
 
 /* --- frontend settings --- */
@@ -211,6 +214,14 @@ type OverwriteFileMessage = {
 
 type PostMessage = DisplayErrorMessage | OverwriteFileMessage
 
+type VsState = {
+	readOptionIsCollapsed: boolean
+	writeOptionIsCollapsed
+	previewIsCollapsed: boolean
+}
+
 type VsExtension = {
 	postMessage: (message: PostMessage) => void
+	setState: (newState: VsState) => void
+	getState: () => VsState | undefined
 }

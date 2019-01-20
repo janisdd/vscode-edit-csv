@@ -10,9 +10,6 @@ const csv = window.Papa;
 let hot;
 const defaultCsvContentIfEmpty = `,\n,`;
 let headerRow = null;
-let miscOptions = {
-    doubleClickMinColWidth: 200
-};
 let defaultCsvReadOptions = {
     header: false,
     comments: '#',
@@ -47,6 +44,14 @@ if (typeof initialContent === 'undefined') {
 if (initialContent === undefined) {
     initialContent = '';
 }
+initialContent =
+    `
+#test
+1,2,3
+4,5,6,7,8
+
+#after
+`;
 console.log("initialConfig: ", initialConfig);
 console.log("initialContent: " + initialContent);
 setupAndApplyInitialConfigPart1(initialConfig);
@@ -54,5 +59,8 @@ let _data = parseCsv(initialContent, defaultCsvReadOptions);
 if (_data) {
     displayData(_data[1], _data[0], _data[2]);
     setupAndApplyInitialConfigPart2(_data[0], _data[2], initialConfig);
+}
+if (vscode) {
+    console.log(JSON.stringify(vscode.getState()));
 }
 //# sourceMappingURL=main.js.map

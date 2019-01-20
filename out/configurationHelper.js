@@ -7,15 +7,16 @@ const defaultConfig = {
     lastColumnTabBehavior: 'default',
     beforeCommentsAppearance: "onlyOnContent",
     afterCommentsAppearance: "onlyOnContent",
-    previewOptionsAppearance: "remember",
-    writeOptionsAppearance: "remember",
-    readOptionsAppearance: "remember",
+    previewOptionsAppearance: "collapsed",
+    writeOptionsAppearance: "collapsed",
+    readOptionsAppearance: "collapsed",
     readOption_comment: "#",
     readOption_delimiter: "",
     readOption_hasHeader: "false",
     writeOption_comment: "#",
     writeOption_delimiter: "",
-    writeOption_hasHeader: "false"
+    writeOption_hasHeader: "false",
+    doubleClickColumnHandleForcedWith: 200,
 };
 /**
  * returns the configuration for this extension
