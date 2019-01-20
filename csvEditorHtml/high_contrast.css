@@ -11,6 +11,16 @@ body.vscode-high-contrast {
 	color: black;
 }
 
+.vscode-high-contrast .button.is-outlined:hover {
+	background-color: white;
+	color: black;
+}
+
+.vscode-high-contrast .button.is-outlined:focus {
+	background-color: transparent;
+	color: white;
+}
+
 .vscode-high-contrast .select select {
 	color: black;
 }

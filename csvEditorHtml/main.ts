@@ -16,7 +16,7 @@ let hot: import('../node_modules/handsontable/handsontable')
  * the default csv content to used if we get empty content
  * handson table will throw if we pass in a 1D array because it expects an object?
  */
-const defaultCsvContentIfEmpty = ','
+const defaultCsvContentIfEmpty = `,\n,`
 
 /**
  * TODO check

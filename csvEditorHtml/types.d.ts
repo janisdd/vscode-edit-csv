@@ -100,8 +100,9 @@ type DisplayErrorMessage = {
 }
 
 type OverwriteFileMessage = {
-	command: 'overwrite'
+	command: 'commit'
 	csvContent: string
+	saveSourceFile: boolean
 }
 
 type PostMessage = DisplayErrorMessage | OverwriteFileMessage

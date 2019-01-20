@@ -80,7 +80,6 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		vscode.workspace.openTextDocument(instance.sourceUri)
 			.then(document => {
-
 				vscode.window.showTextDocument(document)
 			})
 
@@ -221,15 +220,16 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	//just set the panel if we added the instance
 	instance.panel = panel
 
-	panel.webview.onDidReceiveMessage((message) => {
+	panel.webview.onDidReceiveMessage((message: any) => { //TODO PostMessage
 
 		switch (message.command) {
 			case "error": {
 				vscode.window.showErrorMessage(message.content);
 				break
 			}
-			case "overwrite": {
-
+			case "commit": {
+				const { csvContent, saveSourceFile } = message
+				commitContent(instance, csvContent, saveSourceFile)
 				break
 			}
 
@@ -252,6 +252,61 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	panel.webview.html = createEditorHtml(context, initialText)
 
+}
 
+function commitContent(instance: Instance, newContent: string, saveSourceFile: boolean) {
+
+	vscode.workspace.openTextDocument(instance.sourceUri)
+		.then(document => {
+
+			const edit = new vscode.WorkspaceEdit()
+
+			var firstLine = document.lineAt(0);
+			var lastLine = document.lineAt(document.lineCount - 1);
+			var textRange = new vscode.Range(0,
+				firstLine.range.start.character,
+				document.lineCount - 1,
+				lastLine.range.end.character);
+
+			edit.replace(document.uri, textRange, newContent)
+			vscode.workspace.applyEdit(edit)
+				.then(editsApplied => {
+					_afterEditsApplied(document, editsApplied, saveSourceFile)
+				})
+
+			// vscode.window.showTextDocument(document)
+			// 	.then(editor => {
+			// 		editor.edit((builder) => {
+			// 			var firstLine = document.lineAt(0);
+			// 			var lastLine = document.lineAt(document.lineCount - 1);
+			// 			var textRange = new vscode.Range(0,
+			// 				firstLine.range.start.character,
+			// 				document.lineCount - 1,
+			// 				lastLine.range.end.character);
+
+			// 			builder.replace(textRange, newContent)
+			// 		})
+			// 			.then(editsApplied => {
+			// 				_afterEditsApplied(document, editsApplied, saveSourceFile)
+			// 			})
+			// 	})
+
+		})
+}
+
+function _afterEditsApplied(document: vscode.TextDocument, editsApplied: boolean, saveSourceFile: boolean) {
+
+	if (!editsApplied) {
+		vscode.window.showErrorMessage(`edits could not be applied`);
+		return
+	}
+
+	if (!saveSourceFile) return
+
+	document.save()
+		.then(wasSaved => {
+			// console.log(document.isDirty);
+			console.log(wasSaved)
+		})
 
 }

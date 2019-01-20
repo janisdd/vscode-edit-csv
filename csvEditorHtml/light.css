@@ -11,22 +11,20 @@ body.vscode-light {
 	color: #657b83;
 }
 
-.vscode-light .select select {
+.vscode-light .button.is-outlined {
 	color: #657b83;
+	background-color: transparent;
 }
 
-.vscode-light .button.is-white.is-outlined {
-	border-color:#657b83;
-	border-radius: 4px;
-	color:#657b83;
+.vscode-light .button.is-outlined:hover {
+	background-color: #404040;
+	color: #d0d0d0;
+}
+.vscode-light .button.is-outlined:focus {
+	background-color:transparent;
+	color: #404040;
 }
 
-.vscode-light .button.is-white.is-outlined:hover {
-	border-color: white;
-	background-color:#657b83;
-	border-radius: 4px;
-	color:white;
-}
 
 /* handson table styles */
 

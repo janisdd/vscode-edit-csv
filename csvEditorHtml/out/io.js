@@ -80,12 +80,19 @@ function postVsError(text) {
         content: text
     });
 }
-function postOverwriteFile(csvContent) {
+function postCommitContent(saveSourceFile) {
+    const csvContent = getDataAsCsv(csvWriteOptions);
+    if (document.activeElement != document.body)
+        document.activeElement.blur();
+    _posCommitContent(csvContent, saveSourceFile);
+}
+function _posCommitContent(csvContent, saveSourceFile) {
     if (!vscode)
         return;
     vscode.postMessage({
-        command: 'overwrite',
-        csvContent
+        command: 'commit',
+        csvContent,
+        saveSourceFile
     });
 }
 function handleVsCodeMessage(event) {

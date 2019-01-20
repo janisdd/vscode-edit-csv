@@ -150,16 +150,31 @@ function postVsError(text: string) {
 }
 
 /**
+ * called from ui
+ * @param saveSourceFile 
+ */
+function postCommitContent(saveSourceFile: boolean) {
+	const csvContent = getDataAsCsv(csvWriteOptions)
+
+	//used to clear focus... else styles are not properly applied
+	//@ts-ignore
+	if (document.activeElement != document.body) document.activeElement.blur();
+
+	_posCommitContent(csvContent, saveSourceFile)
+}
+/**
  * called to save the current edit state back to the file
  * @param csvContent 
+ * @param saveSourceFile 
  */
-function postOverwriteFile(csvContent: string) {
+function _posCommitContent(csvContent: string, saveSourceFile: boolean) {
 
 	if (!vscode) return
 
 	vscode.postMessage({
-		command: 'overwrite',
-		csvContent
+		command: 'commit',
+		csvContent,
+		saveSourceFile
 	})
 }
 

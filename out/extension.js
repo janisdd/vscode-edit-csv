@@ -168,7 +168,9 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
                 vscode.window.showErrorMessage(message.content);
                 break;
             }
-            case "overwrite": {
+            case "commit": {
+                const { csvContent, saveSourceFile } = message;
+                commitContent(instance, csvContent, saveSourceFile);
                 break;
             }
             default: {
@@ -186,5 +188,47 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
         }
     }, null, context.subscriptions);
     panel.webview.html = getHtml_1.createEditorHtml(context, initialText);
+}
+function commitContent(instance, newContent, saveSourceFile) {
+    vscode.workspace.openTextDocument(instance.sourceUri)
+        .then(document => {
+        const edit = new vscode.WorkspaceEdit();
+        var firstLine = document.lineAt(0);
+        var lastLine = document.lineAt(document.lineCount - 1);
+        var textRange = new vscode.Range(0, firstLine.range.start.character, document.lineCount - 1, lastLine.range.end.character);
+        edit.replace(document.uri, textRange, newContent);
+        vscode.workspace.applyEdit(edit)
+            .then(editsApplied => {
+            _afterEditsApplied(document, editsApplied, saveSourceFile);
+        });
+        // vscode.window.showTextDocument(document)
+        // 	.then(editor => {
+        // 		editor.edit((builder) => {
+        // 			var firstLine = document.lineAt(0);
+        // 			var lastLine = document.lineAt(document.lineCount - 1);
+        // 			var textRange = new vscode.Range(0,
+        // 				firstLine.range.start.character,
+        // 				document.lineCount - 1,
+        // 				lastLine.range.end.character);
+        // 			builder.replace(textRange, newContent)
+        // 		})
+        // 			.then(editsApplied => {
+        // 				_afterEditsApplied(document, editsApplied, saveSourceFile)
+        // 			})
+        // 	})
+    });
+}
+function _afterEditsApplied(document, editsApplied, saveSourceFile) {
+    if (!editsApplied) {
+        vscode.window.showErrorMessage(`edits could not be applied`);
+        return;
+    }
+    if (!saveSourceFile)
+        return;
+    document.save()
+        .then(wasSaved => {
+        // console.log(document.isDirty);
+        console.log(wasSaved);
+    });
 }
 //# sourceMappingURL=extension.js.map

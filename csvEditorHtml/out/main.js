@@ -5,7 +5,7 @@ if (typeof acquireVsCodeApi !== 'undefined') {
 }
 const csv = window.Papa;
 let hot;
-const defaultCsvContentIfEmpty = ',';
+const defaultCsvContentIfEmpty = `,\n,`;
 let headerRow = null;
 let miscOptions = {
     doubleClickMinColWidth: 200

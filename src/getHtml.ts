@@ -57,7 +57,6 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 	</head>
 	<body>
 	
-	
 	<div class="page full-h">
 
 	<div class="all-options">
@@ -216,12 +215,33 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 			<span>Add column</span>
 		</button>
 
-		<button class="button is-white is-outlined is-small" onclick="toggleHelpModal(true)">
+		<button style="margin-left: 3em;" class="button is-white is-outlined is-small" onclick="postCommitContent(true)">
+			<span class="icon is-small">
+					<i class="fas fa-save"></i>
+			</span>
+			<span>Commit and save</span>
+			<span class="tooltip is-tooltip-multiline mar-left-half" data-tooltip="Commits the csv content back to the source file and saves the source file">
+				<i class="fas fa-question-circle"></i>
+		</span>
+		</button>
+
+		<button class="button is-white is-outlined is-small" onclick="postCommitContent(false)">
+			<span class="icon is-small">
+					<i class="fas fa-reply"></i>
+			</span>
+			<span>Commit</span>
+			<span class="tooltip mar-left-half" data-tooltip="Commits the csv content back to the source file">
+				<i class="fas fa-question-circle"></i>
+		</span>
+		</button>
+
+		<button style="float: right;" class="button is-white is-outlined is-small" onclick="toggleHelpModal(true)">
 			<span class="icon is-small">
 					<i class="fas fa-question"></i>
 				</span>
 			<span>Help</span>
 		</button>
+
 	</div>
 
 	<div id="csv-editor-wrapper" class="csv-editor-wrapper">
@@ -230,48 +250,50 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 	
 	</div>
 
-<div id="help-modal" class="modal help-modal">
-  <div class="modal-background"></div>
-  <div class="modal-content">
-		<div class="box">
-			
-			<h3 class="title is-3">Features/Shortcuts</h3>
-			<div class="content">
-					<ul>
-						<li>Undo/Redo</li>
-						<li>Click on column header text to sort</li>
-						<li>Click row/column header (not the text) to select then drag to rearrange</li>
-						<li>Resize row/column</li>
-						<li><div class="keys">Home</div> to move to the first cell in a row</li>
-						<li><div class="keys">End</div> to move to the last cell in a row</li>
-
-						<li><div class="keys">Ctrl</div>+<div class="keys">Home</div> to move to the first cell in a column</li>
-						<li><div class="keys">Ctrl</div>+<div class="keys">End</div> to move to the last cell in a column</li>
-						<li><div class="keys">Esc</div> to cancel editing and close cell editor</li>
-						<li><div class="keys">Ctrl</div>+<div class="keys">Enter</div> to add a line break</li>
-
-						<li>To delete a row/column hover over it and click the trash-icon</li>
-
-						<li>Double click on a column resize handle to fit content, double click on an auto sized column to set width to 200px</li>
-
-					</ul>
-
-					For a full list of shortcuts see <a target="_blank" href="https://handsontable.com/docs/6.2.2/tutorial-keyboard-navigation.html">https://handsontable.com/docs/6.2.2/tutorial-keyboard-navigation.html</a>
-			</div>
-
-			<h3 class="title is-3">Hints</h3>
-			<div class="content">
-					<ul>
-							<li>Sorting state is exported</li>
-						<li>Copy & Past use tab (<div class="keys">⇥</div>) as separator (same as excel)</li>
-					</ul>
-			</div>
+	<div id="help-modal" class="modal help-modal">
+		<div class="modal-background"></div>
+		<div class="modal-content">
+			<div class="box">
 				
+				<h3 class="title is-3">Features/Shortcuts</h3>
+				<div class="content">
+						<ul>
+							<li>Undo/Redo</li>
+							<li>Click on column header text to sort</li>
+							<li>Click row/column header (not the text) to select then drag to rearrange</li>
+							<li>Resize row/column</li>
+							<li><div class="keys">Home</div> to move to the first cell in a row</li>
+							<li><div class="keys">End</div> to move to the last cell in a row</li>
 
+							<li><div class="keys">Ctrl</div>+<div class="keys">Home</div> to move to the first cell in a column</li>
+							<li><div class="keys">Ctrl</div>+<div class="keys">End</div> to move to the last cell in a column</li>
+							<li><div class="keys">Esc</div> to cancel editing and close cell editor</li>
+							<li><div class="keys">Ctrl</div>+<div class="keys">Enter</div> to add a line break</li>
+
+							<li>To delete a row/column hover over it and click the trash-icon</li>
+
+							<li>Double click on a column resize handle to fit content, double click on an auto sized column to set width to 200px</li>
+
+						</ul>
+
+						For a full list of shortcuts see <a target="_blank" href="https://handsontable.com/docs/6.2.2/tutorial-keyboard-navigation.html">https://handsontable.com/docs/6.2.2/tutorial-keyboard-navigation.html</a>
+				</div>
+
+				<h3 class="title is-3">Hints</h3>
+				<div class="content">
+						<ul>
+								<li>Sorting state is exported</li>
+							<li>Copy & Past use tab (<div class="keys">⇥</div>) as separator (same as excel)</li>
+							<li>Comment between csv rows get removed</li>
+							<li>Comments before and after csv content is preserved (if write comment option has a value)</li>
+						</ul>
+				</div>
+					
+
+			</div>
 		</div>
-  </div>
-  <button class="modal-close is-large" aria-label="close" onclick="toggleHelpModal()"></button>
-</div>
+		<button class="modal-close is-large" aria-label="close" onclick="toggleHelpModal()"></button>
+	</div>
 
 </div>
 	<script>
