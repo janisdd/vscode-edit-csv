@@ -51,6 +51,56 @@ function togglePreview(shouldCollapse: boolean) {
 	_toggleCollapse(el, content)
 }
 
+
+function toggleBeforeComments(shouldCollapse: boolean) {
+	const el = _getById('comments-before-content-icon')
+	const content = _getById('comments-before-content') //the wrapper
+
+	if (shouldCollapse !== undefined) {
+		_setCollapsed(shouldCollapse, el, content)
+		onResizeGrid()
+		return
+	}
+
+	_toggleCollapse(el, content)
+	onResizeGrid()
+}
+
+
+function displayOrHideCommentsSections(shouldHide: boolean) {
+
+	displayOrHideBeforeComments(shouldHide)
+	displayOrHideAfterComments(shouldHide)
+
+	const el =_getById(toggleCommentsSectionsButtonId)
+
+	el.style.display = shouldHide ? 'block' : 'none'
+}
+
+function displayOrHideBeforeComments(shouldHide: boolean) {
+	const div = _getById(commentsBeforeOptionId)
+	div.style.display = shouldHide ? 'none' : 'block'
+}
+
+function toggleAfterComments(shouldCollapse: boolean) {
+	const el = _getById('comments-after-content-icon')
+	const content = _getById('comments-after-content') //the wrapper
+
+	if (shouldCollapse !== undefined) {
+		_setCollapsed(shouldCollapse, el, content)
+		onResizeGrid()
+		return
+	}
+
+	_toggleCollapse(el, content)
+	onResizeGrid()
+}
+
+function displayOrHideAfterComments(shouldHide: boolean) {
+	const div = _getById(commentsAfterOptionId)
+	div.style.display = shouldHide ? 'none' : 'block'
+}
+
 function _toggleCollapse(el: HTMLElement, wrapper: HTMLElement) {
 
 	if (el.classList.contains('fa-chevron-right')) {
@@ -123,12 +173,12 @@ function setHasHeader() {
 }
 function setDelimiterString() {
 	const el = _getById('delimiter-string') as HTMLInputElement
-	csvReadOptions.delimiter = el.value
+	defaultCsvReadOptions.delimiter = el.value
 
 }
 function setCommentString() {
 	const el = _getById('comment-string')  as HTMLInputElement
-	csvReadOptions.comments = el.value === '' ? false : el.value
+	defaultCsvReadOptions.comments = el.value === '' ? false : el.value
 }
 
 function setSkipEmptyLines() {
@@ -146,7 +196,7 @@ function setSkipEmptyLines() {
 function setReadDelimiter(delimiter: string) {
 	const el = _getById('delimiter-string')  as HTMLInputElement
 	el.value = delimiter
-	csvReadOptions.delimiter = delimiter
+	defaultCsvReadOptions.delimiter = delimiter
 }
 
 /* --- write options --- */
@@ -154,30 +204,30 @@ function setReadDelimiter(delimiter: string) {
 
 function setHasHeaderWrite() {
 	const el = _getById('has-header-write') as HTMLInputElement
-	csvWriteOptions.header = el.checked
+	defaultCsvWriteOptions.header = el.checked
 }
 
 function setDelimiterStringWrite() {
 	const el = _getById('delimiter-string-write') as HTMLInputElement
-	csvWriteOptions.delimiter = el.value
+	defaultCsvWriteOptions.delimiter = el.value
 }
 
 function setCommentStringWrite() {
 	const el = _getById('comment-string-write') as HTMLInputElement
-	csvWriteOptions.comments = el.value === '' ? false : el.value
+	defaultCsvWriteOptions.comments = el.value === '' ? false : el.value
 }
 
 function setNewLineWrite() {
 	const el = _getById('newline-select-write') as HTMLInputElement
 
 	if (el.value === '') {
-		csvWriteOptions.newline = newLineFromInput
+		defaultCsvWriteOptions.newline = newLineFromInput
 	}
 	else if (el.value === 'lf') {
-		csvWriteOptions.newline = '\n'
+		defaultCsvWriteOptions.newline = '\n'
 	}
 	else if (el.value === 'lf') {
-		csvWriteOptions.newline = '\r\n'
+		defaultCsvWriteOptions.newline = '\r\n'
 	}
 }
 
@@ -188,7 +238,7 @@ function setNewLineWrite() {
 function setWriteDelimiter(delimiter: string) {
 	const el = _getById('delimiter-string-write') as HTMLInputElement
 	el.value = delimiter
-	csvWriteOptions.delimiter = delimiter
+	defaultCsvWriteOptions.delimiter = delimiter
 }
 
 
@@ -198,7 +248,7 @@ function setWriteDelimiter(delimiter: string) {
  * updates the preview
  */
 function generateCsvPreview() {
-	const value = getDataAsCsv(csvWriteOptions)
+	const value = getDataAsCsv(defaultCsvWriteOptions)
 	const el = _getById('csv-preview') as HTMLTextAreaElement
 	el.value = value
 
@@ -213,8 +263,10 @@ function generateCsvPreview() {
  * display the given data in the handson table
  * also sets the headerRow if we have more than 
  * @param {string[][]} data array with the rows or null to just destroy the old table
+ * @param {string[]} commentLinesBefore the comment lines before the csv content
+ * @param {string[]} commentLinesAfter the comment lines after the csv content
  */
-function displayData(data: string[][]) {
+function displayData(data: string[][] | null, commentLinesBefore: string[], commentLinesAfter: string[]) {
 
 	if (data === null) {
 		if (hot) {
@@ -232,6 +284,15 @@ function displayData(data: string[][]) {
 	if (hot) {
 		hot.destroy()
 	}
+
+	//TODO settings?
+	const beforeCommentsTextarea = _getById(beforeCommentsTextareaId) as HTMLTextAreaElement
+	beforeCommentsTextarea.value = commentLinesBefore.join('\n')
+
+	//TODO settings?
+	const afterCommentsTextarea = _getById(afterCommentsTextareaId) as HTMLTextAreaElement
+	afterCommentsTextarea.value = commentLinesAfter.join('\n')
+	
 
 	//@ts-ignore
 	hot = new Handsontable(container, {
@@ -271,9 +332,12 @@ function displayData(data: string[][]) {
 	})
 
 	//@ts-ignore
-	Handsontable.dom.addEvent(window as any, 'resize', throttle(onResize, 200))
+	Handsontable.dom.addEvent(window as any, 'resize', throttle(onResizeGrid, 200))
 
 	checkIfHasHeaderReadOptionIsAvailable()
+
+	//make sure we see something (right size)...
+	onResizeGrid()
 }
 
 //not needed really now because of bug in handson table, see https://github.com/handsontable/handsontable/issues/3328
@@ -282,7 +346,10 @@ let allColSizes = []
 /**
  * updates the handson table to fill available space (will trigger scrollbars)
  */
-function onResize() {
+function onResizeGrid() {
+
+	if (!hot) return
+
 	const widthString = getComputedStyle(csvEditorWrapper).width
 
 	if (!widthString) {

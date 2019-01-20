@@ -1,5 +1,93 @@
 
 
+/**
+ * the settings for the plugin
+ */
+type CsvEditSettings = {
+
+	/**
+	 * the appearance of the before comments section if it is not displayed initially you can still display it manually
+	 * always: always visible but collapsed 
+	 * alwaysExpanded: always visible but expanded
+	 * onlyOnContent: displayed if we have before comments but collapsed
+	 * onlyOnContentExpanded: displayed if we have before comments but expanded
+	 * never: never displayed but comments are still respected (we use write options to decide this)
+	 */
+	beforeCommentsAppearance: 'always' | 'alwaysExpanded' | 'onlyOnContent' | 'onlyOnContentExpanded' | 'never'
+	/**
+	 * the appearance of the read option section if it is not displayed initially you can still display it manually
+	 * 
+	 * same as beforeCommentsAppearance but for after comments
+	 */
+	afterCommentsAppearance: 'always' | 'alwaysExpanded' | 'onlyOnContent' | 'onlyOnContentExpanded' | 'never'
+
+	/**
+	 * the appearance of the read option section
+	 * expanded: read options will always start expanded
+	 * collapsed: read options will always start collapsed
+	 * remember: read options will use the last state (across all edit session, we use the latest)
+	 */
+	readOptionsAppearance: 'expanded' | 'collapsed' | 'remember'
+	/**
+	 * the appearance of the write option section
+	 * 
+	 * 
+	 * same as readOptionsAppearance but for write options
+	 */
+	writeOptionsAppearance: 'expanded' | 'collapsed' | 'remember'
+	/**
+	 * the appearance of the preview section
+	 * 
+	 * 
+	  same as readOptionsAppearance but for preview
+	 */
+	previewOptionsAppearance: 'expanded' | 'collapsed' | 'remember'
+
+
+
+	/**
+	 * the delimiter to use, empty string to auto detect
+	 */
+	readOption_delimiter: string
+
+	/**
+	 * the string used as comment, empty string to thread every line as data line (no comments)
+	 */
+	readOption_comment: string 
+
+		/**
+	 * true: first row is the header row
+	 * false: first row is a normal data row
+	 * 
+	 * we use a string in case we want to add other options...
+	 */
+	readOption_hasHeader: 'true' | 'false'
+
+
+
+
+	/**
+	 * true: export header as row
+	 * false: not
+	 * 
+	 * we use a string in case we want to add other options...
+	 */
+	writeOption_hasHeader: 'true' | 'false'
+
+	/**
+	 * the delimiter to use, empty string to auto detect
+	 */
+	writeOption_delimiter: string
+
+	/**
+	 * the string used as comment, empty string to exclude comments
+	 */
+	writeOption_comment: string 
+
+}
+
+/* --- frontend settings --- */
+
 
 type CsvReadOptions = {
 	/**
@@ -35,7 +123,7 @@ type CsvReadOptions = {
 	 * ui props, not part of papaparse options
 	 * used to determine if we check/uncheck the has header read option
 	 */
-	_hasHeader: false
+	_hasHeader: boolean
 }
 
 

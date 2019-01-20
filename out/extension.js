@@ -9,7 +9,7 @@ const debounceDocumentChangeInMs = 1000;
  * for editor uris this is the scheme to use
  * so we can find editors
  */
-const editorUriScheme = 'csv-edit';
+exports.editorUriScheme = 'csv-edit';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -64,6 +64,7 @@ function activate(context) {
             vscode.window.showTextDocument(document);
         });
     };
+    //@ts-ignore
     const askRefresh = function (instance) {
         const options = ['Yes', 'No'];
         vscode.window.showInformationMessage('The source file changed or was saved. Would you like to overwrite your csv edits with the new content?', {
@@ -118,7 +119,7 @@ function activate(context) {
         // askRefresh(instance)
     }, debounceDocumentChangeInMs));
     vscode.workspace.onDidCloseTextDocument((args) => {
-        if (args.uri.scheme === editorUriScheme)
+        if (args.uri.scheme === exports.editorUriScheme)
             return; //closed an editor nothing to do here... onDispose will handle it
         //when we close a source file ... also close the editor
         const instance = instanceManager.findInstanceBySourceUri(args.uri);
@@ -150,7 +151,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
         panel: null,
         sourceUri: uri,
         editorUri: uri.with({
-            scheme: editorUriScheme
+            scheme: exports.editorUriScheme
         })
     };
     try {
@@ -227,8 +228,9 @@ function _afterEditsApplied(document, editsApplied, saveSourceFile) {
         return;
     document.save()
         .then(wasSaved => {
-        // console.log(document.isDirty);
-        console.log(wasSaved);
+        if (!wasSaved) {
+            vscode.window.showErrorMessage(`Could not save csv file`);
+        }
     });
 }
 //# sourceMappingURL=extension.js.map

@@ -105,15 +105,15 @@ function _setOption<T>(targetOptions: T, options: T, optionName: keyof T) {
  */
 function setCsvReadOptionsInitial(options: CsvReadOptions) {
 
-	const keys = Object.keys(csvReadOptions)
+	const keys = Object.keys(defaultCsvReadOptions)
 
 	for (const key of keys) {
-		_setOption(csvReadOptions, options, key as keyof CsvReadOptions)
+		_setOption(defaultCsvReadOptions, options, key as keyof CsvReadOptions)
 	}
 
 	//set ui from (maybe updated) options
 	const el1 = _getById('delimiter-string') as HTMLInputElement
-	el1.value = csvReadOptions.delimiter
+	el1.value = defaultCsvReadOptions.delimiter
 
 
 	//disabled
@@ -124,10 +124,10 @@ function setCsvReadOptionsInitial(options: CsvReadOptions) {
 	// }
 
 	const el3 = _getById('has-header') as HTMLInputElement
-	el3.checked = csvReadOptions._hasHeader
+	el3.checked = defaultCsvReadOptions._hasHeader
 
 	const el4 = _getById('comment-string') as HTMLInputElement
-	el4.value = csvReadOptions.comments === false ? '' : csvReadOptions.comments
+	el4.value = defaultCsvReadOptions.comments === false ? '' : defaultCsvReadOptions.comments
 }
 
 /**
@@ -137,21 +137,21 @@ function setCsvReadOptionsInitial(options: CsvReadOptions) {
  */
 function setCsvWriteOptionsInitial(options: CsvWriteOptions) {
 
-	const keys = Object.keys(csvWriteOptions)
+	const keys = Object.keys(defaultCsvWriteOptions)
 
 	for (const key of keys) {
-		_setOption(csvWriteOptions, options, key as keyof CsvWriteOptions)
+		_setOption(defaultCsvWriteOptions, options, key as keyof CsvWriteOptions)
 	}
 
 	//set ui from (maybe updated) options
 	const el1 = _getById('has-header-write') as HTMLInputElement
-	el1.checked = csvWriteOptions.header
+	el1.checked = defaultCsvWriteOptions.header
 
 	const el2 = _getById('delimiter-string-write') as HTMLInputElement
-	el2.value = csvWriteOptions.delimiter
+	el2.value = defaultCsvWriteOptions.delimiter
 
 	const el3 = _getById('comment-string-write') as HTMLInputElement
-	el3.value = csvWriteOptions.comments === false ? '' : csvWriteOptions.comments
+	el3.value = defaultCsvWriteOptions.comments === false ? '' : defaultCsvWriteOptions.comments
 }
 
 
@@ -159,11 +159,19 @@ function setCsvWriteOptionsInitial(options: CsvWriteOptions) {
  * parses and displays the given data (csv)
  * @param {string} content 
  */
-function readDataAgain(content: string, csvReadOptions: CsvReadOptions) {	
-	const _data = parseCsv(content, csvReadOptions) as string[][]
-	displayData(_data)
+function readDataAgain(content: string, csvReadOptions: CsvReadOptions) {
+	const _data = parseCsv(content, csvReadOptions)
+
+	if (!_data) {
+		displayData(_data, [], [])
+	}
+	else {
+		displayData(_data[1], _data[0], _data[2])
+	}
+
+
 	//might be bigger than the current view
-	onResize()
+	onResizeGrid()
 }
 
 
@@ -222,3 +230,185 @@ function _error(text: string) {
 	throw new Error(text)
 }
 
+/**
+ * apply the first part of the settings from initialConfig, called before parsing data
+ * some options have impact e.g. on how to parse the data...
+ * some options depend on the state after parse ... e.g. has before/after comments?
+ */
+function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefined) {
+
+	if (initialConfig === undefined) {
+
+		//probably in browser here...
+		displayOrHideCommentsSections(false)
+
+		toggleReadOptions(true)
+		toggleWriteOptions(true)
+		togglePreview(true)
+		toggleBeforeComments(true)
+		toggleAfterComments(true)
+
+		return
+	}
+
+	//apply settings from extension
+
+	const copyReadOptions = {
+		...defaultCsvReadOptions
+	}
+
+	setCsvReadOptionsInitial({
+		...copyReadOptions,
+		delimiter: initialConfig.readOption_delimiter,
+		comments: initialConfig.readOption_comment,
+		_hasHeader: initialConfig.readOption_hasHeader === 'true' ? true : false,
+	})
+
+	const copyWriteOptions = {
+		...defaultCsvReadOptions
+	}
+
+	setCsvWriteOptionsInitial({
+		...copyWriteOptions,
+		comments: initialConfig.writeOption_comment,
+		delimiter: initialConfig.writeOption_delimiter,
+		header: initialConfig.writeOption_hasHeader === 'true' ? true : false,
+	})
+
+
+	switch (initialConfig.readOptionsAppearance) {
+		case 'expanded': {
+			toggleReadOptions(false)
+			break
+		}
+		case 'collapsed': {
+			toggleReadOptions(true)
+			break
+		}
+		case 'remember': {
+			//TODO
+			toggleReadOptions(true)
+			break
+		}
+		default: {
+			_error(`unknown readOptionsAppearance: ${initialConfig.readOptionsAppearance}`)
+			break;
+		}
+	}
+
+	switch (initialConfig.writeOptionsAppearance) {
+		case 'expanded': {
+			toggleWriteOptions(false)
+			break
+		}
+		case 'collapsed': {
+			toggleWriteOptions(true)
+			break
+		}
+		case 'remember': {
+			//TODO
+			toggleWriteOptions(true)
+			break
+		}
+		default: {
+			_error(`unknown writeOptionsAppearance: ${initialConfig.writeOptionsAppearance}`)
+			break;
+		}
+	}
+
+	switch (initialConfig.previewOptionsAppearance) {
+		case 'expanded': {
+			togglePreview(false)
+			break
+		}
+		case 'collapsed': {
+			togglePreview(true)
+			break
+		}
+		case 'remember': {
+			//TODO
+			togglePreview(true)
+			break
+		}
+		default: {
+			_error(`unknown previewOptionsAppearance: ${initialConfig.previewOptionsAppearance}`)
+			break;
+		}
+	}
+
+}
+
+/**
+ * called after parsing data
+ */
+function setupAndApplyInitialConfigPart2(beforeComments: string[], afterComments: string[], initialConfig: CsvEditSettings | undefined) {
+
+	window.addEventListener('message', (event) => {
+		handleVsCodeMessage(event)
+	})
+
+	if (initialConfig === undefined) {
+
+		//probably in browser here...we already done all stuff
+		return
+	}
+
+	//apply settings from extension
+
+	switch (initialConfig.beforeCommentsAppearance) {
+		case 'always': // display but collapsed
+		case 'alwaysExpanded': {
+			toggleBeforeComments(initialConfig.beforeCommentsAppearance === 'always')
+			break
+		}
+		case 'never': {
+			toggleBeforeComments(false)
+			displayOrHideBeforeComments(true)
+			break
+		}
+		case 'onlyOnContent':
+		case 'onlyOnContentExpanded': {
+
+			//expand, if we show it manually we probably want to add comments...
+			toggleBeforeComments(false)
+
+			if (beforeComments.length === 0) {
+				displayOrHideBeforeComments(true)
+			}
+			break
+		}
+		default: {
+			_error(`unknown beforeCommentsAppearance: ${initialConfig.beforeCommentsAppearance}`)
+			break;
+		}
+	}
+
+	switch (initialConfig.afterCommentsAppearance) {
+		case 'always': // display but collapsed
+		case 'alwaysExpanded': {
+			toggleAfterComments(initialConfig.afterCommentsAppearance === 'always')
+			break
+		}
+		case 'never': {
+			toggleAfterComments(false)
+			displayOrHideAfterComments(true)
+			break
+		}
+		case 'onlyOnContent':
+		case 'onlyOnContentExpanded': {
+
+			//expand, if we show it manually we probably want to add comments...
+			toggleAfterComments(false)
+
+			if (beforeComments.length === 0) {
+				displayOrHideAfterComments(true)
+			}
+			break
+		}
+		default: {
+			_error(`unknown afterCommentsAppearance: ${initialConfig.afterCommentsAppearance}`)
+			break;
+		}
+	}
+
+}

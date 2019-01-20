@@ -10,7 +10,7 @@ const debounceDocumentChangeInMs = 1000
  * for editor uris this is the scheme to use
  * so we can find editors
  */
-const editorUriScheme = 'csv-edit'
+export const editorUriScheme = 'csv-edit'
 
 
 
@@ -85,6 +85,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	}
 
+	//@ts-ignore
 	const askRefresh = function (instance: Instance) {
 		const options = ['Yes', 'No']
 		vscode.window.showInformationMessage('The source file changed or was saved. Would you like to overwrite your csv edits with the new content?',
@@ -305,8 +306,9 @@ function _afterEditsApplied(document: vscode.TextDocument, editsApplied: boolean
 
 	document.save()
 		.then(wasSaved => {
-			// console.log(document.isDirty);
-			console.log(wasSaved)
+			if (!wasSaved) {
+				vscode.window.showErrorMessage(`Could not save csv file`);
+			}
 		})
 
 }

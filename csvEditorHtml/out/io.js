@@ -1,32 +1,4 @@
 "use strict";
-function getData() {
-    return hot.getData();
-}
-function getDataAsCsv(csvWriteOptions) {
-    const data = getData();
-    if (csvWriteOptions.newline === '') {
-        csvWriteOptions.newline = newLineFromInput;
-    }
-    if (csvWriteOptions.header) {
-        const colHeaderCells = hot.getColHeader();
-        if (hot.getSettings().colHeaders === defaultColHeaderFunc) {
-            data.unshift(colHeaderCells.map((p, index) => getSpreadsheetColumnLabel(index)));
-        }
-        else {
-            data.unshift(colHeaderCells);
-        }
-    }
-    let dataAsString = csv.unparse(data, csvWriteOptions);
-    if (csvWriteOptions.comments) {
-        if (commentLinesBefore.length > 0) {
-            dataAsString = commentLinesBefore.map(p => csvWriteOptions.comments + p).join(csvWriteOptions.newline) + csvWriteOptions.newline + dataAsString;
-        }
-        if (commentLinesAfter.length > 0) {
-            dataAsString = dataAsString + csvWriteOptions.newline + commentLinesAfter.map(p => csvWriteOptions.comments + p).join(csvWriteOptions.newline);
-        }
-    }
-    return dataAsString;
-}
 function parseCsv(content, csvReadOptions) {
     if (content === '') {
         content = defaultCsvContentIfEmpty;
@@ -43,11 +15,11 @@ function parseCsv(content, csvReadOptions) {
         }
         return null;
     }
-    csvWriteOptions.delimiter = parseResult.meta.delimiter;
+    defaultCsvWriteOptions.delimiter = parseResult.meta.delimiter;
     newLineFromInput = parseResult.meta.linebreak;
+    const commentLinesBefore = [];
+    const commentLinesAfter = [];
     if (csvReadOptions.comments) {
-        commentLinesBefore = [];
-        commentLinesAfter = [];
         let lines = content.split(newLineFromInput);
         let inBeforeLineRange = true;
         for (let i = 0; i < lines.length; i++) {
@@ -70,7 +42,47 @@ function parseCsv(content, csvReadOptions) {
             }
         }
     }
-    return parseResult.data;
+    return [
+        commentLinesBefore,
+        parseResult.data,
+        commentLinesAfter
+    ];
+}
+function getData() {
+    return hot.getData();
+}
+function getDataAsCsv(csvWriteOptions) {
+    const data = getData();
+    if (csvWriteOptions.newline === '') {
+        csvWriteOptions.newline = newLineFromInput;
+    }
+    if (csvWriteOptions.header) {
+        const colHeaderCells = hot.getColHeader();
+        if (hot.getSettings().colHeaders === defaultColHeaderFunc) {
+            data.unshift(colHeaderCells.map((p, index) => getSpreadsheetColumnLabel(index)));
+        }
+        else {
+            data.unshift(colHeaderCells);
+        }
+    }
+    let dataAsString = csv.unparse(data, csvWriteOptions);
+    if (csvWriteOptions.comments) {
+        const beforeCommentsTextarea = _getById(beforeCommentsTextareaId);
+        const afterCommentsTextarea = _getById(afterCommentsTextareaId);
+        const commentLinesBefore = beforeCommentsTextarea.value.length > 0
+            ? beforeCommentsTextarea.value.split('\n')
+            : [];
+        const commentLinesAfter = afterCommentsTextarea.value.length > 0
+            ? afterCommentsTextarea.value.split('\n')
+            : [];
+        if (commentLinesBefore.length > 0) {
+            dataAsString = commentLinesBefore.map(p => csvWriteOptions.comments + p).join(csvWriteOptions.newline) + csvWriteOptions.newline + dataAsString;
+        }
+        if (commentLinesAfter.length > 0) {
+            dataAsString = dataAsString + csvWriteOptions.newline + commentLinesAfter.map(p => csvWriteOptions.comments + p).join(csvWriteOptions.newline);
+        }
+    }
+    return dataAsString;
 }
 function postVsError(text) {
     if (!vscode)
@@ -81,7 +93,7 @@ function postVsError(text) {
     });
 }
 function postCommitContent(saveSourceFile) {
-    const csvContent = getDataAsCsv(csvWriteOptions);
+    const csvContent = getDataAsCsv(defaultCsvWriteOptions);
     if (document.activeElement != document.body)
         document.activeElement.blur();
     _posCommitContent(csvContent, saveSourceFile);
@@ -100,7 +112,7 @@ function handleVsCodeMessage(event) {
     switch (message.command) {
         case 'csvUpdate': {
             initialContent = message.csvContent;
-            readDataAgain(initialContent, csvReadOptions);
+            readDataAgain(initialContent, defaultCsvReadOptions);
             break;
         }
         case 'message': {

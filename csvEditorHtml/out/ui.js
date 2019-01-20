@@ -26,6 +26,42 @@ function togglePreview(shouldCollapse) {
     }
     _toggleCollapse(el, content);
 }
+function toggleBeforeComments(shouldCollapse) {
+    const el = _getById('comments-before-content-icon');
+    const content = _getById('comments-before-content');
+    if (shouldCollapse !== undefined) {
+        _setCollapsed(shouldCollapse, el, content);
+        onResizeGrid();
+        return;
+    }
+    _toggleCollapse(el, content);
+    onResizeGrid();
+}
+function displayOrHideCommentsSections(shouldHide) {
+    displayOrHideBeforeComments(shouldHide);
+    displayOrHideAfterComments(shouldHide);
+    const el = _getById(toggleCommentsSectionsButtonId);
+    el.style.display = shouldHide ? 'block' : 'none';
+}
+function displayOrHideBeforeComments(shouldHide) {
+    const div = _getById(commentsBeforeOptionId);
+    div.style.display = shouldHide ? 'none' : 'block';
+}
+function toggleAfterComments(shouldCollapse) {
+    const el = _getById('comments-after-content-icon');
+    const content = _getById('comments-after-content');
+    if (shouldCollapse !== undefined) {
+        _setCollapsed(shouldCollapse, el, content);
+        onResizeGrid();
+        return;
+    }
+    _toggleCollapse(el, content);
+    onResizeGrid();
+}
+function displayOrHideAfterComments(shouldHide) {
+    const div = _getById(commentsAfterOptionId);
+    div.style.display = shouldHide ? 'none' : 'block';
+}
 function _toggleCollapse(el, wrapper) {
     if (el.classList.contains('fa-chevron-right')) {
         _setCollapsed(false, el, wrapper);
@@ -69,55 +105,55 @@ function setHasHeader() {
 }
 function setDelimiterString() {
     const el = _getById('delimiter-string');
-    csvReadOptions.delimiter = el.value;
+    defaultCsvReadOptions.delimiter = el.value;
 }
 function setCommentString() {
     const el = _getById('comment-string');
-    csvReadOptions.comments = el.value === '' ? false : el.value;
+    defaultCsvReadOptions.comments = el.value === '' ? false : el.value;
 }
 function setSkipEmptyLines() {
 }
 function setReadDelimiter(delimiter) {
     const el = _getById('delimiter-string');
     el.value = delimiter;
-    csvReadOptions.delimiter = delimiter;
+    defaultCsvReadOptions.delimiter = delimiter;
 }
 function setHasHeaderWrite() {
     const el = _getById('has-header-write');
-    csvWriteOptions.header = el.checked;
+    defaultCsvWriteOptions.header = el.checked;
 }
 function setDelimiterStringWrite() {
     const el = _getById('delimiter-string-write');
-    csvWriteOptions.delimiter = el.value;
+    defaultCsvWriteOptions.delimiter = el.value;
 }
 function setCommentStringWrite() {
     const el = _getById('comment-string-write');
-    csvWriteOptions.comments = el.value === '' ? false : el.value;
+    defaultCsvWriteOptions.comments = el.value === '' ? false : el.value;
 }
 function setNewLineWrite() {
     const el = _getById('newline-select-write');
     if (el.value === '') {
-        csvWriteOptions.newline = newLineFromInput;
+        defaultCsvWriteOptions.newline = newLineFromInput;
     }
     else if (el.value === 'lf') {
-        csvWriteOptions.newline = '\n';
+        defaultCsvWriteOptions.newline = '\n';
     }
     else if (el.value === 'lf') {
-        csvWriteOptions.newline = '\r\n';
+        defaultCsvWriteOptions.newline = '\r\n';
     }
 }
 function setWriteDelimiter(delimiter) {
     const el = _getById('delimiter-string-write');
     el.value = delimiter;
-    csvWriteOptions.delimiter = delimiter;
+    defaultCsvWriteOptions.delimiter = delimiter;
 }
 function generateCsvPreview() {
-    const value = getDataAsCsv(csvWriteOptions);
+    const value = getDataAsCsv(defaultCsvWriteOptions);
     const el = _getById('csv-preview');
     el.value = value;
     togglePreview(false);
 }
-function displayData(data) {
+function displayData(data, commentLinesBefore, commentLinesAfter) {
     if (data === null) {
         if (hot) {
             hot.destroy();
@@ -131,6 +167,10 @@ function displayData(data) {
     if (hot) {
         hot.destroy();
     }
+    const beforeCommentsTextarea = _getById(beforeCommentsTextareaId);
+    beforeCommentsTextarea.value = commentLinesBefore.join('\n');
+    const afterCommentsTextarea = _getById(afterCommentsTextareaId);
+    afterCommentsTextarea.value = commentLinesAfter.join('\n');
     hot = new Handsontable(container, {
         data,
         rowHeaders: function (row) {
@@ -158,11 +198,14 @@ function displayData(data) {
             }
         },
     });
-    Handsontable.dom.addEvent(window, 'resize', throttle(onResize, 200));
+    Handsontable.dom.addEvent(window, 'resize', throttle(onResizeGrid, 200));
     checkIfHasHeaderReadOptionIsAvailable();
+    onResizeGrid();
 }
 let allColSizes = [];
-function onResize() {
+function onResizeGrid() {
+    if (!hot)
+        return;
     const widthString = getComputedStyle(csvEditorWrapper).width;
     if (!widthString) {
         _error(`could not resize table, width string was null`);

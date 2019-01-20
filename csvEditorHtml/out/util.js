@@ -46,33 +46,38 @@ function _setOption(targetOptions, options, optionName) {
     }
 }
 function setCsvReadOptionsInitial(options) {
-    const keys = Object.keys(csvReadOptions);
+    const keys = Object.keys(defaultCsvReadOptions);
     for (const key of keys) {
-        _setOption(csvReadOptions, options, key);
+        _setOption(defaultCsvReadOptions, options, key);
     }
     const el1 = _getById('delimiter-string');
-    el1.value = csvReadOptions.delimiter;
+    el1.value = defaultCsvReadOptions.delimiter;
     const el3 = _getById('has-header');
-    el3.checked = csvReadOptions._hasHeader;
+    el3.checked = defaultCsvReadOptions._hasHeader;
     const el4 = _getById('comment-string');
-    el4.value = csvReadOptions.comments === false ? '' : csvReadOptions.comments;
+    el4.value = defaultCsvReadOptions.comments === false ? '' : defaultCsvReadOptions.comments;
 }
 function setCsvWriteOptionsInitial(options) {
-    const keys = Object.keys(csvWriteOptions);
+    const keys = Object.keys(defaultCsvWriteOptions);
     for (const key of keys) {
-        _setOption(csvWriteOptions, options, key);
+        _setOption(defaultCsvWriteOptions, options, key);
     }
     const el1 = _getById('has-header-write');
-    el1.checked = csvWriteOptions.header;
+    el1.checked = defaultCsvWriteOptions.header;
     const el2 = _getById('delimiter-string-write');
-    el2.value = csvWriteOptions.delimiter;
+    el2.value = defaultCsvWriteOptions.delimiter;
     const el3 = _getById('comment-string-write');
-    el3.value = csvWriteOptions.comments === false ? '' : csvWriteOptions.comments;
+    el3.value = defaultCsvWriteOptions.comments === false ? '' : defaultCsvWriteOptions.comments;
 }
 function readDataAgain(content, csvReadOptions) {
     const _data = parseCsv(content, csvReadOptions);
-    displayData(_data);
-    onResize();
+    if (!_data) {
+        displayData(_data, [], []);
+    }
+    else {
+        displayData(_data[1], _data[0], _data[2]);
+    }
+    onResizeGrid();
 }
 function checkIfHasHeaderReadOptionIsAvailable() {
     const data = getData();
@@ -120,5 +125,130 @@ function throttle(func, wait) {
 function _error(text) {
     postVsError(text);
     throw new Error(text);
+}
+function setupAndApplyInitialConfigPart1(initialConfig) {
+    if (initialConfig === undefined) {
+        displayOrHideCommentsSections(false);
+        toggleReadOptions(true);
+        toggleWriteOptions(true);
+        togglePreview(true);
+        toggleBeforeComments(true);
+        toggleAfterComments(true);
+        return;
+    }
+    const copyReadOptions = Object.assign({}, defaultCsvReadOptions);
+    setCsvReadOptionsInitial(Object.assign({}, copyReadOptions, { delimiter: initialConfig.readOption_delimiter, comments: initialConfig.readOption_comment, _hasHeader: initialConfig.readOption_hasHeader === 'true' ? true : false }));
+    const copyWriteOptions = Object.assign({}, defaultCsvReadOptions);
+    setCsvWriteOptionsInitial(Object.assign({}, copyWriteOptions, { comments: initialConfig.writeOption_comment, delimiter: initialConfig.writeOption_delimiter, header: initialConfig.writeOption_hasHeader === 'true' ? true : false }));
+    switch (initialConfig.readOptionsAppearance) {
+        case 'expanded': {
+            toggleReadOptions(false);
+            break;
+        }
+        case 'collapsed': {
+            toggleReadOptions(true);
+            break;
+        }
+        case 'remember': {
+            toggleReadOptions(true);
+            break;
+        }
+        default: {
+            _error(`unknown readOptionsAppearance: ${initialConfig.readOptionsAppearance}`);
+            break;
+        }
+    }
+    switch (initialConfig.writeOptionsAppearance) {
+        case 'expanded': {
+            toggleWriteOptions(false);
+            break;
+        }
+        case 'collapsed': {
+            toggleWriteOptions(true);
+            break;
+        }
+        case 'remember': {
+            toggleWriteOptions(true);
+            break;
+        }
+        default: {
+            _error(`unknown writeOptionsAppearance: ${initialConfig.writeOptionsAppearance}`);
+            break;
+        }
+    }
+    switch (initialConfig.previewOptionsAppearance) {
+        case 'expanded': {
+            togglePreview(false);
+            break;
+        }
+        case 'collapsed': {
+            togglePreview(true);
+            break;
+        }
+        case 'remember': {
+            togglePreview(true);
+            break;
+        }
+        default: {
+            _error(`unknown previewOptionsAppearance: ${initialConfig.previewOptionsAppearance}`);
+            break;
+        }
+    }
+}
+function setupAndApplyInitialConfigPart2(beforeComments, afterComments, initialConfig) {
+    window.addEventListener('message', (event) => {
+        handleVsCodeMessage(event);
+    });
+    if (initialConfig === undefined) {
+        return;
+    }
+    switch (initialConfig.beforeCommentsAppearance) {
+        case 'always':
+        case 'alwaysExpanded': {
+            toggleBeforeComments(initialConfig.beforeCommentsAppearance === 'always');
+            break;
+        }
+        case 'never': {
+            toggleBeforeComments(false);
+            displayOrHideBeforeComments(true);
+            break;
+        }
+        case 'onlyOnContent':
+        case 'onlyOnContentExpanded': {
+            toggleBeforeComments(false);
+            if (beforeComments.length === 0) {
+                displayOrHideBeforeComments(true);
+            }
+            break;
+        }
+        default: {
+            _error(`unknown beforeCommentsAppearance: ${initialConfig.beforeCommentsAppearance}`);
+            break;
+        }
+    }
+    switch (initialConfig.afterCommentsAppearance) {
+        case 'always':
+        case 'alwaysExpanded': {
+            toggleAfterComments(initialConfig.afterCommentsAppearance === 'always');
+            break;
+        }
+        case 'never': {
+            toggleAfterComments(false);
+            displayOrHideAfterComments(true);
+            break;
+        }
+        case 'onlyOnContent':
+        case 'onlyOnContentExpanded': {
+            toggleAfterComments(false);
+            if (beforeComments.length === 0) {
+                displayOrHideAfterComments(true);
+            }
+            break;
+        }
+        default: {
+            _error(`unknown afterCommentsAppearance: ${initialConfig.afterCommentsAppearance}`);
+            break;
+        }
+    }
 }
 //# sourceMappingURL=util.js.map

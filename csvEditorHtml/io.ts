@@ -3,6 +3,87 @@
  * everything for communication or read / write
  */
 
+
+/**
+* parses the content as csv
+* also fills the commentLinesBefore and commentLinesAfter array if comments is enabled
+* on error the errors are displayed and null is returned
+* @param {string} content 
+* @returns {[string[], string[][], string[]]| null} [0] comments before, [1] csv data, [2] comments after
+*/
+function parseCsv(content: string, csvReadOptions: CsvReadOptions): [string[], string[][], string[]] | null {
+
+
+	if (content === '') {
+		content = defaultCsvContentIfEmpty
+	}
+
+	const parseResult = csv.parse(content, {
+		...csvReadOptions,
+		comments: csvReadOptions.comments === false ? '' : csvReadOptions.comments,
+	})
+
+
+	//we allow empty content for newly created files
+	if (parseResult.errors.length > 0) {
+		for (let i = 0; i < parseResult.errors.length; i++) {
+			const error = parseResult.errors[i];
+
+			if (error.row) {
+				_error(`${error.message} on line ${error.row}`)
+				continue
+			}
+
+			_error(`${error.message}`)
+		}
+
+		return null
+	}
+
+	defaultCsvWriteOptions.delimiter = parseResult.meta.delimiter
+	newLineFromInput = parseResult.meta.linebreak
+
+	const commentLinesBefore = []
+	const commentLinesAfter = []
+
+	if (csvReadOptions.comments) {
+
+		let lines = content.split(newLineFromInput)
+		let inBeforeLineRange = true
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i];
+
+			if (inBeforeLineRange) {
+
+				if (line.startsWith(csvReadOptions.comments)) {
+					commentLinesBefore.push(line.substring(csvReadOptions.comments.length))
+					continue
+				}
+
+				if (line === '') {
+					continue
+				}
+
+				inBeforeLineRange = false
+			}
+			else {
+
+				if (line.startsWith(csvReadOptions.comments)) {
+					commentLinesAfter.push(line.substring(csvReadOptions.comments.length))
+					continue
+				}
+			}
+		}
+	}
+
+	return [
+		commentLinesBefore,
+		parseResult.data,
+		commentLinesAfter
+	]
+}
+
+
 /**
  * 
  * @returns {string[][]} the current data in the handson table
@@ -45,6 +126,16 @@ function getDataAsCsv(csvWriteOptions: CsvWriteOptions): string {
 
 	if (csvWriteOptions.comments) {
 
+		const beforeCommentsTextarea = _getById(beforeCommentsTextareaId) as HTMLTextAreaElement
+		const afterCommentsTextarea = _getById(afterCommentsTextareaId) as HTMLTextAreaElement
+
+		const commentLinesBefore = beforeCommentsTextarea.value.length > 0
+			? beforeCommentsTextarea.value.split('\n')
+			: []
+		const commentLinesAfter = afterCommentsTextarea.value.length > 0
+			? afterCommentsTextarea.value.split('\n')
+			: []
+
 		if (commentLinesBefore.length > 0) {
 			dataAsString = commentLinesBefore.map(p => csvWriteOptions.comments + p).join(csvWriteOptions.newline) + csvWriteOptions.newline + dataAsString
 		}
@@ -59,80 +150,6 @@ function getDataAsCsv(csvWriteOptions: CsvWriteOptions): string {
 }
 
 
-
-/**
- * parses the content as csv
- * also fills the commentLinesBefore and commentLinesAfter array if comments is enabled
- * on error the errors are displayed and null is returned
- * @param {string} content 
- * @returns {string[][] | null}
- */
-function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] | null {
-
-
-	if (content === '') {
-		content = defaultCsvContentIfEmpty
-	}
-
-	const parseResult = csv.parse(content, {
-		...csvReadOptions,
-		comments: csvReadOptions.comments === false ? '' : csvReadOptions.comments,
-	})
-	
-
-	//we allow empty content for newly created files
-	if (parseResult.errors.length > 0) {
-		for (let i = 0; i < parseResult.errors.length; i++) {
-			const error = parseResult.errors[i];
-
-			if (error.row) {
-				_error(`${error.message} on line ${error.row}`)
-				continue
-			}
-
-			_error(`${error.message}`)
-		}
-
-		return null
-	}
-
-	csvWriteOptions.delimiter = parseResult.meta.delimiter
-	newLineFromInput = parseResult.meta.linebreak
-
-	if (csvReadOptions.comments) {
-		commentLinesBefore = []
-		commentLinesAfter = []
-		let lines = content.split(newLineFromInput)
-		let inBeforeLineRange = true
-		for (let i = 0; i < lines.length; i++) {
-			const line = lines[i];
-
-			if (inBeforeLineRange) {
-
-				if (line.startsWith(csvReadOptions.comments)) {
-					commentLinesBefore.push(line.substring(csvReadOptions.comments.length))
-					continue
-				}
-
-				if (line === '') {
-					continue
-				}
-
-				inBeforeLineRange = false
-			}
-			else {
-
-				if (line.startsWith(csvReadOptions.comments)) {
-					commentLinesAfter.push(line.substring(csvReadOptions.comments.length))
-					continue
-				}
-			}
-		}
-	}
-
-	return parseResult.data
-}
-
 /* --- messages back to vs code --- */
 
 /**
@@ -142,7 +159,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] |
 function postVsError(text: string) {
 
 	if (!vscode) return
-	
+
 	vscode.postMessage({
 		command: 'error',
 		content: text
@@ -154,7 +171,7 @@ function postVsError(text: string) {
  * @param saveSourceFile 
  */
 function postCommitContent(saveSourceFile: boolean) {
-	const csvContent = getDataAsCsv(csvWriteOptions)
+	const csvContent = getDataAsCsv(defaultCsvWriteOptions)
 
 	//used to clear focus... else styles are not properly applied
 	//@ts-ignore
@@ -186,8 +203,8 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 		case 'csvUpdate': {
 
 			initialContent = message.csvContent
-			readDataAgain(initialContent, csvReadOptions)
-			
+			readDataAgain(initialContent, defaultCsvReadOptions)
+
 			break
 		}
 

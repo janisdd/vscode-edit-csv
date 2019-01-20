@@ -3,6 +3,9 @@ let vscode = undefined;
 if (typeof acquireVsCodeApi !== 'undefined') {
     vscode = acquireVsCodeApi();
 }
+if (typeof initialConfig === 'undefined') {
+    var initialConfig = undefined;
+}
 const csv = window.Papa;
 let hot;
 const defaultCsvContentIfEmpty = `,\n,`;
@@ -10,7 +13,7 @@ let headerRow = null;
 let miscOptions = {
     doubleClickMinColWidth: 200
 };
-let csvReadOptions = {
+let defaultCsvReadOptions = {
     header: false,
     comments: '#',
     delimiter: '',
@@ -20,7 +23,7 @@ let csvReadOptions = {
     dynamicTyping: false,
     _hasHeader: false
 };
-let csvWriteOptions = {
+let defaultCsvWriteOptions = {
     header: false,
     comments: '#',
     delimiter: '',
@@ -28,27 +31,28 @@ let csvWriteOptions = {
     quoteChar: '"',
 };
 let newLineFromInput = '\n';
-let commentLinesBefore = [];
-let commentLinesAfter = [];
 const csvEditorWrapper = _getById('csv-editor-wrapper');
 const csvEditorDiv = _getById('csv-editor');
 const helModalDiv = _getById('help-modal');
-setCsvReadOptionsInitial(csvReadOptions);
-setCsvWriteOptionsInitial(csvWriteOptions);
+const beforeCommentsTextareaId = 'comments-before';
+const afterCommentsTextareaId = 'comments-after';
+const commentsBeforeOptionId = 'comments-before-option';
+const commentsAfterOptionId = 'comments-after-option';
+const toggleCommentsSectionsButtonId = 'toggle-comments-sections';
+setCsvReadOptionsInitial(defaultCsvReadOptions);
+setCsvWriteOptionsInitial(defaultCsvWriteOptions);
 if (typeof initialContent === 'undefined') {
     var initialContent = '';
 }
 if (initialContent === undefined) {
     initialContent = '';
 }
+console.log("initialConfig: ", initialConfig);
 console.log("initialContent: " + initialContent);
-let _data = parseCsv(initialContent, csvReadOptions);
-displayData(_data);
-toggleReadOptions(true);
-toggleWriteOptions(true);
-togglePreview(true);
-onResize();
-window.addEventListener('message', (event) => {
-    handleVsCodeMessage(event);
-});
+setupAndApplyInitialConfigPart1(initialConfig);
+let _data = parseCsv(initialContent, defaultCsvReadOptions);
+if (_data) {
+    displayData(_data[1], _data[0], _data[2]);
+    setupAndApplyInitialConfigPart2(_data[0], _data[2], initialConfig);
+}
 //# sourceMappingURL=main.js.map

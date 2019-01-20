@@ -142,7 +142,80 @@
 		},
 		"configuration": {
 			"title": "Edit csv configuration",
-			"properties": {}
+			"type": "object",
+			"properties": {
+				"csv-edit.beforeCommentsAppearance": {
+					"type": "string",
+					"default": "onlyOnContent",
+					"description": "the appearance of the before comments section if it is not displayed initially you can still display it manually",
+					"enum": ["always", "alwaysExpanded", "onlyOnContent", "onlyOnContentExpanded", "never"],
+					"enumDescriptions": ["always visible", "always visible but expanded", "displayed if we have before comments", "displayed if we have before comments but expanded", "never displayed but comments are still exported (we use write options to decide this)"]
+				},
+				"csv-edit.afterCommentsAppearance": {
+					"type": "string",
+					"default": "onlyOnContent",
+					"description": "the appearance of the after comments section if it is not displayed initially you can still display it manually",
+					"enum": ["always", "alwaysExpanded", "onlyOnContent", "onlyOnContentExpanded", "never"],
+					"enumDescriptions": ["always visible", "always visible but expanded", "displayed if we have after comments", "displayed if we have after comments but expanded", "never displayed but comments are still exported (we use write options to decide this)"]
+				},
+				"csv-edit.readOptionsAppearance": {
+					"type": "string",
+					"default": "remember",
+					"description": "the appearance of the read option section",
+					"enum": ["expanded", "collapsed", "remember"],
+					"enumDescriptions": ["read options will always start expanded", "read options will always start collapsed", "read options will use the last state (across all edit session, we use the latest)"]
+				},
+				"csv-edit.writeOptionsAppearance": {
+					"type": "string",
+					"default": "remember",
+					"description": "the appearance of the write option section",
+					"enum": ["expanded", "collapsed", "remember"],
+					"enumDescriptions": ["write options will always start expanded", "write options will always start collapsed", "write options will use the last state (across all edit session, we use the latest)"]
+				},
+				"csv-edit.previewOptionsAppearance": {
+					"type": "string",
+					"default": "remember",
+					"description": "the appearance of the preview section",
+					"enum": ["expanded", "collapsed", "remember"],
+					"enumDescriptions": ["preview section will always start expanded", "preview section will always start collapsed", "preview section will use the last state (across all edit session, we use the latest)"]
+				},
+
+				"csv-edit.readOption_hasHeader": {
+					"type": "string",
+					"default": "false",
+					"description": "whether the first data line is a header line",
+					"enum": ["true", "false"],
+					"enumDescriptions": ["first row is the header row", "first row is a normal data row"]
+				},
+				"csv-edit.readOption_delimiter": {
+					"type": "string",
+					"default": "",
+					"description": "the delimiter to use, empty string to auto detect"
+				},
+				"csv-edit.readOption_comment": {
+					"type": "string",
+					"default": "#",
+					"description": "the string used as comment, empty string to thread every line as data line (no comments)"
+				},
+
+				"csv-edit.writeOption_hasHeader": {
+					"type": "string",
+					"default": "false",
+					"description": "whether the first data line is a header line",
+					"enum": ["true", "false"],
+					"enumDescriptions": ["first row is the header row", "first row is a normal data row"]
+				},
+				"csv-edit.writeOption_delimiter": {
+					"type": "string",
+					"default": "",
+					"description": "the delimiter to use, empty string to auto detect"
+				},
+				"csv-edit.writeOption_comment": {
+					"type": "string",
+					"default": "#",
+					"description": "the string used as comment, empty string to exclude comments"
+				}
+			}
 		}
 	},
 	"scripts": {

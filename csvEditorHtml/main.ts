@@ -1,11 +1,16 @@
 
 declare var acquireVsCodeApi: any
 declare var initialContent: string
+declare var initialConfig: CsvEditSettings | undefined
 
-let vscode: VsExtension | undefined  = undefined 
+let vscode: VsExtension | undefined = undefined
 
 if (typeof acquireVsCodeApi !== 'undefined') {
 	vscode = acquireVsCodeApi()
+}
+
+if (typeof initialConfig === 'undefined') {
+	var initialConfig = undefined as CsvEditSettings | undefined
 }
 
 const csv: typeof import('papaparse') = (window as any).Papa
@@ -35,7 +40,7 @@ let miscOptions: MiscOptions = {
 
 
 //csv reader options + some ui options
-let csvReadOptions: CsvReadOptions = {
+let defaultCsvReadOptions: CsvReadOptions = {
 	header: false, //always use false to get an array of arrays
 	comments: '#',
 	delimiter: '', //auto detect
@@ -47,7 +52,7 @@ let csvReadOptions: CsvReadOptions = {
 }
 
 
-let csvWriteOptions: CsvWriteOptions = {
+let defaultCsvWriteOptions: CsvWriteOptions = {
 	header: false,
 	comments: '#',
 	delimiter: '', //'' = use from input, will be set from empty to string when exporting (or earlier)
@@ -56,19 +61,26 @@ let csvWriteOptions: CsvWriteOptions = {
 }
 let newLineFromInput = '\n'
 
-//before csv content
-let commentLinesBefore: string[] = []
-let commentLinesAfter: string[] = []
 
 const csvEditorWrapper = _getById('csv-editor-wrapper')
 const csvEditorDiv = _getById('csv-editor')
 const helModalDiv = _getById('help-modal')
 
+//we store the comments inside the text areas
+const beforeCommentsTextareaId = 'comments-before'
+const afterCommentsTextareaId = 'comments-after'
+
+const commentsBeforeOptionId = 'comments-before-option'
+const commentsAfterOptionId = 'comments-after-option'
+
+const toggleCommentsSectionsButtonId = 'toggle-comments-sections'
+
+
 
 /* main */
 
-setCsvReadOptionsInitial(csvReadOptions)
-setCsvWriteOptionsInitial(csvWriteOptions)
+setCsvReadOptionsInitial(defaultCsvReadOptions)
+setCsvWriteOptionsInitial(defaultCsvWriteOptions)
 
 if (typeof initialContent === 'undefined') {
 	var initialContent = ''
@@ -78,21 +90,28 @@ if (initialContent === undefined) {
 	initialContent = ''
 }
 
+// initialContent =
+// 	`
+// #test
+// 1,2,3
+// 4,5,6
+
+// #after
+// `
+
+console.log("initialConfig: ", initialConfig);
 console.log("initialContent: " + initialContent);
 
+setupAndApplyInitialConfigPart1(initialConfig)
+
 //see readDataAgain
-let _data = parseCsv(initialContent, csvReadOptions)
-//@ts-ignore
-// _data = Handsontable.helper.createSpreadsheetData(100, 20)
-displayData(_data)
+let _data = parseCsv(initialContent, defaultCsvReadOptions)
 
+if (_data) {
+	//@ts-ignore
+	// _data = Handsontable.helper.createSpreadsheetData(100, 20)
+	displayData(_data[1], _data[0], _data[2])
 
-toggleReadOptions(true)
-toggleWriteOptions(true)
-togglePreview(true)
+	setupAndApplyInitialConfigPart2(_data[0], _data[2], initialConfig)
+}
 
-onResize();
-
-window.addEventListener('message', (event) => {
-	handleVsCodeMessage(event)
-})
