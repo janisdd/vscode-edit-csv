@@ -16,7 +16,7 @@ function toggleReadOptions(shouldCollapse: boolean) {
 		return
 	}
 
-		_toggleCollapse(el, content)
+	_toggleCollapse(el, content)
 }
 
 /**
@@ -72,7 +72,7 @@ function displayOrHideCommentsSections(shouldHide: boolean) {
 	displayOrHideBeforeComments(shouldHide)
 	displayOrHideAfterComments(shouldHide)
 
-	const el =_getById(toggleCommentsSectionsButtonId)
+	const el = _getById(toggleCommentsSectionsButtonId)
 
 	el.style.display = shouldHide ? 'block' : 'none'
 }
@@ -115,7 +115,7 @@ function _toggleCollapse(el: HTMLElement, wrapper: HTMLElement) {
 
 function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLElement) {
 
-	if(shouldCollapsed) {
+	if (shouldCollapsed) {
 		el.classList.remove('fa-chevron-down')
 		el.classList.add('fa-chevron-right')
 		// el.classList.replace( 'fa-chevron-down','fa-chevron-right')
@@ -156,7 +156,7 @@ function setHasHeader() {
 
 		hot.alter('remove_row', 0)
 
-		
+
 		elWrite.checked = true
 		return
 	}
@@ -177,7 +177,7 @@ function setDelimiterString() {
 
 }
 function setCommentString() {
-	const el = _getById('comment-string')  as HTMLInputElement
+	const el = _getById('comment-string') as HTMLInputElement
 	defaultCsvReadOptions.comments = el.value === '' ? false : el.value
 }
 
@@ -194,7 +194,7 @@ function setSkipEmptyLines() {
  * @param {string} delimiter 
  */
 function setReadDelimiter(delimiter: string) {
-	const el = _getById('delimiter-string')  as HTMLInputElement
+	const el = _getById('delimiter-string') as HTMLInputElement
 	el.value = delimiter
 	defaultCsvReadOptions.delimiter = delimiter
 }
@@ -292,13 +292,13 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 	//TODO settings?
 	const afterCommentsTextarea = _getById(afterCommentsTextareaId) as HTMLTextAreaElement
 	afterCommentsTextarea.value = commentLinesAfter.join('\n')
-	
+
 
 	//@ts-ignore
 	hot = new Handsontable(container, {
 		data,
-		rowHeaders: function(row: number) {
-			let text = (row+1).toString()
+		rowHeaders: function (row: number) {
+			let text = (row + 1).toString()
 			return `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
 		} as any,
 		fillHandle: false,
@@ -316,8 +316,8 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 		outsideClickDeselects: false, //keep selection
 		//TODO see https://github.com/handsontable/handsontable/issues/3328
 		//only working because first argument is actually the old size
-		beforeColumnResize: function(oldSize, newSize, isDoubleClick) { //after change but before render
-			
+		beforeColumnResize: function (oldSize, newSize, isDoubleClick) { //after change but before render
+
 			if (allColSizes.length > 0 && isDoubleClick) {
 				// const oldSize = allColSizes[currentColumn]
 
@@ -329,10 +329,64 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 				}
 			}
 		},
+		enterMoves: function (event: KeyboardEvent) {
+			const selection = hot.getSelected()
+			const _default = {
+				row: 1,
+				col: 0
+			}
+
+			if (!initialConfig || initialConfig.lastRowEnterBehavior !== 'createRow') return _default
+
+			if (!selection || selection.length == 0) return _default
+
+			if (selection.length > 1) return _default
+
+			const rowCount = hot.countRows()
+
+			//see https://handsontable.com/docs/3.0.0/Core.html#getSelected
+			//[startRow, startCol, endRow, endCol].
+			const selected = selection[0]
+			if (selected[0] != selected[2] || selected[0] !== rowCount - 1) return _default
+
+			if (event.key.toLowerCase() === 'enter' && event.shiftKey === false) {
+				addRow(false)
+			}
+			return _default
+		},
+		tabMoves: function (event: KeyboardEvent) {
+			const selection = hot.getSelected()
+			const _default = {
+				row: 0,
+				col: 1
+			}
+
+			// console.log(initialConfig.lastColumnTabBehavior);
+			
+			if (!initialConfig || initialConfig.lastColumnTabBehavior !== 'createColumn') return _default
+
+			if (!selection || selection.length == 0) return _default
+
+			if (selection.length > 1) return _default
+
+			const colCount = hot.countCols()
+
+			//see https://handsontable.com/docs/3.0.0/Core.html#getSelected
+			//[startRow, startCol, endRow, endCol]
+			const selected = selection[0]
+			if (selected[1] != selected[3] || selected[1] !== colCount - 1) return _default
+
+			if (event.key.toLowerCase() === 'tab' && event.shiftKey === false) {
+				addColumn(false)
+			}
+			return _default
+		}
+
 	})
 
 	//@ts-ignore
 	Handsontable.dom.addEvent(window as any, 'resize', throttle(onResizeGrid, 200))
+
 
 	checkIfHasHeaderReadOptionIsAvailable()
 
@@ -357,7 +411,7 @@ function onResizeGrid() {
 		return
 	}
 
-	const width = parseInt(widthString.substring(0, widthString.length-2))
+	const width = parseInt(widthString.substring(0, widthString.length - 2))
 
 	const heightString = getComputedStyle(csvEditorWrapper).height
 
@@ -366,7 +420,7 @@ function onResizeGrid() {
 		return
 	}
 
-	const height = parseInt(heightString.substring(0, heightString.length-2))
+	const height = parseInt(heightString.substring(0, heightString.length - 2))
 
 	hot.updateSettings({
 		width: width,
@@ -400,11 +454,11 @@ function defaultColHeaderFunc(colIndex: number, colName: string | undefined) {
  * @param isVisible 
  */
 function toggleHelpModal(isVisible: boolean) {
-	
+
 	if (isVisible) {
 		helModalDiv.classList.add('is-active')
 		return
 	}
-	
+
 	helModalDiv.classList.remove('is-active')
 }

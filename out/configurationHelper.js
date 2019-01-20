@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = require("vscode");
 const extension_1 = require("./extension");
 const defaultConfig = {
+    lastRowEnterBehavior: 'default',
+    lastColumnTabBehavior: 'default',
     beforeCommentsAppearance: "onlyOnContent",
     afterCommentsAppearance: "onlyOnContent",
     previewOptionsAppearance: "remember",

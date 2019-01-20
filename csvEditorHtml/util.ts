@@ -46,22 +46,27 @@ function removeColumn(index: number) {
 
 /**
  * adds a new row at the end
- * and scrolls to the first col in the new row
+ * @param {boolean} selectNewRow true: scrolls to the  new row
  */
-function addRow() {
+function addRow(selectNewRow = true) {
 
 	// const headerCells = hot.getColHeader()
 	const numRows = hot.countRows()
 	hot.alter('insert_row', numRows) //inserted data contains null but papaparse correctly unparses it as ''
 	// hot.populateFromArray(numRows, 0, [headerCells.map(p => '')])
-	hot.selectCell(numRows, 0)
+
+	if (selectNewRow) {
+		hot.selectCell(numRows, 0)
+	}
+	
 	checkIfHasHeaderReadOptionIsAvailable()
 }
 
 /**
  * adds a new column at the end
+ * @param {boolean} selectNewColumn true: scrolls to the new column
  */
-function addColumn() {
+function addColumn(selectNewColumn = true) {
 
 	const numCols = hot.countCols()
 	hot.alter('insert_col', numCols) //inserted data contains null but papaparse correctly unparses it as ''
@@ -71,7 +76,10 @@ function addColumn() {
 
 	const pos = hot.getSelected() //undefined or [[startRow, startCol, endRow, endCol], ...] (could select not connected cells...)
 	if (pos && pos.length === 1) { //only 1 row selected
-		hot.selectCell(pos[0][0], numCols)
+
+		if (selectNewColumn) {
+			hot.selectCell(pos[0][0], numCols)
+		}
 	}
 }
 
@@ -400,7 +408,7 @@ function setupAndApplyInitialConfigPart2(beforeComments: string[], afterComments
 			//expand, if we show it manually we probably want to add comments...
 			toggleAfterComments(false)
 
-			if (beforeComments.length === 0) {
+			if (afterComments.length === 0) {
 				displayOrHideAfterComments(true)
 			}
 			break

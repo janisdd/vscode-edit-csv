@@ -13,12 +13,6 @@
 
 - what if row has more cols? not displayed but are they exported?
 
-- new line is not respected? edit converts auto?
-  - disable option & add to help modal
-
-- add option for comments (vs)
-  - only show if any (+ expand)
-  - for before & after
 
 ## Maybe
 
@@ -32,7 +26,3 @@ https://code.visualstudio.com/api/extension-guides/webview
 
 - clearify why commit (can do undo on file) (in help dialog?)
 
-- new line is not respected? edit converts auto?
-
-- add option when last line + enter add new line
-- same for col & tab

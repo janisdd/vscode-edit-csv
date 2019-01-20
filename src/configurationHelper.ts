@@ -4,6 +4,8 @@ import { editorUriScheme } from './extension';
 
 
 const defaultConfig: CsvEditSettings = {
+	lastRowEnterBehavior: 'default',
+	lastColumnTabBehavior: 'default',
 	beforeCommentsAppearance: "onlyOnContent",
 	afterCommentsAppearance: "onlyOnContent",
 	previewOptionsAppearance: "remember",

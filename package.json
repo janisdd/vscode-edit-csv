@@ -144,6 +144,21 @@
 			"title": "Edit csv configuration",
 			"type": "object",
 			"properties": {
+				"csv-edit.lastRowEnterBehavior": {
+					"type": "string",
+					"default": "default",
+					"description": "if one edits a cell in the last row and presses enter what the editor should do",
+					"enum": ["default", "createRow"],
+					"enumDescriptions": ["default of handsontable", "create a new row"]
+				},
+				"csv-edit.lastColumnTabBehavior": {
+					"type": "string",
+					"default": "default",
+					"description": "if one edits a cell in the last column and presses tab what the editor should do",
+					"enum": ["default", "createColumn"],
+					"enumDescriptions": ["default of handsontable", "create a new column"]
+				},
+
 				"csv-edit.beforeCommentsAppearance": {
 					"type": "string",
 					"default": "onlyOnContent",

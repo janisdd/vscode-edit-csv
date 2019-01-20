@@ -18,19 +18,23 @@ function removeColumn(index) {
     hot.alter('remove_col', index);
     checkIfHasHeaderReadOptionIsAvailable();
 }
-function addRow() {
+function addRow(selectNewRow = true) {
     const numRows = hot.countRows();
     hot.alter('insert_row', numRows);
-    hot.selectCell(numRows, 0);
+    if (selectNewRow) {
+        hot.selectCell(numRows, 0);
+    }
     checkIfHasHeaderReadOptionIsAvailable();
 }
-function addColumn() {
+function addColumn(selectNewColumn = true) {
     const numCols = hot.countCols();
     hot.alter('insert_col', numCols);
     checkIfHasHeaderReadOptionIsAvailable();
     const pos = hot.getSelected();
     if (pos && pos.length === 1) {
-        hot.selectCell(pos[0][0], numCols);
+        if (selectNewColumn) {
+            hot.selectCell(pos[0][0], numCols);
+        }
     }
 }
 function _setOption(targetOptions, options, optionName) {
@@ -240,7 +244,7 @@ function setupAndApplyInitialConfigPart2(beforeComments, afterComments, initialC
         case 'onlyOnContent':
         case 'onlyOnContentExpanded': {
             toggleAfterComments(false);
-            if (beforeComments.length === 0) {
+            if (afterComments.length === 0) {
                 displayOrHideAfterComments(true);
             }
             break;

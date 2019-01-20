@@ -197,6 +197,48 @@ function displayData(data, commentLinesBefore, commentLinesAfter) {
                 }
             }
         },
+        enterMoves: function (event) {
+            const selection = hot.getSelected();
+            const _default = {
+                row: 1,
+                col: 0
+            };
+            if (!initialConfig || initialConfig.lastRowEnterBehavior !== 'createRow')
+                return _default;
+            if (!selection || selection.length == 0)
+                return _default;
+            if (selection.length > 1)
+                return _default;
+            const rowCount = hot.countRows();
+            const selected = selection[0];
+            if (selected[0] != selected[2] || selected[0] !== rowCount - 1)
+                return _default;
+            if (event.key.toLowerCase() === 'enter' && event.shiftKey === false) {
+                addRow(false);
+            }
+            return _default;
+        },
+        tabMoves: function (event) {
+            const selection = hot.getSelected();
+            const _default = {
+                row: 0,
+                col: 1
+            };
+            if (!initialConfig || initialConfig.lastColumnTabBehavior !== 'createColumn')
+                return _default;
+            if (!selection || selection.length == 0)
+                return _default;
+            if (selection.length > 1)
+                return _default;
+            const colCount = hot.countCols();
+            const selected = selection[0];
+            if (selected[1] != selected[3] || selected[1] !== colCount - 1)
+                return _default;
+            if (event.key.toLowerCase() === 'tab' && event.shiftKey === false) {
+                addColumn(false);
+            }
+            return _default;
+        }
     });
     Handsontable.dom.addEvent(window, 'resize', throttle(onResizeGrid, 200));
     checkIfHasHeaderReadOptionIsAvailable();

@@ -6,6 +6,22 @@
 type CsvEditSettings = {
 
 	/**
+	 * if one edits a cell in the last row and presses enter what the editor should do
+	 * 
+	 * default: default of handson table
+	 * createRow: create a new row
+	 */
+	lastRowEnterBehavior: 'default' | 'createRow'
+
+	/**
+	 * if one edits a cell in the last column and presses tab what the editor should do
+	 * 
+	 * default: default of handson table
+	 * createColumn: create a new column
+	 */
+	lastColumnTabBehavior: 'default' | 'createColumn'
+
+	/**
 	 * the appearance of the before comments section if it is not displayed initially you can still display it manually
 	 * always: always visible but collapsed 
 	 * alwaysExpanded: always visible but expanded
