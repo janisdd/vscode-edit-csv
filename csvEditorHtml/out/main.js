@@ -36,6 +36,8 @@ const afterCommentsTextareaId = 'comments-after';
 const commentsBeforeOptionId = 'comments-before-option';
 const commentsAfterOptionId = 'comments-after-option';
 const toggleCommentsSectionsButtonId = 'toggle-comments-sections';
+const commentsBeforeHasContentDiv = _getById('comments-before-has-content');
+const commentsAfterHasContentDiv = _getById('comments-after-has-content');
 setCsvReadOptionsInitial(defaultCsvReadOptions);
 setCsvWriteOptionsInitial(defaultCsvWriteOptions);
 if (typeof initialContent === 'undefined') {
@@ -44,14 +46,6 @@ if (typeof initialContent === 'undefined') {
 if (initialContent === undefined) {
     initialContent = '';
 }
-initialContent =
-    `
-#test
-1,2,3
-4,5,6,7,8
-
-#after
-`;
 console.log("initialConfig: ", initialConfig);
 console.log("initialContent: " + initialContent);
 setupAndApplyInitialConfigPart1(initialConfig);

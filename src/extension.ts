@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { debounce, isCsvFile, getCurrentViewColumn } from './util';
 import { createEditorHtml } from './getHtml';
 import { InstanceManager, Instance } from './instanceManager';
+import { getExtensionConfiguration } from './configurationHelper';
 
 
 const debounceDocumentChangeInMs = 1000
@@ -154,6 +155,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	}, debounceDocumentChangeInMs));
 
+	vscode.workspace.onDidOpenTextDocument((args) => {
+		console.log(args);
+	})
 	vscode.workspace.onDidSaveTextDocument(debounce((args: vscode.TextDocument) => {
 
 		if (!isCsvFile(args)) return //closed non-csv file ... we cannot have an editor for this document
@@ -161,7 +165,9 @@ export function activate(context: vscode.ExtensionContext) {
 		// const instance = InstanceManager[args.document.uri.toString()]
 		// if (!instance) return
 
-		// console.log('save');
+		console.log(args);
+		
+		console.log('save');
 		// askRefresh(instance)
 
 	}, debounceDocumentChangeInMs))
@@ -223,6 +229,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	//just set the panel if we added the instance
 	instance.panel = panel
+	const config = getExtensionConfiguration()
 
 	panel.webview.onDidReceiveMessage((message: any) => { //TODO PostMessage
 
@@ -233,7 +240,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 			}
 			case "commit": {
 				const { csvContent, saveSourceFile } = message
-				commitContent(instance, csvContent, saveSourceFile)
+				commitContent(instance, csvContent, saveSourceFile, config.openSourceFileAfterCommit)
 				break
 			}
 
@@ -258,7 +265,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 }
 
-function commitContent(instance: Instance, newContent: string, saveSourceFile: boolean) {
+function commitContent(instance: Instance, newContent: string, saveSourceFile: boolean, openSourceFileAfterCommit: boolean) {
 
 	vscode.workspace.openTextDocument(instance.sourceUri)
 		.then(document => {
@@ -275,7 +282,7 @@ function commitContent(instance: Instance, newContent: string, saveSourceFile: b
 			edit.replace(document.uri, textRange, newContent)
 			vscode.workspace.applyEdit(edit)
 				.then(editsApplied => {
-					_afterEditsApplied(document, editsApplied, saveSourceFile)
+					_afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterCommit)
 				})
 
 			// vscode.window.showTextDocument(document)
@@ -298,21 +305,25 @@ function commitContent(instance: Instance, newContent: string, saveSourceFile: b
 		})
 }
 
-function _afterEditsApplied(document: vscode.TextDocument, editsApplied: boolean, saveSourceFile: boolean) {
+function _afterEditsApplied(document: vscode.TextDocument, editsApplied: boolean, saveSourceFile: boolean, openSourceFileAfterCommit: boolean) {
 
+	if (openSourceFileAfterCommit) {
+		vscode.window.showTextDocument(document)
+	}
+	
 	if (!editsApplied) {
 		vscode.window.showErrorMessage(`edits could not be applied`);
 		return
 	}
 
-	if (!saveSourceFile) return
-
-	document.save()
+	if (saveSourceFile) {
+		document.save()
 		.then(wasSaved => {
 			if (!wasSaved) {
 				vscode.window.showErrorMessage(`Could not save csv file`);
 			}
 		})
+	}
 
 }
 

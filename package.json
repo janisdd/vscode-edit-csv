@@ -13,6 +13,7 @@
 	"keywords": [
 		"CSV"
 	],
+	"preview": true,
 	"activationEvents": [
 		"onCommand:edit-csv.edit",
 		"onCommand:edit-csv.goto-source"
@@ -235,6 +236,16 @@
 					"type": "number",
 					"default": "200",
 					"description": "normally the columns are auto sized, if we click on the handle when it has auto size then its with is set to this value (in px). Useful if we have a very wide column (wider than the screen and quickly want to shrink it)"
+				},
+				"csv-edit.openSourceFileAfterCommit": {
+					"type": "boolean",
+					"default": false,
+					"description": "true: opens the source file after commit, false: keep the editor displayed"
+				},
+				"csv-edit.selectTextAfterBeginEditCell": {
+					"type": "boolean",
+					"default": false,
+					"description": "true: select the text inside the cell (note you can also select the cell and start typings to overwrite the cell value), false: cursor starts at the end of the text"
 				}
 			}
 		}

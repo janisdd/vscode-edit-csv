@@ -65,7 +65,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 	<div class="all-options">
 
 		<div class="options-bar">
-			<div>
+			<div class="flexed">
 				<div class="options-title clickable" onclick="toggleReadOptions()">Read options <i id="read-options-icon" class="fas fa-chevron-right"></i></div>
 			</div>
 
@@ -187,7 +187,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 
 				<div>
 					<button id="toggle-comments-sections" class="button is-light" onclick="displayOrHideCommentsSections(false)">
-						<span>Show Comments sections</span>
+						<span>Show Comment sections</span>
 					</button>
 				</div>
 
@@ -228,7 +228,17 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 			<span>Add column</span>
 		</button>
 
-		<button style="margin-left: 3em;" class="button  is-outlined" onclick="postCommitContent(true)">
+		<!-- in case we selected never display comment sections we use these icons as hint...  -->
+		<div style="display: inline-flex;">
+			<div id="comments-before-has-content" class="hoverable tooltip is-tooltip-bottom mar-left" data-tooltip="We got before comments">
+				<i class="fas fa-quote-left"></i>
+			</div>
+			<div id="comments-after-has-content" class="hoverable tooltip is-tooltip-bottom mar-left" data-tooltip="We got after comments">
+				<i class="fas fa-quote-right"></i>
+			</div>
+		</div>
+
+		<button class="button  is-outlined mar-left" onclick="postCommitContent(true)">
 			<span class="icon is-small">
 				<i class="fas fa-save"></i>
 			</span>
@@ -266,12 +276,12 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 			</span>
 		</div>
 		<div id="comments-before-content">
-			<textarea id="comments-before" rows="3" class="textarea"></textarea>
+			<textarea id="comments-before" rows="3" class="textarea"  onblur="onCommentsBeforeBlur(event)"></textarea>
 		</div>
 	</div>
 
 	<!-- main editor/grid area -->
-	<div id="csv-editor-wrapper" class="csv-editor-wrapper">
+	<div id="csv-editor-wrapper" class="csv-editor-wrapper" onclick="onEditorAreaClick(event)">
 		<div id="csv-editor"></div>
 	</div>
 
@@ -284,7 +294,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 			</span>
 		</div>
 		<div id="comments-after-content">
-			<textarea id="comments-after" rows="3" class="textarea"></textarea>
+			<textarea id="comments-after" rows="3" class="textarea" onblur="onCommentsAfterBlur(event)"></textarea>
 		</div>
 	</div>
 
@@ -342,6 +352,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 					<li>Comments before and after csv content is preserved (if write comment option has a value)</li>
 					<li>You cannot change the new line character because vs code automatically converts it to the file setting</li>
 					<li>If a row has more cell than the others the additional cells are ignored</li>
+					<li>Extension configuration is only applied for new editors</li>
 				</ul>
 			</div>
 
@@ -351,7 +362,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 	<button class="modal-close is-large" aria-label="close" onclick="toggleHelpModal()"></button>
 </div>
 
-</div>
+
 	<script>
 		var initialConfig = ${JSON.stringify(config)};
 		//make sure we escape here via json e.g. if we have $\{\} in a csv file...

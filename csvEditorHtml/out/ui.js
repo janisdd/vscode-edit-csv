@@ -95,6 +95,12 @@ function _setCollapsed(shouldCollapsed, el, wrapper) {
     el.classList.remove('fa-chevron-right');
     wrapper.style.display = 'block';
 }
+function toggleBeforeCommentsIndicator(shouldHide) {
+    commentsBeforeHasContentDiv.style.visibility = shouldHide ? 'collapse' : 'visible';
+}
+function toggleAfterCommentsIndicator(shouldHide) {
+    commentsAfterHasContentDiv.style.visibility = shouldHide ? 'collapse' : 'visible';
+}
 function setHasHeader() {
     const el = _getById('has-header');
     const data = getData();
@@ -253,6 +259,17 @@ function displayData(data, commentLinesBefore, commentLinesAfter) {
                 addColumn(false);
             }
             return _default;
+        },
+        afterBeginEditing: function () {
+            if (!initialConfig || !initialConfig.selectTextAfterBeginEditCell)
+                return;
+            const textarea = document.getElementsByClassName("handsontableInput");
+            if (!textarea || textarea.length === 0 || textarea.length > 1)
+                return;
+            const el = textarea.item(0);
+            if (!el)
+                return;
+            el.setSelectionRange(0, el.value.length);
         }
     });
     Handsontable.dom.addEvent(window, 'resize', throttle(onResizeGrid, 200));
@@ -297,5 +314,13 @@ function toggleHelpModal(isVisible) {
         return;
     }
     helModalDiv.classList.remove('is-active');
+}
+function onCommentsBeforeInput(event) {
+    const el = event.currentTarget;
+    toggleBeforeCommentsIndicator(el.value === '');
+}
+function onCommentsAfterInput(event) {
+    const el = event.currentTarget;
+    toggleAfterCommentsIndicator(el.value === '');
 }
 //# sourceMappingURL=ui.js.map

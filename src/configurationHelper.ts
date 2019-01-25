@@ -18,6 +18,8 @@ const defaultConfig: CsvEditSettings = {
 	writeOption_delimiter: "",
 	writeOption_hasHeader: "false",
 	doubleClickColumnHandleForcedWith: 200,
+	openSourceFileAfterCommit: false,
+	selectTextAfterBeginEditCell: false
 }
 
 /**

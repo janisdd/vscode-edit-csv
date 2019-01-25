@@ -159,6 +159,16 @@ function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLE
 	wrapper.style.display = 'block'
 }
 
+
+function toggleBeforeCommentsIndicator(shouldHide: boolean) {
+	commentsBeforeHasContentDiv.style.visibility = shouldHide ? 'collapse' : 'visible'
+}
+
+function toggleAfterCommentsIndicator(shouldHide: boolean) {
+	commentsAfterHasContentDiv.style.visibility = shouldHide ? 'collapse' : 'visible'
+}
+
+
 /* --- read options --- */
 
 function setHasHeader() {
@@ -410,6 +420,19 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 				addColumn(false)
 			}
 			return _default
+		},
+
+		afterBeginEditing: function () {
+			
+			if (!initialConfig || !initialConfig.selectTextAfterBeginEditCell) return
+
+			const textarea = document.getElementsByClassName("handsontableInput")
+			if (!textarea || textarea.length === 0 || textarea.length > 1) return
+
+			const el = textarea.item(0) as HTMLTextAreaElement | null
+			if (!el) return
+
+			el.setSelectionRange(0, el.value.length)
 		}
 
 	})
@@ -491,4 +514,20 @@ function toggleHelpModal(isVisible: boolean) {
 	}
 
 	helModalDiv.classList.remove('is-active')
+}
+
+/**
+ * somehow swallows handsontable the click event?
+ * when we click on the empty area the active element is not blurred...
+ * so we use oninput instead
+ * @param event 
+ */
+function onCommentsBeforeInput(event: Event) {
+	const el = event.currentTarget as HTMLTextAreaElement
+	toggleBeforeCommentsIndicator(el.value === '')
+}
+
+function onCommentsAfterInput(event: Event) {
+	const el = event.currentTarget as HTMLTextAreaElement
+	toggleAfterCommentsIndicator(el.value === '')
 }

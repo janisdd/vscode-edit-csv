@@ -4,6 +4,7 @@ const vscode = require("vscode");
 const util_1 = require("./util");
 const getHtml_1 = require("./getHtml");
 const instanceManager_1 = require("./instanceManager");
+const configurationHelper_1 = require("./configurationHelper");
 const debounceDocumentChangeInMs = 1000;
 /**
  * for editor uris this is the scheme to use
@@ -111,12 +112,16 @@ function activate(context) {
         // console.log('change: ' + args.contentChanges[0].text);
         // askRefresh(instance)
     }, debounceDocumentChangeInMs));
+    vscode.workspace.onDidOpenTextDocument((args) => {
+        console.log(args);
+    });
     vscode.workspace.onDidSaveTextDocument(util_1.debounce((args) => {
         if (!util_1.isCsvFile(args))
             return; //closed non-csv file ... we cannot have an editor for this document
         // const instance = InstanceManager[args.document.uri.toString()]
         // if (!instance) return
-        // console.log('save');
+        console.log(args);
+        console.log('save');
         // askRefresh(instance)
     }, debounceDocumentChangeInMs));
     vscode.workspace.onDidCloseTextDocument((args) => {
@@ -164,6 +169,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
     }
     //just set the panel if we added the instance
     instance.panel = panel;
+    const config = configurationHelper_1.getExtensionConfiguration();
     panel.webview.onDidReceiveMessage((message) => {
         switch (message.command) {
             case "error": {
@@ -172,7 +178,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
             }
             case "commit": {
                 const { csvContent, saveSourceFile } = message;
-                commitContent(instance, csvContent, saveSourceFile);
+                commitContent(instance, csvContent, saveSourceFile, config.openSourceFileAfterCommit);
                 break;
             }
             default: {
@@ -191,7 +197,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
     }, null, context.subscriptions);
     panel.webview.html = getHtml_1.createEditorHtml(context, initialText);
 }
-function commitContent(instance, newContent, saveSourceFile) {
+function commitContent(instance, newContent, saveSourceFile, openSourceFileAfterCommit) {
     vscode.workspace.openTextDocument(instance.sourceUri)
         .then(document => {
         const edit = new vscode.WorkspaceEdit();
@@ -201,7 +207,7 @@ function commitContent(instance, newContent, saveSourceFile) {
         edit.replace(document.uri, textRange, newContent);
         vscode.workspace.applyEdit(edit)
             .then(editsApplied => {
-            _afterEditsApplied(document, editsApplied, saveSourceFile);
+            _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterCommit);
         });
         // vscode.window.showTextDocument(document)
         // 	.then(editor => {
@@ -220,19 +226,22 @@ function commitContent(instance, newContent, saveSourceFile) {
         // 	})
     });
 }
-function _afterEditsApplied(document, editsApplied, saveSourceFile) {
+function _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterCommit) {
+    if (openSourceFileAfterCommit) {
+        vscode.window.showTextDocument(document);
+    }
     if (!editsApplied) {
         vscode.window.showErrorMessage(`edits could not be applied`);
         return;
     }
-    if (!saveSourceFile)
-        return;
-    document.save()
-        .then(wasSaved => {
-        if (!wasSaved) {
-            vscode.window.showErrorMessage(`Could not save csv file`);
-        }
-    });
+    if (saveSourceFile) {
+        document.save()
+            .then(wasSaved => {
+            if (!wasSaved) {
+                vscode.window.showErrorMessage(`Could not save csv file`);
+            }
+        });
+    }
 }
 // class CsvEditStateSerializer  implements vscode.WebviewPanelSerializer{
 // 	static state: VsState = {

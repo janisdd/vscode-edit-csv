@@ -1,28 +1,28 @@
 # TODO
 
-
 --- add
 
-- ask if source file changed... changes are lost
+- add commit, commit & save as commands... to allow keyboard binding?
 
-- can uri change? other file opened or saved?
+- quote char
+
+- unnamed file save --> unnamed closed --> closes editor, new opened... somehow closes new file?
+
+- ask if source file changed... changes are lost?
+  --> should not happen... no update, add to hints (first)
 
 
-- test comments before & after & between (should be removed)
+- add to help modal BIG: all cells are strings!! e.g. sorting might not work as expected
 
-
-- what if row has more cols? not displayed but are they exported?
-
+- document workflow...
 
 ## Maybe
 
-store collapse states
+store collapse states?
 https://code.visualstudio.com/api/extension-guides/webview
-
 
 - goto source, resourceScheme == csv-edit ... not displayed
 
 - clear command --> delete all instances ?
 
-- clearify why commit (can do undo on file) (in help dialog?)
 

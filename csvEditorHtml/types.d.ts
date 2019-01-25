@@ -69,14 +69,14 @@ type CsvEditSettings = {
 	/**
 	 * the string used as comment, empty string to thread every line as data line (no comments)
 	 */
-	readOption_comment: string 
+	readOption_comment: string
 
-		/**
-	 * true: first row is the header row
-	 * false: first row is a normal data row
-	 * 
-	 * we use a string in case we want to add other options...
-	 */
+	/**
+ * true: first row is the header row
+ * false: first row is a normal data row
+ * 
+ * we use a string in case we want to add other options...
+ */
 	readOption_hasHeader: 'true' | 'false'
 
 
@@ -96,13 +96,23 @@ type CsvEditSettings = {
 	/**
 	 * the string used as comment, empty string to exclude comments
 	 */
-	writeOption_comment: string 
+	writeOption_comment: string
 
 
 	/**
 	 * normally the columns are auto sized, if we click on the handle when it has auto size then its with is set to this value (in px). Useful if we have a very wide column (wider than the screen and quickly want to shrink it)
 	 */
 	doubleClickColumnHandleForcedWith: number
+
+	/**
+	 * true: opens the source file after commit, false: keep the editor displayed
+	 */
+	openSourceFileAfterCommit: boolean
+
+	/**
+	 * true: select the text inside the cell (note you can also select the cell and start typings to overwrite the cell value), false: cursor starts at the end of the text
+	 */
+	selectTextAfterBeginEditCell: boolean
 }
 
 /* --- frontend settings --- */
@@ -198,7 +208,7 @@ type CsvUpdateMessage = {
 }
 
 
-type ReceivedMessageFromVsCode = ShowMessage |  CsvUpdateMessage
+type ReceivedMessageFromVsCode = ShowMessage | CsvUpdateMessage
 
 
 type DisplayErrorMessage = {

@@ -56,6 +56,10 @@ html, body {
 	opacity: 0.7;
 }
 
+.hoverable:hover {
+	opacity: 1;
+}
+
 .clickable {
 	opacity: 0.7;
 	cursor: pointer
@@ -154,4 +158,8 @@ input.input {
   white-space: nowrap;
   display: inline-block;
   margin-bottom: 5px;
+}
+
+.margin-centered {
+	margin: auto;
 }

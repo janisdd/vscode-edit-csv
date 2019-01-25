@@ -191,6 +191,8 @@ function setupAndApplyInitialConfigPart2(beforeComments, afterComments, initialC
     window.addEventListener('message', (event) => {
         handleVsCodeMessage(event);
     });
+    toggleBeforeCommentsIndicator(beforeComments.length === 0);
+    toggleAfterCommentsIndicator(afterComments.length === 0);
     if (initialConfig === undefined) {
         return;
     }
@@ -260,20 +262,14 @@ function _createDefaultVsState() {
 }
 function _setReadOptionCollapsedVsState(isCollapsed) {
     if (vscode) {
-        const lastState = _getVsState();
-        const newState = Object.assign({}, lastState, { readOptionIsCollapsed: isCollapsed });
     }
 }
 function _setWriteOptionCollapsedVsState(isCollapsed) {
     if (vscode) {
-        const lastState = _getVsState();
-        const newState = Object.assign({}, lastState, { writeOptionIsCollapsed: isCollapsed });
     }
 }
 function _setPreviewCollapsedVsState(isCollapsed) {
     if (vscode) {
-        const lastState = _getVsState();
-        const newState = Object.assign({}, lastState, { previewIsCollapsed: isCollapsed });
     }
 }
 //# sourceMappingURL=util.js.map

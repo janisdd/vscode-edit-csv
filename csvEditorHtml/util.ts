@@ -348,12 +348,16 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 
 /**
  * called after parsing data
+ * e.g. we need to know if we have comments here
  */
 function setupAndApplyInitialConfigPart2(beforeComments: string[], afterComments: string[], initialConfig: CsvEditSettings | undefined) {
 
 	window.addEventListener('message', (event) => {
 		handleVsCodeMessage(event)
 	})
+	
+	toggleBeforeCommentsIndicator(beforeComments.length === 0)
+	toggleAfterCommentsIndicator(afterComments.length === 0)
 
 	if (initialConfig === undefined) {
 
@@ -446,11 +450,11 @@ function _createDefaultVsState(): VsState {
 
 function _setReadOptionCollapsedVsState(isCollapsed: boolean) {
 	if (vscode) {
-		const lastState = _getVsState()
-		const newState = {
-			...lastState,
-			readOptionIsCollapsed: isCollapsed
-		}
+		// const lastState = _getVsState()
+		// const newState = {
+		// 	...lastState,
+		// 	readOptionIsCollapsed: isCollapsed
+		// }
 		// console.log(JSON.stringify(newState));
 		// vscode.setState(newState)
 	}
@@ -458,22 +462,22 @@ function _setReadOptionCollapsedVsState(isCollapsed: boolean) {
 
 function _setWriteOptionCollapsedVsState(isCollapsed: boolean) {
 	if (vscode) {
-		const lastState = _getVsState()
-		const newState: VsState = {
-			...lastState,
-			writeOptionIsCollapsed: isCollapsed
-		}
+		// const lastState = _getVsState()
+		// const newState: VsState = {
+		// 	...lastState,
+		// 	writeOptionIsCollapsed: isCollapsed
+		// }
 		// vscode.setState(newState)
 	}
 }
 
 function _setPreviewCollapsedVsState(isCollapsed: boolean) {
 	if (vscode) {
-		const lastState = _getVsState()
-		const newState: VsState = {
-			...lastState,
-			previewIsCollapsed: isCollapsed
-		}
+		// const lastState = _getVsState()
+		// const newState: VsState = {
+		// 	...lastState,
+		// 	previewIsCollapsed: isCollapsed
+		// }
 		// vscode.setState(newState)
 	}
 }
