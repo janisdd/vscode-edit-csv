@@ -2,7 +2,6 @@
 
 --- add
 
-- add commit, commit & save as commands... to allow keyboard binding?
 
 - quote char
 

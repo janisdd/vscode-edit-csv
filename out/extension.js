@@ -18,6 +18,24 @@ function activate(context) {
     // This line of code will only be executed once when your extension is activated
     let instanceManager = new instanceManager_1.InstanceManager();
     // const initCommand = vscode.window.registerWebviewPanelSerializer('csv-edit.init', new CsvEditStateSerializer())
+    const commitCsvCommand = vscode.commands.registerCommand('edit-csv.commit', () => {
+        const instance = getActiveEditorInstance(instanceManager);
+        if (!instance)
+            return;
+        const msg = {
+            command: "commitPress"
+        };
+        instance.panel.webview.postMessage(msg);
+    });
+    const commitAndSaveCsvCommand = vscode.commands.registerCommand('edit-csv.commitAndSave', () => {
+        const instance = getActiveEditorInstance(instanceManager);
+        if (!instance)
+            return;
+        const msg = {
+            command: "commitAndSavePress"
+        };
+        instance.panel.webview.postMessage(msg);
+    });
     //called to get from an editor to the source file
     const gotoSourceCsvCommand = vscode.commands.registerCommand('edit-csv.goto-source', () => {
         if (vscode.window.activeTextEditor) { //a web view is no text editor...
@@ -138,6 +156,8 @@ function activate(context) {
     });
     context.subscriptions.push(editCsvCommand);
     context.subscriptions.push(gotoSourceCsvCommand);
+    context.subscriptions.push(commitCsvCommand);
+    context.subscriptions.push(commitAndSaveCsvCommand);
 }
 exports.activate = activate;
 // this method is called when your extension is deactivated
@@ -242,6 +262,26 @@ function _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFi
             }
         });
     }
+}
+/**
+ * returns the active (editor) instance or null
+ * error messages are already handled here
+ * @param instanceManager
+ */
+function getActiveEditorInstance(instanceManager) {
+    if (vscode.window.activeTextEditor) { //a web view is no text editor...
+        vscode.window.showInformationMessage("Open a csv editor first to commit changes");
+        return null;
+    }
+    let instance;
+    try {
+        instance = instanceManager.getActiveEditorInstance();
+    }
+    catch (error) {
+        vscode.window.showErrorMessage(`Could not find the editor instance, error: ${error.message}`);
+        return null;
+    }
+    return instance;
 }
 // class CsvEditStateSerializer  implements vscode.WebviewPanelSerializer{
 // 	static state: VsState = {

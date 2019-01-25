@@ -115,7 +115,12 @@ function handleVsCodeMessage(event) {
             readDataAgain(initialContent, defaultCsvReadOptions);
             break;
         }
-        case 'message': {
+        case 'commitPress': {
+            postCommitContent(false);
+            break;
+        }
+        case 'commitAndSavePress': {
+            postCommitContent(true);
             break;
         }
         default: {

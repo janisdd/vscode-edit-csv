@@ -27,6 +27,28 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// const initCommand = vscode.window.registerWebviewPanelSerializer('csv-edit.init', new CsvEditStateSerializer())
 
+	const commitCsvCommand = vscode.commands.registerCommand('edit-csv.commit', () => {
+
+		const instance = getActiveEditorInstance(instanceManager)
+		if (!instance) return
+
+		const msg: RequestCommitPressMessage = {
+			command: "commitPress"
+		}
+		instance.panel.webview.postMessage(msg)
+	})
+
+	const commitAndSaveCsvCommand = vscode.commands.registerCommand('edit-csv.commitAndSave', () => {
+
+		const instance = getActiveEditorInstance(instanceManager)
+		if (!instance) return
+
+		const msg: RequestCommitAndSavePressMessage = {
+			command: "commitAndSavePress"
+		}
+		instance.panel.webview.postMessage(msg)
+	})
+
 	//called to get from an editor to the source file
 	const gotoSourceCsvCommand = vscode.commands.registerCommand('edit-csv.goto-source', () => {
 
@@ -191,6 +213,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(editCsvCommand)
 	context.subscriptions.push(gotoSourceCsvCommand)
+	context.subscriptions.push(commitCsvCommand)
+	context.subscriptions.push(commitAndSaveCsvCommand)
 }
 
 // this method is called when your extension is deactivated
@@ -231,7 +255,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	instance.panel = panel
 	const config = getExtensionConfiguration()
 
-	panel.webview.onDidReceiveMessage((message: any) => { //TODO PostMessage
+	panel.webview.onDidReceiveMessage((message: PostMessage) => {
 
 		switch (message.command) {
 			case "error": {
@@ -325,6 +349,30 @@ function _afterEditsApplied(document: vscode.TextDocument, editsApplied: boolean
 		})
 	}
 
+}
+
+
+/**
+ * returns the active (editor) instance or null
+ * error messages are already handled here
+ * @param instanceManager 
+ */
+function getActiveEditorInstance(instanceManager: InstanceManager): Instance | null {
+
+	if (vscode.window.activeTextEditor) { //a web view is no text editor...
+		vscode.window.showInformationMessage("Open a csv editor first to commit changes")
+		return null
+	}
+
+	let instance: Instance
+	try {
+		instance = instanceManager.getActiveEditorInstance()
+	} catch (error) {
+		vscode.window.showErrorMessage(`Could not find the editor instance, error: ${error.message}`)
+		return null
+	}
+
+	return instance
 }
 
 // class CsvEditStateSerializer  implements vscode.WebviewPanelSerializer{

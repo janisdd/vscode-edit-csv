@@ -193,22 +193,24 @@ type MiscOptions = {
 }
 
 
-
-/**
- * a message from vs code/extension to the webview
- */
-type ShowMessage = {
-	command: 'message'
-}
-
-
 type CsvUpdateMessage = {
 	command: 'csvUpdate'
 	csvContent: string
 }
 
-
-type ReceivedMessageFromVsCode = ShowMessage | CsvUpdateMessage
+/**
+ * the web view should call the handler of the commit button (emulate press)
+ */
+type RequestCommitPressMessage = {
+	command: 'commitPress'
+}
+/**
+ * the web view should call the handler of the commit and save button (emulate press)
+ */
+type RequestCommitAndSavePressMessage = {
+	command: 'commitAndSavePress'
+}
+type ReceivedMessageFromVsCode = CsvUpdateMessage | RequestCommitPressMessage | RequestCommitAndSavePressMessage
 
 
 type DisplayErrorMessage = {

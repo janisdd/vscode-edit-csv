@@ -208,10 +208,16 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 			break
 		}
 
-		case 'message': {
-
+		case 'commitPress': {
+			postCommitContent(false)
 			break
 		}
+
+		case 'commitAndSavePress': {
+			postCommitContent(true)
+			break
+		}
+
 		default: {
 			_error('received unknown message from vs code')
 			break

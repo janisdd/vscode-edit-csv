@@ -16,7 +16,8 @@
 	"preview": true,
 	"activationEvents": [
 		"onCommand:edit-csv.edit",
-		"onCommand:edit-csv.goto-source"
+		"onCommand:edit-csv.commit",
+		"onCommand:edit-csv.commitAndSave"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -51,6 +52,16 @@
 				"command": "edit-csv.goto-source",
 				"category": "CSV",
 				"title": "Go to csv source file"
+			},
+			{
+				"command": "edit-csv.commit",
+				"category": "CSV",
+				"title": "Commit changes to source file"
+			},
+			{
+				"command": "edit-csv.commitAndSave",
+				"category": "CSV",
+				"title": "Commit changes to source file and save"
 			}
 		],
 		"menus": {
