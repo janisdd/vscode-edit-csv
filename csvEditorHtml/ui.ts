@@ -212,11 +212,21 @@ function setHasHeader() {
 function setDelimiterString() {
 	const el = _getById('delimiter-string') as HTMLInputElement
 	defaultCsvReadOptions.delimiter = el.value
-
 }
+
 function setCommentString() {
 	const el = _getById('comment-string') as HTMLInputElement
 	defaultCsvReadOptions.comments = el.value === '' ? false : el.value
+}
+
+function setQuoteCharString() {
+	const el = _getById('quote-char-string') as HTMLInputElement
+	defaultCsvReadOptions.quoteChar = el.value
+}
+
+function setEscapeCharString() {
+	const el = _getById('escape-char-string') as HTMLInputElement
+	defaultCsvReadOptions.escapeChar = el.value
 }
 
 function setSkipEmptyLines() {
@@ -255,6 +265,24 @@ function setCommentStringWrite() {
 	defaultCsvWriteOptions.comments = el.value === '' ? false : el.value
 }
 
+function setQuoteCharStringWrite() {
+	const el = _getById('quote-char-string-write') as HTMLInputElement
+	defaultCsvWriteOptions.quoteChar = el.value
+}
+
+function setEscapeCharStringWrite() {
+	const el = _getById('escape-char-string-write') as HTMLInputElement
+	defaultCsvWriteOptions.escapeChar = el.value
+}
+
+function setQuoteAllFieldsWrite() {
+	const el = _getById('quote-all-fields-write') as HTMLInputElement
+	defaultCsvWriteOptions.quoteAllFields = el.checked
+}
+
+/**
+ * NOT USED CURRENTLY (ui is hidden)
+ */
 function setNewLineWrite() {
 	const el = _getById('newline-select-write') as HTMLInputElement
 
@@ -287,6 +315,8 @@ function setWriteDelimiter(delimiter: string) {
  */
 function generateCsvPreview() {
 	const value = getDataAsCsv(defaultCsvWriteOptions)
+	console.log(defaultCsvWriteOptions);
+	
 	const el = _getById('csv-preview') as HTMLTextAreaElement
 	el.value = value
 

@@ -60,6 +60,10 @@ function setCsvReadOptionsInitial(options) {
     el3.checked = defaultCsvReadOptions._hasHeader;
     const el4 = _getById('comment-string');
     el4.value = defaultCsvReadOptions.comments === false ? '' : defaultCsvReadOptions.comments;
+    const el5 = _getById('quote-char-string');
+    el5.value = defaultCsvReadOptions.quoteChar;
+    const el6 = _getById('escape-char-string');
+    el6.value = defaultCsvReadOptions.escapeChar;
 }
 function setCsvWriteOptionsInitial(options) {
     const keys = Object.keys(defaultCsvWriteOptions);
@@ -72,6 +76,12 @@ function setCsvWriteOptionsInitial(options) {
     el2.value = defaultCsvWriteOptions.delimiter;
     const el3 = _getById('comment-string-write');
     el3.value = defaultCsvWriteOptions.comments === false ? '' : defaultCsvWriteOptions.comments;
+    const el4 = _getById('quote-char-string-write');
+    el4.value = defaultCsvWriteOptions.quoteChar;
+    const el5 = _getById('escape-char-string-write');
+    el5.value = defaultCsvWriteOptions.quoteChar;
+    const el6 = _getById('quote-all-fields-write');
+    el6.checked = defaultCsvWriteOptions.quoteAllFields;
 }
 function readDataAgain(content, csvReadOptions) {
     const _data = parseCsv(content, csvReadOptions);
@@ -141,9 +151,9 @@ function setupAndApplyInitialConfigPart1(initialConfig) {
         return;
     }
     const copyReadOptions = Object.assign({}, defaultCsvReadOptions);
-    setCsvReadOptionsInitial(Object.assign({}, copyReadOptions, { delimiter: initialConfig.readOption_delimiter, comments: initialConfig.readOption_comment, _hasHeader: initialConfig.readOption_hasHeader === 'true' ? true : false }));
+    setCsvReadOptionsInitial(Object.assign({}, copyReadOptions, { delimiter: initialConfig.readOption_delimiter, comments: initialConfig.readOption_comment, _hasHeader: initialConfig.readOption_hasHeader === 'true' ? true : false, escapeChar: initialConfig.readOption_escapeChar, quoteChar: initialConfig.readOption_quoteChar }));
     const copyWriteOptions = Object.assign({}, defaultCsvReadOptions);
-    setCsvWriteOptionsInitial(Object.assign({}, copyWriteOptions, { comments: initialConfig.writeOption_comment, delimiter: initialConfig.writeOption_delimiter, header: initialConfig.writeOption_hasHeader === 'true' ? true : false }));
+    setCsvWriteOptionsInitial(Object.assign({}, copyWriteOptions, { comments: initialConfig.writeOption_comment, delimiter: initialConfig.writeOption_delimiter, header: initialConfig.writeOption_hasHeader === 'true' ? true : false, escapeChar: initialConfig.writeOption_escapeChar, quoteChar: initialConfig.writeOption_quoteChar, quoteAllFields: initialConfig.quoteAllFields }));
     switch (initialConfig.readOptionsAppearance) {
         case 'expanded': {
             toggleReadOptions(false);

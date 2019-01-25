@@ -12,14 +12,19 @@ const defaultConfig: CsvEditSettings = {
 	writeOptionsAppearance: "collapsed",
 	readOptionsAppearance: "collapsed",
 	readOption_comment: "#",
+	readOption_quoteChar: '"',
+	readOption_escapeChar: '"',
 	readOption_delimiter: "",
 	readOption_hasHeader: "false",
 	writeOption_comment: "#",
 	writeOption_delimiter: "",
+	writeOption_quoteChar: '"',
+	writeOption_escapeChar: '"',
 	writeOption_hasHeader: "false",
 	doubleClickColumnHandleForcedWith: 200,
 	openSourceFileAfterCommit: false,
-	selectTextAfterBeginEditCell: false
+	selectTextAfterBeginEditCell: false,
+	quoteAllFields: false
 }
 
 /**

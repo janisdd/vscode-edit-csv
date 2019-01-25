@@ -5,15 +5,18 @@
 
 - quote char
 
-- unnamed file save --> unnamed closed --> closes editor, new opened... somehow closes new file?
 
 - ask if source file changed... changes are lost?
   --> should not happen... no update, add to hints (first)
 
 
-- add to help modal BIG: all cells are strings!! e.g. sorting might not work as expected
 
 - document workflow...
+
+
+## Known issues
+
+- when we save an unnamed file (via commit and save) then the unname, editor and saved file are closed...
 
 ## Maybe
 

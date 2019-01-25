@@ -16,9 +16,10 @@ let defaultCsvReadOptions = {
     delimiter: '',
     newline: '',
     quoteChar: '"',
+    escapeChar: '"',
     skipEmptyLines: true,
     dynamicTyping: false,
-    _hasHeader: false
+    _hasHeader: false,
 };
 let defaultCsvWriteOptions = {
     header: false,
@@ -26,6 +27,8 @@ let defaultCsvWriteOptions = {
     delimiter: '',
     newline: '',
     quoteChar: '"',
+    escapeChar: '"',
+    quoteAllFields: false,
 };
 let newLineFromInput = '\n';
 const csvEditorWrapper = _getById('csv-editor-wrapper');

@@ -132,6 +132,14 @@ function setCommentString() {
     const el = _getById('comment-string');
     defaultCsvReadOptions.comments = el.value === '' ? false : el.value;
 }
+function setQuoteCharString() {
+    const el = _getById('quote-char-string');
+    defaultCsvReadOptions.quoteChar = el.value;
+}
+function setEscapeCharString() {
+    const el = _getById('escape-char-string');
+    defaultCsvReadOptions.escapeChar = el.value;
+}
 function setSkipEmptyLines() {
 }
 function setReadDelimiter(delimiter) {
@@ -150,6 +158,18 @@ function setDelimiterStringWrite() {
 function setCommentStringWrite() {
     const el = _getById('comment-string-write');
     defaultCsvWriteOptions.comments = el.value === '' ? false : el.value;
+}
+function setQuoteCharStringWrite() {
+    const el = _getById('quote-char-string-write');
+    defaultCsvWriteOptions.quoteChar = el.value;
+}
+function setEscapeCharStringWrite() {
+    const el = _getById('escape-char-string-write');
+    defaultCsvWriteOptions.escapeChar = el.value;
+}
+function setQuoteAllFieldsWrite() {
+    const el = _getById('quote-all-fields-write');
+    defaultCsvWriteOptions.quoteAllFields = el.checked;
 }
 function setNewLineWrite() {
     const el = _getById('newline-select-write');
@@ -170,6 +190,7 @@ function setWriteDelimiter(delimiter) {
 }
 function generateCsvPreview() {
     const value = getDataAsCsv(defaultCsvWriteOptions);
+    console.log(defaultCsvWriteOptions);
     const el = _getById('csv-preview');
     el.value = value;
     togglePreview(false);

@@ -41,9 +41,10 @@ let defaultCsvReadOptions: CsvReadOptions = {
 	delimiter: '', //auto detect
 	newline: '', //auto detect
 	quoteChar: '"',
+	escapeChar: '"',
 	skipEmptyLines: true,
 	dynamicTyping: false,
-	_hasHeader: false
+	_hasHeader: false,
 }
 
 
@@ -53,6 +54,8 @@ let defaultCsvWriteOptions: CsvWriteOptions = {
 	delimiter: '', //'' = use from input, will be set from empty to string when exporting (or earlier)
 	newline: '', //set by editor
 	quoteChar: '"',
+	escapeChar: '"',
+	quoteAllFields: false,
 }
 let newLineFromInput = '\n'
 

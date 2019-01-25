@@ -122,7 +122,10 @@ function getDataAsCsv(csvWriteOptions: CsvWriteOptions): string {
 	}
 
 
-	let dataAsString = csv.unparse(data, csvWriteOptions)
+	let dataAsString = csv.unparse(data, {
+		...csvWriteOptions,
+		quotes: csvWriteOptions.quoteAllFields
+	})
 
 	if (csvWriteOptions.comments) {
 

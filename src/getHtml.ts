@@ -43,7 +43,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 	<!DOCTYPE html>
 	<html>
 	<head>
-		<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: 'unsafe-inline'; script-src vscode-resource: 'unsafe-inline'; style-src vscode-resource: 'unsafe-inline'; font-src vscode-resource:;">
+		<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: data:; script-src vscode-resource: 'unsafe-inline'; style-src vscode-resource: 'unsafe-inline'; font-src vscode-resource:;">
 
 		<link rel="stylesheet" href="${handsontableCss}">
 		<script src="${handsontableJs}"></script>

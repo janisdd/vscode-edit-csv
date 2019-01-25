@@ -145,7 +145,12 @@ function activate(context) {
     vscode.workspace.onDidCloseTextDocument((args) => {
         if (args.uri.scheme === exports.editorUriScheme)
             return; //closed an editor nothing to do here... onDispose will handle it
-        //when we close a source file ... also close the editor
+        //this can happen if we open an unnamed file, then open edit, close unnamed file, then commit and save
+        //if we try to save this file manually we get permission denied for file:///unnamed-1 or something
+        if (!args.isUntitled || args.uri.scheme !== "untitled")
+            return;
+        //THIS is probably not what the user wants...
+        // when we close a source file ... also close the editor
         const instance = instanceManager.findInstanceBySourceUri(args.uri);
         if (!instance)
             return;
@@ -247,20 +252,30 @@ function commitContent(instance, newContent, saveSourceFile, openSourceFileAfter
     });
 }
 function _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterCommit) {
+    const afterShowDocument = () => {
+        if (!editsApplied) {
+            vscode.window.showErrorMessage(`edits could not be applied`);
+            return;
+        }
+        if (saveSourceFile) {
+            document.save()
+                .then(wasSaved => {
+                if (!wasSaved) {
+                    vscode.window.showErrorMessage(`Could not save csv file`);
+                }
+            }, (reason) => {
+                console.warn(reason); //will be null e.g. o permission denied when saved manually
+            });
+        }
+    };
     if (openSourceFileAfterCommit) {
-        vscode.window.showTextDocument(document);
-    }
-    if (!editsApplied) {
-        vscode.window.showErrorMessage(`edits could not be applied`);
-        return;
-    }
-    if (saveSourceFile) {
-        document.save()
-            .then(wasSaved => {
-            if (!wasSaved) {
-                vscode.window.showErrorMessage(`Could not save csv file`);
-            }
+        vscode.window.showTextDocument(document)
+            .then(() => {
+            afterShowDocument();
         });
+    }
+    else {
+        afterShowDocument();
     }
 }
 /**

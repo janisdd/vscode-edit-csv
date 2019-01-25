@@ -51,6 +51,10 @@ html, body {
 	vertical-align: text-bottom
 }
 
+.options-content {
+	margin-top: 0.5em;
+	height: 216px;
+}
 
 .hoverable {
 	opacity: 0.7;
@@ -69,10 +73,6 @@ html, body {
 	opacity: 1;
 }
 
-.options-content {
-	margin-top: 0.5em;
-	height: 144px;
-}
 
 input.input {
 	width: 110px;

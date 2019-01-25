@@ -224,6 +224,16 @@
 					"default": "#",
 					"description": "the string used as comment, empty string to thread every line as data line (no comments)"
 				},
+				"csv-edit.readOption_quoteChar": {
+					"type": "string",
+					"default": "\"",
+					"description": "the string used to quote fields"
+				},
+				"csv-edit.readOption_escapeChar": {
+					"type": "string",
+					"default": "\"",
+					"description": "the string used to escape the quote character within a field"
+				},
 
 				"csv-edit.writeOption_hasHeader": {
 					"type": "string",
@@ -241,6 +251,21 @@
 					"type": "string",
 					"default": "#",
 					"description": "the string used as comment, empty string to exclude comments"
+				},
+				"csv-edit.writeOption_quoteChar": {
+					"type": "string",
+					"default": "\"",
+					"description": "the string used to quote fields"
+				},
+				"csv-edit.writeOption_escapeChar": {
+					"type": "string",
+					"default": "\"",
+					"description": "the string used to escape the quote character within a field"
+				},
+				"csv-edit.quoteAllFields": {
+					"type": "boolean",
+					"default": false,
+					"description": "true: to always quote fields, false: not (only if necessary)"
 				},
 
 				"csv-edit.doubleClickColumnHandleForcedWith": {

@@ -136,6 +136,12 @@ function setCsvReadOptionsInitial(options: CsvReadOptions) {
 
 	const el4 = _getById('comment-string') as HTMLInputElement
 	el4.value = defaultCsvReadOptions.comments === false ? '' : defaultCsvReadOptions.comments
+
+	const el5 = _getById('quote-char-string') as HTMLInputElement
+	el5.value = defaultCsvReadOptions.quoteChar
+
+	const el6 = _getById('escape-char-string') as HTMLInputElement
+	el6.value = defaultCsvReadOptions.escapeChar
 }
 
 /**
@@ -160,6 +166,15 @@ function setCsvWriteOptionsInitial(options: CsvWriteOptions) {
 
 	const el3 = _getById('comment-string-write') as HTMLInputElement
 	el3.value = defaultCsvWriteOptions.comments === false ? '' : defaultCsvWriteOptions.comments
+
+	const el4 = _getById('quote-char-string-write') as HTMLInputElement
+	el4.value = defaultCsvWriteOptions.quoteChar
+
+	const el5 = _getById('escape-char-string-write') as HTMLInputElement
+	el5.value = defaultCsvWriteOptions.quoteChar
+
+	const el6 = _getById('quote-all-fields-write') as HTMLInputElement
+	el6.checked = defaultCsvWriteOptions.quoteAllFields
 }
 
 
@@ -270,6 +285,8 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 		delimiter: initialConfig.readOption_delimiter,
 		comments: initialConfig.readOption_comment,
 		_hasHeader: initialConfig.readOption_hasHeader === 'true' ? true : false,
+		escapeChar: initialConfig.readOption_escapeChar,
+		quoteChar: initialConfig.readOption_quoteChar,
 	})
 
 	const copyWriteOptions = {
@@ -281,6 +298,9 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 		comments: initialConfig.writeOption_comment,
 		delimiter: initialConfig.writeOption_delimiter,
 		header: initialConfig.writeOption_hasHeader === 'true' ? true : false,
+		escapeChar: initialConfig.writeOption_escapeChar,
+		quoteChar: initialConfig.writeOption_quoteChar,
+		quoteAllFields: initialConfig.quoteAllFields,
 	})
 
 

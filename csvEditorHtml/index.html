@@ -51,6 +51,7 @@
 								</label>
 						</div> -->
 
+						<!-- delimiter and comment -->
 						<div class="flexed">
 							<div class="field">
 								<label>
@@ -73,6 +74,23 @@
 								<input id="comment-string" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentString()">
 							</div>
 						</div>
+
+						<!-- quote and escape -->
+						<div class="flexed">
+								<div class="field">
+									<label>
+										<span>QuotChar</span>
+									</label>
+									<input id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()">
+								</div>
+	
+								<div class="field mar-left">
+									<label>
+										<span>EscapeChar</span>
+									</label>
+									<input id="escape-char-string" class="input" type="text" oninput="setEscapeCharString()">
+								</div>
+							</div>
 
 
 						<button class="button is-light" onclick="readDataAgain(initialContent, defaultCsvReadOptions)">
@@ -103,6 +121,7 @@
 						</span>
 					</div>
 
+					<!-- delimiter and comment -->
 					<div class="flexed">
 						<div class="field">
 							<label for="delimiter-string-write">
@@ -128,6 +147,30 @@
 							</label>
 							<input id="comment-string-write" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()">
 						</div>
+					</div>
+
+					<!-- quote and escape -->
+					<div class="flexed">
+						<div class="field">
+							<label>
+								<span>QuotChar</span>
+							</label>
+							<input id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()">
+						</div>
+
+						<div class="field mar-left">
+							<label>
+								<span>EscapeChar</span>
+							</label>
+							<input id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()">
+						</div>
+					</div>
+
+					<div class="field">
+						<input id="quote-all-fields-write" type="checkbox" name="quote-all-fields-write" class="switch is-rounded" checked="checked" onchange="setQuoteAllFieldsWrite()">
+						<label for="quote-all-fields-write">
+							<span>Quote all fields</span>
+						</label>
 					</div>
 
 					<!-- see help modal why -->
@@ -303,8 +346,9 @@
 				<h3 class="title is-3">Hints</h3>
 				<div class="content">
 					<ul>
-						<li>If you close the source csv file the editor will be closed too (unsaved changes will be lost)!</li>
+						<li>If edit an unnamed (csv) file and close it then the editor will be closed too (unsaved changes will be lost)!</li>
 						<li>Sorting state is exported</li>
+						<li>All cell values are strings thus sorting might behave differently than expected</li>
 						<li>Copy & Past use tab (<div class="keys">⇥</div>) as separator (same as excel)</li>
 						<li>Comment between csv rows get removed</li>
 						<li>Comments before and after csv content is preserved (if write comment option has a value)</li>

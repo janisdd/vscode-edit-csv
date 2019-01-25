@@ -72,6 +72,16 @@ type CsvEditSettings = {
 	readOption_comment: string
 
 	/**
+	 * the string used to quote fields
+	 */
+	readOption_quoteChar: string
+
+	/**
+	 * the string used to escape the quote character within a field
+	 */
+	readOption_escapeChar: string
+
+	/**
  * true: first row is the header row
  * false: first row is a normal data row
  * 
@@ -98,6 +108,15 @@ type CsvEditSettings = {
 	 */
 	writeOption_comment: string
 
+	/**
+	 * the string used to quote fields
+	 */
+	writeOption_quoteChar: string
+
+		/**
+	 * the string used to escape the quote character within a field
+	 */
+	writeOption_escapeChar: string
 
 	/**
 	 * normally the columns are auto sized, if we click on the handle when it has auto size then its with is set to this value (in px). Useful if we have a very wide column (wider than the screen and quickly want to shrink it)
@@ -113,6 +132,11 @@ type CsvEditSettings = {
 	 * true: select the text inside the cell (note you can also select the cell and start typings to overwrite the cell value), false: cursor starts at the end of the text
 	 */
 	selectTextAfterBeginEditCell: boolean
+
+	/**
+	 * 
+	 */
+	quoteAllFields: boolean
 }
 
 /* --- frontend settings --- */
@@ -140,6 +164,10 @@ type CsvReadOptions = {
 	 * the quote string
 	 */
 	quoteChar: string,
+	/**
+	 * the escape char
+	 */
+	escapeChar: string
 	/**
 	 * if false we have invalid rows ... always only 1 col
 	 */
@@ -179,6 +207,15 @@ type CsvWriteOptions = {
 	 * the quote string
 	 */
 	quoteChar: string
+	/**
+	 * the escape string used to escape the quote char
+	 */
+	escapeChar: string
+
+	/**
+	 * true: to always quote fields, false: not (only if necessary)
+	 */
+	quoteAllFields: boolean
 }
 
 type MiscOptions = {
