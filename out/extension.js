@@ -85,80 +85,78 @@ function activate(context) {
         });
     };
     //@ts-ignore
-    const askRefresh = function (instance) {
-        const options = ['Yes', 'No'];
-        vscode.window.showInformationMessage('The source file changed or was saved. Would you like to overwrite your csv edits with the new content?', {
-            modal: false,
-        }, ...options)
-            .then((picked) => {
-            if (!picked)
-                return;
-            picked = picked.toLowerCase();
-            if (picked === 'no')
-                return;
-            //update
-            console.log('update');
-            if (!vscode.window.activeTextEditor) {
-                vscode.workspace.openTextDocument(instance.sourceUri)
-                    .then((document) => {
-                    const newContent = document.getText();
-                    instance.panel.webview.html = getHtml_1.createEditorHtml(context, newContent);
-                });
-                return;
-            }
-            const newContent = vscode.window.activeTextEditor.document.getText();
-            //see https://github.com/Microsoft/vscode/issues/47534
-            // const msg = {
-            // 	command: 'csvUpdate',
-            // 	csvContent: newContent
-            // }
-            // instance.panel.webview.postMessage(msg)
-            instance.panel.webview.html = getHtml_1.createEditorHtml(context, newContent);
-        });
-    };
-    vscode.workspace.onDidChangeTextDocument(util_1.debounce((args) => {
-        //see https://github.com/Microsoft/vscode/issues/50344
-        //when dirty flag changes this is called
-        if (args.contentChanges.length === 0) {
-            return;
-        }
-        if (!util_1.isCsvFile(args.document))
-            return; //closed non-csv file ... we cannot have an editor for this document
-        // const instance = InstanceManager[args.document.uri.toString()]
-        // if (!instance) return
-        // const cop = args
-        // console.log('change: ' + args.contentChanges[0].text);
-        // askRefresh(instance)
-    }, debounceDocumentChangeInMs));
+    // const askRefresh = function (instance: Instance) {
+    // 	const options = ['Yes', 'No']
+    // 	vscode.window.showInformationMessage('The source file changed or was saved. Would you like to overwrite your csv edits with the new content?',
+    // 		{
+    // 			modal: false,
+    // 		}, ...options)
+    // 		.then((picked) => {
+    // 			if (!picked) return
+    // 			picked = picked.toLowerCase()
+    // 			if (picked === 'no') return
+    // 			//update
+    // 			console.log('update');
+    // 			if (!vscode.window.activeTextEditor) {
+    // 				vscode.workspace.openTextDocument(instance.sourceUri)
+    // 					.then((document) => {
+    // 						const newContent = document.getText()
+    // 						instance.panel.webview.html = createEditorHtml(context, newContent)
+    // 					})
+    // 				return
+    // 			}
+    // 			const newContent = vscode.window.activeTextEditor.document.getText()
+    // 			//see https://github.com/Microsoft/vscode/issues/47534
+    // 			// const msg = {
+    // 			// 	command: 'csvUpdate',
+    // 			// 	csvContent: newContent
+    // 			// }
+    // 			// instance.panel.webview.postMessage(msg)
+    // 			instance.panel.webview.html = createEditorHtml(context, newContent)
+    // 		})
+    // }
+    //we could use this hook to check if the file was changed (outside of the editor) and show a message to the user
+    //but we would need to distinguish our own changes from external changes...
+    // vscode.workspace.onDidChangeTextDocument(debounce((args: vscode.TextDocumentChangeEvent) => {
+    // 	//see https://github.com/Microsoft/vscode/issues/50344
+    // 	//when dirty flag changes this is called
+    // 	if (args.contentChanges.length === 0) {
+    // 		return
+    // 	}
+    // 	if (!isCsvFile(args.document)) return //closed non-csv file ... we cannot have an editor for this document
+    // 	console.log(`CHANGE ${args.document.uri.toString()}`);
+    // }, debounceDocumentChangeInMs));
+    //when an unnamed file is saved the new file (new uri) is opened
+    //	when the extension calls save the new file is not displayed
+    //	because we don't know the new uri we wait for new csv files to be opened and show them
+    //TODO can be improved to not show any opened csv file (e.g. from other extensions to only write to a file)
     vscode.workspace.onDidOpenTextDocument((args) => {
-        console.log(args);
+        //when we know the old uri then we could update the instance manager and the panel (e.g. title)...
+        //but for now we close the editor iff we saved an untitled file
+        //when we save an unnamed (temp file) file a new file with the new uri is opened and saved
+        //TODO i don't think we can get the old/new name of the file os wait for 
+        //so just filter for csv file and show it 
+        if (args.isUntitled || util_1.isCsvFile(args) === false || args.version !== 1)
+            return;
+        vscode.window.showTextDocument(args.uri);
     });
-    vscode.workspace.onDidSaveTextDocument(util_1.debounce((args) => {
-        if (!util_1.isCsvFile(args))
-            return; //closed non-csv file ... we cannot have an editor for this document
-        // const instance = InstanceManager[args.document.uri.toString()]
-        // if (!instance) return
-        console.log(args);
-        console.log('save');
-        // askRefresh(instance)
-    }, debounceDocumentChangeInMs));
+    // vscode.workspace.onDidSaveTextDocument(debounce((args: vscode.TextDocument) => {
+    // }, debounceDocumentChangeInMs))
+    //when an unnamed csv file is closed and we have an editor for it then close the editor
+    //	this is because we currently not updating the editor (e.g. title, uris) after an unnamed file is saved
     vscode.workspace.onDidCloseTextDocument((args) => {
         if (args.uri.scheme === exports.editorUriScheme)
             return; //closed an editor nothing to do here... onDispose will handle it
-        //this can happen if we open an unnamed file, then open edit, close unnamed file, then commit and save
-        //if we try to save this file manually we get permission denied for file:///unnamed-1 or something
-        if (!args.isUntitled || args.uri.scheme !== "untitled")
-            return;
-        //THIS is probably not what the user wants...
-        // when we close a source file ... also close the editor
-        const instance = instanceManager.findInstanceBySourceUri(args.uri);
-        if (!instance)
-            return;
-        instance.panel.dispose();
+        if (util_1.isCsvFile(args) && args.isUntitled && args.uri.scheme === "untitled") {
+            const instance = instanceManager.findInstanceBySourceUri(args.uri);
+            if (!instance)
+                return;
+            instance.panel.dispose();
+        }
     });
-    vscode.workspace.onDidChangeConfiguration((args) => {
-        //not needed because this changes only initial configuration...
-    });
+    //not needed because this changes only initial configuration...
+    // vscode.workspace.onDidChangeConfiguration((args) => {
+    // })
     context.subscriptions.push(editCsvCommand);
     context.subscriptions.push(gotoSourceCsvCommand);
     context.subscriptions.push(commitCsvCommand);
@@ -168,10 +166,13 @@ exports.activate = activate;
 // this method is called when your extension is deactivated
 function deactivate() { }
 exports.deactivate = deactivate;
+function getEditorTitle(document) {
+    return `CSV edit ${document.fileName}`;
+}
 function createNewEditorInstance(context, activeTextEditor, instanceManager) {
     const uri = activeTextEditor.document.uri;
     const initialText = activeTextEditor.document.getText();
-    const title = `CSV edit ${activeTextEditor.document.fileName}`;
+    const title = getEditorTitle(activeTextEditor.document);
     let panel = vscode.window.createWebviewPanel('csv-editor', title, util_1.getCurrentViewColumn(), {
         enableFindWidget: true,
         enableCommandUris: true,
@@ -264,7 +265,8 @@ function _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFi
                     vscode.window.showErrorMessage(`Could not save csv file`);
                 }
             }, (reason) => {
-                console.warn(reason); //will be null e.g. o permission denied when saved manually
+                console.warn(reason); //will be null e.g. no permission denied when saved manually
+                vscode.window.showErrorMessage(`Error saving csv file`);
             });
         }
     };

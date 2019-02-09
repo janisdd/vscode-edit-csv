@@ -65,7 +65,9 @@ function getDataAsCsv(csvWriteOptions) {
             data.unshift(colHeaderCells);
         }
     }
-    let dataAsString = csv.unparse(data, Object.assign({}, csvWriteOptions, { quotes: csvWriteOptions.quoteAllFields }));
+    const _conf = Object.assign({}, csvWriteOptions, { quotes: csvWriteOptions.quoteAllFields });
+    _conf['skipEmptyLines'] = false;
+    let dataAsString = csv.unparse(data, _conf);
     if (csvWriteOptions.comments) {
         const beforeCommentsTextarea = _getById(beforeCommentsTextareaId);
         const afterCommentsTextarea = _getById(afterCommentsTextareaId);

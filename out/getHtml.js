@@ -87,6 +87,7 @@ function createEditorHtml(context, initialContent) {
 							</label>
 					</div> -->
 
+					<!-- delimiter and comment -->
 					<div class="flexed">
 						<div class="field">
 							<label>
@@ -110,6 +111,23 @@ function createEditorHtml(context, initialContent) {
 						</div>
 					</div>
 
+					<!-- quote and escape -->
+					<div class="flexed">
+							<div class="field">
+								<label>
+									<span>QuotChar</span>
+								</label>
+								<input id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()">
+							</div>
+
+							<div class="field mar-left">
+								<label>
+									<span>EscapeChar</span>
+								</label>
+								<input id="escape-char-string" class="input" type="text" oninput="setEscapeCharString()">
+							</div>
+						</div>
+
 
 					<button class="button is-light" onclick="readDataAgain(initialContent, defaultCsvReadOptions)">
 						<span>Read again</span>
@@ -130,7 +148,7 @@ function createEditorHtml(context, initialContent) {
 			<div id="write-options-content" class="options-content">
 				<div class="field">
 					<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded" checked="checked"
-					 onchange="setHasHeaderWrite()">
+						onchange="setHasHeaderWrite()">
 					<label for="has-header-write">
 						<span>Write header</span>
 					</label>
@@ -139,6 +157,7 @@ function createEditorHtml(context, initialContent) {
 					</span>
 				</div>
 
+				<!-- delimiter and comment -->
 				<div class="flexed">
 					<div class="field">
 						<label for="delimiter-string-write">
@@ -166,6 +185,40 @@ function createEditorHtml(context, initialContent) {
 					</div>
 				</div>
 
+				<!-- quote and escape -->
+				<div class="flexed">
+					<div class="field">
+						<label>
+							<span>QuotChar</span>
+						</label>
+						<input id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()">
+					</div>
+
+					<div class="field mar-left">
+						<label>
+							<span>EscapeChar</span>
+						</label>
+						<input id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()">
+					</div>
+				</div>
+
+				<div class="flexed">
+
+					<div class="field">
+						<input id="quote-all-fields-write" type="checkbox" name="quote-all-fields-write" class="switch is-rounded" checked="checked" onchange="setQuoteAllFieldsWrite()">
+						<label for="quote-all-fields-write">
+							<span>Quote all fields</span>
+						</label>
+					</div>
+
+					<div class="clickable tooltip mar-left" id="toggle-comments-sections" onclick="displayOrHideCommentsSections(false)" data-tooltip="Show Comment sections">
+							<span>
+									<i class="fas fa-quote-left"></i>
+									<i class="fas fa-quote-right"></i>
+							</span>
+						</div>
+				</div>
+
 				<!-- see help modal why -->
 				<div class="field" style="display: none;">
 					<label for="comment-string-write">NewLine</label>
@@ -176,13 +229,6 @@ function createEditorHtml(context, initialContent) {
 							<option value="lf">Linux/Mac (LF)</option>
 						</select>
 					</div>
-				</div>
-
-
-				<div>
-					<button id="toggle-comments-sections" class="button is-light" onclick="displayOrHideCommentsSections(false)">
-						<span>Show Comment sections</span>
-					</button>
 				</div>
 
 			</div>
@@ -270,12 +316,12 @@ function createEditorHtml(context, initialContent) {
 			</span>
 		</div>
 		<div id="comments-before-content">
-			<textarea id="comments-before" rows="3" class="textarea"  onblur="onCommentsBeforeBlur(event)"></textarea>
+			<textarea id="comments-before" rows="3" class="textarea" oninput="onCommentsBeforeInput(event)"></textarea>
 		</div>
 	</div>
 
 	<!-- main editor/grid area -->
-	<div id="csv-editor-wrapper" class="csv-editor-wrapper" onclick="onEditorAreaClick(event)">
+	<div id="csv-editor-wrapper" class="csv-editor-wrapper">
 		<div id="csv-editor"></div>
 	</div>
 
@@ -288,7 +334,7 @@ function createEditorHtml(context, initialContent) {
 			</span>
 		</div>
 		<div id="comments-after-content">
-			<textarea id="comments-after" rows="3" class="textarea" onblur="onCommentsAfterBlur(event)"></textarea>
+			<textarea id="comments-after" rows="3" class="textarea" oninput="onCommentsAfterInput(event)"></textarea>
 		</div>
 	</div>
 
@@ -339,8 +385,9 @@ function createEditorHtml(context, initialContent) {
 			<h3 class="title is-3">Hints</h3>
 			<div class="content">
 				<ul>
-					<li>If you close the source csv file the editor will be closed too (unsaved changes will be lost)!</li>
+					<li>If edit an unnamed (csv) file and close it then the editor will be closed too (unsaved changes will be lost)!</li>
 					<li>Sorting state is exported</li>
+					<li>All cell values are strings thus sorting might behave differently than expected</li>
 					<li>Copy & Past use tab (<div class="keys">⇥</div>) as separator (same as excel)</li>
 					<li>Comment between csv rows get removed</li>
 					<li>Comments before and after csv content is preserved (if write comment option has a value)</li>

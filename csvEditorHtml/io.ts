@@ -121,11 +121,17 @@ function getDataAsCsv(csvWriteOptions: CsvWriteOptions): string {
 		}
 	}
 
-
-	let dataAsString = csv.unparse(data, {
+	
+	const _conf: import('papaparse').UnparseConfig = {
 		...csvWriteOptions,
-		quotes: csvWriteOptions.quoteAllFields
-	})
+		quotes: csvWriteOptions.quoteAllFields,
+	}
+
+	//not documented in papaparse...
+	//@ts-ignore
+	_conf['skipEmptyLines'] = false
+
+	let dataAsString = csv.unparse(data, _conf)
 
 	if (csvWriteOptions.comments) {
 

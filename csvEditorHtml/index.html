@@ -4,7 +4,7 @@
 <head>
 	<link rel="stylesheet" href="../node_modules/handsontable/dist/handsontable.min.css">
 	<script src="../node_modules/handsontable/dist/handsontable.js"></script>
-	<script src="../node_modules/papaparse/papaparse.min.js"></script>
+	<script src="../node_modules/papaparse/papaparse.js"></script>
 
 	<link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
 
@@ -166,11 +166,21 @@
 						</div>
 					</div>
 
-					<div class="field">
-						<input id="quote-all-fields-write" type="checkbox" name="quote-all-fields-write" class="switch is-rounded" checked="checked" onchange="setQuoteAllFieldsWrite()">
-						<label for="quote-all-fields-write">
-							<span>Quote all fields</span>
-						</label>
+					<div class="flexed">
+
+						<div class="field">
+							<input id="quote-all-fields-write" type="checkbox" name="quote-all-fields-write" class="switch is-rounded" checked="checked" onchange="setQuoteAllFieldsWrite()">
+							<label for="quote-all-fields-write">
+								<span>Quote all fields</span>
+							</label>
+						</div>
+
+						<div class="clickable tooltip mar-left" id="toggle-comments-sections" onclick="displayOrHideCommentsSections(false)" data-tooltip="Show Comment sections">
+								<span>
+										<i class="fas fa-quote-left"></i>
+										<i class="fas fa-quote-right"></i>
+								</span>
+							</div>
 					</div>
 
 					<!-- see help modal why -->
@@ -183,13 +193,6 @@
 								<option value="lf">Linux/Mac (LF)</option>
 							</select>
 						</div>
-					</div>
-
-
-					<div>
-						<button id="toggle-comments-sections" class="button is-light" onclick="displayOrHideCommentsSections(false)">
-							<span>Show Comment sections</span>
-						</button>
 					</div>
 
 				</div>
