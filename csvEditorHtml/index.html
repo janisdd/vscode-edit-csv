@@ -93,9 +93,9 @@
 							</div>
 
 
-						<button class="button is-light" onclick="readDataAgain(initialContent, defaultCsvReadOptions)">
-							<span>Read again</span>
-							<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right" data-tooltip="The input file content is saved locally and read again. Thus this view is independent of the source file">
+						<button class="button is-light" onclick="toggleAskReadAgainModal(true)">
+							<span>Reset data</span>
+							<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right" data-tooltip="The input file content was stored locally and used as data. Thus this view is independent of the source file">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</button>
@@ -242,22 +242,22 @@
 				</div>
 			</div>
 
-			<button class="button  is-outlined mar-left" onclick="postCommitContent(true)">
+			<button class="button  is-outlined mar-left" onclick="postApplyContent(true)">
 				<span class="icon is-small">
 					<i class="fas fa-save"></i>
 				</span>
-				<span>Commit and save</span>
-				<span class="tooltip is-tooltip-multiline mar-left-half" data-tooltip="Commits the csv content back to the source file and saves the source file">
+				<span>Apply and save</span>
+				<span class="tooltip is-tooltip-multiline mar-left-half" data-tooltip="Applies the csv content back to the source file and saves the source file">
 					<i class="fas fa-question-circle"></i>
 				</span>
 			</button>
 
-			<button class="button  is-outlined" onclick="postCommitContent(false)">
+			<button class="button  is-outlined" onclick="postApplyContent(false)">
 				<span class="icon is-small">
 					<i class="fas fa-reply"></i>
 				</span>
-				<span>Commit</span>
-				<span class="tooltip mar-left-half" data-tooltip="Commits the csv content back to the source file">
+				<span>Apply</span>
+				<span class="tooltip mar-left-half" data-tooltip="Applies the csv content back to the source file">
 					<i class="fas fa-question-circle"></i>
 				</span>
 			</button>
@@ -291,7 +291,7 @@
 
 		<!-- comments AFTER csv content -->
 		<div id="comments-after-option" class="options-bar">
-			<div class="options-title clickable" onclick="toggleAfterComments()"">
+			<div class="options-title clickable" onclick="toggleAfterComments()">
 				<span> Comments after</span> 
 				<span>
 					<i id="comments-after-content-icon" class="fas fa-chevron-right"></i>
@@ -349,12 +349,12 @@
 				<h3 class="title is-3">Hints</h3>
 				<div class="content">
 					<ul>
-						<li>If edit an unnamed (csv) file and close it then the editor will be closed too (unsaved changes will be lost)!</li>
+						<li>If you edit an unnamed (csv) file and close it then the editor will be closed too (unsaved changes will be lost)!</li>
 						<li>Sorting state is exported</li>
 						<li>All cell values are strings thus sorting might behave differently than expected</li>
 						<li>Copy & Past use tab (<div class="keys">⇥</div>) as separator (same as excel)</li>
 						<li>Comment between csv rows get removed</li>
-						<li>Comments before and after csv content is preserved (if write comment option has a value)</li>
+						<li>Comments before and after csv content are preserved (if write comment option has a value)</li>
 						<li>You cannot change the new line character because vs code automatically converts it to the file setting</li>
 						<li>If a row has more cell than the others the additional cells are ignored</li>
 						<li>Extension configuration is only applied for new editors</li>
@@ -364,7 +364,33 @@
 
 			</div>
 		</div>
-		<button class="modal-close is-large" aria-label="close" onclick="toggleHelpModal()"></button>
+		<button class="modal-close is-large" aria-label="close" onclick="toggleHelpModal(false)"></button>
+	</div>
+
+	<div id="ask-read-again-modal" class="modal help-modal">
+		<div class="modal-background"></div>
+		<div class="modal-content">
+			<div class="box">
+				<h3 class="title is-3">Reset data</h3>
+				
+				<p>
+						Are you sure you want to overwrite the table?
+						This will use the initial data when you opened the csv editor and discard all changes!
+				</p>
+
+				<div style="margin-top: 1em">
+						<button class="button is-warning" onclick="resetData(initialContent, defaultCsvReadOptions)">
+							<span>Reset</span>
+						</button>
+
+						<button style="margin-left: 0.5em" class="button  is-outlined" onclick="toggleAskReadAgainModal(false)">
+							<span>Cancel</span>
+						</button>
+				</div>
+
+			</div>
+		</div>
+		<button class="modal-close is-large" aria-label="close" onclick="toggleAskReadAgainModal(false)"></button>
 	</div>
 
 

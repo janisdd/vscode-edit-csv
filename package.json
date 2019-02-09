@@ -16,8 +16,8 @@
 	"preview": true,
 	"activationEvents": [
 		"onCommand:edit-csv.edit",
-		"onCommand:edit-csv.commit",
-		"onCommand:edit-csv.commitAndSave"
+		"onCommand:edit-csv.apply",
+		"onCommand:edit-csv.applyAndSave"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -54,14 +54,14 @@
 				"title": "Go to csv source file"
 			},
 			{
-				"command": "edit-csv.commit",
+				"command": "edit-csv.apply",
 				"category": "CSV",
-				"title": "Commit changes to source file"
+				"title": "Apply changes to source file"
 			},
 			{
-				"command": "edit-csv.commitAndSave",
+				"command": "edit-csv.applyAndSave",
 				"category": "CSV",
-				"title": "Commit changes to source file and save"
+				"title": "Apply changes to source file and save"
 			}
 		],
 		"menus": {
@@ -273,10 +273,10 @@
 					"default": "200",
 					"description": "normally the columns are auto sized, if we click on the handle when it has auto size then its with is set to this value (in px). Useful if we have a very wide column (wider than the screen and quickly want to shrink it)"
 				},
-				"csv-edit.openSourceFileAfterCommit": {
+				"csv-edit.openSourceFileAfterApply": {
 					"type": "boolean",
 					"default": false,
-					"description": "true: opens the source file after commit, false: keep the editor displayed"
+					"description": "true: opens the source file after apply, false: keep the editor displayed"
 				},
 				"csv-edit.selectTextAfterBeginEditCell": {
 					"type": "boolean",

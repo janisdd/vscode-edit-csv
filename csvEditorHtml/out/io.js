@@ -94,17 +94,17 @@ function postVsError(text) {
         content: text
     });
 }
-function postCommitContent(saveSourceFile) {
+function postApplyContent(saveSourceFile) {
     const csvContent = getDataAsCsv(defaultCsvWriteOptions);
     if (document.activeElement != document.body)
         document.activeElement.blur();
-    _posCommitContent(csvContent, saveSourceFile);
+    _postApplyContent(csvContent, saveSourceFile);
 }
-function _posCommitContent(csvContent, saveSourceFile) {
+function _postApplyContent(csvContent, saveSourceFile) {
     if (!vscode)
         return;
     vscode.postMessage({
-        command: 'commit',
+        command: 'apply',
         csvContent,
         saveSourceFile
     });
@@ -114,15 +114,15 @@ function handleVsCodeMessage(event) {
     switch (message.command) {
         case 'csvUpdate': {
             initialContent = message.csvContent;
-            readDataAgain(initialContent, defaultCsvReadOptions);
+            resetData(initialContent, defaultCsvReadOptions);
             break;
         }
-        case 'commitPress': {
-            postCommitContent(false);
+        case "applyPress": {
+            postApplyContent(false);
             break;
         }
-        case 'commitAndSavePress': {
-            postCommitContent(true);
+        case 'applyAndSavePress': {
+            postApplyContent(true);
             break;
         }
         default: {

@@ -132,6 +132,10 @@ input.input {
 	z-index: 200; /*to be in front of handson table cols*/
 }
 
+#ask-read-again-modal .modal-content {
+	text-align: center;
+}
+
 .help-modal .modal-content {
 	/* width: 80%; */
 }

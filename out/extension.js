@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = require("vscode");
+const path = require("path");
 const util_1 = require("./util");
 const getHtml_1 = require("./getHtml");
 const instanceManager_1 = require("./instanceManager");
 const configurationHelper_1 = require("./configurationHelper");
-const debounceDocumentChangeInMs = 1000;
+// const debounceDocumentChangeInMs = 1000
 /**
  * for editor uris this is the scheme to use
  * so we can find editors
@@ -18,21 +19,21 @@ function activate(context) {
     // This line of code will only be executed once when your extension is activated
     let instanceManager = new instanceManager_1.InstanceManager();
     // const initCommand = vscode.window.registerWebviewPanelSerializer('csv-edit.init', new CsvEditStateSerializer())
-    const commitCsvCommand = vscode.commands.registerCommand('edit-csv.commit', () => {
+    const applyCsvCommand = vscode.commands.registerCommand('edit-csv.apply', () => {
         const instance = getActiveEditorInstance(instanceManager);
         if (!instance)
             return;
         const msg = {
-            command: "commitPress"
+            command: "applyPress"
         };
         instance.panel.webview.postMessage(msg);
     });
-    const commitAndSaveCsvCommand = vscode.commands.registerCommand('edit-csv.commitAndSave', () => {
+    const applyAndSaveCsvCommand = vscode.commands.registerCommand('edit-csv.applyAndSave', () => {
         const instance = getActiveEditorInstance(instanceManager);
         if (!instance)
             return;
         const msg = {
-            command: "commitAndSavePress"
+            command: "applyAndSavePress"
         };
         instance.panel.webview.postMessage(msg);
     });
@@ -159,15 +160,15 @@ function activate(context) {
     // })
     context.subscriptions.push(editCsvCommand);
     context.subscriptions.push(gotoSourceCsvCommand);
-    context.subscriptions.push(commitCsvCommand);
-    context.subscriptions.push(commitAndSaveCsvCommand);
+    context.subscriptions.push(applyCsvCommand);
+    context.subscriptions.push(applyAndSaveCsvCommand);
 }
 exports.activate = activate;
 // this method is called when your extension is deactivated
 function deactivate() { }
 exports.deactivate = deactivate;
 function getEditorTitle(document) {
-    return `CSV edit ${document.fileName}`;
+    return `CSV edit ${path.basename(document.fileName)}`;
 }
 function createNewEditorInstance(context, activeTextEditor, instanceManager) {
     const uri = activeTextEditor.document.uri;
@@ -202,9 +203,9 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
                 vscode.window.showErrorMessage(message.content);
                 break;
             }
-            case "commit": {
+            case "apply": {
                 const { csvContent, saveSourceFile } = message;
-                commitContent(instance, csvContent, saveSourceFile, config.openSourceFileAfterCommit);
+                applyContent(instance, csvContent, saveSourceFile, config.openSourceFileAfterApply);
                 break;
             }
             default: {
@@ -223,7 +224,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
     }, null, context.subscriptions);
     panel.webview.html = getHtml_1.createEditorHtml(context, initialText);
 }
-function commitContent(instance, newContent, saveSourceFile, openSourceFileAfterCommit) {
+function applyContent(instance, newContent, saveSourceFile, openSourceFileAfterApply) {
     vscode.workspace.openTextDocument(instance.sourceUri)
         .then(document => {
         const edit = new vscode.WorkspaceEdit();
@@ -233,7 +234,7 @@ function commitContent(instance, newContent, saveSourceFile, openSourceFileAfter
         edit.replace(document.uri, textRange, newContent);
         vscode.workspace.applyEdit(edit)
             .then(editsApplied => {
-            _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterCommit);
+            _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterApply);
         });
         // vscode.window.showTextDocument(document)
         // 	.then(editor => {
@@ -252,7 +253,7 @@ function commitContent(instance, newContent, saveSourceFile, openSourceFileAfter
         // 	})
     });
 }
-function _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterCommit) {
+function _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterApply) {
     const afterShowDocument = () => {
         if (!editsApplied) {
             vscode.window.showErrorMessage(`edits could not be applied`);
@@ -270,7 +271,8 @@ function _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFi
             });
         }
     };
-    if (openSourceFileAfterCommit) {
+    //also works for unnamed files... they will not be displayed after save
+    if (openSourceFileAfterApply) {
         vscode.window.showTextDocument(document)
             .then(() => {
             afterShowDocument();
@@ -287,7 +289,7 @@ function _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFi
  */
 function getActiveEditorInstance(instanceManager) {
     if (vscode.window.activeTextEditor) { //a web view is no text editor...
-        vscode.window.showInformationMessage("Open a csv editor first to commit changes");
+        vscode.window.showInformationMessage("Open a csv editor first to apply changes");
         return null;
     }
     let instance;

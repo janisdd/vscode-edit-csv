@@ -34,6 +34,7 @@ let newLineFromInput = '\n';
 const csvEditorWrapper = _getById('csv-editor-wrapper');
 const csvEditorDiv = _getById('csv-editor');
 const helModalDiv = _getById('help-modal');
+const askReadAgainModalDiv = _getById('ask-read-again-modal');
 const beforeCommentsTextareaId = 'comments-before';
 const afterCommentsTextareaId = 'comments-after';
 const commentsBeforeOptionId = 'comments-before-option';

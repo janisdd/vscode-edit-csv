@@ -83,7 +83,7 @@ function setCsvWriteOptionsInitial(options) {
     const el6 = _getById('quote-all-fields-write');
     el6.checked = defaultCsvWriteOptions.quoteAllFields;
 }
-function readDataAgain(content, csvReadOptions) {
+function resetData(content, csvReadOptions) {
     const _data = parseCsv(content, csvReadOptions);
     if (!_data) {
         displayData(_data, [], []);
@@ -92,6 +92,7 @@ function readDataAgain(content, csvReadOptions) {
         displayData(_data[1], _data[0], _data[2]);
     }
     onResizeGrid();
+    toggleAskReadAgainModal(false);
 }
 function checkIfHasHeaderReadOptionIsAvailable() {
     const data = getData();

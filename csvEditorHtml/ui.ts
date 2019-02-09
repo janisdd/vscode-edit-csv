@@ -547,6 +547,20 @@ function toggleHelpModal(isVisible: boolean) {
 }
 
 /**
+ * displays or hides the ask read again modal
+ * @param isVisible 
+ */
+function toggleAskReadAgainModal(isVisible: boolean) {
+
+	if (isVisible) {
+		askReadAgainModalDiv.classList.add('is-active')
+		return
+	}
+
+	askReadAgainModalDiv.classList.remove('is-active')
+}
+
+/**
  * somehow swallows handsontable the click event?
  * when we click on the empty area the active element is not blurred...
  * so we use oninput instead

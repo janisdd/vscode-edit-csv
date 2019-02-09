@@ -16,3 +16,5 @@ https://code.visualstudio.com/api/extension-guides/webview
 - clear command --> delete all instances ?
 
 
+
+- read again should display ask dialog... discard changes!

@@ -182,7 +182,7 @@ function setCsvWriteOptionsInitial(options: CsvWriteOptions) {
  * parses and displays the given data (csv)
  * @param {string} content 
  */
-function readDataAgain(content: string, csvReadOptions: CsvReadOptions) {
+function resetData(content: string, csvReadOptions: CsvReadOptions) {
 	const _data = parseCsv(content, csvReadOptions)
 
 	if (!_data) {
@@ -195,6 +195,7 @@ function readDataAgain(content: string, csvReadOptions: CsvReadOptions) {
 
 	//might be bigger than the current view
 	onResizeGrid()
+	toggleAskReadAgainModal(false)
 }
 
 

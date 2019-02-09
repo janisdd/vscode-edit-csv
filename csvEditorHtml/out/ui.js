@@ -336,6 +336,13 @@ function toggleHelpModal(isVisible) {
     }
     helModalDiv.classList.remove('is-active');
 }
+function toggleAskReadAgainModal(isVisible) {
+    if (isVisible) {
+        askReadAgainModalDiv.classList.add('is-active');
+        return;
+    }
+    askReadAgainModalDiv.classList.remove('is-active');
+}
 function onCommentsBeforeInput(event) {
     const el = event.currentTarget;
     toggleBeforeCommentsIndicator(el.value === '');

@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
-import { debounce, isCsvFile, getCurrentViewColumn } from './util';
+import * as path from "path";
+import { isCsvFile, getCurrentViewColumn } from './util';
 import { createEditorHtml } from './getHtml';
 import { InstanceManager, Instance } from './instanceManager';
 import { getExtensionConfiguration } from './configurationHelper';
 
 
-const debounceDocumentChangeInMs = 1000
+// const debounceDocumentChangeInMs = 1000
 
 /**
  * for editor uris this is the scheme to use
@@ -27,24 +28,24 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// const initCommand = vscode.window.registerWebviewPanelSerializer('csv-edit.init', new CsvEditStateSerializer())
 
-	const commitCsvCommand = vscode.commands.registerCommand('edit-csv.commit', () => {
+	const applyCsvCommand = vscode.commands.registerCommand('edit-csv.apply', () => {
 
 		const instance = getActiveEditorInstance(instanceManager)
 		if (!instance) return
 
-		const msg: RequestCommitPressMessage = {
-			command: "commitPress"
+		const msg: RequestApplyPressMessage = {
+			command: "applyPress"
 		}
 		instance.panel.webview.postMessage(msg)
 	})
 
-	const commitAndSaveCsvCommand = vscode.commands.registerCommand('edit-csv.commitAndSave', () => {
+	const applyAndSaveCsvCommand = vscode.commands.registerCommand('edit-csv.applyAndSave', () => {
 
 		const instance = getActiveEditorInstance(instanceManager)
 		if (!instance) return
 
-		const msg: RequestCommitAndSavePressMessage = {
-			command: "commitAndSavePress"
+		const msg: RequestApplyAndSavePressMessage = {
+			command: "applyAndSavePress"
 		}
 		instance.panel.webview.postMessage(msg)
 	})
@@ -216,15 +217,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(editCsvCommand)
 	context.subscriptions.push(gotoSourceCsvCommand)
-	context.subscriptions.push(commitCsvCommand)
-	context.subscriptions.push(commitAndSaveCsvCommand)
+	context.subscriptions.push(applyCsvCommand)
+	context.subscriptions.push(applyAndSaveCsvCommand)
 }
 
 // this method is called when your extension is deactivated
 export function deactivate() { }
 
 function getEditorTitle(document: vscode.TextDocument): string {
-	return `CSV edit ${document.fileName}`
+	return `CSV edit ${path.basename(document.fileName)}`
 }
 
 function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEditor: vscode.TextEditor, instanceManager: InstanceManager): void {
@@ -268,9 +269,9 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 				vscode.window.showErrorMessage(message.content);
 				break
 			}
-			case "commit": {
+			case "apply": {
 				const { csvContent, saveSourceFile } = message
-				commitContent(instance, csvContent, saveSourceFile, config.openSourceFileAfterCommit)
+				applyContent(instance, csvContent, saveSourceFile, config.openSourceFileAfterApply)
 				break
 			}
 
@@ -295,7 +296,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 }
 
-function commitContent(instance: Instance, newContent: string, saveSourceFile: boolean, openSourceFileAfterCommit: boolean) {
+function applyContent(instance: Instance, newContent: string, saveSourceFile: boolean, openSourceFileAfterApply: boolean) {
 
 	vscode.workspace.openTextDocument(instance.sourceUri)
 		.then(document => {
@@ -312,7 +313,7 @@ function commitContent(instance: Instance, newContent: string, saveSourceFile: b
 			edit.replace(document.uri, textRange, newContent)
 			vscode.workspace.applyEdit(edit)
 				.then(editsApplied => {					
-					_afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterCommit)
+					_afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterApply)
 				})
 
 			// vscode.window.showTextDocument(document)
@@ -335,7 +336,7 @@ function commitContent(instance: Instance, newContent: string, saveSourceFile: b
 		})
 }
 
-function _afterEditsApplied(document: vscode.TextDocument, editsApplied: boolean, saveSourceFile: boolean, openSourceFileAfterCommit: boolean) {
+function _afterEditsApplied(document: vscode.TextDocument, editsApplied: boolean, saveSourceFile: boolean, openSourceFileAfterApply: boolean) {
 
 	const afterShowDocument = () => {
 		if (!editsApplied) {
@@ -356,7 +357,8 @@ function _afterEditsApplied(document: vscode.TextDocument, editsApplied: boolean
 		}
 	}
 
-	if (openSourceFileAfterCommit) {
+	//also works for unnamed files... they will not be displayed after save
+	if (openSourceFileAfterApply) {
 		vscode.window.showTextDocument(document)
 			.then(() => {
 				afterShowDocument()
@@ -377,7 +379,7 @@ function _afterEditsApplied(document: vscode.TextDocument, editsApplied: boolean
 function getActiveEditorInstance(instanceManager: InstanceManager): Instance | null {
 
 	if (vscode.window.activeTextEditor) { //a web view is no text editor...
-		vscode.window.showInformationMessage("Open a csv editor first to commit changes")
+		vscode.window.showInformationMessage("Open a csv editor first to apply changes")
 		return null
 	}
 

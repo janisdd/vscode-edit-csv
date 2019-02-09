@@ -21,7 +21,7 @@ const defaultConfig = {
     writeOption_escapeChar: '"',
     writeOption_hasHeader: "false",
     doubleClickColumnHandleForcedWith: 200,
-    openSourceFileAfterCommit: false,
+    openSourceFileAfterApply: false,
     selectTextAfterBeginEditCell: false,
     quoteAllFields: false
 };

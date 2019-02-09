@@ -1,65 +1,70 @@
 # vscode-edit-csv README
 
-This is the README for your extension "vscode-edit-csv". After writing up a brief description, we recommend including the following sections.
+This extensions allows you to edit csv files with an excel like table ui
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Execute the command `edit as csv` to open an editor for the current file.
 
-For example if there is an image subfolder under your extension project workspace:
+*Execute the command again to switch back to the source file or to switch back to the editor*
 
 \!\[feature X\]\(images/feature-x.png\)
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
-## Requirements
+## How this extension works
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+When you click on `edit csv file`
+
+- the file content is stringified and injected into the editor (webview) html
+- the current config is stringified and injected into the editor (webview) html
+- a manager stores a reference to the webview, source file uri, editor uri
+
+- in the webview the injected text is then parsed as csv and displayed in the table element
+
+When you click on `apply`
+
+- the current table is transformed into csv and written to the source file
+	- if you made an apply by accident you can undo in the table element (with the usual shortcuts) or open the source file and just do an undo (with the usual shortcuts)
+
+- When you click on `apply and save`
+	- the first step is equal to `apply`
+	- then the source file is saved
+
+
+- When you click in `Read again`
+	- the injected content is used (when the editor was opened), this does not read the source file again
+
+As you can see this **does not** scale very well with **large csv files** (needs to be stringified and stored the whole time)
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+There are some settings for this plugin. Open the VS Code Settings and search for `csv-edit`
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
 
-## Release Notes
+- `apply and save` an unnamed file will close the editor
+	- this is because the new uri for the new file is not known and for some reason if an extension saves an unnamed file the new file is not displayed automatically
+		- maybe there is some api to get the new uri (but i couldn't find any)
 
-Users appreciate release notes as you update your extension.
+- Because the table is exported comments can only be used before or after the csv content
 
-### 1.0.0
+## Used projects
 
-Initial release of ...
+- for csv parsing/writing: [papaparse](https://github.com/mholt/PapaParse)
+- for grid/table element: [handsontable](https://github.com/handsontable/handsontable)
+- for ui: [bulma](https://github.com/jgthms/bulma), [bulma-extension](https://github.com/Wikiki/bulma-extensions), [fontawesome](https://github.com/FortAwesome/Font-Awesome)
 
-### 1.0.1
 
-Fixed issue #.
+## How to build locally
 
-### 1.1.0
+To compile (and watch) the files in `csvEditorHtml` run
 
-Added features X, Y, and Z.
+```bash
+cd csvEditorHtml
+tsc -w
+```
 
------------------------------------------------------------------------------------------------------------
+then press `F5` to run the extension
 
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+When you edit `csvEditorHtml/index.html` you need to manually copy the changes (everything in the body but without the scripts) into `src/getHtml.ts` (past into body)

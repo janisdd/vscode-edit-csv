@@ -124,9 +124,9 @@ type CsvEditSettings = {
 	doubleClickColumnHandleForcedWith: number
 
 	/**
-	 * true: opens the source file after commit, false: keep the editor displayed
+	 * true: opens the source file after apply, false: keep the editor displayed
 	 */
-	openSourceFileAfterCommit: boolean
+	openSourceFileAfterApply: boolean
 
 	/**
 	 * true: select the text inside the cell (note you can also select the cell and start typings to overwrite the cell value), false: cursor starts at the end of the text
@@ -236,18 +236,18 @@ type CsvUpdateMessage = {
 }
 
 /**
- * the web view should call the handler of the commit button (emulate press)
+ * the web view should call the handler of the apply button (emulate press)
  */
-type RequestCommitPressMessage = {
-	command: 'commitPress'
+type RequestApplyPressMessage = {
+	command: "applyPress"
 }
 /**
- * the web view should call the handler of the commit and save button (emulate press)
+ * the web view should call the handler of the apply and save button (emulate press)
  */
-type RequestCommitAndSavePressMessage = {
-	command: 'commitAndSavePress'
+type RequestApplyAndSavePressMessage = {
+	command: 'applyAndSavePress'
 }
-type ReceivedMessageFromVsCode = CsvUpdateMessage | RequestCommitPressMessage | RequestCommitAndSavePressMessage
+type ReceivedMessageFromVsCode = CsvUpdateMessage | RequestApplyPressMessage | RequestApplyAndSavePressMessage
 
 
 type DisplayErrorMessage = {
@@ -256,7 +256,7 @@ type DisplayErrorMessage = {
 }
 
 type OverwriteFileMessage = {
-	command: 'commit'
+	command: 'apply'
 	csvContent: string
 	saveSourceFile: boolean
 }

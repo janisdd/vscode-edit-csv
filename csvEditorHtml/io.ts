@@ -179,26 +179,26 @@ function postVsError(text: string) {
  * called from ui
  * @param saveSourceFile 
  */
-function postCommitContent(saveSourceFile: boolean) {
+function postApplyContent(saveSourceFile: boolean) {
 	const csvContent = getDataAsCsv(defaultCsvWriteOptions)
 
 	//used to clear focus... else styles are not properly applied
 	//@ts-ignore
 	if (document.activeElement != document.body) document.activeElement.blur();
 
-	_posCommitContent(csvContent, saveSourceFile)
+	_postApplyContent(csvContent, saveSourceFile)
 }
 /**
  * called to save the current edit state back to the file
  * @param csvContent 
  * @param saveSourceFile 
  */
-function _posCommitContent(csvContent: string, saveSourceFile: boolean) {
+function _postApplyContent(csvContent: string, saveSourceFile: boolean) {
 
 	if (!vscode) return
 
 	vscode.postMessage({
-		command: 'commit',
+		command: 'apply',
 		csvContent,
 		saveSourceFile
 	})
@@ -212,18 +212,18 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 		case 'csvUpdate': {
 
 			initialContent = message.csvContent
-			readDataAgain(initialContent, defaultCsvReadOptions)
+			resetData(initialContent, defaultCsvReadOptions)
 
 			break
 		}
 
-		case 'commitPress': {
-			postCommitContent(false)
+		case "applyPress": {
+			postApplyContent(false)
 			break
 		}
 
-		case 'commitAndSavePress': {
-			postCommitContent(true)
+		case 'applyAndSavePress': {
+			postApplyContent(true)
 			break
 		}
 
