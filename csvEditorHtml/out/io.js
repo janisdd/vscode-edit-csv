@@ -4,19 +4,23 @@ function parseCsv(content, csvReadOptions) {
         content = defaultCsvContentIfEmpty;
     }
     const parseResult = csv.parse(content, Object.assign({}, csvReadOptions, { comments: csvReadOptions.comments === false ? '' : csvReadOptions.comments }));
-    if (parseResult.errors.length > 0) {
-        for (let i = 0; i < parseResult.errors.length; i++) {
-            const error = parseResult.errors[i];
-            if (error.type === 'Delimiter' && error.code === 'UndetectableDelimiter') {
-                continue;
+    if (parseResult.errors.length === 1 && parseResult.errors[0].type === 'Delimiter' && parseResult.errors[0].code === 'UndetectableDelimiter') {
+    }
+    else {
+        if (parseResult.errors.length > 0) {
+            for (let i = 0; i < parseResult.errors.length; i++) {
+                const error = parseResult.errors[i];
+                if (error.type === 'Delimiter' && error.code === 'UndetectableDelimiter') {
+                    continue;
+                }
+                if (error.row) {
+                    _error(`${error.message} on line ${error.row}`);
+                    continue;
+                }
+                _error(`${error.message}`);
             }
-            if (error.row) {
-                _error(`${error.message} on line ${error.row}`);
-                continue;
-            }
-            _error(`${error.message}`);
+            return null;
         }
-        return null;
     }
     defaultCsvWriteOptions.delimiter = parseResult.meta.delimiter;
     newLineFromInput = parseResult.meta.linebreak;

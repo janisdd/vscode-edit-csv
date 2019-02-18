@@ -23,26 +23,29 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): [string[], s
 		comments: csvReadOptions.comments === false ? '' : csvReadOptions.comments,
 	})
 
-
-	//we allow empty content for newly created files
-	if (parseResult.errors.length > 0) {
-		for (let i = 0; i < parseResult.errors.length; i++) {
-			const error = parseResult.errors[i];
-			
-			if (error.type === 'Delimiter' && error.code === 'UndetectableDelimiter') {
-				//papaparse will default to ,
-				continue;
+	if (parseResult.errors.length === 1 && parseResult.errors[0].type === 'Delimiter' && parseResult.errors[0].code === 'UndetectableDelimiter') {
+		//this is ok papaparse will default to ,
+	}
+	else {
+		if (parseResult.errors.length > 0) {
+			for (let i = 0; i < parseResult.errors.length; i++) {
+				const error = parseResult.errors[i];
+				
+				if (error.type === 'Delimiter' && error.code === 'UndetectableDelimiter') {
+					//
+					continue;
+				}
+	
+				if (error.row) {
+					_error(`${error.message} on line ${error.row}`)
+					continue
+				}
+	
+				_error(`${error.message}`)
 			}
-
-			if (error.row) {
-				_error(`${error.message} on line ${error.row}`)
-				continue
-			}
-
-			_error(`${error.message}`)
+	
+			return null
 		}
-
-		return null
 	}
 
 	defaultCsvWriteOptions.delimiter = parseResult.meta.delimiter
