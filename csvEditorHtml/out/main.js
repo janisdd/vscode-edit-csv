@@ -19,7 +19,7 @@ let defaultCsvReadOptions = {
     escapeChar: '"',
     skipEmptyLines: true,
     dynamicTyping: false,
-    _hasHeader: false,
+    _hasHeader: true,
 };
 let defaultCsvWriteOptions = {
     header: false,
@@ -52,6 +52,7 @@ if (typeof initialContent === 'undefined') {
 if (initialContent === undefined) {
     initialContent = '';
 }
+initialContent = `123,wet`;
 console.log("initialConfig: ", initialConfig);
 console.log("initialContent: " + initialContent);
 setupAndApplyInitialConfigPart1(initialConfig);

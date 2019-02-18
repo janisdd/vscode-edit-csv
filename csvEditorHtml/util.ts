@@ -177,45 +177,37 @@ function setCsvWriteOptionsInitial(options: CsvWriteOptions) {
 	el6.checked = defaultCsvWriteOptions.quoteAllFields
 }
 
-
-/**
- * parses and displays the given data (csv)
- * @param {string} content 
- */
-function resetData(content: string, csvReadOptions: CsvReadOptions) {
-	const _data = parseCsv(content, csvReadOptions)
-
-	if (!_data) {
-		displayData(_data, [], [])
-	}
-	else {
-		displayData(_data[1], _data[0], _data[2])
-	}
-
-
-	//might be bigger than the current view
-	onResizeGrid()
-	toggleAskReadAgainModal(false)
-}
-
-
 /**
  * checks if the has header read option must be disabled or not
  * and sets the needed state
+ * @returns false: force changes (settings want headers but is not possible with data), true: all ok
  */
-function checkIfHasHeaderReadOptionIsAvailable() {
+function checkIfHasHeaderReadOptionIsAvailable(): boolean {
 
-	const data = getData()
+	const data = getData() //this also includes header rows
 
-	const canSetOption = data.length > 0
+	const el = _getById('has-header') as HTMLInputElement
 
-	const el = _getById('has-header')
+	let canSetOption = false
+
+	if (defaultCsvReadOptions._hasHeader) {
+		canSetOption = data.length > 1 //we already set this option... 2 somehow works?
+	} else {
+		canSetOption = data.length > 1 //no header ... to enable header we need 2 rows
+	}
 
 	if (canSetOption) {
 		el.removeAttribute('disabled')
+
 	} else {
 		el.setAttribute('disabled', '')
+
+		defaultCsvReadOptions._hasHeader = false
+		el.checked = false
+		return false
 	}
+
+	return true
 }
 
 //from https://stackoverflow.com/questions/27078285/simple-throttle-in-js ... from underscore

@@ -83,27 +83,26 @@ function setCsvWriteOptionsInitial(options) {
     const el6 = _getById('quote-all-fields-write');
     el6.checked = defaultCsvWriteOptions.quoteAllFields;
 }
-function resetData(content, csvReadOptions) {
-    const _data = parseCsv(content, csvReadOptions);
-    if (!_data) {
-        displayData(_data, [], []);
-    }
-    else {
-        displayData(_data[1], _data[0], _data[2]);
-    }
-    onResizeGrid();
-    toggleAskReadAgainModal(false);
-}
 function checkIfHasHeaderReadOptionIsAvailable() {
     const data = getData();
-    const canSetOption = data.length > 0;
     const el = _getById('has-header');
+    let canSetOption = false;
+    if (defaultCsvReadOptions._hasHeader) {
+        canSetOption = data.length > 1;
+    }
+    else {
+        canSetOption = data.length > 1;
+    }
     if (canSetOption) {
         el.removeAttribute('disabled');
     }
     else {
         el.setAttribute('disabled', '');
+        defaultCsvReadOptions._hasHeader = false;
+        el.checked = false;
+        return false;
     }
+    return true;
 }
 function throttle(func, wait) {
     var context, args, result;

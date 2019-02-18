@@ -101,7 +101,7 @@ function toggleBeforeCommentsIndicator(shouldHide) {
 function toggleAfterCommentsIndicator(shouldHide) {
     commentsAfterHasContentDiv.style.visibility = shouldHide ? 'collapse' : 'visible';
 }
-function setHasHeader() {
+function applyHasHeader(fromUndo = false) {
     const el = _getById('has-header');
     const data = getData();
     if (data.length === 0) {
@@ -112,17 +112,23 @@ function setHasHeader() {
         hot.updateSettings({
             colHeaders: data[0].map((col, index) => defaultColHeaderFunc(index, col))
         }, false);
+        if (fromUndo)
+            return;
         headerRow = data[0];
         hot.alter('remove_row', 0);
         elWrite.checked = true;
+        defaultCsvReadOptions._hasHeader = true;
         return;
     }
     hot.updateSettings({
         colHeaders: defaultColHeaderFunc
     }, false);
+    if (fromUndo)
+        return;
     hot.alter('insert_row', 0);
     hot.populateFromArray(0, 0, [headerRow]);
     elWrite.checked = false;
+    defaultCsvReadOptions._hasHeader = false;
 }
 function setDelimiterString() {
     const el = _getById('delimiter-string');
@@ -217,7 +223,9 @@ function displayData(data, commentLinesBefore, commentLinesAfter) {
         data,
         rowHeaders: function (row) {
             let text = (row + 1).toString();
-            return `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`;
+            return row !== 0
+                ? `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
+                : `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`;
         },
         fillHandle: false,
         colHeaders: defaultColHeaderFunc,
@@ -291,10 +299,35 @@ function displayData(data, commentLinesBefore, commentLinesAfter) {
             if (!el)
                 return;
             el.setSelectionRange(0, el.value.length);
+        },
+        beforeCopy: function (data, coords) {
+        },
+        afterUndo: function (action) {
+            if (action.actionType === 'remove_row' && action.index === 0) {
+                defaultCsvReadOptions._hasHeader = false;
+                const el = _getById('has-header');
+                const elWrite = _getById('has-header-write');
+                el.checked = false;
+                elWrite.checked = false;
+                applyHasHeader(true);
+            }
+        },
+        beforeRedo: function (action) {
+            if (action.actionType === 'remove_row' && action.index === 0) {
+                defaultCsvReadOptions._hasHeader = false;
+                const el = _getById('has-header');
+                const elWrite = _getById('has-header-write');
+                el.checked = true;
+                elWrite.checked = true;
+                applyHasHeader(true);
+            }
         }
     });
     Handsontable.dom.addEvent(window, 'resize', throttle(onResizeGrid, 200));
-    checkIfHasHeaderReadOptionIsAvailable();
+    const settingsApplied = checkIfHasHeaderReadOptionIsAvailable();
+    if (settingsApplied == true && defaultCsvReadOptions._hasHeader === true) {
+        applyHasHeader();
+    }
     onResizeGrid();
 }
 let allColSizes = [];
@@ -327,7 +360,9 @@ function defaultColHeaderFunc(colIndex, colName) {
     if (colName !== undefined) {
         text = colName;
     }
-    return `${text} <span class="remove-col clickable" onclick="removeColumn(${colIndex})"><i class="fas fa-trash"></i></span>`;
+    return colIndex !== 0
+        ? `${text} <span class="remove-col clickable" onclick="removeColumn(${colIndex})"><i class="fas fa-trash"></i></span>`
+        : `${text} <span class="remove-col clickable" onclick="removeColumn(${colIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`;
 }
 function toggleHelpModal(isVisible) {
     if (isVisible) {
@@ -350,5 +385,16 @@ function onCommentsBeforeInput(event) {
 function onCommentsAfterInput(event) {
     const el = event.currentTarget;
     toggleAfterCommentsIndicator(el.value === '');
+}
+function resetData(content, csvReadOptions) {
+    const _data = parseCsv(content, csvReadOptions);
+    if (!_data) {
+        displayData(_data, [], []);
+    }
+    else {
+        displayData(_data[1], _data[0], _data[2]);
+    }
+    onResizeGrid();
+    toggleAskReadAgainModal(false);
 }
 //# sourceMappingURL=ui.js.map
