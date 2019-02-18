@@ -93,7 +93,7 @@ function createEditorHtml(context, initialContent) {
 								<label>
 									<span>Delimiter</span>
 									<span class="clickable tooltip" data-tooltip="Set to tab character" onclick="setReadDelimiter('\t')">⇥</span>
-									<span class="tooltip" data-tooltip="Empty to auto detect">
+									<span id="read-delimiter-tooltip" class="tooltip" data-tooltip="Empty to auto detect">
 										<i class="fas fa-question-circle"></i>
 									</span>
 								</label>
@@ -119,7 +119,7 @@ function createEditorHtml(context, initialContent) {
 									</label>
 									<input id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()">
 								</div>
-	
+
 								<div class="field mar-left">
 									<label>
 										<span>EscapeChar</span>
@@ -148,7 +148,7 @@ function createEditorHtml(context, initialContent) {
 				<div id="write-options-content" class="options-content">
 					<div class="field">
 						<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded" checked="checked"
-						 onchange="setHasHeaderWrite()">
+						onchange="setHasHeaderWrite()">
 						<label for="has-header-write">
 							<span>Write header</span>
 						</label>

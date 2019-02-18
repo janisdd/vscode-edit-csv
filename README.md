@@ -45,7 +45,11 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 
 - `apply and save` an unnamed file will close the editor
 	- this is because the new uri for the new file is not known and for some reason if an extension saves an unnamed file the new file is not displayed automatically
-		- maybe there is some api to get the new uri (but i couldn't find any)
+		- maybe this can be resolved when https://github.com/Microsoft/vscode/issues/43768 is closed
+
+- renaming a file while an editor is open for that file will break the reference the this source file
+	- thus changes can no longer be saved/applied
+	- maybe this can be resolved when https://github.com/Microsoft/vscode/issues/43768 is closed
 
 - Because the table is exported comments can only be used before or after the csv content
 

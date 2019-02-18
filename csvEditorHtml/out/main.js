@@ -42,6 +42,8 @@ const commentsAfterOptionId = 'comments-after-option';
 const toggleCommentsSectionsButtonId = 'toggle-comments-sections';
 const commentsBeforeHasContentDiv = _getById('comments-before-has-content');
 const commentsAfterHasContentDiv = _getById('comments-after-has-content');
+const readDelimiterTooltip = _getById('read-delimiter-tooltip');
+const readDelimiterTooltipText = "Empty to auto detect";
 setCsvReadOptionsInitial(defaultCsvReadOptions);
 setCsvWriteOptionsInitial(defaultCsvWriteOptions);
 if (typeof initialContent === 'undefined') {

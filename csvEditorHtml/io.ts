@@ -28,6 +28,11 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): [string[], s
 	if (parseResult.errors.length > 0) {
 		for (let i = 0; i < parseResult.errors.length; i++) {
 			const error = parseResult.errors[i];
+			
+			if (error.type === 'Delimiter' && error.code === 'UndetectableDelimiter') {
+				//papaparse will default to ,
+				continue;
+			}
 
 			if (error.row) {
 				_error(`${error.message} on line ${error.row}`)
@@ -42,6 +47,8 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): [string[], s
 
 	defaultCsvWriteOptions.delimiter = parseResult.meta.delimiter
 	newLineFromInput = parseResult.meta.linebreak
+
+	readDelimiterTooltip.setAttribute('data-tooltip', `${readDelimiterTooltipText} (detected: ${defaultCsvWriteOptions.delimiter})`)
 
 	const commentLinesBefore = []
 	const commentLinesAfter = []

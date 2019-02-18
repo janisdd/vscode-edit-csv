@@ -25,9 +25,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 	let instanceManager = new InstanceManager()
 
-
-	// const initCommand = vscode.window.registerWebviewPanelSerializer('csv-edit.init', new CsvEditStateSerializer())
-
 	const applyCsvCommand = vscode.commands.registerCommand('edit-csv.apply', () => {
 
 		const instance = getActiveEditorInstance(instanceManager)
@@ -180,16 +177,23 @@ export function activate(context: vscode.ExtensionContext) {
 		//when we know the old uri then we could update the instance manager and the panel (e.g. title)...
 		//but for now we close the editor iff we saved an untitled file
 
+		// console.log(`onDidOpenTextDocument ${args.uri.toString()}`);
+
 		//when we save an unnamed (temp file) file a new file with the new uri is opened and saved
 		//TODO i don't think we can get the old/new name of the file os wait for 
 		//so just filter for csv file and show it 
 		if (args.isUntitled || isCsvFile(args) === false || args.version !== 1) return
 
-		vscode.window.showTextDocument(args.uri)
+		//this will display the new file (after unnamed was saved) but the reference is still broken...
+		//also this would show almost every opened csv file (even if we don't wan to display it e.g. only for silent editing from other extensions)
+		// vscode.window.showTextDocument(args.uri)
 	})
 
 	// vscode.workspace.onDidSaveTextDocument(debounce((args: vscode.TextDocument) => {
 	// }, debounceDocumentChangeInMs))
+	vscode.workspace.onDidSaveTextDocument((args: vscode.TextDocument) => {
+		// console.log(`onDidSaveTextDocument ${args.uri.toString()}`);
+	})
 
 
 	//when an unnamed csv file is closed and we have an editor for it then close the editor
@@ -197,6 +201,8 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.workspace.onDidCloseTextDocument((args) => {
 
 		if (args.uri.scheme === editorUriScheme) return //closed an editor nothing to do here... onDispose will handle it
+
+		// console.log(`onDidCloseTextDocument ${args.uri.toString()}`);
 
 		if (isCsvFile(args) && args.isUntitled && args.uri.scheme === "untitled") {
 
@@ -207,13 +213,9 @@ export function activate(context: vscode.ExtensionContext) {
 			instance.panel.dispose()
 		}
 	})
-
-
 	//not needed because this changes only initial configuration...
 	// vscode.workspace.onDidChangeConfiguration((args) => {
 	// })
-
-
 
 	context.subscriptions.push(editCsvCommand)
 	context.subscriptions.push(gotoSourceCsvCommand)
@@ -312,9 +314,15 @@ function applyContent(instance: Instance, newContent: string, saveSourceFile: bo
 
 			edit.replace(document.uri, textRange, newContent)
 			vscode.workspace.applyEdit(edit)
-				.then(editsApplied => {					
-					_afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterApply)
-				})
+				.then(
+					editsApplied => {
+						_afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterApply)
+					},
+					(reason) => {
+						console.warn(`Error applying edits`)
+						console.warn(reason)
+						vscode.window.showErrorMessage(`Error applying edits`)
+					})
 
 			// vscode.window.showTextDocument(document)
 			// 	.then(editor => {
@@ -333,27 +341,37 @@ function applyContent(instance: Instance, newContent: string, saveSourceFile: bo
 			// 			})
 			// 	})
 
-		})
+		},
+			(reason) => {
+				console.warn(`Could not find the source file`);
+				console.warn(reason);
+				vscode.window.showErrorMessage(`Could not find the source file`)
+			})
 }
 
 function _afterEditsApplied(document: vscode.TextDocument, editsApplied: boolean, saveSourceFile: boolean, openSourceFileAfterApply: boolean) {
 
 	const afterShowDocument = () => {
 		if (!editsApplied) {
-			vscode.window.showErrorMessage(`edits could not be applied`);
+			console.warn(`Edits could not be applied`)
+			vscode.window.showErrorMessage(`Edits could not be applied`)
 			return
 		}
 
 		if (saveSourceFile) {
 			document.save()
-				.then(wasSaved => {
-					if (!wasSaved) {
-						vscode.window.showErrorMessage(`Could not save csv file`);
-					}
-				}, (reason) => {
+				.then(
+					wasSaved => {
+						if (!wasSaved) {
+							console.warn(`Could not save csv file`)
+							vscode.window.showErrorMessage(`Could not save csv file`)
+						}
+					},
+					(reason) => {
+						console.warn(`Error saving csv file`)
 						console.warn(reason); //will be null e.g. no permission denied when saved manually
-						vscode.window.showErrorMessage(`Error saving csv file`);
-				})
+						vscode.window.showErrorMessage(`Error saving csv file`)
+					})
 		}
 	}
 
