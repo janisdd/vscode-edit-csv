@@ -250,7 +250,7 @@ function postApplyContent(saveSourceFile: boolean) {
 
 	//used to clear focus... else styles are not properly applied
 	//@ts-ignore
-	if (document.activeElement != document.body) document.activeElement.blur();
+	if (document.activeElement !== document.body) document.activeElement.blur();
 
 	_postApplyContent(csvContent, saveSourceFile)
 }

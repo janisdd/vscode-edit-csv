@@ -139,7 +139,7 @@ function postCopyToClipboard(text) {
 }
 function postApplyContent(saveSourceFile) {
     const csvContent = getDataAsCsv(defaultCsvWriteOptions);
-    if (document.activeElement != document.body)
+    if (document.activeElement !== document.body)
         document.activeElement.blur();
     _postApplyContent(csvContent, saveSourceFile);
 }

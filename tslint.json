@@ -3,13 +3,15 @@
 		"no-string-throw": true,
 		"no-unused-expression": true,
 		"no-duplicate-variable": true,
-		"curly": true,
+		"curly": false,
 		"class-name": true,
+		"space-before-function-paren":false,
+		"space-within-parens":false,
 		"semicolon": [
 			false,
 			"always"
 		],
-		"triple-equals": true,
+		"triple-equals": true
 	},
-	"defaultSeverity": "warning"
+	"defaultSeverity": "error"
 }

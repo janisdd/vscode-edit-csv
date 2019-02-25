@@ -269,13 +269,13 @@ function displayData(data, commentLinesBefore, commentLinesAfter) {
             };
             if (!initialConfig || initialConfig.lastRowEnterBehavior !== 'createRow')
                 return _default;
-            if (!selection || selection.length == 0)
+            if (!selection || selection.length === 0)
                 return _default;
             if (selection.length > 1)
                 return _default;
             const rowCount = hot.countRows();
             const selected = selection[0];
-            if (selected[0] != selected[2] || selected[0] !== rowCount - 1)
+            if (selected[0] !== selected[2] || selected[0] !== rowCount - 1)
                 return _default;
             if (event.key.toLowerCase() === 'enter' && event.shiftKey === false) {
                 addRow(false);
@@ -290,13 +290,13 @@ function displayData(data, commentLinesBefore, commentLinesAfter) {
             };
             if (!initialConfig || initialConfig.lastColumnTabBehavior !== 'createColumn')
                 return _default;
-            if (!selection || selection.length == 0)
+            if (!selection || selection.length === 0)
                 return _default;
             if (selection.length > 1)
                 return _default;
             const colCount = hot.countCols();
             const selected = selection[0];
-            if (selected[1] != selected[3] || selected[1] !== colCount - 1)
+            if (selected[1] !== selected[3] || selected[1] !== colCount - 1)
                 return _default;
             if (event.key.toLowerCase() === 'tab' && event.shiftKey === false) {
                 addColumn(false);
@@ -345,7 +345,7 @@ function displayData(data, commentLinesBefore, commentLinesAfter) {
     });
     Handsontable.dom.addEvent(window, 'resize', throttle(onResizeGrid, 200));
     const settingsApplied = checkIfHasHeaderReadOptionIsAvailable();
-    if (settingsApplied == true && defaultCsvReadOptions._hasHeader === true) {
+    if (settingsApplied === true && defaultCsvReadOptions._hasHeader === true) {
         applyHasHeader();
     }
     onResizeGrid();

@@ -51,7 +51,11 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 	- thus changes can no longer be saved/applied
 	- maybe this can be resolved when https://github.com/Microsoft/vscode/issues/43768 is closed
 
-- Because the table is exported comments can only be used before or after the csv content
+- because the table is exported comments can only be used before or after the csv content
+	- *after csv comments* are all comments that are not *before csv comments* (comments inside the csv data are added to the *before csv comments*)
+
+- if the source file content changes is changed while the editor is open, the editor will not be updated (e.g. take new content)
+	- if you apply the editor the source file changes are **overwritten!**
 
 ## Used projects
 
@@ -66,9 +70,11 @@ To compile (and watch) the files in `csvEditorHtml` run
 
 ```bash
 cd csvEditorHtml
-tsc -w
+tsc -w #or just tsc to transpile only once
 ```
 
 then press `F5` to run the extension
 
 When you edit `csvEditorHtml/index.html` you need to manually copy the changes (everything in the body but without the scripts) into `src/getHtml.ts` (past into body)
+
+You can also open `csvEditorHtml/index.html` in your favorite browser and play around *(the vs code settings are not applied in the browser)*

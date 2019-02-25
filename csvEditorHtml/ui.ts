@@ -447,7 +447,7 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 
 			if (!initialConfig || initialConfig.lastRowEnterBehavior !== 'createRow') return _default
 
-			if (!selection || selection.length == 0) return _default
+			if (!selection || selection.length === 0) return _default
 
 			if (selection.length > 1) return _default
 
@@ -456,7 +456,7 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 			//see https://handsontable.com/docs/3.0.0/Core.html#getSelected
 			//[startRow, startCol, endRow, endCol].
 			const selected = selection[0]
-			if (selected[0] != selected[2] || selected[0] !== rowCount - 1) return _default
+			if (selected[0] !== selected[2] || selected[0] !== rowCount - 1) return _default
 
 			if (event.key.toLowerCase() === 'enter' && event.shiftKey === false) {
 				addRow(false)
@@ -474,7 +474,7 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 
 			if (!initialConfig || initialConfig.lastColumnTabBehavior !== 'createColumn') return _default
 
-			if (!selection || selection.length == 0) return _default
+			if (!selection || selection.length === 0) return _default
 
 			if (selection.length > 1) return _default
 
@@ -483,7 +483,7 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 			//see https://handsontable.com/docs/3.0.0/Core.html#getSelected
 			//[startRow, startCol, endRow, endCol]
 			const selected = selection[0]
-			if (selected[1] != selected[3] || selected[1] !== colCount - 1) return _default
+			if (selected[1] !== selected[3] || selected[1] !== colCount - 1) return _default
 
 			if (event.key.toLowerCase() === 'tab' && event.shiftKey === false) {
 				addColumn(false)
@@ -552,7 +552,7 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 
 	//if we have only 1 row and header is enabled by default...this would be an error (we cannot display something)
 
-	if (settingsApplied == true && defaultCsvReadOptions._hasHeader === true) { //this must be applied else we get duplicate first row
+	if (settingsApplied === true && defaultCsvReadOptions._hasHeader === true) { //this must be applied else we get duplicate first row
 		applyHasHeader()
 	}
 

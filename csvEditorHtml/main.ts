@@ -10,6 +10,7 @@ if (typeof acquireVsCodeApi !== 'undefined') {
 }
 
 if (typeof initialConfig === 'undefined') {
+	// tslint:disable-next-line:no-duplicate-variable
 	var initialConfig = undefined as CsvEditSettings | undefined
 }
 
@@ -87,6 +88,7 @@ setCsvReadOptionsInitial(defaultCsvReadOptions)
 setCsvWriteOptionsInitial(defaultCsvWriteOptions)
 
 if (typeof initialContent === 'undefined') {
+	// tslint:disable-next-line:no-duplicate-variable
 	var initialContent = ''
 }
 
@@ -96,14 +98,14 @@ if (initialContent === undefined) {
 
 // initialContent = `123,wet`
 
-initialContent =
-	`
-#test
-1,2,3
-#test
-4,5,6,7,8
+// initialContent =
+// 	`
+// #test
+// 1,2,3
+// #test
+// 4,5,6,7,8
 
-`
+// `
 
 console.log("initialConfig: ", initialConfig);
 console.log("initialContent: " + initialContent);
