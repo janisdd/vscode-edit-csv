@@ -196,10 +196,14 @@ function setWriteDelimiter(delimiter) {
 }
 function generateCsvPreview() {
     const value = getDataAsCsv(defaultCsvWriteOptions);
-    console.log(defaultCsvWriteOptions);
     const el = _getById('csv-preview');
     el.value = value;
     togglePreview(false);
+}
+function copyPreviewToClipboard() {
+    generateCsvPreview();
+    const el = _getById('csv-preview');
+    postCopyToClipboard(el.value);
 }
 function displayData(data, commentLinesBefore, commentLinesAfter) {
     if (data === null) {
@@ -321,6 +325,12 @@ function displayData(data, commentLinesBefore, commentLinesAfter) {
                 elWrite.checked = true;
                 applyHasHeader(true);
             }
+        },
+        afterColumnMove: function (aa, bbb) {
+            console.log('asdasd');
+            hot.updateSettings({
+                colHeaders: defaultColHeaderFunc
+            }, false);
         }
     });
     Handsontable.dom.addEvent(window, 'resize', throttle(onResizeGrid, 200));

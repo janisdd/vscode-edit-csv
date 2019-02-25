@@ -31,7 +31,7 @@ function parseCsv(content, csvReadOptions) {
         let lines = content.split(newLineFromInput);
         let inBeforeLineRange = true;
         for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
+            const line = lines[i].trim();
             if (inBeforeLineRange) {
                 if (line.startsWith(csvReadOptions.comments)) {
                     commentLinesBefore.push(line.substring(csvReadOptions.comments.length));
@@ -94,12 +94,47 @@ function getDataAsCsv(csvWriteOptions) {
     }
     return dataAsString;
 }
-function postVsError(text) {
-    if (!vscode)
+function postVsInformation(text) {
+    if (!vscode) {
+        console.log(`postVsInformation (but in browser)`);
         return;
+    }
     vscode.postMessage({
-        command: 'error',
+        command: 'msgBox',
+        type: 'info',
         content: text
+    });
+}
+function postVsWarning(text) {
+    if (!vscode) {
+        console.log(`postVsWarning (but in browser)`);
+        return;
+    }
+    vscode.postMessage({
+        command: 'msgBox',
+        type: 'warn',
+        content: text
+    });
+}
+function postVsError(text) {
+    if (!vscode) {
+        console.log(`postVsError (but in browser)`);
+        return;
+    }
+    vscode.postMessage({
+        command: 'msgBox',
+        type: 'error',
+        content: text
+    });
+}
+function postCopyToClipboard(text) {
+    if (!vscode) {
+        console.log(`postCopyToClipboard (but in browser)`);
+        return;
+    }
+    vscode.postMessage({
+        command: 'copyToClipboard',
+        text
     });
 }
 function postApplyContent(saveSourceFile) {
@@ -109,8 +144,10 @@ function postApplyContent(saveSourceFile) {
     _postApplyContent(csvContent, saveSourceFile);
 }
 function _postApplyContent(csvContent, saveSourceFile) {
-    if (!vscode)
+    if (!vscode) {
+        console.log(`_postApplyContent (but in browser)`);
         return;
+    }
     vscode.postMessage({
         command: 'apply',
         csvContent,

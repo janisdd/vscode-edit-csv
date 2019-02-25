@@ -324,13 +324,22 @@ function setWriteDelimiter(delimiter: string) {
  */
 function generateCsvPreview() {
 	const value = getDataAsCsv(defaultCsvWriteOptions)
-	console.log(defaultCsvWriteOptions);
 
 	const el = _getById('csv-preview') as HTMLTextAreaElement
 	el.value = value
 
 	//open preview
 	togglePreview(false)
+}
+
+function copyPreviewToClipboard() {
+	
+	generateCsvPreview()
+
+	const el = _getById('csv-preview') as HTMLTextAreaElement
+
+	postCopyToClipboard(el.value)
+
 }
 
 
@@ -505,7 +514,14 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 
 				applyHasHeader(true)
 			}
-			
+		},
+
+		afterColumnMove: function(aa, bbb) {
+			console.log('asdasd');
+			//NOT WORKING
+			hot.updateSettings({
+				colHeaders: defaultColHeaderFunc as any
+			}, false)
 		}
 	})
 

@@ -44,7 +44,7 @@ let defaultCsvReadOptions: CsvReadOptions = {
 	escapeChar: '"',
 	skipEmptyLines: true,
 	dynamicTyping: false,
-	_hasHeader: true,
+	_hasHeader: false,
 }
 
 
@@ -94,15 +94,16 @@ if (initialContent === undefined) {
 	initialContent = ''
 }
 
-initialContent = `123,wet`
+// initialContent = `123,wet`
 
-// initialContent =
-// 	`
-// #test
-// 1,2,3
-// 4,5,6,7,8
+initialContent =
+	`
+#test
+1,2,3
+#test
+4,5,6,7,8
 
-// `
+`
 
 console.log("initialConfig: ", initialConfig);
 console.log("initialContent: " + initialContent);

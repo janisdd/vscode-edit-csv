@@ -250,8 +250,9 @@ type RequestApplyAndSavePressMessage = {
 type ReceivedMessageFromVsCode = CsvUpdateMessage | RequestApplyPressMessage | RequestApplyAndSavePressMessage
 
 
-type DisplayErrorMessage = {
-	command: 'error'
+type DisplayMessageBoxMessage = {
+	command: 'msgBox'
+	type: 'info' | 'warn' | 'error'
 	content: string
 }
 
@@ -261,7 +262,12 @@ type OverwriteFileMessage = {
 	saveSourceFile: boolean
 }
 
-type PostMessage = DisplayErrorMessage | OverwriteFileMessage
+type CopyToClipboardMessage = {
+	command: 'copyToClipboard'
+	text: string
+}
+
+type PostMessage = DisplayMessageBoxMessage | OverwriteFileMessage | CopyToClipboardMessage
 
 type VsState = {
 	readOptionIsCollapsed: boolean

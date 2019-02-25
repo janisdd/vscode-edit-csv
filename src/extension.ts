@@ -267,13 +267,32 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	panel.webview.onDidReceiveMessage((message: PostMessage) => {
 
 		switch (message.command) {
-			case "error": {
-				vscode.window.showErrorMessage(message.content);
+			case "msgBox": {
+
+				if (message.type === 'info') {
+					vscode.window.showInformationMessage(message.content);
+
+				} else if (message.type === 'warn') {
+					vscode.window.showWarningMessage(message.content);
+
+				} else if (message.type === 'error') {
+					vscode.window.showErrorMessage(message.content);
+
+				} else {
+					const _msg = `unknown show message box type: ${message.type}, message: ${message.content}`
+					console.error(_msg)
+					vscode.window.showErrorMessage(_msg);
+				}
 				break
 			}
 			case "apply": {
 				const { csvContent, saveSourceFile } = message
 				applyContent(instance, csvContent, saveSourceFile, config.openSourceFileAfterApply)
+				break
+			}
+
+			case "copyToClipboard": {
+				vscode.env.clipboard.writeText(message.text)
 				break
 			}
 

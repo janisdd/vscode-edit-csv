@@ -73,7 +73,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 					<div>
 
 						<div class="field">
-							<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked" onchange="setHasHeader()">
+							<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked" onchange="applyHasHeader()">
 							<label for="has-header">
 								<span>Has header</span>
 							</label>
@@ -125,7 +125,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 									</label>
 									<input id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()">
 								</div>
-
+	
 								<div class="field mar-left">
 									<label>
 										<span>EscapeChar</span>
@@ -154,7 +154,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 				<div id="write-options-content" class="options-content">
 					<div class="field">
 						<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded" checked="checked"
-						onchange="setHasHeaderWrite()">
+						 onchange="setHasHeaderWrite()">
 						<label for="has-header-write">
 							<span>Write header</span>
 						</label>
@@ -247,6 +247,10 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 						<span><button class="button is-light is-small" style="vertical-align: middle;" onclick="generateCsvPreview()">Generate</button></span>
 						<span class="clickable" onclick="togglePreview()">
 							<i id="preview-icon" class="fas fa-chevron-right"></i>
+						</span>
+
+						<span class="mar-left-half clickable" onclick="copyPreviewToClipboard()">
+							<i id="preview-copy-icon" class="fas fa-paste"></i>
 						</span>
 					</div>
 
@@ -356,7 +360,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 					<ul>
 						<li>Undo/Redo</li>
 						<li>Click on column header text to sort</li>
-						<li>Click row/column header (not the text) to select then drag to rearrange</li>
+						<li>Click left next to the row/column header text to select then drag to rearrange</li>
 						<li>Resize row/column</li>
 						<li>
 							<div class="keys">Home</div> to move to the first cell in a row

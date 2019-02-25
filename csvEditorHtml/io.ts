@@ -7,6 +7,7 @@
 /**
 * parses the content as csv
 * also fills the commentLinesBefore and commentLinesAfter array if comments is enabled
+* commentLinesAfter contains all comments after the commentLinesBefore (this includes comments in the data)
 * on error the errors are displayed and null is returned
 * @param {string} content 
 * @returns {[string[], string[][], string[]]| null} [0] comments before, [1] csv data, [2] comments after
@@ -61,7 +62,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): [string[], s
 		let lines = content.split(newLineFromInput)
 		let inBeforeLineRange = true
 		for (let i = 0; i < lines.length; i++) {
-			const line = lines[i];
+			const line = lines[i].trim();
 
 			if (inBeforeLineRange) {
 
@@ -175,13 +176,68 @@ function getDataAsCsv(csvWriteOptions: CsvWriteOptions): string {
  * called to display the given text in vs code 
  * @param text 
  */
-function postVsError(text: string) {
+function postVsInformation(text: string) {
 
-	if (!vscode) return
+	if (!vscode) {
+		console.log(`postVsInformation (but in browser)`)
+		return
+	}
 
 	vscode.postMessage({
-		command: 'error',
+		command: 'msgBox',
+		type: 'info',
 		content: text
+	})
+}
+/**
+ * called to display the given text in vs code 
+ * @param text 
+ */
+function postVsWarning(text: string) {
+
+	if (!vscode) {
+		console.log(`postVsWarning (but in browser)`)
+		return
+	}
+
+	vscode.postMessage({
+		command: 'msgBox',
+		type: 'warn',
+		content: text
+	})
+}
+/**
+ * called to display the given text in vs code 
+ * @param text 
+ */
+function postVsError(text: string) {
+
+	if (!vscode) {
+		console.log(`postVsError (but in browser)`)
+		return
+	}
+
+	vscode.postMessage({
+		command: 'msgBox',
+		type: 'error',
+		content: text
+	})
+}
+
+/**
+ * called to copy the text to the clipboard through vs code
+ * @param text the text to copy 
+ */
+function postCopyToClipboard(text: string) {
+
+	if (!vscode) {
+		console.log(`postCopyToClipboard (but in browser)`)
+		return
+	}
+
+	vscode.postMessage({
+		command: 'copyToClipboard',
+		text
 	})
 }
 
@@ -205,7 +261,10 @@ function postApplyContent(saveSourceFile: boolean) {
  */
 function _postApplyContent(csvContent: string, saveSourceFile: boolean) {
 
-	if (!vscode) return
+	if (!vscode) {
+		console.log(`_postApplyContent (but in browser)`)
+		return
+	}
 
 	vscode.postMessage({
 		command: 'apply',
