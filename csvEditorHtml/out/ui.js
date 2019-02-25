@@ -205,6 +205,15 @@ function copyPreviewToClipboard() {
     const el = _getById('csv-preview');
     postCopyToClipboard(el.value);
 }
+function _normalizeDataArray(data) {
+    const maxCols = data.reduce((prev, curr) => curr.length > prev ? curr.length : prev, 0);
+    for (let i = 0; i < data.length; i++) {
+        const row = data[i];
+        if (row.length < maxCols) {
+            row.push(...Array.from(Array(maxCols - row.length), (p, index) => ''));
+        }
+    }
+}
 function displayData(data, commentLinesBefore, commentLinesAfter) {
     if (data === null) {
         if (hot) {
@@ -212,6 +221,7 @@ function displayData(data, commentLinesBefore, commentLinesAfter) {
         }
         return;
     }
+    _normalizeDataArray(data);
     if (data.length > 0) {
         headerRow = data[0];
     }

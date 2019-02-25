@@ -345,12 +345,29 @@ function copyPreviewToClipboard() {
 
 /* --- other --- */
 
+function _normalizeDataArray(data: string[][]) {
+
+	//in the good case all rows have equal size right from the beginning
+
+	const maxCols = data.reduce((prev, curr) => curr.length > prev ? curr.length : prev, 0)
+
+	for (let i = 0; i < data.length; i++) {
+		const row = data[i];
+
+		if (row.length < maxCols) {
+			row.push(...Array.from(Array(maxCols - row.length), (p, index) => ''))
+		}
+	}
+}
+
 /**
  * display the given data in the handson table
- * also sets the headerRow if we have more than 
+ * if we have rows this sets the 
+ * @see headerRow and enables the has header option
+ * if we have data we convert it to match a rectangle (every row must have the same number of columns / cells)
  * @param {string[][]} data array with the rows or null to just destroy the old table
  * @param {string[]} commentLinesBefore the comment lines before the csv content
- * @param {string[]} commentLinesAfter the comment lines after the csv content
+ * @param {string[]} commentLinesAfter the comment lines after commentLinesBefore
  */
 function displayData(data: string[][] | null, commentLinesBefore: string[], commentLinesAfter: string[]) {
 
@@ -360,6 +377,8 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 		}
 		return
 	}
+
+	_normalizeDataArray(data)
 
 	if (data.length > 0) {
 		headerRow = data[0]

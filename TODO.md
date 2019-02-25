@@ -2,12 +2,8 @@
 
 --- add
 
-
 - reorder row/col first row can be deleted... somehow afterColumnMove??
 
-- add show message when comments inside data lines
-
-- if first line has less cols than the others?? curr: first row is used
 
 ## Maybe
 
