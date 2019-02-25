@@ -402,7 +402,7 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 	//@ts-ignore
 	hot = new Handsontable(container, {
 		data,
-		rowHeaders: function (row: number) {
+		rowHeaders: function (row: number) { //the visual row index
 			let text = (row + 1).toString()
 			return row !== 0
 				? `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
@@ -604,7 +604,8 @@ function onResizeGrid() {
 /**
  * generates the default html wrapper code for the given column name
  * we add a delete icon
- * @param {number} colIndex 
+ * @param {number} colIndex the physical column index (user could have moved cols so visual  first col is not the physical second) use https://handsontable.com/docs/6.2.2/RecordTranslator.html to translate
+ * 	call like hot.toVisualColumn(colIndex)
  * @param {string | undefined} colName 
  */
 function defaultColHeaderFunc(colIndex: number, colName: string | undefined) {
@@ -612,9 +613,16 @@ function defaultColHeaderFunc(colIndex: number, colName: string | undefined) {
 	if (colName !== undefined) {
 		text = colName
 	}
-	return colIndex !== 0
-	? `${text} <span class="remove-col clickable" onclick="removeColumn(${colIndex})"><i class="fas fa-trash"></i></span>`
-	: `${text} <span class="remove-col clickable" onclick="removeColumn(${colIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
+
+	let visualIndex = colIndex
+
+	if (hot) {
+		visualIndex = hot.toVisualColumn(colIndex)
+	}
+	
+	return visualIndex !== 0
+	? `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})"><i class="fas fa-trash"></i></span>`
+	: `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
 }
 
 /**

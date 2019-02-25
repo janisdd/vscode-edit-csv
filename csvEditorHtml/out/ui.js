@@ -380,9 +380,13 @@ function defaultColHeaderFunc(colIndex, colName) {
     if (colName !== undefined) {
         text = colName;
     }
-    return colIndex !== 0
-        ? `${text} <span class="remove-col clickable" onclick="removeColumn(${colIndex})"><i class="fas fa-trash"></i></span>`
-        : `${text} <span class="remove-col clickable" onclick="removeColumn(${colIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`;
+    let visualIndex = colIndex;
+    if (hot) {
+        visualIndex = hot.toVisualColumn(colIndex);
+    }
+    return visualIndex !== 0
+        ? `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})"><i class="fas fa-trash"></i></span>`
+        : `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`;
 }
 function toggleHelpModal(isVisible) {
     if (isVisible) {

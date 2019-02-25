@@ -2,8 +2,6 @@
 
 --- add
 
-- reorder row/col first row can be deleted... somehow afterColumnMove??
-
 
 ## Maybe
 

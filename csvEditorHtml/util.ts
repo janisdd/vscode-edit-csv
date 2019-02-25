@@ -35,7 +35,7 @@ function removeRow(index: number) {
 
 /**
  * removes a column by index
- * @param {number} index 
+ * @param {number} index the visual column index
  */
 function removeColumn(index: number) {
 	hot.alter('remove_col', index)
