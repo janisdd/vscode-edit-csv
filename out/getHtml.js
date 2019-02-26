@@ -19,7 +19,8 @@ function createEditorHtml(context, initialContent) {
     const _getResourcePath = getResourcePath.bind(undefined, context);
     let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.css');
     let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js');
-    let papaparseJs = _getResourcePath('node_modules/papaparse/papaparse.js');
+    // let papaparseJs = _getResourcePath('node_modules/papaparse/papaparse.js')
+    let papaparseJs = _getResourcePath('thridParty/papaparse.min.js');
     let fontAwesomeCss = _getResourcePath('node_modules/@fortawesome/fontawesome-free/css/all.css');
     let bulmaCss = _getResourcePath('node_modules/bulma/css/bulma.min.css');
     let bulmaExtensionCss = _getResourcePath('node_modules/bulma-extensions/dist/css/bulma-extensions.min.css');

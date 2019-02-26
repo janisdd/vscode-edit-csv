@@ -3,6 +3,11 @@
 --- add
 
 
+- csv comments: whole line (merged cells)
+	- remove before and after lines option
+	- use papaparse no comment then if trimmed line starts with comment --> render one row
+
+
 ## Maybe
 
 store collapse states?
