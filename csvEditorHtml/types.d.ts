@@ -22,22 +22,6 @@ type CsvEditSettings = {
 	lastColumnTabBehavior: 'default' | 'createColumn'
 
 	/**
-	 * the appearance of the before comments section if it is not displayed initially you can still display it manually
-	 * always: always visible but collapsed 
-	 * alwaysExpanded: always visible but expanded
-	 * onlyOnContent: displayed if we have before comments but collapsed
-	 * onlyOnContentExpanded: displayed if we have before comments but expanded
-	 * never: never displayed but comments are still respected (we use write options to decide this)
-	 */
-	beforeCommentsAppearance: 'always' | 'alwaysExpanded' | 'onlyOnContent' | 'onlyOnContentExpanded' | 'never'
-	/**
-	 * the appearance of the read option section if it is not displayed initially you can still display it manually
-	 * 
-	 * same as beforeCommentsAppearance but for after comments
-	 */
-	afterCommentsAppearance: 'always' | 'alwaysExpanded' | 'onlyOnContent' | 'onlyOnContentExpanded' | 'never'
-
-	/**
 	 * the appearance of the read option section
 	 * expanded: read options will always start expanded
 	 * collapsed: read options will always start collapsed
@@ -149,7 +133,7 @@ type CsvReadOptions = {
 	header: false,
 	/**
 	 * the string used for comments in the input
-	 * or false to skip comments
+	 * or false to treat comments as normal rows
 	 */
 	comments: false | string,
 	/**
@@ -279,4 +263,25 @@ type VsExtension = {
 	postMessage: (message: PostMessage) => void
 	setState: (newState: VsState) => void
 	getState: () => VsState | undefined
+}
+
+
+type HandsontableMergedCells = {
+	/**
+	 * zero based start index
+	 */
+	row: number
+	/**
+	 * zero based start index
+	 */
+	col: number
+
+	/**
+	 * the length in rows to span
+	 */
+	rowspan: number
+	/**
+	 * the length in cols to span
+	 */
+	colspan: number
 }

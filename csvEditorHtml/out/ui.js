@@ -37,42 +37,6 @@ function togglePreview(shouldCollapse) {
     }
     _toggleCollapse(el, content, _setPreviewCollapsedVsState);
 }
-function toggleBeforeComments(shouldCollapse) {
-    const el = _getById('comments-before-content-icon');
-    const content = _getById('comments-before-content');
-    if (shouldCollapse !== undefined) {
-        _setCollapsed(shouldCollapse, el, content);
-        onResizeGrid();
-        return;
-    }
-    _toggleCollapse(el, content);
-    onResizeGrid();
-}
-function displayOrHideCommentsSections(shouldHide) {
-    displayOrHideBeforeComments(shouldHide);
-    displayOrHideAfterComments(shouldHide);
-    const el = _getById(toggleCommentsSectionsButtonId);
-    el.style.display = shouldHide ? 'block' : 'none';
-}
-function displayOrHideBeforeComments(shouldHide) {
-    const div = _getById(commentsBeforeOptionId);
-    div.style.display = shouldHide ? 'none' : 'block';
-}
-function toggleAfterComments(shouldCollapse) {
-    const el = _getById('comments-after-content-icon');
-    const content = _getById('comments-after-content');
-    if (shouldCollapse !== undefined) {
-        _setCollapsed(shouldCollapse, el, content);
-        onResizeGrid();
-        return;
-    }
-    _toggleCollapse(el, content);
-    onResizeGrid();
-}
-function displayOrHideAfterComments(shouldHide) {
-    const div = _getById(commentsAfterOptionId);
-    div.style.display = shouldHide ? 'none' : 'block';
-}
 function _toggleCollapse(el, wrapper, afterToggled) {
     if (el.classList.contains('fa-chevron-right')) {
         _setCollapsed(false, el, wrapper);
@@ -94,12 +58,6 @@ function _setCollapsed(shouldCollapsed, el, wrapper) {
     el.classList.add('fa-chevron-down');
     el.classList.remove('fa-chevron-right');
     wrapper.style.display = 'block';
-}
-function toggleBeforeCommentsIndicator(shouldHide) {
-    commentsBeforeHasContentDiv.style.visibility = shouldHide ? 'collapse' : 'visible';
-}
-function toggleAfterCommentsIndicator(shouldHide) {
-    commentsAfterHasContentDiv.style.visibility = shouldHide ? 'collapse' : 'visible';
 }
 function applyHasHeader(fromUndo = false) {
     const el = _getById('has-header');
@@ -195,7 +153,7 @@ function setWriteDelimiter(delimiter) {
     defaultCsvWriteOptions.delimiter = delimiter;
 }
 function generateCsvPreview() {
-    const value = getDataAsCsv(defaultCsvWriteOptions);
+    const value = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions);
     const el = _getById('csv-preview');
     el.value = value;
     togglePreview(false);
@@ -205,23 +163,33 @@ function copyPreviewToClipboard() {
     const el = _getById('csv-preview');
     postCopyToClipboard(el.value);
 }
-function _normalizeDataArray(data) {
+function _normalizeDataArray(data, csvReadConfig) {
+    const commentMergedCells = [];
     const maxCols = data.reduce((prev, curr) => curr.length > prev ? curr.length : prev, 0);
     for (let i = 0; i < data.length; i++) {
         const row = data[i];
+        if (typeof csvReadConfig.comments === 'string' && row[0].trim().startsWith(csvReadConfig.comments)) {
+            commentMergedCells.push({
+                row: i,
+                col: 0,
+                rowspan: 1,
+                colspan: maxCols
+            });
+        }
         if (row.length < maxCols) {
             row.push(...Array.from(Array(maxCols - row.length), (p, index) => ''));
         }
     }
+    return commentMergedCells;
 }
-function displayData(data, commentLinesBefore, commentLinesAfter) {
+function displayData(data, csvReadConfig) {
     if (data === null) {
         if (hot) {
             hot.destroy();
         }
         return;
     }
-    _normalizeDataArray(data);
+    const commentMergedCells = _normalizeDataArray(data, csvReadConfig);
     if (data.length > 0) {
         headerRow = data[0];
     }
@@ -229,22 +197,20 @@ function displayData(data, commentLinesBefore, commentLinesAfter) {
     if (hot) {
         hot.destroy();
     }
-    const beforeCommentsTextarea = _getById(beforeCommentsTextareaId);
-    beforeCommentsTextarea.value = commentLinesBefore.join('\n');
-    const afterCommentsTextarea = _getById(afterCommentsTextareaId);
-    afterCommentsTextarea.value = commentLinesAfter.join('\n');
     hot = new Handsontable(container, {
         data,
         rowHeaders: function (row) {
             let text = (row + 1).toString();
-            return row !== 0
-                ? `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
-                : `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`;
+            if (data.length === 1) {
+                return `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`;
+            }
+            return `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`;
         },
         fillHandle: false,
         colHeaders: defaultColHeaderFunc,
         currentColClassName: 'foo',
         currentRowClassName: 'foo',
+        mergeCells: commentMergedCells,
         comments: false,
         manualRowMove: true,
         manualRowResize: true,
@@ -325,6 +291,8 @@ function displayData(data, commentLinesBefore, commentLinesAfter) {
                 elWrite.checked = false;
                 applyHasHeader(true);
             }
+            if (action.actionType === 'insert_col') {
+            }
         },
         beforeRedo: function (action) {
             if (action.actionType === 'remove_row' && action.index === 0) {
@@ -335,9 +303,10 @@ function displayData(data, commentLinesBefore, commentLinesAfter) {
                 elWrite.checked = true;
                 applyHasHeader(true);
             }
+            if (action.actionType === 'insert_col') {
+            }
         },
         afterColumnMove: function (aa, bbb) {
-            console.log('asdasd');
             hot.updateSettings({
                 colHeaders: defaultColHeaderFunc
             }, false);
@@ -383,6 +352,10 @@ function defaultColHeaderFunc(colIndex, colName) {
     let visualIndex = colIndex;
     if (hot) {
         visualIndex = hot.toVisualColumn(colIndex);
+        if (hot.countCols() === 1) {
+            return `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`;
+        }
+        return `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})"><i class="fas fa-trash"></i></span>`;
     }
     return visualIndex !== 0
         ? `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})"><i class="fas fa-trash"></i></span>`
@@ -402,22 +375,9 @@ function toggleAskReadAgainModal(isVisible) {
     }
     askReadAgainModalDiv.classList.remove('is-active');
 }
-function onCommentsBeforeInput(event) {
-    const el = event.currentTarget;
-    toggleBeforeCommentsIndicator(el.value === '');
-}
-function onCommentsAfterInput(event) {
-    const el = event.currentTarget;
-    toggleAfterCommentsIndicator(el.value === '');
-}
 function resetData(content, csvReadOptions) {
     const _data = parseCsv(content, csvReadOptions);
-    if (!_data) {
-        displayData(_data, [], []);
-    }
-    else {
-        displayData(_data[1], _data[0], _data[2]);
-    }
+    displayData(_data, csvReadOptions);
     onResizeGrid();
     toggleAskReadAgainModal(false);
 }

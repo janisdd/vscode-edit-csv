@@ -3,7 +3,7 @@ function parseCsv(content, csvReadOptions) {
     if (content === '') {
         content = defaultCsvContentIfEmpty;
     }
-    const parseResult = csv.parse(content, Object.assign({}, csvReadOptions, { comments: csvReadOptions.comments === false ? '' : csvReadOptions.comments }));
+    const parseResult = csv.parse(content, Object.assign({}, csvReadOptions, { comments: false }));
     if (parseResult.errors.length === 1 && parseResult.errors[0].type === 'Delimiter' && parseResult.errors[0].code === 'UndetectableDelimiter') {
     }
     else {
@@ -25,41 +25,12 @@ function parseCsv(content, csvReadOptions) {
     defaultCsvWriteOptions.delimiter = parseResult.meta.delimiter;
     newLineFromInput = parseResult.meta.linebreak;
     readDelimiterTooltip.setAttribute('data-tooltip', `${readDelimiterTooltipText} (detected: ${defaultCsvWriteOptions.delimiter})`);
-    const commentLinesBefore = [];
-    const commentLinesAfter = [];
-    if (csvReadOptions.comments) {
-        let lines = content.split(newLineFromInput);
-        let inBeforeLineRange = true;
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i].trim();
-            if (inBeforeLineRange) {
-                if (line.startsWith(csvReadOptions.comments)) {
-                    commentLinesBefore.push(line.substring(csvReadOptions.comments.length));
-                    continue;
-                }
-                if (line === '') {
-                    continue;
-                }
-                inBeforeLineRange = false;
-            }
-            else {
-                if (line.startsWith(csvReadOptions.comments)) {
-                    commentLinesAfter.push(line.substring(csvReadOptions.comments.length));
-                    continue;
-                }
-            }
-        }
-    }
-    return [
-        commentLinesBefore,
-        parseResult.data,
-        commentLinesAfter
-    ];
+    return parseResult.data;
 }
 function getData() {
     return hot.getData();
 }
-function getDataAsCsv(csvWriteOptions) {
+function getDataAsCsv(csvReadOptions, csvWriteOptions) {
     const data = getData();
     if (csvWriteOptions.newline === '') {
         csvWriteOptions.newline = newLineFromInput;
@@ -73,25 +44,19 @@ function getDataAsCsv(csvWriteOptions) {
             data.unshift(colHeaderCells);
         }
     }
+    for (let i = 0; i < data.length; i++) {
+        const row = data[i];
+        if (row[0] === null)
+            continue;
+        if (typeof csvReadOptions.comments === 'string'
+            && typeof csvWriteOptions.comments === 'string'
+            && row[0].trim().startsWith(csvReadOptions.comments)) {
+            data[i] = [`${csvWriteOptions.comments}${row[0].trim().substring(csvReadOptions.comments.length)}`];
+        }
+    }
     const _conf = Object.assign({}, csvWriteOptions, { quotes: csvWriteOptions.quoteAllFields });
     _conf['skipEmptyLines'] = false;
     let dataAsString = csv.unparse(data, _conf);
-    if (csvWriteOptions.comments) {
-        const beforeCommentsTextarea = _getById(beforeCommentsTextareaId);
-        const afterCommentsTextarea = _getById(afterCommentsTextareaId);
-        const commentLinesBefore = beforeCommentsTextarea.value.length > 0
-            ? beforeCommentsTextarea.value.split('\n')
-            : [];
-        const commentLinesAfter = afterCommentsTextarea.value.length > 0
-            ? afterCommentsTextarea.value.split('\n')
-            : [];
-        if (commentLinesBefore.length > 0) {
-            dataAsString = commentLinesBefore.map(p => csvWriteOptions.comments + p).join(csvWriteOptions.newline) + csvWriteOptions.newline + dataAsString;
-        }
-        if (commentLinesAfter.length > 0) {
-            dataAsString = dataAsString + csvWriteOptions.newline + commentLinesAfter.map(p => csvWriteOptions.comments + p).join(csvWriteOptions.newline);
-        }
-    }
     return dataAsString;
 }
 function postVsInformation(text) {
@@ -138,7 +103,7 @@ function postCopyToClipboard(text) {
     });
 }
 function postApplyContent(saveSourceFile) {
-    const csvContent = getDataAsCsv(defaultCsvWriteOptions);
+    const csvContent = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions);
     if (document.activeElement !== document.body)
         document.activeElement.blur();
     _postApplyContent(csvContent, saveSourceFile);

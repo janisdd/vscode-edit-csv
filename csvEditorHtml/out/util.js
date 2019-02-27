@@ -17,6 +17,7 @@ function removeRow(index) {
 function removeColumn(index) {
     hot.alter('remove_col', index);
     checkIfHasHeaderReadOptionIsAvailable();
+    _resizeMergedColumns();
 }
 function addRow(selectNewRow = true) {
     const numRows = hot.countRows();
@@ -36,6 +37,20 @@ function addColumn(selectNewColumn = true) {
             hot.selectCell(pos[0][0], numCols);
         }
     }
+    _resizeMergedColumns();
+}
+function _resizeMergedColumns() {
+    if (typeof hot.getSettings().mergeCells === 'boolean' || !hot.getSettings().mergeCells)
+        return;
+    const mergedCells = hot.getSettings().mergeCells;
+    const numCols = hot.countCols();
+    for (let i = 0; i < mergedCells.length; i++) {
+        const mergedCell = mergedCells[i];
+        mergedCell.colspan = numCols;
+    }
+    hot.updateSettings({
+        mergeCells: mergedCells
+    }, false);
 }
 function _setOption(targetOptions, options, optionName) {
     if (options.hasOwnProperty(optionName)) {
@@ -142,12 +157,9 @@ function _error(text) {
 }
 function setupAndApplyInitialConfigPart1(initialConfig) {
     if (initialConfig === undefined) {
-        displayOrHideCommentsSections(false);
         toggleReadOptions(true);
         toggleWriteOptions(true);
         togglePreview(true);
-        toggleBeforeComments(true);
-        toggleAfterComments(true);
         return;
     }
     const copyReadOptions = Object.assign({}, defaultCsvReadOptions);
@@ -193,64 +205,6 @@ function setupAndApplyInitialConfigPart1(initialConfig) {
         }
         default: {
             _error(`unknown previewOptionsAppearance: ${initialConfig.previewOptionsAppearance}`);
-            break;
-        }
-    }
-}
-function setupAndApplyInitialConfigPart2(beforeComments, afterComments, initialConfig) {
-    window.addEventListener('message', (event) => {
-        handleVsCodeMessage(event);
-    });
-    toggleBeforeCommentsIndicator(beforeComments.length === 0);
-    toggleAfterCommentsIndicator(afterComments.length === 0);
-    if (initialConfig === undefined) {
-        return;
-    }
-    switch (initialConfig.beforeCommentsAppearance) {
-        case 'always':
-        case 'alwaysExpanded': {
-            toggleBeforeComments(initialConfig.beforeCommentsAppearance === 'always');
-            break;
-        }
-        case 'never': {
-            toggleBeforeComments(false);
-            displayOrHideBeforeComments(true);
-            break;
-        }
-        case 'onlyOnContent':
-        case 'onlyOnContentExpanded': {
-            toggleBeforeComments(false);
-            if (beforeComments.length === 0) {
-                displayOrHideBeforeComments(true);
-            }
-            break;
-        }
-        default: {
-            _error(`unknown beforeCommentsAppearance: ${initialConfig.beforeCommentsAppearance}`);
-            break;
-        }
-    }
-    switch (initialConfig.afterCommentsAppearance) {
-        case 'always':
-        case 'alwaysExpanded': {
-            toggleAfterComments(initialConfig.afterCommentsAppearance === 'always');
-            break;
-        }
-        case 'never': {
-            toggleAfterComments(false);
-            displayOrHideAfterComments(true);
-            break;
-        }
-        case 'onlyOnContent':
-        case 'onlyOnContentExpanded': {
-            toggleAfterComments(false);
-            if (afterComments.length === 0) {
-                displayOrHideAfterComments(true);
-            }
-            break;
-        }
-        default: {
-            _error(`unknown afterCommentsAppearance: ${initialConfig.afterCommentsAppearance}`);
             break;
         }
     }

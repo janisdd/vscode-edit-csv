@@ -12,8 +12,7 @@
 * @param {string} content 
 * @returns {[string[], string[][], string[]]| null} [0] comments before, [1] csv data, [2] comments after
 */
-function parseCsv(content: string, csvReadOptions: CsvReadOptions): [string[], string[][], string[]] | null {
-
+function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] | null {
 
 	if (content === '') {
 		content = defaultCsvContentIfEmpty
@@ -21,7 +20,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): [string[], s
 
 	const parseResult = csv.parse(content, {
 		...csvReadOptions,
-		comments: csvReadOptions.comments === false ? '' : csvReadOptions.comments,
+		comments: false, //false gives use all lines we later check each line if it's a comment to merge the cells in that row
 	})
 
 	if (parseResult.errors.length === 1 && parseResult.errors[0].type === 'Delimiter' && parseResult.errors[0].code === 'UndetectableDelimiter') {
@@ -31,20 +30,20 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): [string[], s
 		if (parseResult.errors.length > 0) {
 			for (let i = 0; i < parseResult.errors.length; i++) {
 				const error = parseResult.errors[i];
-				
+
 				if (error.type === 'Delimiter' && error.code === 'UndetectableDelimiter') {
 					//
 					continue;
 				}
-	
+
 				if (error.row) {
 					_error(`${error.message} on line ${error.row}`)
 					continue
 				}
-	
+
 				_error(`${error.message}`)
 			}
-	
+
 			return null
 		}
 	}
@@ -54,44 +53,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): [string[], s
 
 	readDelimiterTooltip.setAttribute('data-tooltip', `${readDelimiterTooltipText} (detected: ${defaultCsvWriteOptions.delimiter})`)
 
-	const commentLinesBefore = []
-	const commentLinesAfter = []
-
-	if (csvReadOptions.comments) {
-
-		let lines = content.split(newLineFromInput)
-		let inBeforeLineRange = true
-		for (let i = 0; i < lines.length; i++) {
-			const line = lines[i].trim();
-
-			if (inBeforeLineRange) {
-
-				if (line.startsWith(csvReadOptions.comments)) {
-					commentLinesBefore.push(line.substring(csvReadOptions.comments.length))
-					continue
-				}
-
-				if (line === '') {
-					continue
-				}
-
-				inBeforeLineRange = false
-			}
-			else {
-
-				if (line.startsWith(csvReadOptions.comments)) {
-					commentLinesAfter.push(line.substring(csvReadOptions.comments.length))
-					continue
-				}
-			}
-		}
-	}
-
-	return [
-		commentLinesBefore,
-		parseResult.data,
-		commentLinesAfter
-	]
+	return parseResult.data
 }
 
 
@@ -107,10 +69,11 @@ function getData(): string[][] {
 /**
  * return the data in the handson table as a string (with respect to the write options)
  * if comments are enabled the commentLinesBefore and commentLinesAfter are also used
+ * @param {any} csvReadOptions used to check if a row is a comment
  * @param {any} csvWriteOptions 
  * @returns {string} 
  */
-function getDataAsCsv(csvWriteOptions: CsvWriteOptions): string {
+function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteOptions): string {
 	const data = getData()
 
 	if (csvWriteOptions.newline === '') {
@@ -132,7 +95,20 @@ function getDataAsCsv(csvWriteOptions: CsvWriteOptions): string {
 		}
 	}
 
-	
+	for (let i = 0; i < data.length; i++) {
+		const row = data[i];
+
+		if (row[0] === null) continue //e.g. when we add a new empty row
+
+		if (typeof csvReadOptions.comments === 'string'
+			&& typeof csvWriteOptions.comments === 'string'
+			&& row[0].trim().startsWith(csvReadOptions.comments)) {
+			//this is a comment
+			data[i] = [`${csvWriteOptions.comments}${row[0].trim().substring(csvReadOptions.comments.length)}`]
+		}
+
+	}
+
 	const _conf: import('papaparse').UnparseConfig = {
 		...csvWriteOptions,
 		quotes: csvWriteOptions.quoteAllFields,
@@ -143,28 +119,6 @@ function getDataAsCsv(csvWriteOptions: CsvWriteOptions): string {
 	_conf['skipEmptyLines'] = false
 
 	let dataAsString = csv.unparse(data, _conf)
-
-	if (csvWriteOptions.comments) {
-
-		const beforeCommentsTextarea = _getById(beforeCommentsTextareaId) as HTMLTextAreaElement
-		const afterCommentsTextarea = _getById(afterCommentsTextareaId) as HTMLTextAreaElement
-
-		const commentLinesBefore = beforeCommentsTextarea.value.length > 0
-			? beforeCommentsTextarea.value.split('\n')
-			: []
-		const commentLinesAfter = afterCommentsTextarea.value.length > 0
-			? afterCommentsTextarea.value.split('\n')
-			: []
-
-		if (commentLinesBefore.length > 0) {
-			dataAsString = commentLinesBefore.map(p => csvWriteOptions.comments + p).join(csvWriteOptions.newline) + csvWriteOptions.newline + dataAsString
-		}
-
-		if (commentLinesAfter.length > 0) {
-			dataAsString = dataAsString + csvWriteOptions.newline + commentLinesAfter.map(p => csvWriteOptions.comments + p).join(csvWriteOptions.newline)
-		}
-
-	}
 
 	return dataAsString
 }
@@ -246,7 +200,7 @@ function postCopyToClipboard(text: string) {
  * @param saveSourceFile 
  */
 function postApplyContent(saveSourceFile: boolean) {
-	const csvContent = getDataAsCsv(defaultCsvWriteOptions)
+	const csvContent = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
 
 	//used to clear focus... else styles are not properly applied
 	//@ts-ignore

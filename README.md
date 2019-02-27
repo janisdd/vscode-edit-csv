@@ -42,6 +42,8 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 
 ## Known Issues
 
+- if the source file content changes while the editor is open, the editor will not be updated (e.g. take new content)
+	- if you then apply the editor the source file changes are **overwritten!**
 
 - `apply and save` an unnamed file will close the editor
 	- this is because the new uri for the new file is not known and for some reason if an extension saves an unnamed file the new file is not displayed automatically
@@ -54,8 +56,7 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 - because the table is exported comments can only be used before or after the csv content
 	- *after csv comments* are all comments that are not *before csv comments* (comments inside the csv data are added to the *before csv comments*)
 
-- if the source file content changes is changed while the editor is open, the editor will not be updated (e.g. take new content)
-	- if you apply the editor the source file changes are **overwritten!**
+- if you have comment row(s) and add a new column then undo and redo will make the comment row(s) not span the full table width
 
 ## Used projects
 

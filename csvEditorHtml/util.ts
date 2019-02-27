@@ -42,6 +42,8 @@ function removeColumn(index: number) {
 
 	//we could get 0 cols...
 	checkIfHasHeaderReadOptionIsAvailable()
+
+	_resizeMergedColumns()
 }
 
 /**
@@ -81,7 +83,62 @@ function addColumn(selectNewColumn = true) {
 			hot.selectCell(pos[0][0], numCols)
 		}
 	}
+
+	_resizeMergedColumns()
 }
+
+function _resizeMergedColumns() {
+
+	if (typeof hot.getSettings().mergeCells === 'boolean' || !hot.getSettings().mergeCells) return
+
+	const mergedCells: HandsontableMergedCells[] = hot.getSettings().mergeCells as HandsontableMergedCells[]
+
+	const numCols = hot.countCols()
+
+	for (let i = 0; i < mergedCells.length; i++) {
+		const mergedCell = mergedCells[i];
+		mergedCell.colspan = numCols
+	}
+
+	//this breaks stuff (e.g. selection not working after this??)
+	// (hot as any).undoRedo.ignoreNewActions = true;
+
+	hot.updateSettings({
+		mergeCells: mergedCells
+	}, false);
+
+	// (hot as any).undoRedo.ignoreNewActions = false;
+
+}
+
+// function transformIntoCommentRow(rowIndex: number, csvReadOptions: CsvReadOptions): string | null {
+	
+// 	if (typeof hot.getSettings().mergeCells === 'boolean' || !hot.getSettings().mergeCells) return null
+
+// 	const mergedCells: HandsontableMergedCells[] = hot.getSettings().mergeCells as HandsontableMergedCells[]
+
+// 	const numCols = hot.countCols()
+
+// 	mergedCells.push({
+// 		row: rowIndex,
+// 		col: 0,
+// 		colspan: numCols,
+// 		rowspan: 1
+// 	})
+
+// 	const rowData = hot.getDataAtRow(rowIndex)
+
+// 	hot.updateSettings({
+// 		mergeCells: mergedCells
+// 	}, false);
+
+
+// 	if (typeof csvReadOptions.comments === 'boolean') return null
+
+// 	const newRowText = `${csvReadOptions.comments}${csv.unparse([rowData])}`
+
+// 	return newRowText
+// }
 
 
 /**
@@ -256,13 +313,10 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 	if (initialConfig === undefined) {
 
 		//probably in browser here...
-		displayOrHideCommentsSections(false)
 
 		toggleReadOptions(true)
 		toggleWriteOptions(true)
 		togglePreview(true)
-		toggleBeforeComments(true)
-		toggleAfterComments(true)
 
 		return
 	}
@@ -359,84 +413,6 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 
 }
 
-/**
- * called after parsing data
- * e.g. we need to know if we have comments here
- */
-function setupAndApplyInitialConfigPart2(beforeComments: string[], afterComments: string[], initialConfig: CsvEditSettings | undefined) {
-
-	window.addEventListener('message', (event) => {
-		handleVsCodeMessage(event)
-	})
-	
-	toggleBeforeCommentsIndicator(beforeComments.length === 0)
-	toggleAfterCommentsIndicator(afterComments.length === 0)
-
-	if (initialConfig === undefined) {
-
-		//probably in browser here...we already done all stuff
-		return
-	}
-
-	//apply settings from extension
-
-	switch (initialConfig.beforeCommentsAppearance) {
-		case 'always': // display but collapsed
-		case 'alwaysExpanded': {
-			toggleBeforeComments(initialConfig.beforeCommentsAppearance === 'always')
-			break
-		}
-		case 'never': {
-			toggleBeforeComments(false)
-			displayOrHideBeforeComments(true)
-			break
-		}
-		case 'onlyOnContent':
-		case 'onlyOnContentExpanded': {
-
-			//expand, if we show it manually we probably want to add comments...
-			toggleBeforeComments(false)
-
-			if (beforeComments.length === 0) {
-				displayOrHideBeforeComments(true)
-			}
-			break
-		}
-		default: {
-			_error(`unknown beforeCommentsAppearance: ${initialConfig.beforeCommentsAppearance}`)
-			break;
-		}
-	}
-
-	switch (initialConfig.afterCommentsAppearance) {
-		case 'always': // display but collapsed
-		case 'alwaysExpanded': {
-			toggleAfterComments(initialConfig.afterCommentsAppearance === 'always')
-			break
-		}
-		case 'never': {
-			toggleAfterComments(false)
-			displayOrHideAfterComments(true)
-			break
-		}
-		case 'onlyOnContent':
-		case 'onlyOnContentExpanded': {
-
-			//expand, if we show it manually we probably want to add comments...
-			toggleAfterComments(false)
-
-			if (afterComments.length === 0) {
-				displayOrHideAfterComments(true)
-			}
-			break
-		}
-		default: {
-			_error(`unknown afterCommentsAppearance: ${initialConfig.afterCommentsAppearance}`)
-			break;
-		}
-	}
-
-}
 
 /* - maybe we get the collapse states and store them across sessions see
 CsvEditSettings

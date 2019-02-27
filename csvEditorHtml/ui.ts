@@ -75,56 +75,6 @@ function togglePreview(shouldCollapse: boolean) {
 	_toggleCollapse(el, content, _setPreviewCollapsedVsState)
 }
 
-
-function toggleBeforeComments(shouldCollapse: boolean) {
-	const el = _getById('comments-before-content-icon')
-	const content = _getById('comments-before-content') //the wrapper
-
-	if (shouldCollapse !== undefined) {
-		_setCollapsed(shouldCollapse, el, content)
-		onResizeGrid()
-		return
-	}
-
-	_toggleCollapse(el, content)
-	onResizeGrid()
-}
-
-
-function displayOrHideCommentsSections(shouldHide: boolean) {
-
-	displayOrHideBeforeComments(shouldHide)
-	displayOrHideAfterComments(shouldHide)
-
-	const el = _getById(toggleCommentsSectionsButtonId)
-
-	el.style.display = shouldHide ? 'block' : 'none'
-}
-
-function displayOrHideBeforeComments(shouldHide: boolean) {
-	const div = _getById(commentsBeforeOptionId)
-	div.style.display = shouldHide ? 'none' : 'block'
-}
-
-function toggleAfterComments(shouldCollapse: boolean) {
-	const el = _getById('comments-after-content-icon')
-	const content = _getById('comments-after-content') //the wrapper
-
-	if (shouldCollapse !== undefined) {
-		_setCollapsed(shouldCollapse, el, content)
-		onResizeGrid()
-		return
-	}
-
-	_toggleCollapse(el, content)
-	onResizeGrid()
-}
-
-function displayOrHideAfterComments(shouldHide: boolean) {
-	const div = _getById(commentsAfterOptionId)
-	div.style.display = shouldHide ? 'none' : 'block'
-}
-
 function _toggleCollapse(el: HTMLElement, wrapper: HTMLElement, afterToggled?: (isCollapsed: boolean) => void) {
 
 	if (el.classList.contains('fa-chevron-right')) {
@@ -157,15 +107,6 @@ function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLE
 	// el.classList.replace('fa-chevron-right', 'fa-chevron-down')
 
 	wrapper.style.display = 'block'
-}
-
-
-function toggleBeforeCommentsIndicator(shouldHide: boolean) {
-	commentsBeforeHasContentDiv.style.visibility = shouldHide ? 'collapse' : 'visible'
-}
-
-function toggleAfterCommentsIndicator(shouldHide: boolean) {
-	commentsAfterHasContentDiv.style.visibility = shouldHide ? 'collapse' : 'visible'
 }
 
 
@@ -323,7 +264,7 @@ function setWriteDelimiter(delimiter: string) {
  * updates the preview
  */
 function generateCsvPreview() {
-	const value = getDataAsCsv(defaultCsvWriteOptions)
+	const value = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
 
 	const el = _getById('csv-preview') as HTMLTextAreaElement
 	el.value = value
@@ -333,7 +274,7 @@ function generateCsvPreview() {
 }
 
 function copyPreviewToClipboard() {
-	
+
 	generateCsvPreview()
 
 	const el = _getById('csv-preview') as HTMLTextAreaElement
@@ -345,19 +286,32 @@ function copyPreviewToClipboard() {
 
 /* --- other --- */
 
-function _normalizeDataArray(data: string[][]) {
+function _normalizeDataArray(data: string[][], csvReadConfig: CsvReadOptions): HandsontableMergedCells[] {
 
 	//in the good case all rows have equal size right from the beginning
+	const commentMergedCells: HandsontableMergedCells[] = []
 
 	const maxCols = data.reduce((prev, curr) => curr.length > prev ? curr.length : prev, 0)
 
 	for (let i = 0; i < data.length; i++) {
 		const row = data[i];
 
+		if (typeof csvReadConfig.comments === 'string' && row[0].trim().startsWith(csvReadConfig.comments)) {
+			//this is a comment so merge cells
+			commentMergedCells.push({
+				row: i,
+				col: 0,
+				rowspan: 1,
+				colspan: maxCols
+			})
+		}
+
 		if (row.length < maxCols) {
 			row.push(...Array.from(Array(maxCols - row.length), (p, index) => ''))
 		}
 	}
+
+	return commentMergedCells
 }
 
 /**
@@ -366,10 +320,8 @@ function _normalizeDataArray(data: string[][]) {
  * @see headerRow and enables the has header option
  * if we have data we convert it to match a rectangle (every row must have the same number of columns / cells)
  * @param {string[][]} data array with the rows or null to just destroy the old table
- * @param {string[]} commentLinesBefore the comment lines before the csv content
- * @param {string[]} commentLinesAfter the comment lines after commentLinesBefore
  */
-function displayData(data: string[][] | null, commentLinesBefore: string[], commentLinesAfter: string[]) {
+function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 	if (data === null) {
 		if (hot) {
@@ -378,7 +330,7 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 		return
 	}
 
-	_normalizeDataArray(data)
+	const commentMergedCells = _normalizeDataArray(data, csvReadConfig)
 
 	if (data.length > 0) {
 		headerRow = data[0]
@@ -390,13 +342,6 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 		hot.destroy()
 	}
 
-	//TODO settings?
-	const beforeCommentsTextarea = _getById(beforeCommentsTextareaId) as HTMLTextAreaElement
-	beforeCommentsTextarea.value = commentLinesBefore.join('\n')
-
-	//TODO settings?
-	const afterCommentsTextarea = _getById(afterCommentsTextareaId) as HTMLTextAreaElement
-	afterCommentsTextarea.value = commentLinesAfter.join('\n')
 
 
 	//@ts-ignore
@@ -404,16 +349,24 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 		data,
 		rowHeaders: function (row: number) { //the visual row index
 			let text = (row + 1).toString()
-			return row !== 0
-				? `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
-				: `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
+
+			if (data.length === 1) {
+				return `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
+			}
+
+			return `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
+			//why would we alway disallow to remove first row?
+			// return row !== 0
+			// 	? `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
+			// 	: `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
 		} as any,
 		fillHandle: false,
 		colHeaders: defaultColHeaderFunc as any,
 		currentColClassName: 'foo',
 		currentRowClassName: 'foo',
+		mergeCells: commentMergedCells,
 		//plugins
-		comments: false, //don't know how this is handled
+		comments: false,
 		manualRowMove: true,
 		manualRowResize: true,
 		manualColumnMove: true,
@@ -421,6 +374,30 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 		columnSorting: true,
 
 		outsideClickDeselects: false, //keep selection
+
+		//not fully working... we would handle already comment cells
+		// beforeChange: function (changes) {
+
+		// 	if (!changes || changes.length !== 1) return
+
+		// 	console.log(changes)
+			
+		// 	const rowIndex = changes[0][0]
+		// 	const colIndex = changes[0][1] as number
+		// 	const oldVal = changes[0][2]
+		// 	const newVal = changes[0][3]
+
+		// 	if (oldVal === newVal) return //user only started editing then canceled
+			
+		// 	if (typeof csvReadConfig.comments === 'string' && colIndex === 0 && newVal.trim().startsWith(csvReadConfig.comments)) {
+		// 		//this is now a merged comment row
+		// 		const _tmp = transformIntoCommentRow(rowIndex, csvReadConfig)
+		// 		changes[0][3] =  _tmp
+		// 		console.log(_tmp)
+		// 	}
+			
+		// },
+
 		//TODO see https://github.com/handsontable/handsontable/issues/3328
 		//only working because first argument is actually the old size, which is a bug
 		beforeColumnResize: function (oldSize, newSize, isDoubleClick) { //after change but before render
@@ -509,7 +486,7 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 			//we could change data to 1 element array containing the finished data? log to console then step until we get to SheetClip.stringify
 			// console.log('data');
 		},
-		afterUndo: function(action: any) {
+		afterUndo: function (action: any) {
 			if (action.actionType === 'remove_row' && action.index === 0) { //first row cannot be removed normally so it must be the header row option
 				//remove header row
 				defaultCsvReadOptions._hasHeader = false
@@ -520,9 +497,14 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 
 				applyHasHeader(true)
 			}
+
+			if (action.actionType === 'insert_col') {
+				//this is ok for merged comment cells because they don't have to change
+			}
+
 		},
-		beforeRedo: function(action: any) {
-			if (action.actionType=== 'remove_row' && action.index === 0) { //first row cannot be removed normally so it must be the header row option
+		beforeRedo: function (action: any) {
+			if (action.actionType === 'remove_row' && action.index === 0) { //first row cannot be removed normally so it must be the header row option
 				//we re insert header row
 
 				defaultCsvReadOptions._hasHeader = false
@@ -533,10 +515,14 @@ function displayData(data: string[][] | null, commentLinesBefore: string[], comm
 
 				applyHasHeader(true)
 			}
+
+			if (action.actionType === 'insert_col') {
+				//not working... because merge inserts new actions??
+				// _resizeMergedColumns()
+			}
 		},
 
-		afterColumnMove: function(aa, bbb) {
-			console.log('asdasd');
+		afterColumnMove: function (aa, bbb) {
 			//NOT WORKING
 			hot.updateSettings({
 				colHeaders: defaultColHeaderFunc as any
@@ -618,11 +604,17 @@ function defaultColHeaderFunc(colIndex: number, colName: string | undefined) {
 
 	if (hot) {
 		visualIndex = hot.toVisualColumn(colIndex)
+
+		if (hot.countCols() === 1) {
+			return `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
+		}
+
+		return `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})"><i class="fas fa-trash"></i></span>`
 	}
-	
+
 	return visualIndex !== 0
-	? `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})"><i class="fas fa-trash"></i></span>`
-	: `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
+		? `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})"><i class="fas fa-trash"></i></span>`
+		: `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
 }
 
 /**
@@ -653,21 +645,7 @@ function toggleAskReadAgainModal(isVisible: boolean) {
 	askReadAgainModalDiv.classList.remove('is-active')
 }
 
-/**
- * somehow swallows handsontable the click event?
- * when we click on the empty area the active element is not blurred...
- * so we use oninput instead
- * @param event 
- */
-function onCommentsBeforeInput(event: Event) {
-	const el = event.currentTarget as HTMLTextAreaElement
-	toggleBeforeCommentsIndicator(el.value === '')
-}
 
-function onCommentsAfterInput(event: Event) {
-	const el = event.currentTarget as HTMLTextAreaElement
-	toggleAfterCommentsIndicator(el.value === '')
-}
 
 /**
  * parses and displays the given data (csv)
@@ -676,13 +654,7 @@ function onCommentsAfterInput(event: Event) {
 function resetData(content: string, csvReadOptions: CsvReadOptions) {
 	const _data = parseCsv(content, csvReadOptions)
 
-	if (!_data) {
-		displayData(_data, [], [])
-	}
-	else {
-		displayData(_data[1], _data[0], _data[2])
-	}
-
+	displayData(_data, csvReadOptions)
 
 	//might be bigger than the current view
 	onResizeGrid()
