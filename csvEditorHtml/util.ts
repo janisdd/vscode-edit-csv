@@ -307,6 +307,8 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 		return
 	}
 
+	highlightCsvComments = initialConfig.highlightCsvComments
+	
 	//apply settings from extension
 
 	const copyReadOptions = {

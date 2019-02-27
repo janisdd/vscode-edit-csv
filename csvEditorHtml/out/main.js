@@ -31,6 +31,7 @@ let defaultCsvWriteOptions = {
     quoteAllFields: false,
 };
 let newLineFromInput = '\n';
+let highlightCsvComments = true;
 const csvEditorWrapper = _getById('csv-editor-wrapper');
 const csvEditorDiv = _getById('csv-editor');
 const helModalDiv = _getById('help-modal');

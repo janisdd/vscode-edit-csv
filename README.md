@@ -53,10 +53,6 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 	- thus changes can no longer be saved/applied
 	- maybe this can be resolved when https://github.com/Microsoft/vscode/issues/43768 is closed
 
-- because the table is exported comments can only be used before or after the csv content
-	- *after csv comments* are all comments that are not *before csv comments* (comments inside the csv data are added to the *before csv comments*)
-
-- if you have comment row(s) and add a new column then undo and redo will make the comment row(s) not span the full table width
 
 ## Used projects
 

@@ -6,6 +6,11 @@
 type CsvEditSettings = {
 
 	/**
+	 * * true: the cell/row color is changed if the first cell is a comment, (might have negative impact on performance e.g. for large data sets), false: no additional highlighting (comments are still treated as comments)
+	 */
+	highlightCsvComments: boolean
+
+	/**
 	 * if one edits a cell in the last row and presses enter what the editor should do
 	 * 
 	 * default: default of handson table

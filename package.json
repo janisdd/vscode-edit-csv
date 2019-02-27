@@ -156,6 +156,11 @@
 			"title": "Edit csv configuration",
 			"type": "object",
 			"properties": {
+				"csv-edit.highlightCsvComments": {
+					"type": "boolean",
+					"default": true,
+					"description": "* true: the cell/row color is changed if the first cell is a comment, (might have negative impact on performance e.g. for large data sets), false: no additional highlighting (comments are still treated as comments)"
+				},
 				"csv-edit.lastRowEnterBehavior": {
 					"type": "string",
 					"default": "default",

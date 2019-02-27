@@ -217,24 +217,27 @@ function displayData(data, csvReadConfig) {
         manualColumnResize: true,
         columnSorting: true,
         outsideClickDeselects: false,
-        cells: function (row, col) {
-            var cellProperties = {};
-            cellProperties.renderer = 'commentValueRenderer';
-            if (row === undefined || row === null)
+        cells: highlightCsvComments
+            ? function (row, col) {
+                var cellProperties = {};
+                cellProperties.renderer = 'commentValueRenderer';
+                if (row === undefined || row === null)
+                    return cellProperties;
+                if (col === undefined || col === null)
+                    return cellProperties;
+                const _hot = this.instance;
+                const firstCellVal = _hot.getDataAtCell(row, 0);
+                if (firstCellVal === null)
+                    return cellProperties;
+                if (typeof csvReadConfig.comments === 'string' && firstCellVal.trim().startsWith(csvReadConfig.comments)) {
+                    cellProperties._isComment = true;
+                }
+                else {
+                    cellProperties._isComment = false;
+                }
                 return cellProperties;
-            const _hot = this.instance;
-            const tableData = _hot.getData();
-            const firstCellVal = tableData[row][0];
-            if (firstCellVal === null)
-                return cellProperties;
-            if (typeof csvReadConfig.comments === 'string' && firstCellVal.trim().startsWith(csvReadConfig.comments)) {
-                cellProperties._isComment = true;
             }
-            else {
-                cellProperties._isComment = false;
-            }
-            return cellProperties;
-        },
+            : undefined,
         beforeColumnResize: function (oldSize, newSize, isDoubleClick) {
             if (oldSize === newSize) {
                 if (initialConfig) {

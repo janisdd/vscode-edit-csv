@@ -376,17 +376,20 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 		outsideClickDeselects: false, //keep selection
 
-		cells: function(row, col) {
+		cells: highlightCsvComments 
+		? function(row, col) {
 			var cellProperties: GridSettings = {};
 			cellProperties.renderer = 'commentValueRenderer'
 
 			if (row === undefined || row === null) return cellProperties
+			if (col === undefined || col === null) return cellProperties
 
-			const _hot = (this as any).instance as Handsontable
-			const tableData = _hot.getData()
+			//@ts-ignore
+			const _hot = this.instance as Handsontable
+			// const tableData = _hot.getData() //this is slooooooow, getDataAtCell is much faster
 
 			//we should always have 1 col
-			const firstCellVal = tableData[row][0]
+			const firstCellVal = _hot.getDataAtCell(row, 0) //tableData[row][0]
 
 			if (firstCellVal === null) return cellProperties
 			
@@ -399,7 +402,8 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			}
 			
 			return cellProperties
-		},
+		}
+		: undefined,
 
 		//not fully working... we would handle already comment cells
 		// beforeChange: function (changes) {

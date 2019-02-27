@@ -4,6 +4,7 @@ import { editorUriScheme } from './extension';
 
 
 const defaultConfig: CsvEditSettings = {
+	highlightCsvComments: true,
 	lastRowEnterBehavior: 'default',
 	lastColumnTabBehavior: 'default',
 	previewOptionsAppearance: "collapsed",

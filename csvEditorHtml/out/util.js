@@ -171,6 +171,7 @@ function setupAndApplyInitialConfigPart1(initialConfig) {
         togglePreview(true);
         return;
     }
+    highlightCsvComments = initialConfig.highlightCsvComments;
     const copyReadOptions = Object.assign({}, defaultCsvReadOptions);
     setCsvReadOptionsInitial(Object.assign({}, copyReadOptions, { delimiter: initialConfig.readOption_delimiter, comments: initialConfig.readOption_comment, _hasHeader: initialConfig.readOption_hasHeader === 'true' ? true : false, escapeChar: initialConfig.readOption_escapeChar, quoteChar: initialConfig.readOption_quoteChar }));
     const copyWriteOptions = Object.assign({}, defaultCsvReadOptions);

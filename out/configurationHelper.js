@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = require("vscode");
 const extension_1 = require("./extension");
 const defaultConfig = {
+    highlightCsvComments: true,
     lastRowEnterBehavior: 'default',
     lastColumnTabBehavior: 'default',
     previewOptionsAppearance: "collapsed",
