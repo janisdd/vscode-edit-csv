@@ -171,20 +171,6 @@
 					"enumDescriptions": ["default of handsontable", "create a new column"]
 				},
 
-				"csv-edit.beforeCommentsAppearance": {
-					"type": "string",
-					"default": "onlyOnContent",
-					"description": "the appearance of the before comments section if it is not displayed initially you can still display it manually",
-					"enum": ["always", "alwaysExpanded", "onlyOnContent", "onlyOnContentExpanded", "never"],
-					"enumDescriptions": ["always visible", "always visible but expanded", "displayed if we have before comments", "displayed if we have before comments but expanded", "never displayed but comments are still exported (we use write options to decide this)"]
-				},
-				"csv-edit.afterCommentsAppearance": {
-					"type": "string",
-					"default": "onlyOnContent",
-					"description": "the appearance of the after comments section if it is not displayed initially you can still display it manually",
-					"enum": ["always", "alwaysExpanded", "onlyOnContent", "onlyOnContentExpanded", "never"],
-					"enumDescriptions": ["always visible", "always visible but expanded", "displayed if we have after comments", "displayed if we have after comments but expanded", "never displayed but comments are still exported (we use write options to decide this)"]
-				},
 				"csv-edit.readOptionsAppearance": {
 					"type": "string",
 					"default": "collapsed",

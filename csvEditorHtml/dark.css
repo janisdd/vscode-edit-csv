@@ -143,3 +143,8 @@ body.vscode-dark {
 .vscode-dark .ht_clone_top_left_corner thead tr:nth-child(1) {
 	border-right: 0 !important;
 }
+
+.vscode-dark .comment-cell {
+	/* background-color: #5f5f5f!important; */
+	color: #888787;
+}

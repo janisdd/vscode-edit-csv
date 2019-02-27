@@ -80,6 +80,11 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 		csvWriteOptions.newline = newLineFromInput
 	}
 
+	const _conf: import('papaparse').UnparseConfig = {
+		...csvWriteOptions,
+		quotes: csvWriteOptions.quoteAllFields,
+	}
+
 	if (csvWriteOptions.header) {
 
 		//write the header...
@@ -104,15 +109,15 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 			&& typeof csvWriteOptions.comments === 'string'
 			&& row[0].trim().startsWith(csvReadOptions.comments)) {
 			//this is a comment
-			data[i] = [`${csvWriteOptions.comments}${row[0].trim().substring(csvReadOptions.comments.length)}`]
+			// data[i] = [`${csvWriteOptions.comments}${row[0].trim().substring(csvReadOptions.comments.length)}`]
+			// row[0] = row[0].trim().substring(csvReadOptions.comments.length)
+			_compressCommentRow(row)
+			// data[i] = [`${csvWriteOptions.comments}${csv.unparse([row], _conf)}`]
+			data[i] = [`${csvWriteOptions.comments}${row.join(" ")}`]
 		}
 
 	}
 
-	const _conf: import('papaparse').UnparseConfig = {
-		...csvWriteOptions,
-		quotes: csvWriteOptions.quoteAllFields,
-	}
 
 	//not documented in papaparse...
 	//@ts-ignore
@@ -123,6 +128,25 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 	return dataAsString
 }
 
+/**
+ * removes all empty trailing cells
+ * @param row 
+ */
+function _compressCommentRow(row: string[]) {
+
+	let delCount = 0
+	for (let i = row.length-1; i > 0; i--) {
+		const cell = row[i];
+		if (cell === null || cell === '') {
+			delCount++
+			continue
+		}
+
+		break
+	}
+
+	row.splice(row.length - delCount, delCount)
+}
 
 /* --- messages back to vs code --- */
 

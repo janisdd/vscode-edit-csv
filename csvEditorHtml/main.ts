@@ -86,15 +86,15 @@ if (initialContent === undefined) {
 
 // initialContent = `123,wet`
 
-initialContent =
-	`
-#test
-1,2,3
-#test 2
-4,5,6,7,8
+// initialContent =
+// 	`
+// #test , wer
+// # wetwet
+// 1,2,3
+// 4,5,6,7,8
+// 4,5,6,7,8
 
-#test 3
-`
+// `
 
 console.log("initialConfig: ", initialConfig);
 console.log("initialContent: " + initialContent);

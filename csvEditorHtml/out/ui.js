@@ -189,7 +189,7 @@ function displayData(data, csvReadConfig) {
         }
         return;
     }
-    const commentMergedCells = _normalizeDataArray(data, csvReadConfig);
+    _normalizeDataArray(data, csvReadConfig);
     if (data.length > 0) {
         headerRow = data[0];
     }
@@ -210,7 +210,6 @@ function displayData(data, csvReadConfig) {
         colHeaders: defaultColHeaderFunc,
         currentColClassName: 'foo',
         currentRowClassName: 'foo',
-        mergeCells: commentMergedCells,
         comments: false,
         manualRowMove: true,
         manualRowResize: true,
@@ -218,12 +217,28 @@ function displayData(data, csvReadConfig) {
         manualColumnResize: true,
         columnSorting: true,
         outsideClickDeselects: false,
+        cells: function (row, col) {
+            var cellProperties = {};
+            cellProperties.renderer = 'commentValueRenderer';
+            if (row === undefined || row === null)
+                return cellProperties;
+            const _hot = this.instance;
+            const tableData = _hot.getData();
+            const firstCellVal = tableData[row][0];
+            if (firstCellVal === null)
+                return cellProperties;
+            if (typeof csvReadConfig.comments === 'string' && firstCellVal.trim().startsWith(csvReadConfig.comments)) {
+                cellProperties._isComment = true;
+            }
+            else {
+                cellProperties._isComment = false;
+            }
+            return cellProperties;
+        },
         beforeColumnResize: function (oldSize, newSize, isDoubleClick) {
-            if (allColSizes.length > 0 && isDoubleClick) {
-                if (oldSize === newSize) {
-                    if (initialConfig) {
-                        return initialConfig.doubleClickColumnHandleForcedWith;
-                    }
+            if (oldSize === newSize) {
+                if (initialConfig) {
+                    return initialConfig.doubleClickColumnHandleForcedWith;
                 }
             }
         },
@@ -291,8 +306,6 @@ function displayData(data, csvReadConfig) {
                 elWrite.checked = false;
                 applyHasHeader(true);
             }
-            if (action.actionType === 'insert_col') {
-            }
         },
         beforeRedo: function (action) {
             if (action.actionType === 'remove_row' && action.index === 0) {
@@ -302,8 +315,6 @@ function displayData(data, csvReadConfig) {
                 el.checked = true;
                 elWrite.checked = true;
                 applyHasHeader(true);
-            }
-            if (action.actionType === 'insert_col') {
             }
         },
         afterColumnMove: function (aa, bbb) {
@@ -319,7 +330,7 @@ function displayData(data, csvReadConfig) {
     }
     onResizeGrid();
 }
-let allColSizes = [];
+var allColSizes = [];
 function onResizeGrid() {
     if (!hot)
         return;

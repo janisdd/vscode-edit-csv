@@ -111,35 +111,21 @@ function _resizeMergedColumns() {
 
 }
 
-// function transformIntoCommentRow(rowIndex: number, csvReadOptions: CsvReadOptions): string | null {
-	
-// 	if (typeof hot.getSettings().mergeCells === 'boolean' || !hot.getSettings().mergeCells) return null
+function commentValueRenderer(instance: Handsontable, td: HTMLTableDataCellElement, row: number, col: number, prop: any, value: string | null, cellProperties: any) {
+	//@ts-ignore
+  Handsontable.renderers.TextRenderer.apply(this, arguments);
 
-// 	const mergedCells: HandsontableMergedCells[] = hot.getSettings().mergeCells as HandsontableMergedCells[]
+	// console.log(value)
 
-// 	const numCols = hot.countCols()
+	if (cellProperties._isComment) {
+		td.classList.add('comment-cell')
+	} else {
+		// td.style.backgroundColor = ''
+	}
 
-// 	mergedCells.push({
-// 		row: rowIndex,
-// 		col: 0,
-// 		colspan: numCols,
-// 		rowspan: 1
-// 	})
+}
 
-// 	const rowData = hot.getDataAtRow(rowIndex)
-
-// 	hot.updateSettings({
-// 		mergeCells: mergedCells
-// 	}, false);
-
-
-// 	if (typeof csvReadOptions.comments === 'boolean') return null
-
-// 	const newRowText = `${csvReadOptions.comments}${csv.unparse([rowData])}`
-
-// 	return newRowText
-// }
-
+(Handsontable.renderers as any).registerRenderer('commentValueRenderer', commentValueRenderer);
 
 /**
  * overwrites a single option

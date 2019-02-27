@@ -35,6 +35,7 @@ function getDataAsCsv(csvReadOptions, csvWriteOptions) {
     if (csvWriteOptions.newline === '') {
         csvWriteOptions.newline = newLineFromInput;
     }
+    const _conf = Object.assign({}, csvWriteOptions, { quotes: csvWriteOptions.quoteAllFields });
     if (csvWriteOptions.header) {
         const colHeaderCells = hot.getColHeader();
         if (hot.getSettings().colHeaders === defaultColHeaderFunc) {
@@ -51,13 +52,25 @@ function getDataAsCsv(csvReadOptions, csvWriteOptions) {
         if (typeof csvReadOptions.comments === 'string'
             && typeof csvWriteOptions.comments === 'string'
             && row[0].trim().startsWith(csvReadOptions.comments)) {
-            data[i] = [`${csvWriteOptions.comments}${row[0].trim().substring(csvReadOptions.comments.length)}`];
+            _compressCommentRow(row);
+            data[i] = [`${csvWriteOptions.comments}${row.join(" ")}`];
         }
     }
-    const _conf = Object.assign({}, csvWriteOptions, { quotes: csvWriteOptions.quoteAllFields });
     _conf['skipEmptyLines'] = false;
     let dataAsString = csv.unparse(data, _conf);
     return dataAsString;
+}
+function _compressCommentRow(row) {
+    let delCount = 0;
+    for (let i = row.length - 1; i > 0; i--) {
+        const cell = row[i];
+        if (cell === null || cell === '') {
+            delCount++;
+            continue;
+        }
+        break;
+    }
+    row.splice(row.length - delCount, delCount);
 }
 function postVsInformation(text) {
     if (!vscode) {

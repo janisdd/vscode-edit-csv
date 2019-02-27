@@ -42,3 +42,7 @@ body.vscode-light {
 }
 
 
+.vscode-light .comment-cell {
+	/* background-color: #f7f7f7!important; */
+	color: #b1b1b1;
+}

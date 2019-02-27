@@ -5,8 +5,6 @@ const extension_1 = require("./extension");
 const defaultConfig = {
     lastRowEnterBehavior: 'default',
     lastColumnTabBehavior: 'default',
-    beforeCommentsAppearance: "onlyOnContent",
-    afterCommentsAppearance: "onlyOnContent",
     previewOptionsAppearance: "collapsed",
     writeOptionsAppearance: "collapsed",
     readOptionsAppearance: "collapsed",

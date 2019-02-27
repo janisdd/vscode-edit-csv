@@ -1,5 +1,7 @@
 
 
+type GridSettings = import("../node_modules/handsontable/handsontable").GridSettings
+
 /* --- common helpers --- */
 
 
@@ -330,7 +332,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		return
 	}
 
-	const commentMergedCells = _normalizeDataArray(data, csvReadConfig)
+	_normalizeDataArray(data, csvReadConfig)
 
 	if (data.length > 0) {
 		headerRow = data[0]
@@ -355,7 +357,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			}
 
 			return `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
-			//why would we alway disallow to remove first row?
+			//why we would always disallow to remove first row?
 			// return row !== 0
 			// 	? `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
 			// 	: `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
@@ -364,7 +366,6 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		colHeaders: defaultColHeaderFunc as any,
 		currentColClassName: 'foo',
 		currentRowClassName: 'foo',
-		mergeCells: commentMergedCells,
 		//plugins
 		comments: false,
 		manualRowMove: true,
@@ -374,6 +375,31 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		columnSorting: true,
 
 		outsideClickDeselects: false, //keep selection
+
+		cells: function(row, col) {
+			var cellProperties: GridSettings = {};
+			cellProperties.renderer = 'commentValueRenderer'
+
+			if (row === undefined || row === null) return cellProperties
+
+			const _hot = (this as any).instance as Handsontable
+			const tableData = _hot.getData()
+
+			//we should always have 1 col
+			const firstCellVal = tableData[row][0]
+
+			if (firstCellVal === null) return cellProperties
+			
+			if (typeof csvReadConfig.comments === 'string' && firstCellVal.trim().startsWith(csvReadConfig.comments)) {
+				//@ts-ignore
+				cellProperties._isComment = true
+			} else {
+				//@ts-ignore
+				cellProperties._isComment = false
+			}
+			
+			return cellProperties
+		},
 
 		//not fully working... we would handle already comment cells
 		// beforeChange: function (changes) {
@@ -404,7 +430,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 			//allColSizes is not always up to date... only set on window resize... when the bug is fixed we need to change this...
 
-			if (allColSizes.length > 0 && isDoubleClick) {
+			// if (allColSizes.length > 0 && isDoubleClick) {
 				// const oldSize = allColSizes[currentColumn]
 
 				if (oldSize === newSize) {
@@ -413,7 +439,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 						return initialConfig.doubleClickColumnHandleForcedWith
 					}
 				}
-			}
+			// }
 		},
 		enterMoves: function (event: KeyboardEvent) {
 			const selection = hot.getSelected()
@@ -498,10 +524,6 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 				applyHasHeader(true)
 			}
 
-			if (action.actionType === 'insert_col') {
-				//this is ok for merged comment cells because they don't have to change
-			}
-
 		},
 		beforeRedo: function (action: any) {
 			if (action.actionType === 'remove_row' && action.index === 0) { //first row cannot be removed normally so it must be the header row option
@@ -514,11 +536,6 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 				elWrite.checked = true
 
 				applyHasHeader(true)
-			}
-
-			if (action.actionType === 'insert_col') {
-				//not working... because merge inserts new actions??
-				// _resizeMergedColumns()
 			}
 		},
 
@@ -548,7 +565,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 //not needed really now because of bug in handson table, see https://github.com/handsontable/handsontable/issues/3328
 //just used to check if we have columns
-let allColSizes = []
+var allColSizes = []
 /**
  * updates the handson table to fill available space (will trigger scrollbars)
  */

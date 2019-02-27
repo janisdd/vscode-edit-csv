@@ -118,3 +118,8 @@ body.vscode-high-contrast {
 .vscode-high-contrast .ht_clone_top_left_corner thead tr:nth-child(1) {
 	border-right: 0 !important;
 }
+
+.vscode-high-contrast .comment-cell {
+	/* background-color: #f7f7f7!important; */
+	color: #ff9d00;
+}

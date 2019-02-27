@@ -45,15 +45,6 @@ if (typeof initialContent === 'undefined') {
 if (initialContent === undefined) {
     initialContent = '';
 }
-initialContent =
-    `
-#test
-1,2,3
-#test 2
-4,5,6,7,8
-
-#test 3
-`;
 console.log("initialConfig: ", initialConfig);
 console.log("initialContent: " + initialContent);
 setupAndApplyInitialConfigPart1(initialConfig);

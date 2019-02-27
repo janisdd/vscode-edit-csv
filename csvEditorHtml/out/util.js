@@ -52,6 +52,15 @@ function _resizeMergedColumns() {
         mergeCells: mergedCells
     }, false);
 }
+function commentValueRenderer(instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    if (cellProperties._isComment) {
+        td.classList.add('comment-cell');
+    }
+    else {
+    }
+}
+Handsontable.renderers.registerRenderer('commentValueRenderer', commentValueRenderer);
 function _setOption(targetOptions, options, optionName) {
     if (options.hasOwnProperty(optionName)) {
         if (targetOptions.hasOwnProperty(optionName) === false) {
