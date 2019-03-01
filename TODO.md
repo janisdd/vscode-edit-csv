@@ -1,6 +1,12 @@
 # TODO
 
 
+- disallow removing row if we have 2 and hasHeader is not enabled...
+ - or disable hasHeader option if omly 1 row (BETTER)
+
+- custom headers disallow removing last col
+
+- remove _resizeMergedColumns ?
 
 ## Maybe
 

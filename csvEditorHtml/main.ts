@@ -16,7 +16,7 @@ if (typeof initialConfig === 'undefined') {
 
 const csv: typeof import('papaparse') = (window as any).Papa
 //handsontable instance
-let hot: import('../node_modules/handsontable/handsontable')
+let hot: import('../node_modules/handsontable/handsontable') | null
 
 /**
  * the default csv content to used if we get empty content
@@ -32,7 +32,7 @@ const defaultCsvContentIfEmpty = `,\n,`
  * can be null if we have 0 rows
  * {string[] | null}
  */
-let headerRow: string[] | null = null
+let headerRow: Array<string | null> | null = null
 
 
 //csv reader options + some ui options
@@ -89,7 +89,8 @@ if (initialContent === undefined) {
 	initialContent = ''
 }
 
-// initialContent = `123,wet`
+initialContent = `123,wet
+4,5`
 
 // initialContent =
 // 	`

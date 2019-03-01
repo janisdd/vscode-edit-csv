@@ -63,7 +63,18 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] |
  */
 function getData(): string[][] {
 	//hot.getSourceData() returns the original data (e.g. not sorted...)
+	
+	if (!hot) throw new Error('table was null')
+
 	return hot.getData()
+}
+
+function getFirstRow(): string[] {
+	if (!hot) return []
+
+	if (hot.countRows() === 0) return []
+
+	return hot.getDataAtRow(0)
 }
 
 /**
@@ -88,6 +99,7 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 	if (csvWriteOptions.header) {
 
 		//write the header...
+		if (!hot) throw new Error('table was null')
 
 		const colHeaderCells = hot.getColHeader() as string[]
 		//@ts-ignore

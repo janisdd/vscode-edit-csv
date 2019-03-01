@@ -118,14 +118,16 @@ function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLE
  * @param fromUndo true: only update col headers, do not change the table data (will be done by undo/redo), false: normal
  */
 function applyHasHeader(fromUndo = false) {
-	const el = _getById('has-header') as HTMLInputElement
-	const data = getData()
+	const el = _getById('has-header') as HTMLInputElement //or defaultCsvReadOptions._hasHeader
+	const data = getFirstRow()
 
 	if (data.length === 0) {
 		return
 	}
+	
+	if (!hot) throw new Error('table was null')
 
-	const elWrite = _getById('has-header-write') as HTMLInputElement
+	const elWrite = _getById('has-header-write') as HTMLInputElement //or defaultCsvWriteOptions.header
 
 	if (el.checked) {
 
@@ -133,12 +135,12 @@ function applyHasHeader(fromUndo = false) {
 
 		//use header row from data
 		hot.updateSettings({
-			colHeaders: data[0].map((col, index) => defaultColHeaderFunc(index, col))
+			colHeaders: data.map((col, index) => defaultColHeaderFunc(index, col))
 		}, false)
 
 		if (fromUndo) return
 
-		headerRow = data[0]
+		headerRow = data
 
 		hot.alter('remove_row', 0);
 
@@ -327,7 +329,8 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 	if (data === null) {
 		if (hot) {
-			hot.destroy()
+			hot.getInstance().destroy()
+			hot = null
 		}
 		return
 	}
@@ -342,9 +345,8 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 	if (hot) {
 		hot.destroy()
+		hot = null
 	}
-
-
 
 	//@ts-ignore
 	hot = new Handsontable(container, {
@@ -379,7 +381,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		cells: highlightCsvComments 
 		? function(row, col) {
 			var cellProperties: GridSettings = {};
-			cellProperties.renderer = 'commentValueRenderer'
+			cellProperties.renderer = 'commentValueRenderer' //is registered in util
 
 			if (row === undefined || row === null) return cellProperties
 			if (col === undefined || col === null) return cellProperties
@@ -446,6 +448,9 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			// }
 		},
 		enterMoves: function (event: KeyboardEvent) {
+
+			if (!hot) throw new Error('table was null')
+
 			const selection = hot.getSelected()
 			const _default = {
 				row: 1,
@@ -471,6 +476,9 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			return _default
 		},
 		tabMoves: function (event: KeyboardEvent) {
+
+			if (!hot) throw new Error('table was null')
+
 			const selection = hot.getSelected()
 			const _default = {
 				row: 0,
@@ -544,7 +552,10 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		},
 
 		afterColumnMove: function (aa, bbb) {
-			//NOT WORKING
+
+			if (!hot) throw new Error('table was null')
+
+			//TODO NOT WORKING??
 			hot.updateSettings({
 				colHeaders: defaultColHeaderFunc as any
 			}, false)
@@ -613,11 +624,16 @@ function onResizeGrid() {
  * we add a delete icon
  * @param {number} colIndex the physical column index (user could have moved cols so visual  first col is not the physical second) use https://handsontable.com/docs/6.2.2/RecordTranslator.html to translate
  * 	call like hot.toVisualColumn(colIndex)
- * @param {string | undefined} colName 
+ * @param {string | undefined | null} colName 
  */
-function defaultColHeaderFunc(colIndex: number, colName: string | undefined) {
+function defaultColHeaderFunc(colIndex: number, colName: string | undefined | null) {
+
 	let text = getSpreadsheetColumnLabel(colIndex)
-	if (colName !== undefined) {
+	
+
+	//null can also happen if we enable header, add column, disable header, enable header (then the new column have null values)
+	if (colName !== undefined && colName !== null) {
+		//@ts-ignore
 		text = colName
 	}
 

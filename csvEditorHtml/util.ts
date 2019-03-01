@@ -29,6 +29,9 @@ function getSpreadsheetColumnLabel(index: number) {
  * @param {number} index 0 based
  */
 function removeRow(index: number) {
+
+	if (!hot) throw new Error('table was null')
+
 	hot.alter('remove_row', index)
 	checkIfHasHeaderReadOptionIsAvailable()
 }
@@ -38,12 +41,23 @@ function removeRow(index: number) {
  * @param {number} index the visual column index
  */
 function removeColumn(index: number) {
+
+	if (!hot) throw new Error('table was null')
+
 	hot.alter('remove_col', index)
+
+	//keep header in sync with the number of columns
+	if (headerRow) {
+		headerRow.splice(index,1)
+	}
 
 	//we could get 0 cols...
 	checkIfHasHeaderReadOptionIsAvailable()
 
+	rerenderColumns()
+
 	_resizeMergedColumns()
+
 }
 
 /**
@@ -51,6 +65,8 @@ function removeColumn(index: number) {
  * @param {boolean} selectNewRow true: scrolls to the  new row
  */
 function addRow(selectNewRow = true) {
+
+	if (!hot) throw new Error('table was null')
 
 	// const headerCells = hot.getColHeader()
 	const numRows = hot.countRows()
@@ -70,8 +86,15 @@ function addRow(selectNewRow = true) {
  */
 function addColumn(selectNewColumn = true) {
 
+	if (!hot) throw new Error('table was null')
+
 	const numCols = hot.countCols()
 	hot.alter('insert_col', numCols) //inserted data contains null but papaparse correctly unparses it as ''
+
+	//keep header in sync with the number of columns
+	if (headerRow) {
+		headerRow.push(null)
+	}
 
 	//we could get 0 cols...
 	checkIfHasHeaderReadOptionIsAvailable()
@@ -84,10 +107,35 @@ function addColumn(selectNewColumn = true) {
 		}
 	}
 
+	rerenderColumns()
+
 	_resizeMergedColumns()
 }
 
+/**
+ * after some actions e.g. inserting/removing rows we need to correct the header column text
+ */
+function rerenderColumns() {
+
+	if (!hot) throw new Error('table was null')
+
+	if (defaultCsvReadOptions._hasHeader && headerRow) {
+		const data = headerRow
+
+		hot.updateSettings({
+			colHeaders: data.map((col, index) => defaultColHeaderFunc(index, col))
+		}, false)
+
+	} else {
+		hot.updateSettings({
+			colHeaders: defaultColHeaderFunc as any
+		}, false)
+	}
+}
+
 function _resizeMergedColumns() {
+
+	if (!hot) throw new Error('table was null')
 
 	if (typeof hot.getSettings().mergeCells === 'boolean' || !hot.getSettings().mergeCells) return
 
@@ -113,7 +161,7 @@ function _resizeMergedColumns() {
 
 function commentValueRenderer(instance: Handsontable, td: HTMLTableDataCellElement, row: number, col: number, prop: any, value: string | null, cellProperties: any) {
 	//@ts-ignore
-  Handsontable.renderers.TextRenderer.apply(this, arguments);
+	Handsontable.renderers.TextRenderer.apply(this, arguments);
 
 	// console.log(value)
 
@@ -234,7 +282,7 @@ function checkIfHasHeaderReadOptionIsAvailable(): boolean {
 	let canSetOption = false
 
 	if (defaultCsvReadOptions._hasHeader) {
-		canSetOption = data.length > 1 //we already set this option... 2 somehow works?
+		canSetOption = data.length >= 1 //we have +1 row because header option is enabled
 	} else {
 		canSetOption = data.length > 1 //no header ... to enable header we need 2 rows
 	}
@@ -308,7 +356,7 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 	}
 
 	highlightCsvComments = initialConfig.highlightCsvComments
-	
+
 	//apply settings from extension
 
 	const copyReadOptions = {
