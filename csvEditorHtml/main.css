@@ -1,7 +1,9 @@
 
 html, body {
 	height: 100%;
-	background-color:#003b49;
+	/* dark  for browser*/
+	/* background-color:#003b49; */
+	/* light */
 	/* background-color: #c3b990; */
 }
 

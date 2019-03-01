@@ -102,8 +102,10 @@ if (initialContent === undefined) {
 
 // `
 
-console.log("initialConfig: ", initialConfig);
-console.log("initialContent: " + initialContent);
+if (!vscode) {
+	console.log("initialConfig: ", initialConfig);
+	console.log("initialContent: " + initialContent);
+}
 
 setupAndApplyInitialConfigPart1(initialConfig)
 
