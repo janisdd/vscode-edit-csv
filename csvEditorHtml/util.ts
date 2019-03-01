@@ -55,9 +55,6 @@ function removeColumn(index: number) {
 	checkIfHasHeaderReadOptionIsAvailable()
 
 	rerenderColumns()
-
-	_resizeMergedColumns()
-
 }
 
 /**
@@ -108,8 +105,6 @@ function addColumn(selectNewColumn = true) {
 	}
 
 	rerenderColumns()
-
-	_resizeMergedColumns()
 }
 
 /**
@@ -131,32 +126,6 @@ function rerenderColumns() {
 			colHeaders: defaultColHeaderFunc as any
 		}, false)
 	}
-}
-
-function _resizeMergedColumns() {
-
-	if (!hot) throw new Error('table was null')
-
-	if (typeof hot.getSettings().mergeCells === 'boolean' || !hot.getSettings().mergeCells) return
-
-	const mergedCells: HandsontableMergedCells[] = hot.getSettings().mergeCells as HandsontableMergedCells[]
-
-	const numCols = hot.countCols()
-
-	for (let i = 0; i < mergedCells.length; i++) {
-		const mergedCell = mergedCells[i];
-		mergedCell.colspan = numCols
-	}
-
-	//this breaks stuff (e.g. selection not working after this??)
-	// (hot as any).undoRedo.ignoreNewActions = true;
-
-	hot.updateSettings({
-		mergeCells: mergedCells
-	}, false);
-
-	// (hot as any).undoRedo.ignoreNewActions = false;
-
 }
 
 function commentValueRenderer(instance: Handsontable, td: HTMLTableDataCellElement, row: number, col: number, prop: any, value: string | null, cellProperties: any) {

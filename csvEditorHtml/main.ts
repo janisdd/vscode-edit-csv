@@ -89,8 +89,8 @@ if (initialContent === undefined) {
 	initialContent = ''
 }
 
-initialContent = `123,wet
-4,5`
+// initialContent = `123,wet
+// 4,5`
 
 // initialContent =
 // 	`

@@ -290,32 +290,34 @@ function copyPreviewToClipboard() {
 
 /* --- other --- */
 
-function _normalizeDataArray(data: string[][], csvReadConfig: CsvReadOptions): HandsontableMergedCells[] {
+/**
+ * ensures that all rows inside data have the same length
+ * this also trims all cell values
+ * @param data 
+ * @param csvReadConfig 
+ */
+function _normalizeDataArray(data: string[][], csvReadConfig: CsvReadOptions, fillString = '') {
 
-	//in the good case all rows have equal size right from the beginning
-	const commentMergedCells: HandsontableMergedCells[] = []
-
+	
 	const maxCols = data.reduce((prev, curr) => curr.length > prev ? curr.length : prev, 0)
 
 	for (let i = 0; i < data.length; i++) {
 		const row = data[i];
-
-		if (typeof csvReadConfig.comments === 'string' && row[0].trim().startsWith(csvReadConfig.comments)) {
-			//this is a comment so merge cells
-			commentMergedCells.push({
-				row: i,
-				col: 0,
-				rowspan: 1,
-				colspan: maxCols
-			})
-		}
-
 		if (row.length < maxCols) {
-			row.push(...Array.from(Array(maxCols - row.length), (p, index) => ''))
+			row.push(...Array.from(Array(maxCols - row.length), (p, index) => fillString))
 		}
+
+		//handsontable trims cell values as soon as we finish editing it
+		//we could disable this in the settings (trimWhitespace) but this is ok for now
+		for (let j = 0; j < row.length; j++) {
+
+			if (row[j] === null || row[j] === undefined) continue
+
+			row[j] = row[j].trim()
+		}
+
 	}
 
-	return commentMergedCells
 }
 
 /**
