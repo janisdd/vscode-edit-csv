@@ -55,6 +55,12 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 
 - there are probably *some* issues which enabling `hasHeader`, removing first row and undoing/redoing that
 
+
+## Why not...?
+
+- use merged cells for comments (rows)
+	- there are some problems with adding/removing rows in connection with undo & redo
+
 ## Used projects
 
 - for csv parsing/writing: [papaparse](https://github.com/mholt/PapaParse)

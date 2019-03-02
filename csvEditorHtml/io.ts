@@ -69,6 +69,9 @@ function getData(): string[][] {
 	return hot.getData()
 }
 
+/**
+ * @returns {string[]} the first row of the data or an empty array
+ */
 function getFirstRow(): string[] {
 	if (!hot) return []
 
@@ -108,7 +111,12 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 			data.unshift(colHeaderCells.map((p: string, index: number) => getSpreadsheetColumnLabel(index)))
 		}
 		else {
-			data.unshift(colHeaderCells)
+
+			if (headerRow === null) {
+				throw new Error('header row was null')
+			}
+
+			data.unshift(headerRow.map<string>((val) => val !== null ? val : ''))
 		}
 	}
 

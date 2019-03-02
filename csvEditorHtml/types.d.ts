@@ -175,7 +175,7 @@ type CsvReadOptions = {
 
 type CsvWriteOptions = {
 	/**
-	 * true to write a header file
+	 * true to write a header to the file
 	 */
 	header: boolean
 	/**

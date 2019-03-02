@@ -145,6 +145,7 @@ function applyHasHeader(fromUndo = false) {
 		hot.alter('remove_row', 0);
 
 		elWrite.checked = true
+		defaultCsvWriteOptions.header = true
 		defaultCsvReadOptions._hasHeader = true
 		return
 	}
@@ -160,6 +161,7 @@ function applyHasHeader(fromUndo = false) {
 	hot.populateFromArray(0, 0, [headerRow])
 
 	elWrite.checked = false
+	defaultCsvWriteOptions.header = false
 	defaultCsvReadOptions._hasHeader = false
 
 }
