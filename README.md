@@ -8,7 +8,7 @@ Execute the command `edit as csv` to open an editor for the current file.
 
 *Execute the command again to switch back to the source file or to switch back to the editor*
 
-\!\[feature X\]\(images/feature-x.png\)
+![feature X](images/titleImg.gif)
 
 
 ## How this extension works
@@ -53,8 +53,11 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 	- thus changes can no longer be saved/applied
 	- maybe this can be resolved when https://github.com/Microsoft/vscode/issues/43768 is closed
 
-- there are probably *some* issues which enabling `hasHeader`, removing first row and undoing/redoing that
+- there are probably *some* issues which enabling `hasHeader`, (and removing first) row and undoing/redoing that
 
+## Alternatives
+
+*If you want to preview csv files you can go for the extension [Excel Viewer](https://marketplace.visualstudio.com/items?itemName=GrapeCity.gc-excelviewer). It has some more advanced sorting and filtering features.*
 
 ## Why not...?
 

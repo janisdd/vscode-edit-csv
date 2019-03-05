@@ -1,9 +1,10 @@
 {
 	"name": "vscode-edit-csv",
-	"displayName": "vscode-edit-csv",
+	"displayName": "Edit csv",
 	"description": "extension to edit csv files",
-	"version": "1.0.0",
+	"version": "0.0.9",
 	"license": "MIT",
+	"publisher": "janisdd",
 	"engines": {
 		"vscode": "^1.30.0"
 	},
@@ -14,6 +15,10 @@
 		"CSV"
 	],
 	"preview": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/janisdd/vscode-edit-csv.git"
+	},
 	"activationEvents": [
 		"onCommand:edit-csv.edit",
 		"onCommand:edit-csv.apply",
@@ -165,45 +170,79 @@
 					"type": "string",
 					"default": "default",
 					"description": "if one edits a cell in the last row and presses enter what the editor should do",
-					"enum": ["default", "createRow"],
-					"enumDescriptions": ["default of handsontable", "create a new row"]
+					"enum": [
+						"default",
+						"createRow"
+					],
+					"enumDescriptions": [
+						"default of handsontable",
+						"create a new row"
+					]
 				},
 				"csv-edit.lastColumnTabBehavior": {
 					"type": "string",
 					"default": "default",
 					"description": "if one edits a cell in the last column and presses tab what the editor should do",
-					"enum": ["default", "createColumn"],
-					"enumDescriptions": ["default of handsontable", "create a new column"]
+					"enum": [
+						"default",
+						"createColumn"
+					],
+					"enumDescriptions": [
+						"default of handsontable",
+						"create a new column"
+					]
 				},
-
 				"csv-edit.readOptionsAppearance": {
 					"type": "string",
 					"default": "collapsed",
 					"description": "the appearance of the read option section",
-					"enum": ["expanded", "collapsed"],
-					"enumDescriptions": ["read options will always start expanded", "read options will always start collapsed"]
+					"enum": [
+						"expanded",
+						"collapsed"
+					],
+					"enumDescriptions": [
+						"read options will always start expanded",
+						"read options will always start collapsed"
+					]
 				},
 				"csv-edit.writeOptionsAppearance": {
 					"type": "string",
 					"default": "collapsed",
 					"description": "the appearance of the write option section",
-					"enum": ["expanded", "collapsed"],
-					"enumDescriptions": ["write options will always start expanded", "write options will always start collapsed"]
+					"enum": [
+						"expanded",
+						"collapsed"
+					],
+					"enumDescriptions": [
+						"write options will always start expanded",
+						"write options will always start collapsed"
+					]
 				},
 				"csv-edit.previewOptionsAppearance": {
 					"type": "string",
 					"default": "collapsed",
 					"description": "the appearance of the preview section",
-					"enum": ["expanded", "collapsed"],
-					"enumDescriptions": ["preview section will always start expanded", "preview section will always start collapsed"]
+					"enum": [
+						"expanded",
+						"collapsed"
+					],
+					"enumDescriptions": [
+						"preview section will always start expanded",
+						"preview section will always start collapsed"
+					]
 				},
-
 				"csv-edit.readOption_hasHeader": {
 					"type": "string",
 					"default": "false",
 					"description": "whether the first data line is a header line",
-					"enum": ["true", "false"],
-					"enumDescriptions": ["first row is the header row", "first row is a normal data row"]
+					"enum": [
+						"true",
+						"false"
+					],
+					"enumDescriptions": [
+						"first row is the header row",
+						"first row is a normal data row"
+					]
 				},
 				"csv-edit.readOption_delimiter": {
 					"type": "string",
@@ -225,13 +264,18 @@
 					"default": "\"",
 					"description": "the string used to escape the quote character within a field"
 				},
-
 				"csv-edit.writeOption_hasHeader": {
 					"type": "string",
 					"default": "false",
 					"description": "whether the first data line is a header line",
-					"enum": ["true", "false"],
-					"enumDescriptions": ["first row is the header row", "first row is a normal data row"]
+					"enum": [
+						"true",
+						"false"
+					],
+					"enumDescriptions": [
+						"first row is the header row",
+						"first row is a normal data row"
+					]
 				},
 				"csv-edit.writeOption_delimiter": {
 					"type": "string",
@@ -258,7 +302,6 @@
 					"default": false,
 					"description": "true: to always quote fields, false: not (only if necessary)"
 				},
-
 				"csv-edit.doubleClickColumnHandleForcedWith": {
 					"type": "number",
 					"default": "200",
@@ -279,7 +322,7 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
+		"compile": "tsc -p ./ && tsc -p ./csvEditorHtml/tsconfig.json",
 		"watch": "tsc -watch -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
 		"test": "npm run compile && node ./node_modules/vscode/bin/test",
@@ -297,7 +340,6 @@
 		"@types/papaparse": "^4.5.6",
 		"bulma": "^0.7.2",
 		"bulma-extensions": "^4.0.1",
-		"handsontable": "^6.2.2",
-		"papaparse": "^4.6.3"
+		"handsontable": "^6.2.2"
 	}
 }
