@@ -130,7 +130,7 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 			&& row[0].trim().startsWith(csvReadOptions.comments)) {
 			//this is a comment
 			// data[i] = [`${csvWriteOptions.comments}${row[0].trim().substring(csvReadOptions.comments.length)}`]
-			// row[0] = row[0].trim().substring(csvReadOptions.comments.length)
+			row[0] = row[0].trim().substring(csvReadOptions.comments.length)
 			_compressCommentRow(row)
 			// data[i] = [`${csvWriteOptions.comments}${csv.unparse([row], _conf)}`]
 			data[i] = [`${csvWriteOptions.comments}${row.join(" ")}`]

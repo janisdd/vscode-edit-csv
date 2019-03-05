@@ -93,6 +93,12 @@ function _toggleCollapse(el: HTMLElement, wrapper: HTMLElement, afterToggled?: (
 	if (afterToggled) afterToggled(true)
 }
 
+/**
+ * sets a collapseable sections state
+ * @param shouldCollapsed 
+ * @param el 
+ * @param wrapper 
+ */
 function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLElement) {
 
 	if (shouldCollapsed) {
@@ -100,6 +106,8 @@ function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLE
 		el.classList.add('fa-chevron-right')
 		// el.classList.replace( 'fa-chevron-down','fa-chevron-right')
 		wrapper.style.display = 'none'
+
+		onResizeGrid()
 		return
 	}
 
@@ -109,6 +117,8 @@ function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLE
 	// el.classList.replace('fa-chevron-right', 'fa-chevron-down')
 
 	wrapper.style.display = 'block'
+
+	onResizeGrid()
 }
 
 
@@ -447,6 +457,8 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 					//e.g. we have a large column and the auto size is too large...
 					if (initialConfig) {
 						return initialConfig.doubleClickColumnHandleForcedWith
+					} else {
+						console.log(`initialConfig is falsy`)
 					}
 				}
 			// }
@@ -585,6 +597,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 //not needed really now because of bug in handson table, see https://github.com/handsontable/handsontable/issues/3328
 //just used to check if we have columns
 var allColSizes = []
+
 /**
  * updates the handson table to fill available space (will trigger scrollbars)
  */

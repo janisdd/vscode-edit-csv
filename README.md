@@ -19,12 +19,12 @@ When you click on `edit csv file`
 - the current config is stringified and injected into the editor (webview) html
 - a manager stores a reference to the webview, source file uri, editor uri
 
-- in the webview the injected text is then parsed as csv and displayed in the table element
+- in the webview the injected text is parsed as csv and displayed in the (handson) table element
 
 When you click on `apply`
 
 - the current table is transformed into csv and written to the source file
-	- if you made an apply by accident you can undo in the table element (with the usual shortcuts) or open the source file and just do an undo (with the usual shortcuts)
+	- if you clicked on `apply` by accident, you can undo the changes in the table element (with the usual shortcuts) and apply again or open the source file and just do an undo (with the usual shortcuts)
 
 - When you click on `apply and save`
 	- the first step is equal to `apply`
@@ -43,7 +43,7 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 ## Known Issues
 
 - if the source file content changes while the editor is open, the editor will not be updated (e.g. take new content)
-	- if you then apply the editor the source file changes are **overwritten!**
+	- if you then apply the editor the source file content/changes are **overwritten!**
 
 - `apply and save` an unnamed file will close the editor
 	- this is because the new uri for the new file is not known and for some reason if an extension saves an unnamed file the new file is not displayed automatically

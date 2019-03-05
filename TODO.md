@@ -1,8 +1,20 @@
 # TODO
 
+
+
+- add gif
+
+
 - remove vscode template files (e.g. vsc-extension-quickstart.md)
 
+
 ## Maybe
+
+- insert columns / rows at arbitrary positions
+
+- add extension option to trim fields?
+
+## Maybe 2
 
 store collapse states?
 https://code.visualstudio.com/api/extension-guides/webview
