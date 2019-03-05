@@ -19,8 +19,8 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 
 	const _getResourcePath = getResourcePath.bind(undefined, context)
 
-	let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.css')
-	let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js')
+	let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.min.css')
+	let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js')
 	// let papaparseJs = _getResourcePath('node_modules/papaparse/papaparse.js')
 	let papaparseJs = _getResourcePath('thridParty/papaparse.min.js')
 	let fontAwesomeCss = _getResourcePath('node_modules/@fortawesome/fontawesome-free/css/all.css')
