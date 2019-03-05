@@ -19,6 +19,13 @@
 		"type": "git",
 		"url": "https://github.com/janisdd/vscode-edit-csv.git"
 	},
+	"bugs": {
+		"url": "https://github.com/janisdd/vscode-edit-csv/issues"
+	},
+	"galleryBanner": {
+    "color": "#687bff",
+    "theme": "light"
+  },
 	"activationEvents": [
 		"onCommand:edit-csv.edit",
 		"onCommand:edit-csv.apply",

@@ -1,13 +1,6 @@
 # TODO
 
 
-
-- add gif
-
-
-- remove vscode template files (e.g. vsc-extension-quickstart.md)
-
-
 ## Maybe
 
 - insert columns / rows at arbitrary positions
