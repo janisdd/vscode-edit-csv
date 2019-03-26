@@ -1,2 +1,3 @@
 *.map
 csvEditorHtml/out/
+node_modules

@@ -10,6 +10,7 @@ Execute the command `edit as csv` to open an editor for the current file.
 
 ![feature X](images/titleImg.gif)
 
+**Note that the data flow is one way (editor to source file). If you make changes to the source file (.csv) while the editor is open, the editor will not be updated!**
 
 ## How this extension works
 
