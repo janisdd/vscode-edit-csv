@@ -77,7 +77,7 @@ function getFirstRow(): string[] {
 
 	if (hot.countRows() === 0) return []
 
-	return hot.getDataAtRow(0)
+	return [...hot.getDataAtRow(0)] //make a copy to not get a reference
 }
 
 /**

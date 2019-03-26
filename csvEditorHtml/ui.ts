@@ -167,8 +167,12 @@ function applyHasHeader(fromUndo = false) {
 
 	if (fromUndo) return
 
+	if (headerRow === null) {
+		throw new Error('could not insert header row')
+	}
+
 	hot.alter('insert_row', 0)
-	hot.populateFromArray(0, 0, [headerRow])
+	hot.populateFromArray(0, 0, [[...headerRow]])
 
 	elWrite.checked = false
 	defaultCsvWriteOptions.header = false
@@ -352,7 +356,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 	_normalizeDataArray(data, csvReadConfig)
 
 	if (data.length > 0) {
-		headerRow = data[0]
+		headerRow = [...data[0]] //copy to not get reference
 	}
 
 	const container = csvEditorDiv
