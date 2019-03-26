@@ -7,7 +7,9 @@ const configurationHelper_1 = require("./configurationHelper");
  * @param filePath
  */
 function getResourcePath(context, filePath) {
-    return `vscode-resource:${path.join(context.extensionPath, filePath)}`;
+    //fix for windows because there path.join will use \ as separator and when we inline this string in html/js
+    //we get specials strings e.g. c:\n
+    return `vscode-resource:${path.join(context.extensionPath, filePath).replace(/\\/g, '/')}`;
 }
 exports.getResourcePath = getResourcePath;
 /**
@@ -20,8 +22,10 @@ function createEditorHtml(context, initialContent) {
     let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.min.css');
     let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js');
     // let papaparseJs = _getResourcePath('node_modules/papaparse/papaparse.js')
-    let papaparseJs = _getResourcePath('thridParty/papaparse.min.js');
-    let fontAwesomeCss = _getResourcePath('node_modules/@fortawesome/fontawesome-free/css/all.css');
+    let papaparseJs = _getResourcePath('thirdParty/papaparse.min.js');
+    let fontAwesomeCss = _getResourcePath('node_modules/@fortawesome/fontawesome-free/css/all.min.css');
+    //we need to load the font manually because the url() seems to not work properly with vscode-resource
+    const iconFont = _getResourcePath('node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2');
     let bulmaCss = _getResourcePath('node_modules/bulma/css/bulma.min.css');
     let bulmaExtensionCss = _getResourcePath('node_modules/bulma-extensions/dist/css/bulma-extensions.min.css');
     const mainCss = _getResourcePath('csvEditorHtml/main.css');
@@ -39,6 +43,14 @@ function createEditorHtml(context, initialContent) {
 	<html>
 	<head>
 		<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: data:; script-src vscode-resource: 'unsafe-inline'; style-src vscode-resource: 'unsafe-inline'; font-src vscode-resource:;">
+
+		<style>
+			@font-face {
+				font-family: 'Font Awesome 5 Free';
+				font-weight: 900;
+				src: url("${iconFont}") format("woff2");
+			}
+		</style>
 
 		<link rel="stylesheet" href="${handsontableCss}">
 		<script src="${handsontableJs}"></script>
@@ -421,6 +433,7 @@ function createEditorHtml(context, initialContent) {
 	 <script src="${utilJs}"></script>
 	 <script src="${uiJs}"></script>
 		<script src="${mainJs}"></script>
+		
 	</body>
 	`;
 }
