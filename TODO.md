@@ -1,5 +1,6 @@
 # TODO
 
+- check if all ui actions are in ui.ts
 
 ## Maybe
 

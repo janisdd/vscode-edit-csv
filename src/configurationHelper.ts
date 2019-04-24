@@ -23,7 +23,7 @@ const defaultConfig: CsvEditSettings = {
 	doubleClickColumnHandleForcedWith: 200,
 	openSourceFileAfterApply: false,
 	selectTextAfterBeginEditCell: false,
-	quoteAllFields: false
+	quoteAllFields: false,
 }
 
 /**

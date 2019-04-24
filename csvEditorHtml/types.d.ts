@@ -123,7 +123,7 @@ type CsvEditSettings = {
 	selectTextAfterBeginEditCell: boolean
 
 	/**
-	 * 
+	 * true: to always quote fields, false: not (only if necessary)
 	 */
 	quoteAllFields: boolean
 }
@@ -219,9 +219,12 @@ type MiscOptions = {
 }
 
 
+/**
+ * used to update the csv string we use to build the table (changes will be lost!!)
+ */
 type CsvUpdateMessage = {
 	command: 'csvUpdate'
-	csvContent: string
+	csvContent: string | StringSlice
 }
 
 /**
@@ -238,7 +241,16 @@ type RequestApplyAndSavePressMessage = {
 }
 type ReceivedMessageFromVsCode = CsvUpdateMessage | RequestApplyPressMessage | RequestApplyAndSavePressMessage
 
+/**
+ * send by the webview indicating that it has rendered and the webview has set up the listener to receive content
+ */
+type ReadyMessage = {
+	command: 'ready'
+}
 
+/**
+ * msg from the webview when it finished rendering and can receive messages
+ */
 type DisplayMessageBoxMessage = {
 	command: 'msgBox'
 	type: 'info' | 'warn' | 'error'
@@ -256,7 +268,7 @@ type CopyToClipboardMessage = {
 	text: string
 }
 
-type PostMessage = DisplayMessageBoxMessage | OverwriteFileMessage | CopyToClipboardMessage
+type PostMessage = ReadyMessage | DisplayMessageBoxMessage | OverwriteFileMessage | CopyToClipboardMessage
 
 type VsState = {
 	readOptionIsCollapsed: boolean
@@ -289,4 +301,10 @@ type HandsontableMergedCells = {
 	 * the length in cols to span
 	 */
 	colspan: number
+}
+
+type StringSlice = {
+	text: string
+	sliceNr: number
+	totalSlices: number
 }

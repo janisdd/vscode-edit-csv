@@ -365,10 +365,12 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		hot.destroy()
 		hot = null
 	}
-
+	
 	//@ts-ignore
 	hot = new Handsontable(container, {
 		data,
+		rowHeaderWidth: getRowHeaderWidth(data.length),
+		renderAllRows: false, //use false and small table size for fast initial render, see https://handsontable.com/docs/7.0.2/Options.html#renderAllRows
 		rowHeaders: function (row: number) { //the visual row index
 			let text = (row + 1).toString()
 
@@ -717,4 +719,31 @@ function resetData(content: string, csvReadOptions: CsvReadOptions) {
 	//might be bigger than the current view
 	onResizeGrid()
 	toggleAskReadAgainModal(false)
+}
+
+function startReceiveCsvProgBar() {
+	receivedCsvProgBar.value = 0
+	receivedCsvProgBarWrapper.style.display = "block"
+}
+
+function intermediateReceiveCsvProgBar() {
+	receivedCsvProgBar.attributes.removeNamedItem('value')
+}
+
+function stopReceiveCsvProgBar() {
+	receivedCsvProgBarWrapper.style.display = "none"
+}
+
+/**
+ * the height for the th element
+ * @param rows total number of rows
+ */
+function getRowHeaderWidth(rows: number) {
+	const parentPadding = 5*2 //th has 1 border + 4 padding on both sides
+	const widthMultiplyFactor = 10 //0-9 are all <10px width (with the current font)
+	const iconPadding = 4
+	const binIcon = 14
+	const len = rows.toString().length * widthMultiplyFactor + binIcon + iconPadding + parentPadding
+	return len
+	//or Math.ceil(Math.log10(num + 1)) from https://stackoverflow.com/questions/10952615/length-of-number-in-javascript
 }

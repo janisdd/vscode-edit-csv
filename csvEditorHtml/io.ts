@@ -63,7 +63,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] |
  */
 function getData(): string[][] {
 	//hot.getSourceData() returns the original data (e.g. not sorted...)
-	
+
 	if (!hot) throw new Error('table was null')
 
 	return hot.getData()
@@ -155,7 +155,7 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 function _compressCommentRow(row: string[]) {
 
 	let delCount = 0
-	for (let i = row.length-1; i > 0; i--) {
+	for (let i = row.length - 1; i > 0; i--) {
 		const cell = row[i];
 		if (cell === null || cell === '') {
 			delCount++
@@ -271,6 +271,18 @@ function _postApplyContent(csvContent: string, saveSourceFile: boolean) {
 	})
 }
 
+function _postReadyMessage() {
+	if (!vscode) {
+		console.log(`_postReadyMessage (but in browser)`)
+		return
+	}
+
+	startReceiveCsvProgBar()
+	vscode.postMessage({
+		command: 'ready'
+	})
+}
+
 function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 	const message = event.data
 
@@ -278,8 +290,16 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 
 		case 'csvUpdate': {
 
-			initialContent = message.csvContent
-			resetData(initialContent, defaultCsvReadOptions)
+			if (typeof message.csvContent === 'string') {
+				onReceiveCsvContentSlice({
+					text: message.csvContent,
+					sliceNr: 1,
+					totalSlices: 1
+				})
+
+			} else {
+				onReceiveCsvContentSlice(message.csvContent)
+			}
 
 			break
 		}
@@ -300,4 +320,40 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 		}
 	}
 
+}
+function onReceiveCsvContentSlice(slice: StringSlice) {
+
+	// console.log(`received slice ${slice.sliceNr}/${slice.totalSlices}`)
+	if (slice.sliceNr === 1) {
+		initialContent = ''
+		statusInfo.innerText = `Receiving csv...`
+	}
+
+	initialContent += slice.text
+	receivedCsvProgBar.value = slice.sliceNr * 100 / slice.totalSlices
+	// console.log(`% = ${receivedCsvProgBar.value}`)
+
+	if (slice.sliceNr === slice.totalSlices) {
+		// intermediateReceiveCsvProgBar() //now showing because ui thread is blocked
+		stopReceiveCsvProgBar()
+		statusInfo.innerText = `Rendering table...`
+
+		call_after_DOM_updated(() => {
+
+			resetData(initialContent, defaultCsvReadOptions)
+			statusInfo.innerText = `Performing last steps...`
+			
+			//profiling shows that handsontable calls some column resize function which causes the last hang...
+			setTimeout(() => {
+				statusInfo.innerText = '';
+			}, 0)
+		})
+
+	}
+}
+
+//from https://www.freecodecamp.org/forum/t/how-to-make-js-wait-until-dom-is-updated/122067/2
+function call_after_DOM_updated(fn: any) {
+	var intermediate = function () { window.requestAnimationFrame(fn) }
+	window.requestAnimationFrame(intermediate)
 }

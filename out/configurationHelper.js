@@ -22,7 +22,7 @@ const defaultConfig = {
     doubleClickColumnHandleForcedWith: 200,
     openSourceFileAfterApply: false,
     selectTextAfterBeginEditCell: false,
-    quoteAllFields: false
+    quoteAllFields: false,
 };
 /**
  * returns the configuration for this extension

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from "path";
-import { isCsvFile, getCurrentViewColumn } from './util';
+import { isCsvFile, getCurrentViewColumn, debugLog, partitionString } from './util';
 import { createEditorHtml } from './getHtml';
 import { InstanceManager, Instance } from './instanceManager';
 import { getExtensionConfiguration } from './configurationHelper';
@@ -67,6 +67,8 @@ export function activate(context: vscode.ExtensionContext) {
 			return
 		}
 
+		//vscode.window.activeTextEditor will be undefined if file is too large...
+		//see https://github.com/Microsoft/vscode/blob/master/src/vs/editor/common/model/textModel.ts
 		if (!vscode.window.activeTextEditor || !isCsvFile(vscode.window.activeTextEditor.document)) {
 			vscode.window.showInformationMessage("Open a csv file first to show the csv editor")
 			return
@@ -267,6 +269,40 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	panel.webview.onDidReceiveMessage((message: PostMessage) => {
 
 		switch (message.command) {
+
+			case 'ready': {
+
+				debugLog('received ready from webview')
+
+				const textSlices = partitionString(initialText, 1024 * 1024) //<1MB less should be loaded in a blink
+
+				for (let i = 0; i < textSlices.length; i++) {
+					const textSlice = textSlices[i];
+
+					const msg: ReceivedMessageFromVsCode = {
+						command: "csvUpdate",
+						csvContent: {
+							text: textSlice.text,
+							sliceNr: textSlice.sliceNr,
+							totalSlices: textSlice.totalSlices
+						}
+					}
+
+					panel.webview.postMessage(msg)
+				}
+
+
+				// const msg: ReceivedMessageFromVsCode = {
+				// 	command:"csvUpdate",
+				// 	csvContent: initialText
+				// }
+
+				//panel.webview.postMessage(msg)
+
+				debugLog('finished sending csv content to webview')
+
+				break
+			}
 			case "msgBox": {
 
 				if (message.type === 'info') {
@@ -445,3 +481,4 @@ function getActiveEditorInstance(instanceManager: InstanceManager): Instance | n
 // 		CsvEditStateSerializer.state = state
 // 	}
 // }
+

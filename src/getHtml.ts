@@ -287,49 +287,60 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 		</div>
 
 		<div class="table-action-buttons">
-			<button class="button is-outlined" onclick="addRow()">
-				<span class="icon is-small">
-					<i class="fas fa-plus"></i>
-				</span>
-				<span>Add row</span>
-			</button>
 
-			<button class="button  is-outlined" onclick="addColumn()">
-				<span class="icon is-small">
-					<i class="fas fa-plus"></i>
-				</span>
-				<span>Add column</span>
-			</button>
+			<div>
+				<button class="button is-outlined" onclick="addRow()">
+					<span class="icon is-small">
+						<i class="fas fa-plus"></i>
+					</span>
+					<span>Add row</span>
+				</button>
 
-			<button class="button  is-outlined mar-left" onclick="postApplyContent(true)">
-				<span class="icon is-small">
-					<i class="fas fa-save"></i>
-				</span>
-				<span>Apply and save</span>
-				<span class="tooltip is-tooltip-multiline mar-left-half"
-					data-tooltip="Applies the csv content back to the source file and saves the source file">
-					<i class="fas fa-question-circle"></i>
-				</span>
-			</button>
+				<button class="button  is-outlined" onclick="addColumn()">
+					<span class="icon is-small">
+						<i class="fas fa-plus"></i>
+					</span>
+					<span>Add column</span>
+				</button>
 
-			<button class="button  is-outlined" onclick="postApplyContent(false)">
-				<span class="icon is-small">
-					<i class="fas fa-reply"></i>
-				</span>
-				<span>Apply</span>
-				<span class="tooltip mar-left-half" data-tooltip="Applies the csv content back to the source file">
-					<i class="fas fa-question-circle"></i>
-				</span>
-			</button>
+				<button class="button  is-outlined mar-left" onclick="postApplyContent(true)">
+					<span class="icon is-small">
+						<i class="fas fa-save"></i>
+					</span>
+					<span>Apply and save</span>
+					<span class="tooltip is-tooltip-multiline mar-left-half"
+						data-tooltip="Applies the csv content back to the source file and saves the source file">
+						<i class="fas fa-question-circle"></i>
+					</span>
+				</button>
 
-			<button style="float: right;" class="button  is-outlined" onclick="toggleHelpModal(true)">
-				<span class="icon is-small">
-					<i class="fas fa-question"></i>
-				</span>
-				<span>Help</span>
-			</button>
+				<button class="button  is-outlined" onclick="postApplyContent(false)">
+					<span class="icon is-small">
+						<i class="fas fa-reply"></i>
+					</span>
+					<span>Apply</span>
+					<span class="tooltip mar-left-half" data-tooltip="Applies the csv content back to the source file">
+						<i class="fas fa-question-circle"></i>
+					</span>
+				</button>
 
+				<div id="status-info-wrapper">
+					<span id="status-info"></span>
+				</div>
+
+				<button style="float: right;" class="button  is-outlined" onclick="toggleHelpModal(true)">
+					<span class="icon is-small">
+						<i class="fas fa-question"></i>
+					</span>
+					<span>Help</span>
+				</button>
 		</div>
+			<div id="received-csv-prog-bar-wrapper">
+				<progress id="received-csv-prog-bar" class="progress is-info" value="50" max="100"></progress>
+			</div>
+		</div>
+
+		
 
 		<!-- main editor/grid area -->
 		<div id="csv-editor-wrapper" class="csv-editor-wrapper">
@@ -430,16 +441,16 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 		<button class="modal-close is-large" aria-label="close" onclick="toggleAskReadAgainModal(false)"></button>
 	</div>
 
+
 	<script>
-		var initialConfig = ${JSON.stringify(config)};
-		//make sure we escape here via json e.g. if we have $\{\} in a csv file...
-		var initialContent = ${JSON.stringify(initialContent)};
-	</script>
+	var initialConfig = ${JSON.stringify(config)};
+</script>
+
 	 <script src="${ioJs}"></script>
 	 <script src="${utilJs}"></script>
 	 <script src="${uiJs}"></script>
 		<script src="${mainJs}"></script>
 		
 	</body>
-	`
+</html>`
 }

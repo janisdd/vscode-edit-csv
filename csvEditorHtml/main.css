@@ -24,8 +24,10 @@ html, body {
 
 #csv-editor {
 	overflow: hidden;
-	/* width: 1500px; */
-	/* height: 300px; */
+	/*when we set the initial size small and use handsontable option renderAllRows false
+	the initial render will not hang for large data (e.g. 100 000 rows ~ 13Mb)*/
+	width: 200px;
+	height: 200px;
 }
 
 .options-bar {
@@ -123,6 +125,18 @@ input.input {
 
 .table-action-buttons {
 	margin: 0.5em 0;
+	position: relative;
+}
+
+#received-csv-prog-bar {
+	height: 5px;
+}
+#received-csv-prog-bar-wrapper {
+	font-display: none;
+	position: absolute;
+	left:0;
+	right:0;
+	bottom:-8px;
 }
 
 .preview-csv-textarea {
@@ -169,4 +183,12 @@ input.input {
 
 .margin-centered {
 	margin: auto;
+}
+
+#status-info-wrapper {
+	display: inline-block;
+	padding: 0.3em
+}
+#status-info {
+
 }

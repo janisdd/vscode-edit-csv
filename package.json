@@ -23,9 +23,9 @@
 		"url": "https://github.com/janisdd/vscode-edit-csv/issues"
 	},
 	"galleryBanner": {
-    "color": "#687bff",
-    "theme": "light"
-  },
+		"color": "#687bff",
+		"theme": "light"
+	},
 	"activationEvents": [
 		"onCommand:edit-csv.edit",
 		"onCommand:edit-csv.apply",
@@ -304,11 +304,6 @@
 					"default": "\"",
 					"description": "the string used to escape the quote character within a field"
 				},
-				"csv-edit.quoteAllFields": {
-					"type": "boolean",
-					"default": false,
-					"description": "true: to always quote fields, false: not (only if necessary)"
-				},
 				"csv-edit.doubleClickColumnHandleForcedWith": {
 					"type": "number",
 					"default": "200",
@@ -323,6 +318,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "true: select the text inside the cell (note you can also select the cell and start typings to overwrite the cell value), false: cursor starts at the end of the text"
+				},
+				"csv-edit.quoteAllFields": {
+					"type": "boolean",
+					"default": false,
+					"description": "true: to always quote fields, false: not (only if necessary)"
 				}
 			}
 		}
@@ -345,7 +345,7 @@
 	"dependencies": {
 		"@fortawesome/fontawesome-free": "^5.6.3",
 		"@types/papaparse": "^4.5.6",
-		"bulma": "^0.7.2",
+		"bulma": "^0.7.4",
 		"bulma-extensions": "^4.0.1",
 		"handsontable": "^6.2.2"
 	}

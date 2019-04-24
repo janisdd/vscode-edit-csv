@@ -50,6 +50,8 @@ function activate(context) {
             openSourceFileFunc();
             return;
         }
+        //vscode.window.activeTextEditor will be undefined if file is too large...
+        //see https://github.com/Microsoft/vscode/blob/master/src/vs/editor/common/model/textModel.ts
         if (!vscode.window.activeTextEditor || !util_1.isCsvFile(vscode.window.activeTextEditor.document)) {
             vscode.window.showInformationMessage("Open a csv file first to show the csv editor");
             return;
@@ -205,6 +207,29 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
     const config = configurationHelper_1.getExtensionConfiguration();
     panel.webview.onDidReceiveMessage((message) => {
         switch (message.command) {
+            case 'ready': {
+                util_1.debugLog('received ready from webview');
+                const textSlices = util_1.partitionString(initialText, 1024 * 1024); //<1MB less should be loaded in a blink
+                for (let i = 0; i < textSlices.length; i++) {
+                    const textSlice = textSlices[i];
+                    const msg = {
+                        command: "csvUpdate",
+                        csvContent: {
+                            text: textSlice.text,
+                            sliceNr: textSlice.sliceNr,
+                            totalSlices: textSlice.totalSlices
+                        }
+                    };
+                    panel.webview.postMessage(msg);
+                }
+                // const msg: ReceivedMessageFromVsCode = {
+                // 	command:"csvUpdate",
+                // 	csvContent: initialText
+                // }
+                //panel.webview.postMessage(msg)
+                util_1.debugLog('finished sending csv content to webview');
+                break;
+            }
             case "msgBox": {
                 if (message.type === 'info') {
                     vscode.window.showInformationMessage(message.content);

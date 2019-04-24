@@ -74,6 +74,9 @@ const askReadAgainModalDiv = _getById('ask-read-again-modal')
 const readDelimiterTooltip = _getById('read-delimiter-tooltip')
 const readDelimiterTooltipText = "Empty to auto detect"
 
+const receivedCsvProgBar = _getById('received-csv-prog-bar') as HTMLProgressElement
+const receivedCsvProgBarWrapper = _getById('received-csv-prog-bar-wrapper') as HTMLDivElement
+const statusInfo = _getById('status-info') as HTMLSpanElement
 
 /* main */
 
@@ -112,12 +115,19 @@ setupAndApplyInitialConfigPart1(initialConfig)
 //see readDataAgain
 let _data = parseCsv(initialContent, defaultCsvReadOptions)
 
-if (_data) {
+if (_data && !vscode) {
 	//@ts-ignore
 	// _data = Handsontable.helper.createSpreadsheetData(100, 20)
 	displayData(_data, defaultCsvReadOptions)
 }
 
 if (vscode) {
-	console.log(JSON.stringify(vscode.getState()))
+
+	receivedCsvProgBarWrapper.style.display = "block"
+
+	window.addEventListener('message', (e) => {
+		handleVsCodeMessage(e)
+	})
+	_postReadyMessage()
+	// console.log(JSON.stringify(vscode.getState()))
 }

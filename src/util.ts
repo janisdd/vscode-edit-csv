@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
 
+export function debugLog(msg: any) {
+	// console.log(msg)
+}
+
 /**
  * gets the current view column (e.g. we could have split view)
  */
@@ -35,4 +39,23 @@ export function isCsvFile(document: vscode.TextDocument) {
 	let possible = ['csv', 'csv (semicolon)', 'tsv', 'plaintext']
 	const _isCsvFile = possible.find(p => p === lang) && document.uri.scheme !== 'csv-edit'
 	return _isCsvFile
+}
+
+export function partitionString(text: string, sliceLength: number): StringSlice[] {
+
+	const slices: StringSlice[] = []
+	const totalSlices = Math.ceil(text.length / sliceLength)
+
+	for (let i = 0; i < text.length / sliceLength; i++) {
+		const _part = text.substr(i, sliceLength)
+
+		slices.push({
+			text: _part,
+			sliceNr: i + 1,
+			totalSlices
+		})
+	}
+
+
+	return slices
 }

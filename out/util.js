@@ -1,6 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = require("vscode");
+function debugLog(msg) {
+    // console.log(msg)
+}
+exports.debugLog = debugLog;
 /**
  * gets the current view column (e.g. we could have split view)
  */
@@ -38,4 +42,18 @@ function isCsvFile(document) {
     return _isCsvFile;
 }
 exports.isCsvFile = isCsvFile;
+function partitionString(text, sliceLength) {
+    const slices = [];
+    const totalSlices = Math.ceil(text.length / sliceLength);
+    for (let i = 0; i < text.length / sliceLength; i++) {
+        const _part = text.substr(i, sliceLength);
+        slices.push({
+            text: _part,
+            sliceNr: i + 1,
+            totalSlices
+        });
+    }
+    return slices;
+}
+exports.partitionString = partitionString;
 //# sourceMappingURL=util.js.map
