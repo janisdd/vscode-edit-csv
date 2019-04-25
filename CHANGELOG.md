@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.0.11
+
 - fixed row header width issue for large files
 - fixed issue where large files causes the editor to hang
 	- handsontable virtual renderer is now used with small initial table size
