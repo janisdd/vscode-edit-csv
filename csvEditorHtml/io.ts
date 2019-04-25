@@ -240,19 +240,6 @@ function postCopyToClipboard(text: string) {
 }
 
 /**
- * called from ui
- * @param saveSourceFile 
- */
-function postApplyContent(saveSourceFile: boolean) {
-	const csvContent = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
-
-	//used to clear focus... else styles are not properly applied
-	//@ts-ignore
-	if (document.activeElement !== document.body) document.activeElement.blur();
-
-	_postApplyContent(csvContent, saveSourceFile)
-}
-/**
  * called to save the current edit state back to the file
  * @param csvContent 
  * @param saveSourceFile 
@@ -278,6 +265,7 @@ function _postReadyMessage() {
 	}
 
 	startReceiveCsvProgBar()
+
 	vscode.postMessage({
 		command: 'ready'
 	})
@@ -335,22 +323,34 @@ function onReceiveCsvContentSlice(slice: StringSlice) {
 
 	if (slice.sliceNr === slice.totalSlices) {
 		// intermediateReceiveCsvProgBar() //now showing because ui thread is blocked
+
 		stopReceiveCsvProgBar()
-		statusInfo.innerText = `Rendering table...`
 
-		call_after_DOM_updated(() => {
-
-			resetData(initialContent, defaultCsvReadOptions)
-			statusInfo.innerText = `Performing last steps...`
-			
-			//profiling shows that handsontable calls some column resize function which causes the last hang...
-			setTimeout(() => {
-				statusInfo.innerText = '';
-			}, 0)
-		})
-
+		startRenderData()
 	}
 }
+
+/**
+ * performs the last steps to actually show the data (set status, render table, ...)
+ */
+function startRenderData() {
+
+	statusInfo.innerText = `Rendering table...`
+
+	call_after_DOM_updated(() => {
+
+		resetData(initialContent, defaultCsvReadOptions)
+		statusInfo.innerText = `Performing last steps...`
+		
+		//profiling shows that handsontable calls some column resize function which causes the last hang...
+		//status display should be cleared after the handsontable operation so enqueue
+		setTimeout(() => {
+			statusInfo.innerText = '';
+		}, 0)
+	})
+
+}
+
 
 //from https://www.freecodecamp.org/forum/t/how-to-make-js-wait-until-dom-is-updated/122067/2
 function call_after_DOM_updated(fn: any) {

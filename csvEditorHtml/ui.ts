@@ -199,6 +199,9 @@ function setEscapeCharString() {
 	defaultCsvReadOptions.escapeChar = el.value
 }
 
+/**
+ * @deprecated not longer supported
+ */
 function setSkipEmptyLines() {
 	// const el = _getById('skip-empty-lines')
 	// if (el) {
@@ -721,6 +724,13 @@ function resetData(content: string, csvReadOptions: CsvReadOptions) {
 	toggleAskReadAgainModal(false)
 }
 
+function resetDataFromResetDialog() {
+
+	toggleAskReadAgainModal(false)
+
+	startRenderData()
+}
+
 function startReceiveCsvProgBar() {
 	receivedCsvProgBar.value = 0
 	receivedCsvProgBarWrapper.style.display = "block"
@@ -732,6 +742,70 @@ function intermediateReceiveCsvProgBar() {
 
 function stopReceiveCsvProgBar() {
 	receivedCsvProgBarWrapper.style.display = "none"
+}
+
+/**
+ * adds a new row at the end
+ * @param {boolean} selectNewRow true: scrolls to the  new row
+ */
+function addRow(selectNewRow = true) {
+
+	if (!hot) throw new Error('table was null')
+
+	// const headerCells = hot.getColHeader()
+	const numRows = hot.countRows()
+	hot.alter('insert_row', numRows) //inserted data contains null but papaparse correctly unparses it as ''
+	// hot.populateFromArray(numRows, 0, [headerCells.map(p => '')])
+
+	if (selectNewRow) {
+		hot.selectCell(numRows, 0)
+	}
+
+	checkIfHasHeaderReadOptionIsAvailable()
+}
+
+/**
+ * called from ui
+ * @param saveSourceFile 
+ */
+function postApplyContent(saveSourceFile: boolean) {
+	const csvContent = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
+
+	//used to clear focus... else styles are not properly applied
+	//@ts-ignore
+	if (document.activeElement !== document.body) document.activeElement.blur();
+
+	_postApplyContent(csvContent, saveSourceFile)
+}
+
+/**
+ * adds a new column at the end
+ * @param {boolean} selectNewColumn true: scrolls to the new column
+ */
+function addColumn(selectNewColumn = true) {
+
+	if (!hot) throw new Error('table was null')
+
+	const numCols = hot.countCols()
+	hot.alter('insert_col', numCols) //inserted data contains null but papaparse correctly unparses it as ''
+
+	//keep header in sync with the number of columns
+	if (headerRow) {
+		headerRow.push(null)
+	}
+
+	//we could get 0 cols...
+	checkIfHasHeaderReadOptionIsAvailable()
+
+	const pos = hot.getSelected() //undefined or [[startRow, startCol, endRow, endCol], ...] (could select not connected cells...)
+	if (pos && pos.length === 1) { //only 1 row selected
+
+		if (selectNewColumn) {
+			hot.selectCell(pos[0][0], numCols)
+		}
+	}
+
+	rerenderColumns()
 }
 
 /**

@@ -421,7 +421,7 @@ function createEditorHtml(context, initialContent) {
 				</p>
 
 				<div style="margin-top: 1em">
-					<button class="button is-warning" onclick="resetData(initialContent, defaultCsvReadOptions)">
+					<button class="button is-warning" onclick="resetDataFromResetDialog()">
 						<span>Reset</span>
 					</button>
 

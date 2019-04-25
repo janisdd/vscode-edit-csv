@@ -427,7 +427,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 				</p>
 
 				<div style="margin-top: 1em">
-					<button class="button is-warning" onclick="resetData(initialContent, defaultCsvReadOptions)">
+					<button class="button is-warning" onclick="resetDataFromResetDialog()">
 						<span>Reset</span>
 					</button>
 

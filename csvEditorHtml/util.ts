@@ -58,56 +58,6 @@ function removeColumn(index: number) {
 }
 
 /**
- * adds a new row at the end
- * @param {boolean} selectNewRow true: scrolls to the  new row
- */
-function addRow(selectNewRow = true) {
-
-	if (!hot) throw new Error('table was null')
-
-	// const headerCells = hot.getColHeader()
-	const numRows = hot.countRows()
-	hot.alter('insert_row', numRows) //inserted data contains null but papaparse correctly unparses it as ''
-	// hot.populateFromArray(numRows, 0, [headerCells.map(p => '')])
-
-	if (selectNewRow) {
-		hot.selectCell(numRows, 0)
-	}
-
-	checkIfHasHeaderReadOptionIsAvailable()
-}
-
-/**
- * adds a new column at the end
- * @param {boolean} selectNewColumn true: scrolls to the new column
- */
-function addColumn(selectNewColumn = true) {
-
-	if (!hot) throw new Error('table was null')
-
-	const numCols = hot.countCols()
-	hot.alter('insert_col', numCols) //inserted data contains null but papaparse correctly unparses it as ''
-
-	//keep header in sync with the number of columns
-	if (headerRow) {
-		headerRow.push(null)
-	}
-
-	//we could get 0 cols...
-	checkIfHasHeaderReadOptionIsAvailable()
-
-	const pos = hot.getSelected() //undefined or [[startRow, startCol, endRow, endCol], ...] (could select not connected cells...)
-	if (pos && pos.length === 1) { //only 1 row selected
-
-		if (selectNewColumn) {
-			hot.selectCell(pos[0][0], numCols)
-		}
-	}
-
-	rerenderColumns()
-}
-
-/**
  * after some actions e.g. inserting/removing rows we need to correct the header column text
  */
 function rerenderColumns() {
