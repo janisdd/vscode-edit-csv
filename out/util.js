@@ -45,8 +45,8 @@ exports.isCsvFile = isCsvFile;
 function partitionString(text, sliceLength) {
     const slices = [];
     const totalSlices = Math.ceil(text.length / sliceLength);
-    for (let i = 0; i < text.length / sliceLength; i++) {
-        const _part = text.substr(i, sliceLength);
+    for (let i = 0; i < totalSlices; i++) {
+        const _part = text.substr(i * sliceLength, sliceLength);
         slices.push({
             text: _part,
             sliceNr: i + 1,

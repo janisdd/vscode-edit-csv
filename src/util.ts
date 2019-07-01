@@ -46,8 +46,8 @@ export function partitionString(text: string, sliceLength: number): StringSlice[
 	const slices: StringSlice[] = []
 	const totalSlices = Math.ceil(text.length / sliceLength)
 
-	for (let i = 0; i < text.length / sliceLength; i++) {
-		const _part = text.substr(i, sliceLength)
+	for (let i = 0; i < totalSlices; i++) {
+		const _part = text.substr(i * sliceLength, sliceLength)
 
 		slices.push({
 			text: _part,
@@ -55,7 +55,6 @@ export function partitionString(text: string, sliceLength: number): StringSlice[
 			totalSlices
 		})
 	}
-
 
 	return slices
 }

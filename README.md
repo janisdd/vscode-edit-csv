@@ -12,6 +12,13 @@ Execute the command `edit as csv` to open an editor for the current file.
 
 **Note that the data flow is one way (editor to source file). If you make changes to the source file (.csv) while the editor is open, the editor will not be updated!**
 
+## Important Notes
+
+- On initial load all rows are expanded to have all equal number of cells
+
+- Plugin Versions **0.0.11** had an issue with loading and saving files with more than \~1 MB
+	- saved files were corrupted (content of the first \~1MB was repeated after the first \~1MB until the file size was reached)
+
 ## How this extension works
 
 When you click on `edit csv file`
