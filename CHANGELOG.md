@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## 0.0.12
+
+- fixed critical bug where files with more than \~1MB are not properly loaded and saved
+	- saved files were corrupted (content of the first \~1MB was repeated after the first \~1MB until the file size was reached)
+- added button to trim whitespace (leading and trailing) in all cells
+	- prior versions will **trim by default** (on initial render and after cell editing)!
+
 ## 0.0.11
 
 - fixed row header width issue for large files
