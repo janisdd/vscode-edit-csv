@@ -288,7 +288,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 
 		<div class="table-action-buttons">
 
-			<div>
+			<div class="separated-btns">
 				<button class="button is-outlined" onclick="addRow()">
 					<span class="icon is-small">
 						<i class="fas fa-plus"></i>
@@ -296,14 +296,14 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 					<span>Add row</span>
 				</button>
 
-				<button class="button  is-outlined" onclick="addColumn()">
+				<button class="button is-outlined" onclick="addColumn()">
 					<span class="icon is-small">
 						<i class="fas fa-plus"></i>
 					</span>
 					<span>Add column</span>
 				</button>
 
-				<button class="button  is-outlined mar-left" onclick="postApplyContent(true)">
+				<button class="button is-outlined mar-left" onclick="postApplyContent(true)">
 					<span class="icon is-small">
 						<i class="fas fa-save"></i>
 					</span>
@@ -314,7 +314,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 					</span>
 				</button>
 
-				<button class="button  is-outlined" onclick="postApplyContent(false)">
+				<button class="button is-outlined" onclick="postApplyContent(false)">
 					<span class="icon is-small">
 						<i class="fas fa-reply"></i>
 					</span>
@@ -325,15 +325,30 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 				</button>
 
 				<div id="status-info-wrapper">
-					<span id="status-info"></span>
+					<div>
+						<span id="status-info"></span>
+					</div>
 				</div>
 
-				<button style="float: right;" class="button  is-outlined" onclick="toggleHelpModal(true)">
-					<span class="icon is-small">
-						<i class="fas fa-question"></i>
-					</span>
-					<span>Help</span>
-				</button>
+				<div>
+					<button style="margin-right: 1em" class="button is-outlined" onclick="trimAllCells()">
+						<span class="icon is-small">
+							<i class="fas fa-hand-scissors"></i>
+						</span>
+						<span>Trim</span>
+						<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left" data-tooltip="Trims ever cell in the Table (removes leading and trailing spaces, tabs, ...). This Will also clear  Undo/Redo!">
+							<i class="fas fa-question-circle"></i>
+						</span>
+					</button>
+	
+					<button class="button is-outlined" onclick="toggleHelpModal(true)">
+						<span class="icon is-small">
+							<i class="fas fa-question"></i>
+						</span>
+						<span>Help</span>
+					</button>
+				</div>
+				
 		</div>
 			<div id="received-csv-prog-bar-wrapper">
 				<progress id="received-csv-prog-bar" class="progress is-info" value="50" max="100"></progress>
@@ -431,7 +446,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 						<span>Reset</span>
 					</button>
 
-					<button style="margin-left: 0.5em" class="button  is-outlined" onclick="toggleAskReadAgainModal(false)">
+					<button style="margin-left: 0.5em" class="button is-outlined" onclick="toggleAskReadAgainModal(false)">
 						<span>Cancel</span>
 					</button>
 				</div>

@@ -39,6 +39,10 @@ html, body {
 	min-width: 180px;
 }
 
+.options-bar:not(:last-child) {
+	margin-right: 5px;
+}
+
 .all-options {
 	display: flex;
 	align-items: baseline;
@@ -128,6 +132,29 @@ input.input {
 	position: relative;
 }
 
+.table-action-buttons .separated-btns {
+	display: flex;
+}
+
+.table-action-buttons .separated-btns button:not(:last-child) {
+	margin-right: 5px;
+}
+
+#status-info-wrapper {
+	flex: 1;
+	display: inline-block;
+	padding: 0.3em 1em 0.3em 0.3em;
+	overflow: hidden;
+}
+
+#status-info-wrapper > div {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+#status-info {
+	white-space: nowrap;
+}
+
 #received-csv-prog-bar {
 	height: 5px;
 }
@@ -185,10 +212,3 @@ input.input {
 	margin: auto;
 }
 
-#status-info-wrapper {
-	display: inline-block;
-	padding: 0.3em
-}
-#status-info {
-
-}

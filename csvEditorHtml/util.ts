@@ -16,6 +16,38 @@ function _getById(id: string): HTMLElement {
 }
 
 /**
+ * ensures that all rows inside data have the same length
+ * this also trims all cell values
+ * @param data 
+ * @param csvReadConfig 
+ */
+function _normalizeDataArray(data: string[][], csvReadConfig: CsvReadOptions, fillString = '') {
+
+	
+	const maxCols = data.reduce((prev, curr) => curr.length > prev ? curr.length : prev, 0)
+
+	for (let i = 0; i < data.length; i++) {
+		const row = data[i];
+
+		if (row.length < maxCols) {
+			row.push(...Array.from(Array(maxCols - row.length), (p, index) => fillString))
+		}
+
+		//trim cell values to normalize
+		// if(trimWhitespace) {
+		// 	for (let j = 0; j < row.length; j++) {
+
+		// 		if (row[j] === null || row[j] === undefined) continue
+	
+		// 		row[j] = row[j].trim()
+		// 	}
+		// }
+
+	}
+
+}
+
+/**
  * generates column labels: column 1, column 2, ....
  * @param index 0 based
  */
@@ -94,6 +126,19 @@ function commentValueRenderer(instance: Handsontable, td: HTMLTableDataCellEleme
 
 (Handsontable.renderers as any).registerRenderer('commentValueRenderer', commentValueRenderer);
 
+// function invisiblesCellValueRenderer(instance: Handsontable, td: HTMLTableDataCellElement, row: number, col: number, prop: any, value: string | null, cellProperties: any) {
+// 	//@ts-ignore
+// 	const val = Handsontable.helper.stringify(value);
+
+// 	console.log(value)
+
+// 	td.innerText = val.replace(/\ /g, '·').replace(/\	/g, '⇥')
+
+// 	return td
+// }
+
+// (Handsontable.renderers as any).registerRenderer('invisiblesCellValueRenderer', invisiblesCellValueRenderer);
+
 /**
  * overwrites a single option
  * warns and returns if the an option name is not found in targetOptions or options
@@ -101,7 +146,7 @@ function commentValueRenderer(instance: Handsontable, td: HTMLTableDataCellEleme
  * @param {*} options the option to take the value from
  * @param {*} optionName the option name
  */
-function _setOption<T>(targetOptions: T, options: T, optionName: keyof T) {
+function _setOption<T extends {}>(targetOptions: T, options: T, optionName: keyof T) {
 
 	if (options.hasOwnProperty(optionName)) {
 

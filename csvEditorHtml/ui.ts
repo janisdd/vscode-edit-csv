@@ -134,7 +134,7 @@ function applyHasHeader(fromUndo = false) {
 	if (data.length === 0) {
 		return
 	}
-	
+
 	if (!hot) throw new Error('table was null')
 
 	const elWrite = _getById('has-header-write') as HTMLInputElement //or defaultCsvWriteOptions.header
@@ -309,35 +309,6 @@ function copyPreviewToClipboard() {
 
 /* --- other --- */
 
-/**
- * ensures that all rows inside data have the same length
- * this also trims all cell values
- * @param data 
- * @param csvReadConfig 
- */
-function _normalizeDataArray(data: string[][], csvReadConfig: CsvReadOptions, fillString = '') {
-
-	
-	const maxCols = data.reduce((prev, curr) => curr.length > prev ? curr.length : prev, 0)
-
-	for (let i = 0; i < data.length; i++) {
-		const row = data[i];
-		if (row.length < maxCols) {
-			row.push(...Array.from(Array(maxCols - row.length), (p, index) => fillString))
-		}
-
-		//handsontable trims cell values as soon as we finish editing it
-		//we could disable this in the settings (trimWhitespace) but this is ok for now
-		for (let j = 0; j < row.length; j++) {
-
-			if (row[j] === null || row[j] === undefined) continue
-
-			row[j] = row[j].trim()
-		}
-
-	}
-
-}
 
 /**
  * display the given data in the handson table
@@ -372,6 +343,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 	//@ts-ignore
 	hot = new Handsontable(container, {
 		data,
+		trimWhitespace: false,
 		rowHeaderWidth: getRowHeaderWidth(data.length),
 		renderAllRows: false, //use false and small table size for fast initial render, see https://handsontable.com/docs/7.0.2/Options.html#renderAllRows
 		rowHeaders: function (row: number) { //the visual row index
@@ -401,34 +373,35 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 		outsideClickDeselects: false, //keep selection
 
-		cells: highlightCsvComments 
-		? function(row, col) {
-			var cellProperties: GridSettings = {};
-			cellProperties.renderer = 'commentValueRenderer' //is registered in util
+		cells: highlightCsvComments
+			? function (row, col) {
+				var cellProperties: GridSettings = {};
+				cellProperties.renderer = 'commentValueRenderer' //is registered in util
+				// cellProperties.renderer = 'invisiblesCellValueRenderer' //is registered in util
 
-			if (row === undefined || row === null) return cellProperties
-			if (col === undefined || col === null) return cellProperties
+				if (row === undefined || row === null) return cellProperties
+				if (col === undefined || col === null) return cellProperties
 
-			//@ts-ignore
-			const _hot = this.instance as Handsontable
-			// const tableData = _hot.getData() //this is slooooooow, getDataAtCell is much faster
-
-			//we should always have 1 col
-			const firstCellVal = _hot.getDataAtCell(row, 0) //tableData[row][0]
-
-			if (firstCellVal === null) return cellProperties
-			
-			if (typeof csvReadConfig.comments === 'string' && firstCellVal.trim().startsWith(csvReadConfig.comments)) {
 				//@ts-ignore
-				cellProperties._isComment = true
-			} else {
-				//@ts-ignore
-				cellProperties._isComment = false
+				const _hot = this.instance as Handsontable
+				// const tableData = _hot.getData() //this is slooooooow, getDataAtCell is much faster
+
+				//we should always have 1 col
+				const firstCellVal = _hot.getDataAtCell(row, 0) //tableData[row][0]
+
+				if (firstCellVal === null) return cellProperties
+
+				if (typeof csvReadConfig.comments === 'string' && firstCellVal.trim().startsWith(csvReadConfig.comments)) {
+					//@ts-ignore
+					cellProperties._isComment = true
+				} else {
+					//@ts-ignore
+					cellProperties._isComment = false
+				}
+
+				return cellProperties
 			}
-			
-			return cellProperties
-		}
-		: undefined,
+			: undefined,
 
 		//not fully working... we would handle already comment cells
 		// beforeChange: function (changes) {
@@ -436,21 +409,21 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		// 	if (!changes || changes.length !== 1) return
 
 		// 	console.log(changes)
-			
+
 		// 	const rowIndex = changes[0][0]
 		// 	const colIndex = changes[0][1] as number
 		// 	const oldVal = changes[0][2]
 		// 	const newVal = changes[0][3]
 
 		// 	if (oldVal === newVal) return //user only started editing then canceled
-			
+
 		// 	if (typeof csvReadConfig.comments === 'string' && colIndex === 0 && newVal.trim().startsWith(csvReadConfig.comments)) {
 		// 		//this is now a merged comment row
 		// 		const _tmp = transformIntoCommentRow(rowIndex, csvReadConfig)
 		// 		changes[0][3] =  _tmp
 		// 		console.log(_tmp)
 		// 	}
-			
+
 		// },
 
 		//TODO see https://github.com/handsontable/handsontable/issues/3328
@@ -460,16 +433,16 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			//allColSizes is not always up to date... only set on window resize... when the bug is fixed we need to change this...
 
 			// if (allColSizes.length > 0 && isDoubleClick) {
-				// const oldSize = allColSizes[currentColumn]
+			// const oldSize = allColSizes[currentColumn]
 
-				if (oldSize === newSize) {
-					//e.g. we have a large column and the auto size is too large...
-					if (initialConfig) {
-						return initialConfig.doubleClickColumnHandleForcedWith
-					} else {
-						console.log(`initialConfig is falsy`)
-					}
+			if (oldSize === newSize) {
+				//e.g. we have a large column and the auto size is too large...
+				if (initialConfig) {
+					return initialConfig.doubleClickColumnHandleForcedWith
+				} else {
+					console.log(`initialConfig is falsy`)
 				}
+			}
 			// }
 		},
 		enterMoves: function (event: KeyboardEvent) {
@@ -655,7 +628,7 @@ function onResizeGrid() {
 function defaultColHeaderFunc(colIndex: number, colName: string | undefined | null) {
 
 	let text = getSpreadsheetColumnLabel(colIndex)
-	
+
 
 	//null can also happen if we enable header, add column, disable header, enable header (then the new column have null values)
 	if (colName !== undefined && colName !== null) {
@@ -813,11 +786,52 @@ function addColumn(selectNewColumn = true) {
  * @param rows total number of rows
  */
 function getRowHeaderWidth(rows: number) {
-	const parentPadding = 5*2 //th has 1 border + 4 padding on both sides
+	const parentPadding = 5 * 2 //th has 1 border + 4 padding on both sides
 	const widthMultiplyFactor = 10 //0-9 are all <10px width (with the current font)
 	const iconPadding = 4
 	const binIcon = 14
 	const len = rows.toString().length * widthMultiplyFactor + binIcon + iconPadding + parentPadding
 	return len
 	//or Math.ceil(Math.log10(num + 1)) from https://stackoverflow.com/questions/10952615/length-of-number-in-javascript
+}
+
+function trimAllCells() {
+
+	if (!hot) throw new Error('table was null')
+
+	const numRows = hot.countRows()
+	const numCols = hot.countCols()
+	const allData = getData()
+	let data: string = ''
+
+	for (let row = 0; row < numRows; row++) {
+		for (let col = 0; col < numCols; col++) {
+			data = allData[row][col]
+
+			if (typeof data !== "string") {
+				// console.log(`${row}, ${col} no string`)
+				continue
+			}
+
+			allData[row][col] = data.trim()
+			//tooo slow for large tables
+			// hot.setDataAtCell(row, col, data.trim())
+		}
+	}
+
+	hot.updateSettings({
+		data: allData
+	}, false)
+
+	// const afterData = getData()
+
+	// for (let row = 0; row < numRows; row++) {
+	// 	for (let col = 0; col < numCols; col++) {
+
+	// 		if (afterData[row][col] !== allData[row][col]) {
+	// 			console.log(`${row}, ${col}`)
+	// 		}
+	// 	}
+	// }
+
 }
