@@ -328,7 +328,7 @@ function createEditorHtml(context, initialContent) {
 
 				<div class="flexed">
 
-					<div>
+						<div>
 						<button id="show-comments-btn" style="margin-right: 1em" class="button is-outlined" onclick="showOrHideAllComments(true)">
 							<span class="icon is-small">
 								<i class="far fa-comments"></i>
@@ -340,6 +340,10 @@ function createEditorHtml(context, initialContent) {
 								<i class="fas fa-comments"></i>
 							</span>
 							<span>Hide comments</span>
+							<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
+								data-tooltip="Hides rows starting with a comment .Hidden rows are also exported.">
+								<i class="fas fa-question-circle"></i>
+							</span>
 						</button>
 					</div>
 
@@ -424,15 +428,17 @@ function createEditorHtml(context, initialContent) {
 				<h3 class="title is-3">Hints</h3>
 				<div class="content">
 					<ul>
-							<li>Cell values are always trimmed</li>
+						<li>Hidden rows are also exported</li>
 						<li>If you edit an unnamed (csv) file and close it then the editor will be closed too (unsaved changes will
 							be lost)!</li>
 						<li>Sorting state is exported</li>
 						<li>All cell values are strings thus sorting might behave differently than expected</li>
 						<li>Copy & Past use tab (<div class="keys">⇥</div>) as separator (same as excel)</li>
-						<li>You cannot change the new line character (because vs code automatically converts it to the file setting i think)
+						<li>You cannot change the new line character (because vs code automatically converts it to the file setting
+							i think)
 						</li>
-						<li>If a row has more cell than the others empty cells are added to match the row with the highest cell count</li>
+						<li>If a row has more cell than the others empty cells are added to match the row with the highest cell
+							count</li>
 						<li>Extension configuration is only applied for new editors</li>
 					</ul>
 				</div>

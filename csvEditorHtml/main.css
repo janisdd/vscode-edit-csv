@@ -221,5 +221,24 @@ tr + tr.hidden-row {
 }
 
 tr.hidden-row + tr > th {
-	background-color: blue !important
+	position: relative;
+	overflow: visible;
+}
+
+tr.hidden-row + tr > th:before {
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+	content: '\f0dd';
+	position: absolute;
+	right: 0;
+	top: -20px;
+}
+
+tr.hidden-row + tr > th:after {
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+	content: '\f0de';
+	position: absolute;
+	right: 0;
+	top: -3px;
 }

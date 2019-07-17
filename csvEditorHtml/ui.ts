@@ -971,7 +971,8 @@ function getRowHeaderWidth(rows: number) {
 	const widthMultiplyFactor = 10 //0-9 are all <10px width (with the current font)
 	const iconPadding = 4
 	const binIcon = 14
-	const len = rows.toString().length * widthMultiplyFactor + binIcon + iconPadding + parentPadding
+	const hiddenRowIcon = 10
+	const len = rows.toString().length * widthMultiplyFactor + binIcon + iconPadding + parentPadding + hiddenRowIcon
 	return len
 	//or Math.ceil(Math.log10(num + 1)) from https://stackoverflow.com/questions/10952615/length-of-number-in-javascript
 }
