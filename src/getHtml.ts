@@ -75,6 +75,8 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 	
 	<div class="page full-h">
 
+		<div class="page full-h">
+
 		<div class="all-options">
 
 			<div class="options-bar">
@@ -330,17 +332,34 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 					</div>
 				</div>
 
-				<div>
+				<div class="flexed">
+
+					<div>
+						<button id="show-comments-btn" style="margin-right: 1em" class="button is-outlined" onclick="showOrHideAllComments(true)">
+							<span class="icon is-small">
+								<i class="far fa-comments"></i>
+							</span>
+							<span>Show comments</span>
+						</button>
+						<button id="hide-comments-btn" style="margin-right: 1em" class="button is-outlined" onclick="showOrHideAllComments(false)">
+							<span class="icon is-small">
+								<i class="fas fa-comments"></i>
+							</span>
+							<span>Hide comments</span>
+						</button>
+					</div>
+
 					<button style="margin-right: 1em" class="button is-outlined" onclick="trimAllCells()">
 						<span class="icon is-small">
 							<i class="fas fa-hand-scissors"></i>
 						</span>
 						<span>Trim</span>
-						<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left" data-tooltip="Trims ever cell in the Table (removes leading and trailing spaces, tabs, ...). This Will also clear  Undo/Redo!">
+						<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
+							data-tooltip="Trims ever cell in the Table (removes leading and trailing spaces, tabs, ...). This Will also clear  Undo/Redo!">
 							<i class="fas fa-question-circle"></i>
 						</span>
 					</button>
-	
+
 					<button class="button is-outlined" onclick="toggleHelpModal(true)">
 						<span class="icon is-small">
 							<i class="fas fa-question"></i>
@@ -348,14 +367,14 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 						<span>Help</span>
 					</button>
 				</div>
-				
-		</div>
+
+			</div>
 			<div id="received-csv-prog-bar-wrapper">
 				<progress id="received-csv-prog-bar" class="progress is-info" value="50" max="100"></progress>
 			</div>
 		</div>
 
-		
+
 
 		<!-- main editor/grid area -->
 		<div id="csv-editor-wrapper" class="csv-editor-wrapper">

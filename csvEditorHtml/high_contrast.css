@@ -123,3 +123,20 @@ body.vscode-high-contrast {
 	/* background-color: #f7f7f7!important; */
 	color: #ff9d00;
 }
+
+/* context menu */
+.vscode-high-contrast  .htContextMenu table tbody tr td {
+	background-color: black !important;
+	border-color: #5c5c5c !important;
+}
+
+.vscode-high-contrast  .htContextMenu table tbody tr td:hover {
+	background-color: #ff0d0d !important;
+}
+.vscode-high-contrast  .htContextMenu table tbody tr td.htDisabled:hover {
+	background-color: black !important;
+}
+
+.vscode-high-contrast  .htContextMenu table.htCore {
+	border-color: #5c5c5c !important;
+}

@@ -212,3 +212,14 @@ input.input {
 	margin: auto;
 }
 
+.hidden-row {
+	display: none;
+}
+
+tr + tr.hidden-row {
+	background-color: red !important
+}
+
+tr.hidden-row + tr > th {
+	background-color: blue !important
+}

@@ -14,9 +14,9 @@ Execute the command `edit as csv` to open an editor for the current file.
 
 ## Important Notes
 
-- On initial load all rows are expanded to have all equal number of cells
+- On initial load all rows are expanded so that all rows have equal length (number of cells)
 
-- Plugin Versions **0.0.11** had an issue with loading and saving files with more than \~1 MB
+- Plugin Version **0.0.11** had an issue with loading and saving files with more than \~1 MB
 	- saved files were corrupted (content of the first \~1MB was repeated after the first \~1MB until the file size was reached)
 
 ## How this extension works
@@ -61,7 +61,8 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 	- thus changes can no longer be saved/applied
 	- maybe this can be resolved when https://github.com/Microsoft/vscode/issues/43768 is closed
 
-- there are probably *some* issues which enabling `hasHeader`, (and removing first) row and undoing/redoing that
+- there are probably *some* issues which enabling `hasHeader`, (and removing first row) and undoing/redoing that
+	- there are some issues with switching `hasHeader` option in combination with hiding comment rows and and undo/redo
 
 ## Alternatives
 

@@ -34,8 +34,10 @@ const defaultCsvContentIfEmpty = `,\n,`
  */
 let headerRow: Array<string | null> | null = null
 
+let hiddenPhysicalRowIndices: number[] = []
 
 //csv reader options + some ui options
+//this gets overwritten with the real configuration in setCsvReadOptionsInitial
 let defaultCsvReadOptions: CsvReadOptions = {
 	header: false, //always use false to get an array of arrays
 	comments: '#',
@@ -49,6 +51,7 @@ let defaultCsvReadOptions: CsvReadOptions = {
 }
 
 
+//this gets overwritten with the real configuration in setCsvWriteOptionsInitial
 let defaultCsvWriteOptions: CsvWriteOptions = {
 	header: false,
 	comments: '#',
@@ -77,6 +80,9 @@ const readDelimiterTooltipText = "Empty to auto detect"
 const receivedCsvProgBar = _getById('received-csv-prog-bar') as HTMLProgressElement
 const receivedCsvProgBarWrapper = _getById('received-csv-prog-bar-wrapper') as HTMLDivElement
 const statusInfo = _getById('status-info') as HTMLSpanElement
+
+const showCommentsBtn = _getById('show-comments-btn') as HTMLButtonElement
+const hideCommentsBtn = _getById('hide-comments-btn') as HTMLButtonElement
 
 /* main */
 

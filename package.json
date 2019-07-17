@@ -176,7 +176,7 @@
 				"csv-edit.lastRowEnterBehavior": {
 					"type": "string",
 					"default": "default",
-					"description": "if one edits a cell in the last row and presses enter what the editor should do",
+					"description": "if one edits a cell in the last row and presses enter what the editor should do (default is to jump to the first row in the next column)",
 					"enum": [
 						"default",
 						"createRow"
@@ -189,7 +189,7 @@
 				"csv-edit.lastColumnTabBehavior": {
 					"type": "string",
 					"default": "default",
-					"description": "if one edits a cell in the last column and presses tab what the editor should do",
+					"description": "if one edits a cell in the last column and presses tab what the editor should do (default is to jump to the first row in the first column)",
 					"enum": [
 						"default",
 						"createColumn"
@@ -323,6 +323,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "true: to always quote fields, false: not (only if necessary)"
+				},
+				"csv-edit.hideCommentsInitially": {
+					"type": "boolean",
+					"default": false,
+					"description": "true: Hides rows with comments initially found in the table, false: not hide rows with comments"
 				}
 			}
 		}
@@ -347,6 +352,6 @@
 		"@types/papaparse": "4.5.6",
 		"bulma": "0.7.4",
 		"bulma-extensions": "4.0.1",
-		"handsontable": "6.2.2"
+		"handsontable": "^6.2.2"
 	}
 }

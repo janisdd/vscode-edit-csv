@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## 0.0.13
+
+- added buttons to hide and show rows with comments
+- added context menu to insert/remove rows/columns at arbitrary positions
+- added context menu options alignment
+- fixed issue where sorting and comment highlighting was not synced
+- fixed issue where deleting a sorted column would not reset sorting
+
 ## 0.0.12
 
 - fixed critical bug where files with more than \~1MB are not properly loaded and saved

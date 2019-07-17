@@ -46,3 +46,19 @@ body.vscode-light {
 	/* background-color: #f7f7f7!important; */
 	color: #b1b1b1;
 }
+
+/* context menu */
+.vscode-light .htContextMenu table tbody tr td {
+	background-color: white !important;
+}
+
+.vscode-light .htContextMenu table tbody tr td:hover {
+	background-color: #e4e4e4 !important;
+}
+.vscode-light .htContextMenu table tbody tr td.htDisabled:hover {
+	background-color: white !important;
+}
+
+.vscode-light .htContextMenu table.htCore {
+	/* border-color: #5c5c5c !important; */
+}

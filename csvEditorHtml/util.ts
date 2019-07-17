@@ -48,6 +48,28 @@ function _normalizeDataArray(data: string[][], csvReadConfig: CsvReadOptions, fi
 }
 
 /**
+ * returns the rows starting with a comment string
+ * if comments are treated as normal rows an empty array is returned
+ * @param data 
+ * @param csvReadConfig 
+ */
+function _getCommentIndices(data: string[][], csvReadConfig: CsvReadOptions): number[] {
+
+	if (typeof csvReadConfig.comments !== "string") return []
+
+	let commentIndices: number[] = []
+
+	for (let i = 0; i < data.length; i++) {
+		const row = data[i];
+
+		if (row.length > 0 && row[0].trim().startsWith(csvReadConfig.comments)) {
+			commentIndices.push(i)
+		}
+	}
+	return commentIndices
+}
+
+/**
  * generates column labels: column 1, column 2, ....
  * @param index 0 based
  */
@@ -316,6 +338,9 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 		toggleWriteOptions(true)
 		togglePreview(true)
 
+		showCommentsBtn.style.display = 'none'
+		hideCommentsBtn.style.display = 'initial'
+
 		return
 	}
 
@@ -409,6 +434,15 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 			_error(`unknown previewOptionsAppearance: ${initialConfig.previewOptionsAppearance}`)
 			break;
 		}
+	}
+
+	if (initialConfig.hideCommentsInitially) {
+		showCommentsBtn.style.display = 'initial'
+		hideCommentsBtn.style.display = 'none'
+	}
+	else {
+		showCommentsBtn.style.display = 'none'
+		hideCommentsBtn.style.display = 'initial'
 	}
 
 }

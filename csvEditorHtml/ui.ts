@@ -1,3 +1,4 @@
+type ContextMenuSettings = import("../node_modules/handsontable/handsontable").contextMenu.Settings
 
 
 type GridSettings = import("../node_modules/handsontable/handsontable").GridSettings
@@ -339,7 +340,13 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		hot.destroy()
 		hot = null
 	}
-	
+
+	const hideCommentsInitially = initialConfig ? initialConfig.hideCommentsInitially : false
+
+	if (hideCommentsInitially) {
+		hiddenPhysicalRowIndices = _getCommentIndices(data, csvReadConfig)
+	}
+
 	//@ts-ignore
 	hot = new Handsontable(container, {
 		data,
@@ -370,6 +377,53 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		manualColumnMove: true,
 		manualColumnResize: true,
 		columnSorting: true,
+		//see https://handsontable.com/docs/7.1.0/demo-context-menu.html
+		contextMenu: {
+			callback: function (key: string, ...others) {
+			},
+			items: {
+				'row_above': {},
+				'row_below': {},
+				'---------': {
+					name: '---------'
+				},
+				'col_left': {},
+				'col_right': {},
+				'---------2': {
+					name: '---------'
+				},
+				'remove_row': {
+					disabled: function () {
+
+						const selection = hot!.getSelected()
+						let allRowsAreSelected = false
+						if (selection) {
+							const selectedRowsCount = Math.abs(selection[0][0] - selection[0][2]) //starts at 0 --> +1
+							allRowsAreSelected = hot!.countRows() === selectedRowsCount + 1
+						}
+
+						return hot!.countRows() === 1 || allRowsAreSelected
+					}
+				},
+				'remove_col': {
+					disabled: function () {
+
+						const selection = hot!.getSelected()
+						let allColsAreSelected = false
+						if (selection) {
+							const selectedColsCount = Math.abs(selection[0][1] - selection[0][3]) //starts at 0 --> +1
+							allColsAreSelected = hot!.countCols() === selectedColsCount + 1
+						}
+
+						return hot!.countCols() === 1 || allColsAreSelected
+					}
+				},
+				'---------3': {
+					name: '---------'
+				},
+				'alignment': {},
+			}
+		} as ContextMenuSettings,
 
 		outsideClickDeselects: false, //keep selection
 
@@ -387,7 +441,8 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 				// const tableData = _hot.getData() //this is slooooooow, getDataAtCell is much faster
 
 				//we should always have 1 col
-				const firstCellVal = _hot.getDataAtCell(row, 0) //tableData[row][0]
+				const visualRowIndex = _hot.toVisualRow(row);
+				const firstCellVal = _hot.getDataAtCell(visualRowIndex, 0) //tableData[row][0]
 
 				if (firstCellVal === null) return cellProperties
 
@@ -557,7 +612,133 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			hot.updateSettings({
 				colHeaders: defaultColHeaderFunc as any
 			}, false)
-		}
+		},
+		afterGetRowHeader: function (visualRowIndex: number, th: any) {
+			const tr = th.parentNode as HTMLTableRowElement
+
+			if (!tr || !hot) return
+
+			//is row hidden?
+			let physicalIndex = hot.toPhysicalRow(visualRowIndex)
+
+			if (hiddenPhysicalRowIndices.indexOf(physicalIndex) === -1) {
+				tr.classList.remove('hidden-row')
+			} else {
+				tr.classList.add('hidden-row')
+			}
+		},
+		afterRemoveCol: function (visualColIndex, amount) {
+
+			if (!hot) return
+			const sortConfigs = hot.getPlugin('columnSorting').getSortConfig()
+
+			const sortedColumnIds = sortConfigs.map(p => hot!.toPhysicalColumn(p.column))
+
+			let removedColIds: number[] = []
+			for (let i = 0; i < amount; i++) {
+				removedColIds.push(hot!.toPhysicalColumn(visualColIndex + i))
+			}
+
+			//if we removed some col that was sorted then clear sorting...
+			if (sortedColumnIds.some(p => removedColIds.includes(p))) {
+				hot.getPlugin('columnSorting').clearSort()
+			}
+
+		},
+		afterCreateRow: function (visualRowIndex, amount) {
+			//we need to modify some or all hiddenPhysicalRowIndices...
+
+			for (let i = 0; i < hiddenPhysicalRowIndices.length; i++) {
+				const hiddenPhysicalRowIndex = hiddenPhysicalRowIndices[i];
+
+				if (hiddenPhysicalRowIndex >= visualRowIndex) {
+					hiddenPhysicalRowIndices[i] += amount
+				}
+			}
+		},
+		afterRemoveRow: function (visualRowIndex, amount) {
+			//we need to modify some or all hiddenPhysicalRowIndices...
+
+			for (let i = 0; i < hiddenPhysicalRowIndices.length; i++) {
+				const hiddenPhysicalRowIndex = hiddenPhysicalRowIndices[i];
+
+				if (hiddenPhysicalRowIndex >= visualRowIndex) {
+					hiddenPhysicalRowIndices[i] -= amount
+				}
+			}
+		},
+		//called when we select a row via row header
+		beforeSetRangeStartOnly: function (coords) {
+		},
+		beforeSetRangeStart: function (coords) {
+
+			if (!hot) return
+
+			if (hiddenPhysicalRowIndices.length === 0) return
+
+			const lastPossibleRowIndex = hot.countRows() - 1
+			const lastPossibleColIndex = hot.countCols() - 1
+			const actualSelection = hot.getSelectedLast()
+			let columnIndexModifier = 0
+			const isLastOrFirstRowHidden = hiddenPhysicalRowIndices.indexOf(lastPossibleRowIndex) !== -1
+				|| hiddenPhysicalRowIndices.indexOf(0) !== -1
+
+			let direction = 1 // or -1
+
+			if (actualSelection) {
+				const actualPhysicalIndex = hot.toPhysicalRow(actualSelection[0])
+				direction = actualPhysicalIndex < coords.row ? 1 : -1
+
+				//direction is invalid if actualPhysicalIndex === 0 && coords.row === lastPossibleRowIndex 
+				//this is because the last row is hidden...
+
+				//move up but last row is hidden
+				if (isLastOrFirstRowHidden && coords.row === lastPossibleRowIndex && actualPhysicalIndex === 0) { //
+					direction = -1
+				}
+				//move down on last row but first row is hidden
+				else if (isLastOrFirstRowHidden && coords.row === 0 && actualPhysicalIndex === lastPossibleRowIndex) {
+					direction = 1
+				}
+			}
+
+			const getNextRow: (a: number) => number = (visualRowIndex: number) => {
+
+				let visualRow = visualRowIndex;
+				//@ts-ignore
+				let physicalIndex = hot.toPhysicalRow(visualRowIndex)
+
+				if (visualRow > lastPossibleRowIndex) { //moved under the last row
+					columnIndexModifier = 1
+					return getNextRow(0)
+				}
+
+				if (visualRow < 0) { //we moved above row 0
+					columnIndexModifier = -1
+					return getNextRow(lastPossibleRowIndex)
+				}
+
+				if (hiddenPhysicalRowIndices.indexOf(physicalIndex) !== -1) {
+					//row is hidden
+					return getNextRow(visualRow + direction)
+				}
+
+				return visualRow
+			}
+
+			console.log(`tttt`)
+			coords.row = getNextRow(coords.row)
+			coords.col = coords.col + (isLastOrFirstRowHidden ? columnIndexModifier : 0)
+			if (coords.col > lastPossibleColIndex) {
+				coords.col = 0
+			}
+			else if (coords.col < 0) {
+				coords.col = lastPossibleColIndex
+			}
+		},
+		//called multiple times when we move mouse while selecting...
+		beforeSetRangeEnd: function (coords) {
+		},
 	})
 
 	//@ts-ignore
@@ -834,4 +1015,27 @@ function trimAllCells() {
 	// 	}
 	// }
 
+}
+
+function showOrHideAllComments(show: boolean) {
+
+	if (show) {
+		showCommentsBtn.style.display = 'none'
+		hideCommentsBtn.style.display = 'initial'
+
+		hiddenPhysicalRowIndices = []
+	}
+	else {
+		showCommentsBtn.style.display = 'initial'
+		hideCommentsBtn.style.display = 'none'
+
+		if (hot) {
+			hiddenPhysicalRowIndices = _getCommentIndices(getData(), defaultCsvReadOptions)
+			hiddenPhysicalRowIndices = hiddenPhysicalRowIndices.map(p => hot!.toPhysicalRow(p))
+		}
+	}
+
+	if (!hot) return
+
+	hot.render()
 }

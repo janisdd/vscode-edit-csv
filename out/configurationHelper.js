@@ -23,6 +23,7 @@ const defaultConfig = {
     openSourceFileAfterApply: false,
     selectTextAfterBeginEditCell: false,
     quoteAllFields: false,
+    hideCommentsInitially: false,
 };
 /**
  * returns the configuration for this extension
