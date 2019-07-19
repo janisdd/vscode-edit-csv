@@ -24,7 +24,7 @@ const defaultConfig: CsvEditSettings = {
 	openSourceFileAfterApply: false,
 	selectTextAfterBeginEditCell: false,
 	quoteAllFields: false,
-	hideCommentsInitially: false,
+	initiallyHideComments: false,
 }
 
 /**

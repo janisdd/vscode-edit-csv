@@ -63,6 +63,10 @@ let defaultCsvWriteOptions: CsvWriteOptions = {
 }
 let newLineFromInput = '\n'
 
+//we need to store this because for collapsed columns we need to change the selection
+//and we need to know if we we need to change the column or not
+let lastHandsonMoveWas: 'tab' | 'enter' | null = null
+
 /**
  * true: the cell/row color is changed if the first cell is a comment, (might have negative impact on performance e.g. for large data sets),
  * false: no additional highlighting (comments are still treated as comments)

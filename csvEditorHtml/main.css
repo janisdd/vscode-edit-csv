@@ -216,6 +216,15 @@ input.input {
 	display: none;
 }
 
+/* css cannot  select previous selements... */
+.hidden-row-previous-row {
+}
+
+.hidden-row-previous-row > th {
+	position: relative;
+	overflow: visible;
+}
+
 tr + tr.hidden-row {
 	background-color: red !important
 }
@@ -228,17 +237,19 @@ tr.hidden-row + tr > th {
 tr.hidden-row + tr > th:before {
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
-	content: '\f0dd';
-	position: absolute;
-	right: 0;
-	top: -20px;
-}
-
-tr.hidden-row + tr > th:after {
-	font-family: "Font Awesome 5 Free";
-	font-weight: 900;
 	content: '\f0de';
 	position: absolute;
 	right: 0;
 	top: -3px;
 }
+
+tr.hidden-row-previous-row > th:after {
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+	content: '\f0dd';
+	position: absolute;
+	right: 0;
+	bottom: -4px;
+}
+
+

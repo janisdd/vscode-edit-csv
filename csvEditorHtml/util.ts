@@ -436,7 +436,7 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 		}
 	}
 
-	if (initialConfig.hideCommentsInitially) {
+	if (initialConfig.initiallyHideComments) {
 		showCommentsBtn.style.display = 'initial'
 		hideCommentsBtn.style.display = 'none'
 	}

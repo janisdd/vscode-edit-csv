@@ -128,9 +128,9 @@ type CsvEditSettings = {
 	quoteAllFields: boolean
 
 	/**
-	 * true: Hides rows with comments initially found in the table, false: not hide rows with comments
+	 * true: Initially hides rows with comments found in the table, false: not hide rows with comments
 	 */
-	hideCommentsInitially: boolean
+	initiallyHideComments: boolean
 }
 
 /* --- frontend settings --- */

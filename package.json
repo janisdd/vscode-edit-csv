@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files",
-	"version": "0.0.12",
+	"version": "0.0.13",
 	"license": "MIT",
 	"publisher": "janisdd",
 	"engines": {
@@ -324,10 +324,10 @@
 					"default": false,
 					"description": "true: to always quote fields, false: not (only if necessary)"
 				},
-				"csv-edit.hideCommentsInitially": {
+				"csv-edit.initiallyHideComments": {
 					"type": "boolean",
 					"default": false,
-					"description": "true: Hides rows with comments initially found in the table, false: not hide rows with comments"
+					"description": "true: Initially hides rows with comments found in the table, false: not hide rows with comments"
 				}
 			}
 		}

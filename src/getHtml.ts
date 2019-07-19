@@ -44,350 +44,328 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 
 	const config = getExtensionConfiguration()
 
-	return `
-	<!DOCTYPE html>
-	<html>
-	<head>
-		<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: data:; script-src vscode-resource: 'unsafe-inline'; style-src vscode-resource: 'unsafe-inline'; font-src vscode-resource:;">
-
-		<style>
-			@font-face {
-				font-family: 'Font Awesome 5 Free';
-				font-weight: 900;
-				src: url("${iconFont}") format("woff2");
-			}
-		</style>
-
-		<link rel="stylesheet" href="${handsontableCss}">
-		<script src="${handsontableJs}"></script>
-		<script src="${papaparseJs}"></script>
-	
-		<link rel="stylesheet" href="${fontAwesomeCss}">
-	
-		<link rel="stylesheet" href="${bulmaCss}">
-		<link rel="stylesheet" href="${bulmaExtensionCss}">
-		<link rel="stylesheet" href="${mainCss}">
-		<link rel="stylesheet" href="${darkThemeCss}">
-		<link rel="stylesheet" href="${lightThemeCss}">
-		<link rel="stylesheet" href="${hightContrastThemeCss}">
-	</head>
-	<body>
-	
-	<div class="page full-h">
-
+	//use blocks so vs code adds folding
+	let bodyPageHtml = ``
+	 {
+		bodyPageHtml= `
 		<div class="page full-h">
-
-		<div class="all-options">
-
-			<div class="options-bar">
-				<div class="flexed">
-					<div class="options-title clickable" onclick="toggleReadOptions()">Read options <i id="read-options-icon"
-							class="fas fa-chevron-right"></i></div>
+	
+			<div class="all-options">
+	
+				<div class="options-bar">
+					<div class="flexed">
+						<div class="options-title clickable" onclick="toggleReadOptions()">Read options <i id="read-options-icon"
+								class="fas fa-chevron-right"></i></div>
+					</div>
+	
+					<div id="read-options-content" class="options-content">
+						<div>
+	
+							<div class="field">
+								<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked"
+									onchange="applyHasHeader()">
+								<label for="has-header">
+									<span>Has header</span>
+								</label>
+								<span class="tooltip is-tooltip-right is-tooltip-multiline"
+									data-tooltip="The first row is used as header. Note that changing this option will also change the write header option.">
+									<i class="fas fa-question-circle"></i>
+								</span>
+							</div>
+	
+							<!-- this makes the row data invalid if we have more than 1 col-->
+							<!-- <div class="field">
+									<input id="skip-empty-lines" type="checkbox" name="skip-empty-lines" class="switch is-rounded" checked="checked" onchange="setSkipEmptyLines()" disabled>
+									<label for="skip-empty-lines">
+										<span>Skip empty lines</span>
+										<span class="tooltip is-tooltip-multiline" data-tooltip="If enabled empty lines will be used as row. Disabled because empty rows are invalid if we have more than 1 column.">
+												<i class="fas fa-question-circle"></i>
+										</span>
+									</label>
+							</div> -->
+	
+							<!-- delimiter and comment -->
+							<div class="flexed">
+								<div class="field">
+									<label>
+										<span>Delimiter</span>
+										<span class="clickable tooltip" data-tooltip="Set to tab character"
+											onclick="setReadDelimiter('\t')">⇥</span>
+										<span id="read-delimiter-tooltip" class="tooltip" data-tooltip="Empty to auto detect">
+											<i class="fas fa-question-circle"></i>
+										</span>
+									</label>
+									<input id="delimiter-string" class="input" type="text" placeholder="auto"
+										oninput="setDelimiterString()">
+								</div>
+	
+								<div class="field mar-left">
+									<label>
+										<span>Comment</span>
+										<span class="tooltip is-tooltip-multiline"
+											data-tooltip="Comments before and after csv data are preserved. Comments between data rows are ignored. Empty to treat every line as data (no comments).">
+											<i class="fas fa-question-circle"></i>
+										</span>
+									</label>
+									<input id="comment-string" class="input" type="text" placeholder="Empty for no comments"
+										oninput="setCommentString()">
+								</div>
+							</div>
+	
+							<!-- quote and escape -->
+							<div class="flexed">
+								<div class="field">
+									<label>
+										<span>QuotChar</span>
+									</label>
+									<input id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()">
+								</div>
+	
+								<div class="field mar-left">
+									<label>
+										<span>EscapeChar</span>
+									</label>
+									<input id="escape-char-string" class="input" type="text" oninput="setEscapeCharString()">
+								</div>
+							</div>
+	
+	
+							<button class="button is-light" onclick="toggleAskReadAgainModal(true)">
+								<span>Reset data</span>
+								<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
+									data-tooltip="The input file content was stored locally and used as data. Thus this view is independent of the source file">
+									<i class="fas fa-question-circle"></i>
+								</span>
+							</button>
+	
+						</div>
+					</div>
 				</div>
-
-				<div id="read-options-content" class="options-content">
+	
+				<div class="options-bar">
 					<div>
-
+						<div class="options-title clickable" onclick="toggleWriteOptions()">Write options <i id="write-options-icon"
+								class="fas fa-chevron-right"></i></div>
+					</div>
+	
+					<div id="write-options-content" class="options-content">
 						<div class="field">
-							<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked"
-								onchange="applyHasHeader()">
-							<label for="has-header">
-								<span>Has header</span>
+							<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded"
+								checked="checked" onchange="setHasHeaderWrite()">
+							<label for="has-header-write">
+								<span>Write header</span>
 							</label>
-							<span class="tooltip is-tooltip-right is-tooltip-multiline"
-								data-tooltip="The first row is used as header. Note that changing this option will also change the write header option.">
+							<span class="tooltip is-tooltip-bottom" data-tooltip="Checked: writes the header row, unchecked: not">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</div>
-
-						<!-- this makes the row data invalid if we have more than 1 col-->
-						<!-- <div class="field">
-								<input id="skip-empty-lines" type="checkbox" name="skip-empty-lines" class="switch is-rounded" checked="checked" onchange="setSkipEmptyLines()" disabled>
-								<label for="skip-empty-lines">
-									<span>Skip empty lines</span>
-									<span class="tooltip is-tooltip-multiline" data-tooltip="If enabled empty lines will be used as row. Disabled because empty rows are invalid if we have more than 1 column.">
-											<i class="fas fa-question-circle"></i>
-									</span>
-								</label>
-						</div> -->
-
+	
 						<!-- delimiter and comment -->
 						<div class="flexed">
 							<div class="field">
-								<label>
-									<span>Delimiter</span>
-									<span class="clickable tooltip" data-tooltip="Set to tab character"
-										onclick="setReadDelimiter('\t')">⇥</span>
-									<span id="read-delimiter-tooltip" class="tooltip" data-tooltip="Empty to auto detect">
-										<i class="fas fa-question-circle"></i>
-									</span>
+								<label for="delimiter-string-write">
+									<label>
+										<span>Delimiter</span>
+										<span class="clickable tooltip" data-tooltip="Set to tab character"
+											onclick="setWriteDelimiter('\t')">⇥</span>
+										<span class="tooltip" data-tooltip="Empty to use delimiter from read">
+											<i class="fas fa-question-circle"></i>
+										</span>
+									</label>
 								</label>
-								<input id="delimiter-string" class="input" type="text" placeholder="auto"
-									oninput="setDelimiterString()">
+								<input id="delimiter-string-write" class="input" type="text" placeholder="auto"
+									oninput="setDelimiterStringWrite()">
 							</div>
-
+	
 							<div class="field mar-left">
-								<label>
-									<span>Comment</span>
-									<span class="tooltip is-tooltip-multiline"
-										data-tooltip="Comments before and after csv data are preserved. Comments between data rows are ignored. Empty to treat every line as data (no comments).">
-										<i class="fas fa-question-circle"></i>
-									</span>
+								<label for="comment-string-write">
+									<label>
+										<span>Comment</span>
+										<span class="tooltip is-tooltip-multiline"
+											data-tooltip="Empty for no comments. Comments before and after csv data are written if char is present. Empty to exclude comments.">
+											<i class="fas fa-question-circle"></i>
+										</span>
+									</label>
 								</label>
-								<input id="comment-string" class="input" type="text" placeholder="Empty for no comments"
-									oninput="setCommentString()">
+								<input id="comment-string-write" class="input" type="text" placeholder="Empty for no comments"
+									oninput="setCommentStringWrite()">
 							</div>
 						</div>
-
+	
 						<!-- quote and escape -->
 						<div class="flexed">
 							<div class="field">
 								<label>
 									<span>QuotChar</span>
 								</label>
-								<input id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()">
+								<input id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()">
 							</div>
-
+	
 							<div class="field mar-left">
 								<label>
 									<span>EscapeChar</span>
 								</label>
-								<input id="escape-char-string" class="input" type="text" oninput="setEscapeCharString()">
+								<input id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()">
 							</div>
 						</div>
-
-
-						<button class="button is-light" onclick="toggleAskReadAgainModal(true)">
-							<span>Reset data</span>
-							<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
-								data-tooltip="The input file content was stored locally and used as data. Thus this view is independent of the source file">
-								<i class="fas fa-question-circle"></i>
-							</span>
-						</button>
-
-					</div>
-				</div>
-			</div>
-
-			<div class="options-bar">
-				<div>
-					<div class="options-title clickable" onclick="toggleWriteOptions()">Write options <i id="write-options-icon"
-							class="fas fa-chevron-right"></i></div>
-				</div>
-
-				<div id="write-options-content" class="options-content">
-					<div class="field">
-						<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded"
-							checked="checked" onchange="setHasHeaderWrite()">
-						<label for="has-header-write">
-							<span>Write header</span>
-						</label>
-						<span class="tooltip is-tooltip-bottom" data-tooltip="Checked: writes the header row, unchecked: not">
-							<i class="fas fa-question-circle"></i>
-						</span>
-					</div>
-
-					<!-- delimiter and comment -->
-					<div class="flexed">
-						<div class="field">
-							<label for="delimiter-string-write">
-								<label>
-									<span>Delimiter</span>
-									<span class="clickable tooltip" data-tooltip="Set to tab character"
-										onclick="setWriteDelimiter('\t')">⇥</span>
-									<span class="tooltip" data-tooltip="Empty to use delimiter from read">
-										<i class="fas fa-question-circle"></i>
-									</span>
+	
+						<div class="flexed">
+	
+							<div class="field">
+								<input id="quote-all-fields-write" type="checkbox" name="quote-all-fields-write" class="switch is-rounded"
+									checked="checked" onchange="setQuoteAllFieldsWrite()">
+								<label for="quote-all-fields-write">
+									<span>Quote all fields</span>
 								</label>
-							</label>
-							<input id="delimiter-string-write" class="input" type="text" placeholder="auto"
-								oninput="setDelimiterStringWrite()">
+							</div>
+	
 						</div>
-
-						<div class="field mar-left">
-							<label for="comment-string-write">
-								<label>
-									<span>Comment</span>
-									<span class="tooltip is-tooltip-multiline"
-										data-tooltip="Empty for no comments. Comments before and after csv data are written if char is present. Empty to exclude comments.">
-										<i class="fas fa-question-circle"></i>
-									</span>
-								</label>
-							</label>
-							<input id="comment-string-write" class="input" type="text" placeholder="Empty for no comments"
-								oninput="setCommentStringWrite()">
+	
+						<!-- see help modal why -->
+						<div class="field" style="display: none;">
+							<label for="comment-string-write">NewLine</label>
+							<div class="select">
+								<select id="newline-select-write" onchange="setNewLineWrite()">
+									<option value="">Same as input</option>
+									<option value="crlf">Windows (CRLF)</option>
+									<option value="lf">Linux/Mac (LF)</option>
+								</select>
+							</div>
 						</div>
+	
 					</div>
-
-					<!-- quote and escape -->
-					<div class="flexed">
-						<div class="field">
-							<label>
-								<span>QuotChar</span>
-							</label>
-							<input id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()">
-						</div>
-
-						<div class="field mar-left">
-							<label>
-								<span>EscapeChar</span>
-							</label>
-							<input id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()">
-						</div>
-					</div>
-
-					<div class="flexed">
-
-						<div class="field">
-							<input id="quote-all-fields-write" type="checkbox" name="quote-all-fields-write" class="switch is-rounded"
-								checked="checked" onchange="setQuoteAllFieldsWrite()">
-							<label for="quote-all-fields-write">
-								<span>Quote all fields</span>
-							</label>
-						</div>
-
-					</div>
-
-					<!-- see help modal why -->
-					<div class="field" style="display: none;">
-						<label for="comment-string-write">NewLine</label>
-						<div class="select">
-							<select id="newline-select-write" onchange="setNewLineWrite()">
-								<option value="">Same as input</option>
-								<option value="crlf">Windows (CRLF)</option>
-								<option value="lf">Linux/Mac (LF)</option>
-							</select>
-						</div>
-					</div>
-
 				</div>
-			</div>
-
-			<div class="options-bar" style="flex: 1;">
-				<div>
-					<div class="options-title">
-						<span class="clickable" onclick="togglePreview()">Preview</span>
-						<span><button class="button is-light is-small" style="vertical-align: middle;"
-								onclick="generateCsvPreview()">Generate</button></span>
-						<span class="clickable" onclick="togglePreview()">
-							<i id="preview-icon" class="fas fa-chevron-right"></i>
-						</span>
-
-						<span class="mar-left-half clickable" onclick="copyPreviewToClipboard()"
-							title="Creates the preview and copies it to the clipboard">
-							<i id="preview-copy-icon" class="fas fa-paste"></i>
-						</span>
-					</div>
-
-				</div>
-
-				<div id="preview-content" class="options-content">
-					<textarea id="csv-preview" class="textarea preview-csv-textarea"></textarea>
-				</div>
-
-			</div>
-		</div>
-
-		<div class="table-action-buttons">
-
-			<div class="separated-btns">
-				<button class="button is-outlined" onclick="addRow()">
-					<span class="icon is-small">
-						<i class="fas fa-plus"></i>
-					</span>
-					<span>Add row</span>
-				</button>
-
-				<button class="button is-outlined" onclick="addColumn()">
-					<span class="icon is-small">
-						<i class="fas fa-plus"></i>
-					</span>
-					<span>Add column</span>
-				</button>
-
-				<button class="button is-outlined mar-left" onclick="postApplyContent(true)">
-					<span class="icon is-small">
-						<i class="fas fa-save"></i>
-					</span>
-					<span>Apply and save</span>
-					<span class="tooltip is-tooltip-multiline mar-left-half"
-						data-tooltip="Applies the csv content back to the source file and saves the source file">
-						<i class="fas fa-question-circle"></i>
-					</span>
-				</button>
-
-				<button class="button is-outlined" onclick="postApplyContent(false)">
-					<span class="icon is-small">
-						<i class="fas fa-reply"></i>
-					</span>
-					<span>Apply</span>
-					<span class="tooltip mar-left-half" data-tooltip="Applies the csv content back to the source file">
-						<i class="fas fa-question-circle"></i>
-					</span>
-				</button>
-
-				<div id="status-info-wrapper">
+	
+				<div class="options-bar" style="flex: 1;">
 					<div>
-						<span id="status-info"></span>
+						<div class="options-title">
+							<span class="clickable" onclick="togglePreview()">Preview</span>
+							<span><button class="button is-light is-small" style="vertical-align: middle;"
+									onclick="generateCsvPreview()">Generate</button></span>
+							<span class="clickable" onclick="togglePreview()">
+								<i id="preview-icon" class="fas fa-chevron-right"></i>
+							</span>
+	
+							<span class="mar-left-half clickable" onclick="copyPreviewToClipboard()"
+								title="Creates the preview and copies it to the clipboard">
+								<i id="preview-copy-icon" class="fas fa-paste"></i>
+							</span>
+						</div>
+	
 					</div>
+	
+					<div id="preview-content" class="options-content">
+						<textarea id="csv-preview" class="textarea preview-csv-textarea"></textarea>
+					</div>
+	
 				</div>
-
-				<div class="flexed">
-
-						<div>
-						<button id="show-comments-btn" style="margin-right: 1em" class="button is-outlined" onclick="showOrHideAllComments(true)">
-							<span class="icon is-small">
-								<i class="far fa-comments"></i>
-							</span>
-							<span>Show comments</span>
-						</button>
-						<button id="hide-comments-btn" style="margin-right: 1em" class="button is-outlined" onclick="showOrHideAllComments(false)">
-							<span class="icon is-small">
-								<i class="fas fa-comments"></i>
-							</span>
-							<span>Hide comments</span>
-							<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
-								data-tooltip="Hides rows starting with a comment .Hidden rows are also exported.">
-								<i class="fas fa-question-circle"></i>
-							</span>
-						</button>
-					</div>
-
-					<button style="margin-right: 1em" class="button is-outlined" onclick="trimAllCells()">
+			</div>
+	
+			<div class="table-action-buttons">
+	
+				<div class="separated-btns">
+					<button class="button is-outlined" onclick="addRow()">
 						<span class="icon is-small">
-							<i class="fas fa-hand-scissors"></i>
+							<i class="fas fa-plus"></i>
 						</span>
-						<span>Trim</span>
-						<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
-							data-tooltip="Trims ever cell in the Table (removes leading and trailing spaces, tabs, ...). This Will also clear  Undo/Redo!">
+						<span>Add row</span>
+					</button>
+	
+					<button class="button is-outlined" onclick="addColumn()">
+						<span class="icon is-small">
+							<i class="fas fa-plus"></i>
+						</span>
+						<span>Add column</span>
+					</button>
+	
+					<button class="button is-outlined mar-left" onclick="postApplyContent(true)">
+						<span class="icon is-small">
+							<i class="fas fa-save"></i>
+						</span>
+						<span>Apply and save</span>
+						<span class="tooltip is-tooltip-multiline mar-left-half"
+							data-tooltip="Applies the csv content back to the source file and saves the source file">
 							<i class="fas fa-question-circle"></i>
 						</span>
 					</button>
-
-					<button class="button is-outlined" onclick="toggleHelpModal(true)">
+	
+					<button class="button is-outlined" onclick="postApplyContent(false)">
 						<span class="icon is-small">
-							<i class="fas fa-question"></i>
+							<i class="fas fa-reply"></i>
 						</span>
-						<span>Help</span>
+						<span>Apply</span>
+						<span class="tooltip mar-left-half" data-tooltip="Applies the csv content back to the source file">
+							<i class="fas fa-question-circle"></i>
+						</span>
 					</button>
+	
+					<div id="status-info-wrapper">
+						<div>
+							<span id="status-info"></span>
+						</div>
+					</div>
+	
+					<div class="flexed">
+	
+						<div>
+							<button id="show-comments-btn" style="margin-right: 1em" class="button is-outlined" onclick="showOrHideAllComments(true)">
+								<span class="icon is-small">
+									<i class="far fa-comments"></i>
+								</span>
+								<span>Show comments</span>
+							</button>
+							<button id="hide-comments-btn" style="margin-right: 1em" class="button is-outlined" onclick="showOrHideAllComments(false)">
+								<span class="icon is-small">
+									<i class="fas fa-comments"></i>
+								</span>
+								<span>Hide comments</span>
+								<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
+									data-tooltip="Hides rows starting with a comment. The row headers will display an indicator if a row above or below is hidden. Hidden rows are also exported!">
+									<i class="fas fa-question-circle"></i>
+								</span>
+							</button>
+						</div>
+	
+						<button style="margin-right: 1em" class="button is-outlined" onclick="trimAllCells()">
+							<span class="icon is-small">
+								<i class="fas fa-hand-scissors"></i>
+							</span>
+							<span>Trim</span>
+							<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
+								data-tooltip="Trims ever cell in the table (removes leading and trailing spaces, tabs, ...). This will also clear  undo/redo!">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</button>
+	
+						<button class="button is-outlined" onclick="toggleHelpModal(true)">
+							<span class="icon is-small">
+								<i class="fas fa-question"></i>
+							</span>
+							<span>Help</span>
+						</button>
+					</div>
+	
 				</div>
-
+				<div id="received-csv-prog-bar-wrapper">
+					<progress id="received-csv-prog-bar" class="progress is-info" value="50" max="100"></progress>
+				</div>
 			</div>
-			<div id="received-csv-prog-bar-wrapper">
-				<progress id="received-csv-prog-bar" class="progress is-info" value="50" max="100"></progress>
+	
+	
+	
+			<!-- main editor/grid area -->
+			<div id="csv-editor-wrapper" class="csv-editor-wrapper">
+				<div id="csv-editor"></div>
 			</div>
+	
 		</div>
+		`
+	 }
 
-
-
-		<!-- main editor/grid area -->
-		<div id="csv-editor-wrapper" class="csv-editor-wrapper">
-			<div id="csv-editor"></div>
-		</div>
-
-	</div>
-
-	<div id="help-modal" class="modal help-modal">
+	let helpModalHtml = ``
+	{
+		helpModalHtml = `
+		<div id="help-modal" class="modal help-modal">
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<div class="box">
@@ -454,8 +432,14 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 		</div>
 		<button class="modal-close is-large" aria-label="close" onclick="toggleHelpModal(false)"></button>
 	</div>
-
-	<div id="ask-read-again-modal" class="modal help-modal">
+		`
+	}
+	
+	
+	let askReadAgainModalHtml = ``
+	{
+		askReadAgainModalHtml = `
+		<div id="ask-read-again-modal" class="modal help-modal">
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<div class="box">
@@ -479,8 +463,43 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 			</div>
 		</div>
 		<button class="modal-close is-large" aria-label="close" onclick="toggleAskReadAgainModal(false)"></button>
-	</div>
+	</div>`
+	}
 
+	return `
+	<!DOCTYPE html>
+	<html>
+	<head>
+		<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: data:; script-src vscode-resource: 'unsafe-inline'; style-src vscode-resource: 'unsafe-inline'; font-src vscode-resource:;">
+
+		<style>
+			@font-face {
+				font-family: 'Font Awesome 5 Free';
+				font-weight: 900;
+				src: url("${iconFont}") format("woff2");
+			}
+		</style>
+
+		<link rel="stylesheet" href="${handsontableCss}">
+		<script src="${handsontableJs}"></script>
+		<script src="${papaparseJs}"></script>
+	
+		<link rel="stylesheet" href="${fontAwesomeCss}">
+	
+		<link rel="stylesheet" href="${bulmaCss}">
+		<link rel="stylesheet" href="${bulmaExtensionCss}">
+		<link rel="stylesheet" href="${mainCss}">
+		<link rel="stylesheet" href="${darkThemeCss}">
+		<link rel="stylesheet" href="${lightThemeCss}">
+		<link rel="stylesheet" href="${hightContrastThemeCss}">
+	</head>
+	<body>
+	
+	${bodyPageHtml}
+
+	${helpModalHtml}
+
+	${askReadAgainModalHtml}
 
 	<script>
 	var initialConfig = ${JSON.stringify(config)};

@@ -341,9 +341,9 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		hot = null
 	}
 
-	const hideCommentsInitially = initialConfig ? initialConfig.hideCommentsInitially : false
+	const initiallyHideComments = initialConfig ? initialConfig.initiallyHideComments : false
 
-	if (hideCommentsInitially) {
+	if (initiallyHideComments) {
 		hiddenPhysicalRowIndices = _getCommentIndices(data, csvReadConfig)
 	}
 
@@ -504,6 +504,8 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 			if (!hot) throw new Error('table was null')
 
+			lastHandsonMoveWas = 'enter'
+
 			const selection = hot.getSelected()
 			const _default = {
 				row: 1,
@@ -531,6 +533,8 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		tabMoves: function (event: KeyboardEvent) {
 
 			if (!hot) throw new Error('table was null')
+
+			lastHandsonMoveWas = 'tab'
 
 			const selection = hot.getSelected()
 			const _default = {
@@ -623,8 +627,18 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 			if (hiddenPhysicalRowIndices.indexOf(physicalIndex) === -1) {
 				tr.classList.remove('hidden-row')
+
+				if (tr.previousElementSibling) {
+					tr.previousElementSibling.classList.remove('hidden-row-previous-row')
+				}
+
 			} else {
 				tr.classList.add('hidden-row')
+
+				//css cannot select previous elements...add a separate class
+				if (tr.previousElementSibling) {
+					tr.previousElementSibling.classList.add('hidden-row-previous-row')
+				}
 			}
 		},
 		afterRemoveCol: function (visualColIndex, amount) {
@@ -726,15 +740,21 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 				return visualRow
 			}
 
-			console.log(`tttt`)
+			
 			coords.row = getNextRow(coords.row)
-			coords.col = coords.col + (isLastOrFirstRowHidden ? columnIndexModifier : 0)
+
+			if (lastHandsonMoveWas !== 'tab') {
+				coords.col = coords.col + (isLastOrFirstRowHidden  ? columnIndexModifier : 0)
+			}
+
 			if (coords.col > lastPossibleColIndex) {
 				coords.col = 0
 			}
 			else if (coords.col < 0) {
 				coords.col = lastPossibleColIndex
 			}
+
+			lastHandsonMoveWas = null
 		},
 		//called multiple times when we move mouse while selecting...
 		beforeSetRangeEnd: function (coords) {

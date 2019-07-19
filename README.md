@@ -57,7 +57,7 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 	- this is because the new uri for the new file is not known and for some reason if an extension saves an unnamed file the new file is not displayed automatically
 		- maybe this can be resolved when https://github.com/Microsoft/vscode/issues/43768 is closed
 
-- renaming a file while an editor is open for that file will break the reference the this source file
+- renaming a file while an editor is open for that file will break the reference the the source file
 	- thus changes can no longer be saved/applied
 	- maybe this can be resolved when https://github.com/Microsoft/vscode/issues/43768 is closed
 
@@ -68,10 +68,22 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 
 *If you want to preview csv files you can go for the extension [Excel Viewer](https://marketplace.visualstudio.com/items?itemName=GrapeCity.gc-excelviewer). It has some more advanced sorting and filtering features.*
 
+## How long will it stay in preview?
+
+There are two things missing...
+
+- a pretty icon ;)
+- tests
+	- especially for interaction between vs code and the webview
+	- I added some listeners to handsontable hooks which manipulate data and rendering...
+
+
 ## Why not...?
 
 - use merged cells for comments (rows)
 	- there are some problems with adding/removing rows in connection with undo & redo
+- update handsontable to 7.x.x
+	- with version 7 handsontable is only free for non-commercial use
 
 ## Used projects
 
