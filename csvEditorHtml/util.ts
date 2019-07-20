@@ -174,16 +174,16 @@ function commentValueRenderer(instance: Handsontable, td: HTMLTableDataCellEleme
 	// console.log(value)
 
 	if (value !== null && isCommentCell(value, defaultCsvReadOptions)) {
-		// td.classList.add('comment-cell')
+		// td.classList.add('comment-row')
 
 		//make the whole row a comment
 		if (td && td.parentElement) {
-			td.parentElement.classList.add('comment-cell')
+			td.parentElement.classList.add('comment-row')
 		}
 	}
 
 	// if (cellProperties._isComment) {
-	// 	td.classList.add('comment-cell')
+	// 	td.classList.add('comment-row')
 	// } else {
 	// 	// td.style.backgroundColor = ''
 	// }

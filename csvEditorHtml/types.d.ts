@@ -102,7 +102,7 @@ type CsvEditSettings = {
 	 */
 	writeOption_quoteChar: string
 
-		/**
+	/**
 	 * the string used to escape the quote character within a field
 	 */
 	writeOption_escapeChar: string
@@ -312,4 +312,11 @@ type StringSlice = {
 	text: string
 	sliceNr: number
 	totalSlices: number
+}
+
+type MergedCellDef = {
+	row: number
+	col: number
+	rowspan: number
+	colspan: number
 }

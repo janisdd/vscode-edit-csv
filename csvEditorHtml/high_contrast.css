@@ -119,9 +119,13 @@ body.vscode-high-contrast {
 	border-right: 0 !important;
 }
 
-.vscode-high-contrast .comment-cell {
+.vscode-high-contrast .comment-comment-row {
 	/* background-color: #f7f7f7!important; */
 	color: #ff9d00;
+}
+
+.vscode-high-contrast .comment-row td:nth-child(n+3) {
+	color: red;
 }
 
 /* context menu */

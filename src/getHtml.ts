@@ -23,9 +23,8 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 
 	let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.min.css')
 	let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js')
-	// let papaparseJs = _getResourcePath('node_modules/papaparse/papaparse.js')
-	// let papaparseJs = _getResourcePath('thirdParty/papaparse.min.js')
-	let papaparseJs = _getResourcePath('thirdParty/papaparse.js')
+	let papaparseJs = _getResourcePath('thirdParty/papaparse.min.js')
+	// let papaparseJs = _getResourcePath('thirdParty/papaparse.js')
 
 	let fontAwesomeCss = _getResourcePath('node_modules/@fortawesome/fontawesome-free/css/all.min.css')
 	//we need to load the font manually because the url() seems to not work properly with vscode-resource
@@ -416,6 +415,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 					<ul>
 						<li>You can right-click on the table to get a context menu</li>
 						<li>Hidden rows are also exported</li>
+						<li>Comment rows will export only the first cell/column. If you use a cell other than the first for comments the cell color will indicate this. </li>
 						<li>If you edit an unnamed (csv) file and close it then the editor will be closed too (unsaved changes will
 							be lost)!</li>
 						<li>Sorting state is exported</li>

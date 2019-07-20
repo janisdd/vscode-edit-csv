@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## 0.1.1
+
+- fixed issue where rendering was really really slow because of comment cell/row highlighting (tested with 100.000 rows ~ 12MB)
+- changed comment row handling so that comments are not longer treated like normal csv
+	- this also resolves issues where comments with `,` are not properly handled (imported/exported)
+	- monkeypatched papaparse so comment rows are parsed as plain text and also exported as plain text
+
 ## 0.1.0
 
 - added feature to hide and show rows with comments
@@ -31,4 +38,5 @@
 - fixed issue where adding a column adds two instead of one
 
 ## 0.0.9
+
 - Initial release

@@ -42,9 +42,13 @@ body.vscode-light {
 }
 
 
-.vscode-light .comment-cell {
+.vscode-light .comment-row {
 	/* background-color: #f7f7f7!important; */
 	color: #b1b1b1;
+}
+
+.vscode-light .comment-row td:nth-child(n+3) {
+	color: red;
 }
 
 /* context menu */
