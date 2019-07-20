@@ -215,6 +215,11 @@ License: MIT
 			_config.error = isFunction(_config.error);
 			delete _config.worker;	// prevent infinite loop
 
+			//custom _config.rowInsertCommentLines_commentsString
+			//if !== null then we use this to detect comments... comments are treated as single cell
+			//and are not further processed
+			//a comment is a row trimmed and starting with rowInsertCommentLines_commentsString
+
 			w.postMessage({
 				input: _input,
 				config: _config,
@@ -281,6 +286,11 @@ License: MIT
 
 		/** the columns (keys) we expect when we unparse objects */
 		var _columns = null;
+
+		/** !== null: we want to include comments but they should be processed, lines trimmed starting with a comments are comment lines
+		 * only the first row data is exported
+		 */
+		var _rowInsertCommentLines_commentsString = null
 
 		unpackConfig();
 
@@ -360,6 +370,10 @@ License: MIT
 			if (_config.escapeChar !== undefined) {
 				_escapedQuote = _config.escapeChar + _quoteChar;
 			}
+
+			if (_config.rowInsertCommentLines_commentsString !== null) {
+				_rowInsertCommentLines_commentsString = _config.rowInsertCommentLines_commentsString
+			}
 		}
 
 
@@ -421,6 +435,14 @@ License: MIT
 				}
 				if (!emptyLine)
 				{
+					
+					if (data[row].length > 0 && _rowInsertCommentLines_commentsString) {
+						if (typeof data[row][0] === 'string' && data[row][0].startsWith(_rowInsertCommentLines_commentsString)) {
+							csv += data[row][0] + _newline
+							continue
+						}
+				}
+
 					for (var col = 0; col < maxCol; col++)
 					{
 						if (col > 0 && !nullLine)
@@ -1381,6 +1403,8 @@ License: MIT
 			escapeChar = config.escapeChar;
 		}
 
+		var rowInsertCommentLines_commentsString = config.rowInsertCommentLines_commentsString
+
 		// Delimiter must be valid
 		if (typeof delim !== 'string'
 			|| Papa.BAD_DELIMITERS.indexOf(delim) > -1)
@@ -1417,9 +1441,17 @@ License: MIT
 				commentsLen = comments.length;
 			var stepIsFunction = isFunction(step);
 
+			var rowInsertCommentLines_commentsStringLen = 0
+			var treatCommentsSpecially = typeof rowInsertCommentLines_commentsString === 'string'
+
+			if (treatCommentsSpecially) {
+				rowInsertCommentLines_commentsStringLen = rowInsertCommentLines_commentsString.length
+			}
+
 			// Establish starting state
 			cursor = 0;
 			var data = [], errors = [], row = [], lastCursor = 0;
+			
 
 			if (!input)
 				return returnable();
@@ -1430,6 +1462,9 @@ License: MIT
 				for (var i = 0; i < rows.length; i++)
 				{
 					row = rows[i];
+
+					var isCommentRow = treatCommentsSpecially && row.trimLeft().startsWith(rowInsertCommentLines_commentsString)
+
 					cursor += row.length;
 					if (i !== rows.length - 1)
 						cursor += newline.length;
@@ -1440,13 +1475,13 @@ License: MIT
 					if (stepIsFunction)
 					{
 						data = [];
-						pushRow(row.split(delim));
+						pushRow(!isCommentRow ? row.split(delim) : [row]);
 						doStep();
 						if (aborted)
 							return returnable();
 					}
 					else
-						pushRow(row.split(delim));
+						pushRow(!isCommentRow ? row.split(delim) : [row]);
 					if (preview && i >= preview)
 					{
 						data = data.slice(0, preview);
@@ -1585,6 +1620,21 @@ License: MIT
 					nextNewline = input.indexOf(newline, cursor);
 					nextDelim = input.indexOf(delim, cursor);
 					continue;
+				}
+
+				if (row.length === 0 && treatCommentsSpecially && input.substr(cursor, rowInsertCommentLines_commentsStringLen) === rowInsertCommentLines_commentsString) {
+
+					if (nextNewline === -1) {
+						//add the last comment
+						row.push(input.substring(cursor));
+						pushRow(row); // is called in finish
+						return returnable();
+					}
+
+					row.push(input.substring(cursor, nextNewline));
+					saveRow(nextNewline + newlineLen);
+					nextDelim = input.indexOf(delim, cursor);
+					continue
 				}
 
 				// Next delimiter comes before next newline, so we've reached end of field

@@ -328,6 +328,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		return
 	}
 
+	//this will also expand comment rows but we only use the first column value...
 	_normalizeDataArray(data, csvReadConfig)
 
 	if (data.length > 0) {
@@ -343,7 +344,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 	const initiallyHideComments = initialConfig ? initialConfig.initiallyHideComments : false
 
-	if (initiallyHideComments) {
+	if (initiallyHideComments && typeof csvReadConfig.comments === 'string') {
 		hiddenPhysicalRowIndices = _getCommentIndices(data, csvReadConfig)
 	}
 
@@ -433,26 +434,26 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 				cellProperties.renderer = 'commentValueRenderer' //is registered in util
 				// cellProperties.renderer = 'invisiblesCellValueRenderer' //is registered in util
 
-				if (row === undefined || row === null) return cellProperties
-				if (col === undefined || col === null) return cellProperties
+				// if (row === undefined || row === null) return cellProperties
+				// if (col === undefined || col === null) return cellProperties
 
 				//@ts-ignore
-				const _hot = this.instance as Handsontable
+				// const _hot = this.instance as Handsontable
 				// const tableData = _hot.getData() //this is slooooooow, getDataAtCell is much faster
 
 				//we should always have 1 col
-				const visualRowIndex = _hot.toVisualRow(row);
-				const firstCellVal = _hot.getDataAtCell(visualRowIndex, 0) //tableData[row][0]
+				// const visualRowIndex = _hot.toVisualRow(row); //this is toooooo slow for e.g. 100.000 rows (takes ~3.3 mins vs 12s with just cell renderer)
+				// const firstCellVal = _hot.getDataAtCell(row, 0) //tableData[row][0]
 
-				if (firstCellVal === null) return cellProperties
+				// if (firstCellVal === null) return cellProperties
 
-				if (typeof csvReadConfig.comments === 'string' && firstCellVal.trim().startsWith(csvReadConfig.comments)) {
-					//@ts-ignore
-					cellProperties._isComment = true
-				} else {
-					//@ts-ignore
-					cellProperties._isComment = false
-				}
+				// if (typeof csvReadConfig.comments === 'string' && firstCellVal.trim().startsWith(csvReadConfig.comments)) {
+				// 	//@ts-ignore
+				// 	cellProperties._isComment = true
+				// } else {
+				// 	//@ts-ignore
+				// 	cellProperties._isComment = false
+				// }
 
 				return cellProperties
 			}
@@ -912,7 +913,7 @@ function toggleAskReadAgainModal(isVisible: boolean) {
  */
 function resetData(content: string, csvReadOptions: CsvReadOptions) {
 	const _data = parseCsv(content, csvReadOptions)
-
+	// console.log(`_data`, _data)
 	displayData(_data, csvReadOptions)
 
 	//might be bigger than the current view

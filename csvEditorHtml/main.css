@@ -225,8 +225,8 @@ input.input {
 	overflow: visible;
 }
 
+/* this is not visible...*/
 tr + tr.hidden-row {
-	background-color: red !important
 }
 
 tr.hidden-row + tr > th {

@@ -16,14 +16,27 @@ function _getById(id: string): HTMLElement {
 }
 
 /**
+ * checks if a given cell value is a comment with the given configuration
+ * @param value
+ * @param csvReadConfig
+ */
+function isCommentCell(value: string, csvReadConfig: CsvReadOptions) {
+
+	if (typeof csvReadConfig.comments === 'string') {
+		return value.trimLeft().startsWith(csvReadConfig.comments)
+	}
+
+	return false
+}
+
+/**
  * ensures that all rows inside data have the same length
- * this also trims all cell values
  * @param data 
  * @param csvReadConfig 
  */
 function _normalizeDataArray(data: string[][], csvReadConfig: CsvReadOptions, fillString = '') {
 
-	
+
 	const maxCols = data.reduce((prev, curr) => curr.length > prev ? curr.length : prev, 0)
 
 	for (let i = 0; i < data.length; i++) {
@@ -47,6 +60,27 @@ function _normalizeDataArray(data: string[][], csvReadConfig: CsvReadOptions, fi
 
 }
 
+// /**
+//  * if we find a comment row merge the cells into one row (else we would need to display additional columns for them)
+//  * also for export multiple cells in a comment row is bad because we might need to escape the cells because of spaces... e.g. #"  test  ", aaa
+//  * @param data 
+//  * @param csvReadConfig 
+//  */
+// function mergeCommentRowsIntoOneCell(data: string[][], csvReadConfig: CsvReadOptions): void {
+
+// 	for (let i = 0; i < data.length; i++) {
+// 		const row = data[i];
+
+// 		if (isCommentCell(row[0], csvReadConfig)) {
+
+// 			data[i] = [row.join(',')]// csv.unparse([row])
+
+// 		}
+		
+// 	}
+
+// }
+
 /**
  * returns the rows starting with a comment string
  * if comments are treated as normal rows an empty array is returned
@@ -63,7 +97,7 @@ function _getCommentIndices(data: string[][], csvReadConfig: CsvReadOptions): nu
 		const row = data[i];
 
 		//can be null if we added a new row
-		if (row.length > 0 && row[0] !== null && row[0].trim().startsWith(csvReadConfig.comments)) {
+		if (row.length > 0 && row[0] !== null && isCommentCell(row[0], csvReadConfig)) {
 			commentIndices.push(i)
 		}
 	}
@@ -103,7 +137,7 @@ function removeColumn(index: number) {
 
 	//keep header in sync with the number of columns
 	if (headerRow) {
-		headerRow.splice(index,1)
+		headerRow.splice(index, 1)
 	}
 
 	//we could get 0 cols...
@@ -139,11 +173,20 @@ function commentValueRenderer(instance: Handsontable, td: HTMLTableDataCellEleme
 
 	// console.log(value)
 
-	if (cellProperties._isComment) {
-		td.classList.add('comment-cell')
-	} else {
-		// td.style.backgroundColor = ''
+	if (value !== null && isCommentCell(value, defaultCsvReadOptions)) {
+		// td.classList.add('comment-cell')
+
+		//make the whole row a comment
+		if (td && td.parentElement) {
+			td.parentElement.classList.add('comment-cell')
+		}
 	}
+
+	// if (cellProperties._isComment) {
+	// 	td.classList.add('comment-cell')
+	// } else {
+	// 	// td.style.backgroundColor = ''
+	// }
 
 }
 

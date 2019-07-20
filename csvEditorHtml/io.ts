@@ -18,10 +18,15 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] |
 		content = defaultCsvContentIfEmpty
 	}
 
+	//comments are parses as normal text, only one cell is added
 	const parseResult = csv.parse(content, {
 		...csvReadOptions,
 		comments: false, //false gives use all lines we later check each line if it's a comment to merge the cells in that row
-	})
+		rowInsertCommentLines_commentsString: typeof csvReadOptions.comments === 'string' ? csvReadOptions.comments : null,
+		// fastMode: false //monkeypatch must work with normal and fast mode...
+	} as any)
+
+	
 
 	if (parseResult.errors.length === 1 && parseResult.errors[0].type === 'Delimiter' && parseResult.errors[0].code === 'UndetectableDelimiter') {
 		//this is ok papaparse will default to ,
@@ -127,13 +132,17 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 
 		if (typeof csvReadOptions.comments === 'string'
 			&& typeof csvWriteOptions.comments === 'string'
-			&& row[0].trim().startsWith(csvReadOptions.comments)) {
+			&& isCommentCell(row[0], csvReadOptions)) { 
 			//this is a comment
-			// data[i] = [`${csvWriteOptions.comments}${row[0].trim().substring(csvReadOptions.comments.length)}`]
-			row[0] = row[0].trim().substring(csvReadOptions.comments.length)
-			_compressCommentRow(row)
-			// data[i] = [`${csvWriteOptions.comments}${csv.unparse([row], _conf)}`]
-			data[i] = [`${csvWriteOptions.comments}${row.join(" ")}`]
+
+			//we expanded comment rows to have the max length
+			//we monkeypatched papaparse so that comments are treated as normal text (1 cell)
+			//so just take the first cell/column
+
+			const index = row[0].indexOf(csvReadOptions.comments)
+			//trim left else papaparse (and probably other programs) will not recognize the comment anymore...
+			row[0] = `${row[0].substring(0, index)}${csvWriteOptions.comments}${row[0].substring(index+csvReadOptions.comments.length)}`.trimLeft().replace(/\n/mg, "")
+
 		}
 
 	}
@@ -142,31 +151,15 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 	//not documented in papaparse...
 	//@ts-ignore
 	_conf['skipEmptyLines'] = false
+	//a custom param
+	//@ts-ignore
+	_conf['rowInsertCommentLines_commentsString'] = typeof csvWriteOptions.comments === 'string' ? csvWriteOptions.comments : null
 
 	let dataAsString = csv.unparse(data, _conf)
 
 	return dataAsString
 }
 
-/**
- * removes all empty trailing cells
- * @param row 
- */
-function _compressCommentRow(row: string[]) {
-
-	let delCount = 0
-	for (let i = row.length - 1; i > 0; i--) {
-		const cell = row[i];
-		if (cell === null || cell === '') {
-			delCount++
-			continue
-		}
-
-		break
-	}
-
-	row.splice(row.length - delCount, delCount)
-}
 
 /* --- messages back to vs code --- */
 
