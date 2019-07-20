@@ -740,11 +740,11 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 				return visualRow
 			}
 
-			
+
 			coords.row = getNextRow(coords.row)
 
 			if (lastHandsonMoveWas !== 'tab') {
-				coords.col = coords.col + (isLastOrFirstRowHidden  ? columnIndexModifier : 0)
+				coords.col = coords.col + (isLastOrFirstRowHidden ? columnIndexModifier : 0)
 			}
 
 			if (coords.col > lastPossibleColIndex) {
@@ -757,8 +757,30 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			lastHandsonMoveWas = null
 		},
 		//called multiple times when we move mouse while selecting...
-		beforeSetRangeEnd: function (coords) {
+		beforeSetRangeEnd: function () {
 		},
+
+		rowHeights: function (visualRowIndex: number) {
+
+			//see https://handsontable.com/docs/6.2.2/Options.html#rowHeights
+			let defaultHeight = 23
+
+			if (!hot) return defaultHeight
+
+			const actualPhysicalIndex = hot.toPhysicalRow(visualRowIndex)
+
+			//some hack so that the renderer still respects the row... (also see http://embed.plnkr.co/lBmuxU/)
+			//this is needed else we render all hidden rows as blank spaces (we see a scrollbar but not rows/cells)
+			//but this means we will lose performance because hidden rows are still managed and rendered (even if not visible)
+			if (hiddenPhysicalRowIndices.includes(actualPhysicalIndex)) {
+				//sub 1 height is treated by the virtual renderer as height 0??
+				//we better add some more zeros
+				return 0.000001
+			}
+
+			return defaultHeight
+		} as any,
+
 	})
 
 	//@ts-ignore

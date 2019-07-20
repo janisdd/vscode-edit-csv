@@ -412,6 +412,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 				<h3 class="title is-3">Hints</h3>
 				<div class="content">
 					<ul>
+						<li>You can right-click on the table to get a context menu</li>
 						<li>Hidden rows are also exported</li>
 						<li>If you edit an unnamed (csv) file and close it then the editor will be closed too (unsaved changes will
 							be lost)!</li>

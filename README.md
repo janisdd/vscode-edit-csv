@@ -16,6 +16,9 @@ Execute the command `edit as csv` to open an editor for the current file.
 
 - On initial load all rows are expanded so that all rows have equal length (number of cells)
 
+- Starting with Version **0.1.0** the table has a context menu (right-click the table)
+	- *(just mentioning it because it is not obvious via the ui)*
+
 - Plugin Version **0.0.11** had an issue with loading and saving files with more than \~1 MB
 	- saved files were corrupted (content of the first \~1MB was repeated after the first \~1MB until the file size was reached)
 
@@ -75,8 +78,7 @@ There are two things missing...
 - a pretty icon ;)
 - tests
 	- especially for interaction between vs code and the webview
-	- I added some listeners to handsontable hooks which manipulate data and rendering...
-
+	- I added some listeners to handsontable hooks which manipulate rendering, selection...
 
 ## Why not...?
 

@@ -62,7 +62,8 @@ function _getCommentIndices(data: string[][], csvReadConfig: CsvReadOptions): nu
 	for (let i = 0; i < data.length; i++) {
 		const row = data[i];
 
-		if (row.length > 0 && row[0].trim().startsWith(csvReadConfig.comments)) {
+		//can be null if we added a new row
+		if (row.length > 0 && row[0] !== null && row[0].trim().startsWith(csvReadConfig.comments)) {
 			commentIndices.push(i)
 		}
 	}

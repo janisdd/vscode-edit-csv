@@ -2,9 +2,9 @@
 
 ## [Unreleased]
 
-## 0.0.13
+## 0.1.0
 
-- added buttons to hide and show rows with comments
+- added feature to hide and show rows with comments
 - added context menu to insert/remove rows/columns at arbitrary positions
 - added context menu options alignment
 - fixed issue where sorting and comment highlighting was not synced
