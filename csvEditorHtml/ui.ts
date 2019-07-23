@@ -125,14 +125,20 @@ function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLE
 
 /* --- read options --- */
 /**
+ * if input value is set programmatically this is NOT called
  * 
  * @param fromUndo true: only update col headers, do not change the table data (will be done by undo/redo), false: normal
  */
 function applyHasHeader(fromUndo = false) {
-	const el = _getById('has-header') as HTMLInputElement //or defaultCsvReadOptions._hasHeader
-	const data = getFirstRow()
 
-	if (data.length === 0) {
+	const el = _getById('has-header') as HTMLInputElement //or defaultCsvReadOptions._hasHeader
+	const dataWithIndex = getFirstRowWithIndex()
+
+	if (dataWithIndex === null) {
+		//disable input...
+		const el3 = _getById('has-header') as HTMLInputElement
+		el3.checked = false
+		headerRowWithIndex = null
 		return
 	}
 
@@ -146,14 +152,14 @@ function applyHasHeader(fromUndo = false) {
 
 		//use header row from data
 		hot.updateSettings({
-			colHeaders: data.map((col, index) => defaultColHeaderFunc(index, col))
+			colHeaders: dataWithIndex.row.map((col, index) => defaultColHeaderFunc(index, col))
 		}, false)
 
 		if (fromUndo) return
 
-		headerRow = data
+		headerRowWithIndex = dataWithIndex
 
-		hot.alter('remove_row', 0);
+		hot.alter('remove_row', headerRowWithIndex.physicalIndex);
 
 		elWrite.checked = true
 		defaultCsvWriteOptions.header = true
@@ -168,12 +174,15 @@ function applyHasHeader(fromUndo = false) {
 
 	if (fromUndo) return
 
-	if (headerRow === null) {
+	if (headerRowWithIndex === null) {
 		throw new Error('could not insert header row')
 	}
 
-	hot.alter('insert_row', 0)
-	hot.populateFromArray(0, 0, [[...headerRow]])
+	hot.alter('insert_row', headerRowWithIndex.physicalIndex)
+	const visualRow = hot.toVisualRow(headerRowWithIndex.physicalIndex)
+	const visualCol = hot.toVisualColumn(0)
+	//see https://handsontable.com/docs/6.2.2/Core.html#populateFromArray
+	hot.populateFromArray(visualRow, visualCol, [[...headerRowWithIndex.row]])
 
 	elWrite.checked = false
 	defaultCsvWriteOptions.header = false
@@ -332,7 +341,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 	_normalizeDataArray(data, csvReadConfig)
 
 	if (data.length > 0) {
-		headerRow = [...data[0]] //copy to not get reference
+		headerRowWithIndex = getFirstRowWithIndex()
 	}
 
 	const container = csvEditorDiv
@@ -369,8 +378,8 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		} as any,
 		fillHandle: false,
 		colHeaders: defaultColHeaderFunc as any,
-		currentColClassName: 'foo',
-		currentRowClassName: 'foo',
+		currentColClassName: 'foo', //actually used to overwrite highlighting
+		currentRowClassName: 'foo', //actually used to overwrite highlighting
 		//plugins
 		comments: false,
 		manualRowMove: true,
@@ -583,7 +592,8 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			// console.log('data');
 		},
 		afterUndo: function (action: any) {
-			if (action.actionType === 'remove_row' && action.index === 0) { //first row cannot be removed normally so it must be the header row option
+			
+			if (headerRowWithIndex && action.actionType === 'remove_row' && action.index === headerRowWithIndex.physicalIndex) {
 				//remove header row
 				defaultCsvReadOptions._hasHeader = false
 				const el = _getById('has-header') as HTMLInputElement
@@ -596,7 +606,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 		},
 		beforeRedo: function (action: any) {
-			if (action.actionType === 'remove_row' && action.index === 0) { //first row cannot be removed normally so it must be the header row option
+			if (headerRowWithIndex && action.actionType === 'remove_row' && action.index === headerRowWithIndex.physicalIndex) { //first row cannot be removed normally so it must be the header row option
 				//we re insert header row
 
 				defaultCsvReadOptions._hasHeader = false
@@ -788,7 +798,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 	Handsontable.dom.addEvent(window as any, 'resize', throttle(onResizeGrid, 200))
 
 
-	const settingsApplied = checkIfHasHeaderReadOptionIsAvailable()
+	const settingsApplied = checkIfHasHeaderReadOptionIsAvailable(true)
 
 	//if we have only 1 row and header is enabled by default...this would be an error (we cannot display something)
 
@@ -798,6 +808,9 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 	//make sure we see something (right size)...
 	onResizeGrid()
+
+	//select first cell by default so we have always a context
+	hot.selectCell(0,0)
 }
 
 //not needed really now because of bug in handson table, see https://github.com/handsontable/handsontable/issues/3328
@@ -941,25 +954,6 @@ function stopReceiveCsvProgBar() {
 	receivedCsvProgBarWrapper.style.display = "none"
 }
 
-/**
- * adds a new row at the end
- * @param {boolean} selectNewRow true: scrolls to the  new row
- */
-function addRow(selectNewRow = true) {
-
-	if (!hot) throw new Error('table was null')
-
-	// const headerCells = hot.getColHeader()
-	const numRows = hot.countRows()
-	hot.alter('insert_row', numRows) //inserted data contains null but papaparse correctly unparses it as ''
-	// hot.populateFromArray(numRows, 0, [headerCells.map(p => '')])
-
-	if (selectNewRow) {
-		hot.selectCell(numRows, 0)
-	}
-
-	checkIfHasHeaderReadOptionIsAvailable()
-}
 
 /**
  * called from ui
@@ -975,35 +969,6 @@ function postApplyContent(saveSourceFile: boolean) {
 	_postApplyContent(csvContent, saveSourceFile)
 }
 
-/**
- * adds a new column at the end
- * @param {boolean} selectNewColumn true: scrolls to the new column
- */
-function addColumn(selectNewColumn = true) {
-
-	if (!hot) throw new Error('table was null')
-
-	const numCols = hot.countCols()
-	hot.alter('insert_col', numCols) //inserted data contains null but papaparse correctly unparses it as ''
-
-	//keep header in sync with the number of columns
-	if (headerRow) {
-		headerRow.push(null)
-	}
-
-	//we could get 0 cols...
-	checkIfHasHeaderReadOptionIsAvailable()
-
-	const pos = hot.getSelected() //undefined or [[startRow, startCol, endRow, endCol], ...] (could select not connected cells...)
-	if (pos && pos.length === 1) { //only 1 row selected
-
-		if (selectNewColumn) {
-			hot.selectCell(pos[0][0], numCols)
-		}
-	}
-
-	rerenderColumns()
-}
 
 /**
  * the height for the th element

@@ -32,7 +32,7 @@ const defaultCsvContentIfEmpty = `,\n,`
  * can be null if we have 0 rows
  * {string[] | null}
  */
-let headerRow: Array<string | null> | null = null
+let headerRowWithIndex: HeaderRowWithIndex | null = null
 
 let hiddenPhysicalRowIndices: number[] = []
 
@@ -88,8 +88,13 @@ const statusInfo = _getById('status-info') as HTMLSpanElement
 const showCommentsBtn = _getById('show-comments-btn') as HTMLButtonElement
 const hideCommentsBtn = _getById('hide-comments-btn') as HTMLButtonElement
 
+//add this to the first wrong column
+const warningTooltipTextWhenCommentRowNotFirstCellIsUsed = `Please use only the first cell in comment row (others are not exported)`
+
+
 /* main */
 
+//set defaults when we are in browser
 setCsvReadOptionsInitial(defaultCsvReadOptions)
 setCsvWriteOptionsInitial(defaultCsvWriteOptions)
 
@@ -120,6 +125,7 @@ if (!vscode) {
 	console.log("initialContent: " + initialContent);
 }
 
+//set values from extension config
 setupAndApplyInitialConfigPart1(initialConfig)
 
 //see readDataAgain

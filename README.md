@@ -96,6 +96,7 @@ There are two things missing...
 ## Used projects
 
 - for csv parsing/writing: [papaparse](https://github.com/mholt/PapaParse)
+	- with small custom modifications to handle comments specially
 - for grid/table element: [handsontable](https://github.com/handsontable/handsontable)
 - for ui: [bulma](https://github.com/jgthms/bulma), [bulma-extension](https://github.com/Wikiki/bulma-extensions), [fontawesome](https://github.com/FortAwesome/Font-Awesome)
 

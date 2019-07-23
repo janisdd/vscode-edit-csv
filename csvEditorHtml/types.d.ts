@@ -314,6 +314,11 @@ type StringSlice = {
 	totalSlices: number
 }
 
+type HeaderRowWithIndex = {
+	row: Array<string | null>
+	physicalIndex: number
+}
+
 type MergedCellDef = {
 	row: number
 	col: number

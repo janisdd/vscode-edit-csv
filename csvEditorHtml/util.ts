@@ -20,7 +20,9 @@ function _getById(id: string): HTMLElement {
  * @param value
  * @param csvReadConfig
  */
-function isCommentCell(value: string, csvReadConfig: CsvReadOptions) {
+function isCommentCell(value: string | null, csvReadConfig: CsvReadOptions) {
+
+	if (value === null) return false
 
 	if (typeof csvReadConfig.comments === 'string') {
 		return value.trimLeft().startsWith(csvReadConfig.comments)
@@ -106,12 +108,62 @@ function _getCommentIndices(data: string[][], csvReadConfig: CsvReadOptions): nu
 
 /**
  * generates column labels: column 1, column 2, ....
- * @param index 0 based
+ * @param index 0 based (where 0 will generate label 1 because this is probably more desired)
  */
 function getSpreadsheetColumnLabel(index: number) {
-	return `column ${index}`
+	return `column ${index+1}`
 }
 
+/**
+ * adds a new column at the end
+ * @param {boolean} selectNewColumn true: scrolls to the new column
+ */
+function addColumn(selectNewColumn = true) {
+
+	if (!hot) throw new Error('table was null')
+
+	const numCols = hot.countCols()
+	hot.alter('insert_col', numCols) //inserted data contains null but papaparse correctly unparses it as ''
+
+	//keep header in sync with the number of columns
+	if (headerRowWithIndex) {
+		headerRowWithIndex.row.push(null)
+	}
+	console.log(`headerRowWithIndex`, headerRowWithIndex)
+
+	//we could get 0 cols...
+	checkIfHasHeaderReadOptionIsAvailable(false)
+
+	const pos = hot.getSelected() //undefined or [[startRow, startCol, endRow, endCol], ...] (could select not connected cells...)
+	if (pos && pos.length === 1) { //only 1 row selected
+
+		if (selectNewColumn) {
+			hot.selectCell(pos[0][0], numCols)
+		}
+	}
+
+	rerenderColumns()
+}
+
+/**
+ * adds a new row at the end
+ * @param {boolean} selectNewRow true: scrolls to the  new row
+ */
+function addRow(selectNewRow = true) {
+
+	if (!hot) throw new Error('table was null')
+
+	// const headerCells = hot.getColHeader()
+	const numRows = hot.countRows()
+	hot.alter('insert_row', numRows) //inserted data contains null but papaparse correctly unparses it as ''
+	// hot.populateFromArray(numRows, 0, [headerCells.map(p => '')])
+
+	if (selectNewRow) {
+		hot.selectCell(numRows, 0)
+	}
+
+	checkIfHasHeaderReadOptionIsAvailable(false)
+}
 
 /**
  * removes a row by index
@@ -122,7 +174,7 @@ function removeRow(index: number) {
 	if (!hot) throw new Error('table was null')
 
 	hot.alter('remove_row', index)
-	checkIfHasHeaderReadOptionIsAvailable()
+	checkIfHasHeaderReadOptionIsAvailable(false)
 }
 
 /**
@@ -136,12 +188,12 @@ function removeColumn(index: number) {
 	hot.alter('remove_col', index)
 
 	//keep header in sync with the number of columns
-	if (headerRow) {
-		headerRow.splice(index, 1)
+	if (headerRowWithIndex) {
+		headerRowWithIndex.row.splice(index, 1)
 	}
 
 	//we could get 0 cols...
-	checkIfHasHeaderReadOptionIsAvailable()
+	checkIfHasHeaderReadOptionIsAvailable(false)
 
 	rerenderColumns()
 }
@@ -153,11 +205,11 @@ function rerenderColumns() {
 
 	if (!hot) throw new Error('table was null')
 
-	if (defaultCsvReadOptions._hasHeader && headerRow) {
-		const data = headerRow
+	if (defaultCsvReadOptions._hasHeader && headerRowWithIndex) {
+		const data = headerRowWithIndex
 
 		hot.updateSettings({
-			colHeaders: data.map((col, index) => defaultColHeaderFunc(index, col))
+			colHeaders: data.row.map((col, index) => defaultColHeaderFunc(index, col))
 		}, false)
 
 	} else {
@@ -167,6 +219,17 @@ function rerenderColumns() {
 	}
 }
 
+/**
+ * called on every render...
+ * so we only need to add the css rule and never remove it
+ * @param instance 
+ * @param td 
+ * @param row 
+ * @param col 
+ * @param prop 
+ * @param value 
+ * @param cellProperties 
+ */
 function commentValueRenderer(instance: Handsontable, td: HTMLTableDataCellElement, row: number, col: number, prop: any, value: string | null, cellProperties: any) {
 	//@ts-ignore
 	Handsontable.renderers.TextRenderer.apply(this, arguments);
@@ -175,6 +238,9 @@ function commentValueRenderer(instance: Handsontable, td: HTMLTableDataCellEleme
 
 	if (value !== null && isCommentCell(value, defaultCsvReadOptions)) {
 		// td.classList.add('comment-row')
+		if (td && td.nextSibling) {
+			(td.nextSibling as HTMLElement).title = warningTooltipTextWhenCommentRowNotFirstCellIsUsed;
+		}
 
 		//make the whole row a comment
 		if (td && td.parentElement) {
@@ -301,9 +367,13 @@ function setCsvWriteOptionsInitial(options: CsvWriteOptions) {
 /**
  * checks if the has header read option must be disabled or not
  * and sets the needed state
+ * 
+ * see https://forum.handsontable.com/t/table-with-only-header-row/2915 and
+ * and https://github.com/handsontable/handsontable/issues/735
+ * seems like with default headers it's not possible to only have headers?
  * @returns false: force changes (settings want headers but is not possible with data), true: all ok
  */
-function checkIfHasHeaderReadOptionIsAvailable(): boolean {
+function checkIfHasHeaderReadOptionIsAvailable(isInitialRender: boolean): boolean {
 
 	const data = getData() //this also includes header rows
 
@@ -311,11 +381,17 @@ function checkIfHasHeaderReadOptionIsAvailable(): boolean {
 
 	let canSetOption = false
 
-	if (defaultCsvReadOptions._hasHeader) {
-		canSetOption = data.length >= 1 //we have +1 row because header option is enabled
-	} else {
-		canSetOption = data.length > 1 //no header ... to enable header we need 2 rows
+	if (isInitialRender) {
+		canSetOption = data.length > 1
 	}
+	else {
+		if (defaultCsvReadOptions._hasHeader) {
+			canSetOption = data.length >= 1 //we already stored the header row so we have data + 1 rows...
+		} else {
+			canSetOption = data.length > 1 //no header ... to enable header we need 2 rows
+		}
+	}
+	
 
 	if (canSetOption) {
 		el.removeAttribute('disabled')

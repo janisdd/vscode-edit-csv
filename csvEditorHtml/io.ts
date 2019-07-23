@@ -77,12 +77,30 @@ function getData(): string[][] {
 /**
  * @returns {string[]} the first row of the data or an empty array
  */
-function getFirstRow(): string[] {
-	if (!hot) return []
+function getFirstRowWithIndex(skipCommentLines: boolean = true): HeaderRowWithIndex | null {
+	if (!hot) return null
 
-	if (hot.countRows() === 0) return []
+	const rowCount = hot.countRows()
+	if (rowCount === 0) return null
 
-	return [...hot.getDataAtRow(0)] //make a copy to not get a reference
+	let firstDataRow: string[] = []
+	let rowIndex = 0
+
+	for (let i = 0; i < rowCount; i++) {
+		const row = hot.getDataAtRow(i)
+		if (row.length === 0) continue
+		
+		if (skipCommentLines && isCommentCell(row[0], defaultCsvReadOptions)) continue
+
+		firstDataRow = [...row] //make a copy to not get a reference
+		rowIndex = i
+		break
+	}
+
+	return {
+		physicalIndex: rowIndex,
+		row: firstDataRow
+	}
 }
 
 /**
@@ -117,11 +135,11 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 		}
 		else {
 
-			if (headerRow === null) {
+			if (headerRowWithIndex === null) {
 				throw new Error('header row was null')
 			}
 
-			data.unshift(headerRow.map<string>((val) => val !== null ? val : ''))
+			data.unshift(headerRowWithIndex.row.map<string>((val) => val !== null ? val : ''))
 		}
 	}
 
