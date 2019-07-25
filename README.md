@@ -70,8 +70,8 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 	- thus changes can no longer be saved/applied
 	- maybe this can be resolved when https://github.com/Microsoft/vscode/issues/43768 is closed
 
-- there are probably *some* issues which enabling `hasHeader`, (and removing first row) and undoing/redoing that
-	- there are some issues with switching `hasHeader` option in combination with hiding comment rows and and undo/redo
+- there are probably *some* issues which enabling/disabling `hasHeader` and undoing/redoing that
+	- there are some issues when switching `hasHeader` option in combination with hiding comment rows and and undo/redo
 
 ## Alternatives
 

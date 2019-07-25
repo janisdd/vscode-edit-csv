@@ -75,7 +75,7 @@ function getData(): string[][] {
 }
 
 /**
- * @returns {string[]} the first row of the data or an empty array
+ * if we have an header row already it is ignored here!!
  */
 function getFirstRowWithIndex(skipCommentLines: boolean = true): HeaderRowWithIndex | null {
 	if (!hot) return null
@@ -84,7 +84,7 @@ function getFirstRowWithIndex(skipCommentLines: boolean = true): HeaderRowWithIn
 	if (rowCount === 0) return null
 
 	let firstDataRow: string[] = []
-	let rowIndex = 0
+	let rowIndex = -1
 
 	for (let i = 0; i < rowCount; i++) {
 		const row = hot.getDataAtRow(i)
@@ -95,6 +95,39 @@ function getFirstRowWithIndex(skipCommentLines: boolean = true): HeaderRowWithIn
 		firstDataRow = [...row] //make a copy to not get a reference
 		rowIndex = i
 		break
+	}
+
+	if (rowIndex === -1) {
+		return null
+	}
+
+	return {
+		physicalIndex: rowIndex,
+		row: firstDataRow
+	}
+}
+
+function getFirstRowWithIndexByData(data: string[][], skipCommentLines: boolean = true): HeaderRowWithIndex | null {
+
+	const rowCount = data.length
+	if (rowCount === 0) return null
+
+	let firstDataRow: string[] = []
+	let rowIndex = -1
+
+	for (let i = 0; i < rowCount; i++) {
+		const row = data[i]
+		if (row.length === 0) continue
+		
+		if (skipCommentLines && isCommentCell(row[0], defaultCsvReadOptions)) continue
+
+		firstDataRow = [...row] //make a copy to not get a reference
+		rowIndex = i
+		break
+	}
+
+	if (rowIndex === -1) {
+		return null
 	}
 
 	return {
@@ -127,9 +160,8 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 		//write the header...
 		if (!hot) throw new Error('table was null')
 
-		const colHeaderCells = hot.getColHeader() as string[]
-		//@ts-ignore
-		if (hot.getSettings().colHeaders === defaultColHeaderFunc) {
+		if (headerRowWithIndex === null) {
+			const colHeaderCells = hot.getColHeader() as string[]
 			//default headers... because the actual header string is html we need to generate the string only column headers
 			data.unshift(colHeaderCells.map((p: string, index: number) => getSpreadsheetColumnLabel(index)))
 		}

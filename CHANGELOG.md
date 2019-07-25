@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+## 0.1.2
+
+- trim feature now also trims header row (probably better)
+- column names now start with 1 (probably better)
+- the `has header` option now ignores rows with comments
+- fixed bad behavior where disabling `has header` option would insert additional rows (when one deleted rows and the original row index was larger than the current row count)
+	- in this case the header row is now inserted as the last row
+	- else the header row is inserted at the index where we got it
+- fixed some issues where `has header` option and only rows with comments throws
+- fixed issue where column headers (via has header option) was not always correctly displayed (the default A, B, C, ... columns were displayed)
+- fixed issue where a comment not in the first column would visually indicate the row as a comment row
+
+
 ## 0.1.1
 
 - fixed issue where rendering was really really slow because of comment cell/row highlighting (tested with 100.000 rows ~ 12MB)

@@ -23,6 +23,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 
 	let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.min.css')
 	let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js')
+	// let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js')
 	let papaparseJs = _getResourcePath('thirdParty/papaparse.min.js')
 	// let papaparseJs = _getResourcePath('thirdParty/papaparse.js')
 
@@ -64,7 +65,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 	
 							<div class="field">
 								<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked"
-									onchange="applyHasHeader()">
+									onchange="applyHasHeader(true, false)">
 								<label for="has-header">
 									<span>Has header</span>
 								</label>
@@ -333,7 +334,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 							</span>
 							<span>Trim</span>
 							<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
-								data-tooltip="Trims ever cell in the table (removes leading and trailing spaces, tabs, ...). This will also clear  undo/redo!">
+							data-tooltip="Trims ever cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo!">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</button>

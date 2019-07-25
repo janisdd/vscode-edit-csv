@@ -129,64 +129,81 @@ function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLE
  * 
  * @param fromUndo true: only update col headers, do not change the table data (will be done by undo/redo), false: normal
  */
-function applyHasHeader(fromUndo = false) {
+function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 
 	const el = _getById('has-header') as HTMLInputElement //or defaultCsvReadOptions._hasHeader
-	const dataWithIndex = getFirstRowWithIndex()
-
-	if (dataWithIndex === null) {
-		//disable input...
-		const el3 = _getById('has-header') as HTMLInputElement
-		el3.checked = false
-		headerRowWithIndex = null
-		return
-	}
-
-	if (!hot) throw new Error('table was null')
 
 	const elWrite = _getById('has-header-write') as HTMLInputElement //or defaultCsvWriteOptions.header
 
-	if (el.checked) {
+	let func = () => {
 
-		//this checked state is set from csvReadOptions._hasHeader
+		if (!hot) throw new Error('table was null')
 
-		//use header row from data
-		hot.updateSettings({
-			colHeaders: dataWithIndex.row.map((col, index) => defaultColHeaderFunc(index, col))
-		}, false)
+		if (el.checked) {
 
+			//this checked state is set from csvReadOptions._hasHeader
+			const dataWithIndex = getFirstRowWithIndex()
+	
+			if (dataWithIndex === null) {
+				//disable input...
+				const el3 = _getById('has-header') as HTMLInputElement
+				el3.checked = false
+				headerRowWithIndex = null
+				return
+			}
+	
+			if (fromUndo) return
+	
+			headerRowWithIndex = dataWithIndex
+	
+			hot.alter('remove_row', headerRowWithIndex.physicalIndex);
+	
+			elWrite.checked = true
+			defaultCsvWriteOptions.header = true
+			defaultCsvReadOptions._hasHeader = true
+
+			return
+		}
+	
 		if (fromUndo) return
+	
+		if (headerRowWithIndex === null) {
+			throw new Error('could not insert header row')
+		}
+	
+		hot.alter('insert_row', headerRowWithIndex.physicalIndex)
+		const visualRow = hot.toVisualRow(headerRowWithIndex.physicalIndex)
+		const visualCol = hot.toVisualColumn(0)
+		//see https://handsontable.com/docs/6.2.2/Core.html#populateFromArray
+		hot.populateFromArray(visualRow, visualCol, [[...headerRowWithIndex.row]])
+	
+		headerRowWithIndex = null
+	
+		elWrite.checked = false
+		defaultCsvWriteOptions.header = false
+		defaultCsvReadOptions._hasHeader = false
+	
+		//we changed headerRowWithIndex / header row so force a re-render so that hot calls defaultColHeaderFunc again
+		hot.render()
+	}
 
-		headerRowWithIndex = dataWithIndex
+	if (displayRenderInformation) {
+		statusInfo.innerText = `Rendering table...`
 
-		hot.alter('remove_row', headerRowWithIndex.physicalIndex);
+		call_after_DOM_updated(() => {
 
-		elWrite.checked = true
-		defaultCsvWriteOptions.header = true
-		defaultCsvReadOptions._hasHeader = true
+			func()
+
+			setTimeout(() => {
+				statusInfo.innerText = '';
+			}, 0)
+
+		})
+
 		return
 	}
 
-	//use default headers
-	hot.updateSettings({
-		colHeaders: defaultColHeaderFunc as any
-	}, false)
-
-	if (fromUndo) return
-
-	if (headerRowWithIndex === null) {
-		throw new Error('could not insert header row')
-	}
-
-	hot.alter('insert_row', headerRowWithIndex.physicalIndex)
-	const visualRow = hot.toVisualRow(headerRowWithIndex.physicalIndex)
-	const visualCol = hot.toVisualColumn(0)
-	//see https://handsontable.com/docs/6.2.2/Core.html#populateFromArray
-	hot.populateFromArray(visualRow, visualCol, [[...headerRowWithIndex.row]])
-
-	elWrite.checked = false
-	defaultCsvWriteOptions.header = false
-	defaultCsvReadOptions._hasHeader = false
+	func()
 
 }
 function setDelimiterString() {
@@ -340,9 +357,9 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 	//this will also expand comment rows but we only use the first column value...
 	_normalizeDataArray(data, csvReadConfig)
 
-	if (data.length > 0) {
-		headerRowWithIndex = getFirstRowWithIndex()
-	}
+	// if (data.length > 0) {
+	// 	headerRowWithIndex = getFirstRowWithIndexByData(data)
+	// }
 
 	const container = csvEditorDiv
 
@@ -362,6 +379,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		data,
 		trimWhitespace: false,
 		rowHeaderWidth: getRowHeaderWidth(data.length),
+		//false to enable virtual rendering
 		renderAllRows: false, //use false and small table size for fast initial render, see https://handsontable.com/docs/7.0.2/Options.html#renderAllRows
 		rowHeaders: function (row: number) { //the visual row index
 			let text = (row + 1).toString()
@@ -592,7 +610,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			// console.log('data');
 		},
 		afterUndo: function (action: any) {
-			
+
 			if (headerRowWithIndex && action.actionType === 'remove_row' && action.index === headerRowWithIndex.physicalIndex) {
 				//remove header row
 				defaultCsvReadOptions._hasHeader = false
@@ -601,7 +619,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 				el.checked = false
 				elWrite.checked = false
 
-				applyHasHeader(true)
+				applyHasHeader(true, true)
 			}
 
 		},
@@ -615,7 +633,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 				el.checked = true
 				elWrite.checked = true
 
-				applyHasHeader(true)
+				applyHasHeader(true, true)
 			}
 		},
 
@@ -624,9 +642,9 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			if (!hot) throw new Error('table was null')
 
 			//TODO NOT WORKING??
-			hot.updateSettings({
-				colHeaders: defaultColHeaderFunc as any
-			}, false)
+			// hot.updateSettings({
+			// 	colHeaders: defaultColHeaderFunc as any
+			// }, false)
 		},
 		afterGetRowHeader: function (visualRowIndex: number, th: any) {
 			const tr = th.parentNode as HTMLTableRowElement
@@ -652,16 +670,34 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 				}
 			}
 		},
+		afterCreateCol: function (visualColIndex, amount) {
+
+			if (!hot) return
+
+			if (headerRowWithIndex) {
+				const physicalIndex = hot.toPhysicalColumn(visualColIndex)
+				//@ts-ignore
+				headerRowWithIndex.row.splice(physicalIndex, 0, ...Array(amount).fill(null))
+				//hot automatically re-renders after this
+			}
+		},
 		afterRemoveCol: function (visualColIndex, amount) {
 
 			if (!hot) return
+
+			if (headerRowWithIndex) {
+				const physicalIndex = hot.toPhysicalColumn(visualColIndex)
+				headerRowWithIndex.row.splice(physicalIndex, amount)
+				//hot automatically re-renders after this
+			}
+
 			const sortConfigs = hot.getPlugin('columnSorting').getSortConfig()
 
 			const sortedColumnIds = sortConfigs.map(p => hot!.toPhysicalColumn(p.column))
 
 			let removedColIds: number[] = []
 			for (let i = 0; i < amount; i++) {
-				removedColIds.push(hot!.toPhysicalColumn(visualColIndex + i))
+				removedColIds.push(hot.toPhysicalColumn(visualColIndex + i))
 			}
 
 			//if we removed some col that was sorted then clear sorting...
@@ -670,6 +706,12 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			}
 
 		},
+		//inspired by https://github.com/handsontable/handsontable/blob/master/src/plugins/hiddenRows/hiddenRows.js
+		//i absolutely don't understand how handsontable implementation is working... 
+		//their this.hiddenRows should be physical indices (see https://github.com/handsontable/handsontable/blob/master/src/plugins/hiddenRows/hiddenRows.js#L254)
+		//but in onAfterCreateRow & onAfterRemoveRow they check against `visualRow` which is actually the physical row (see above)
+		//and then they increment the physical row via the amount
+		//however, it works somehow...
 		afterCreateRow: function (visualRowIndex, amount) {
 			//we need to modify some or all hiddenPhysicalRowIndices...
 
@@ -683,6 +725,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		},
 		afterRemoveRow: function (visualRowIndex, amount) {
 			//we need to modify some or all hiddenPhysicalRowIndices...
+			if (!hot) return
 
 			for (let i = 0; i < hiddenPhysicalRowIndices.length; i++) {
 				const hiddenPhysicalRowIndex = hiddenPhysicalRowIndices[i];
@@ -691,6 +734,17 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 					hiddenPhysicalRowIndices[i] -= amount
 				}
 			}
+
+			//when we have a header row and the original index was 10 and now we have only 5 rows... change index to be the last row
+			//so that when we disable has header we insert it correctly
+			// const physicalIndex = hot.toPhysicalRow(visualRowIndex)
+			if (headerRowWithIndex) {
+				const lastValidIndex = hot.countRows()
+				if (headerRowWithIndex.physicalIndex > lastValidIndex) {
+					headerRowWithIndex.physicalIndex = lastValidIndex
+				}
+			}
+
 		},
 		//called when we select a row via row header
 		beforeSetRangeStartOnly: function (coords) {
@@ -803,14 +857,14 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 	//if we have only 1 row and header is enabled by default...this would be an error (we cannot display something)
 
 	if (settingsApplied === true && defaultCsvReadOptions._hasHeader === true) { //this must be applied else we get duplicate first row
-		applyHasHeader()
+		applyHasHeader(true, false)
 	}
 
 	//make sure we see something (right size)...
 	onResizeGrid()
 
 	//select first cell by default so we have always a context
-	hot.selectCell(0,0)
+	hot.selectCell(0, 0)
 }
 
 //not needed really now because of bug in handson table, see https://github.com/handsontable/handsontable/issues/3328
@@ -866,6 +920,15 @@ function defaultColHeaderFunc(colIndex: number, colName: string | undefined | nu
 
 	let text = getSpreadsheetColumnLabel(colIndex)
 
+	if (headerRowWithIndex !== null && colIndex < headerRowWithIndex.row.length) {
+		let visualIndex = colIndex
+		if (hot)
+			visualIndex = hot!.toVisualColumn(colIndex)
+		const data = headerRowWithIndex.row[visualIndex]
+		if (data !== null) {
+			text = data
+		}
+	}
 
 	//null can also happen if we enable header, add column, disable header, enable header (then the new column have null values)
 	if (colName !== undefined && colName !== null) {
@@ -1006,6 +1069,18 @@ function trimAllCells() {
 			allData[row][col] = data.trim()
 			//tooo slow for large tables
 			// hot.setDataAtCell(row, col, data.trim())
+		}
+	}
+
+	if (headerRowWithIndex) {
+		for (let col = 0; col < headerRowWithIndex.row.length; col++) {
+			const data = headerRowWithIndex.row[col]
+
+			if (typeof data !== "string") {
+				continue
+			}
+
+			headerRowWithIndex.row[col] = data.trim();
 		}
 	}
 

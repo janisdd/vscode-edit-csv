@@ -125,11 +125,7 @@ function addColumn(selectNewColumn = true) {
 	const numCols = hot.countCols()
 	hot.alter('insert_col', numCols) //inserted data contains null but papaparse correctly unparses it as ''
 
-	//keep header in sync with the number of columns
-	if (headerRowWithIndex) {
-		headerRowWithIndex.row.push(null)
-	}
-	console.log(`headerRowWithIndex`, headerRowWithIndex)
+	//in hooks we insert a null column in the header
 
 	//we could get 0 cols...
 	checkIfHasHeaderReadOptionIsAvailable(false)
@@ -141,8 +137,6 @@ function addColumn(selectNewColumn = true) {
 			hot.selectCell(pos[0][0], numCols)
 		}
 	}
-
-	rerenderColumns()
 }
 
 /**
@@ -188,36 +182,13 @@ function removeColumn(index: number) {
 	hot.alter('remove_col', index)
 
 	//keep header in sync with the number of columns
-	if (headerRowWithIndex) {
-		headerRowWithIndex.row.splice(index, 1)
-	}
+	//this is done in the hooks
 
 	//we could get 0 cols...
 	checkIfHasHeaderReadOptionIsAvailable(false)
 
-	rerenderColumns()
 }
 
-/**
- * after some actions e.g. inserting/removing rows we need to correct the header column text
- */
-function rerenderColumns() {
-
-	if (!hot) throw new Error('table was null')
-
-	if (defaultCsvReadOptions._hasHeader && headerRowWithIndex) {
-		const data = headerRowWithIndex
-
-		hot.updateSettings({
-			colHeaders: data.row.map((col, index) => defaultColHeaderFunc(index, col))
-		}, false)
-
-	} else {
-		hot.updateSettings({
-			colHeaders: defaultColHeaderFunc as any
-		}, false)
-	}
-}
 
 /**
  * called on every render...
@@ -236,7 +207,7 @@ function commentValueRenderer(instance: Handsontable, td: HTMLTableDataCellEleme
 
 	// console.log(value)
 
-	if (value !== null && isCommentCell(value, defaultCsvReadOptions)) {
+	if (value !== null && col === 0 && isCommentCell(value, defaultCsvReadOptions)) {
 		// td.classList.add('comment-row')
 		if (td && td.nextSibling) {
 			(td.nextSibling as HTMLElement).title = warningTooltipTextWhenCommentRowNotFirstCellIsUsed;
@@ -368,6 +339,9 @@ function setCsvWriteOptionsInitial(options: CsvWriteOptions) {
  * checks if the has header read option must be disabled or not
  * and sets the needed state
  * 
+ * if has header option is available (when we have enough data rows) we also check 
+ * {@link headerRowWithIndex} if we have only comment rows
+ * 
  * see https://forum.handsontable.com/t/table-with-only-header-row/2915 and
  * and https://github.com/handsontable/handsontable/issues/735
  * seems like with default headers it's not possible to only have headers?
@@ -391,8 +365,15 @@ function checkIfHasHeaderReadOptionIsAvailable(isInitialRender: boolean): boolea
 			canSetOption = data.length > 1 //no header ... to enable header we need 2 rows
 		}
 	}
-	
 
+	if (canSetOption) {
+		//but we could have only comments --> no header available
+		const firstRow = getFirstRowWithIndex()
+		if (firstRow === null && !el.checked) { //if el.checked is true then we already have a header row...
+			canSetOption = false
+		}
+	}
+	
 	if (canSetOption) {
 		el.removeAttribute('disabled')
 
