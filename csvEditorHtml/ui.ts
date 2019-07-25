@@ -127,6 +127,8 @@ function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLE
 /**
  * if input value is set programmatically this is NOT called
  * 
+ * when the settings apply header {@link startRenderData} we need to reset the status text here
+ * 
  * @param fromUndo true: only update col headers, do not change the table data (will be done by undo/redo), false: normal
  */
 function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
@@ -357,6 +359,9 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 	//this will also expand comment rows but we only use the first column value...
 	_normalizeDataArray(data, csvReadConfig)
 
+	//reset header row
+	headerRowWithIndex = null
+	
 	// if (data.length > 0) {
 	// 	headerRowWithIndex = getFirstRowWithIndexByData(data)
 	// }
@@ -997,6 +1002,9 @@ function resetData(content: string, csvReadOptions: CsvReadOptions) {
 	toggleAskReadAgainModal(false)
 }
 
+/**
+ * a wrapper for resetData to display status text when rendering
+ */
 function resetDataFromResetDialog() {
 
 	toggleAskReadAgainModal(false)
