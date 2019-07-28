@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"license": "MIT",
 	"publisher": "janisdd",
 	"engines": {
