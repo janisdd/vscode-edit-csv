@@ -24,6 +24,7 @@ const defaultConfig = {
     selectTextAfterBeginEditCell: false,
     quoteAllFields: false,
     initiallyHideComments: false,
+    enableWrapping: true,
 };
 /**
  * returns the configuration for this extension

@@ -405,6 +405,11 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		currentRowClassName: 'foo', //actually used to overwrite highlighting
 		//plugins
 		comments: false,
+		wordWrap: enableWrapping,
+		//keep this undefined/disabled because else performance is very very very bad for large files 
+		//(for every row the height is calculated even if not rendered, on plugin startup and when a col is resized?)
+		//i also don't understand the benefit of it... maybe for non text content?
+		// autoRowSize: true, 
 		manualRowMove: true,
 		manualRowResize: true,
 		manualColumnMove: true,

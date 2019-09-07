@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## 0.1.3
+
+- added option for cell content wrapping (fixes issue #7)
+- switched to custom/own version of handsontable (6.2.2, to keep MIT license)
+
 ## 0.1.2
 
 - trim feature now also trims header row (probably better)

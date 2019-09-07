@@ -73,6 +73,12 @@ let lastHandsonMoveWas: 'tab' | 'enter' | null = null
  */
 let highlightCsvComments: boolean = true
 
+/**
+ * true: cell content is wrapped and the row height is changed,
+ * false: no wrapping (content is hidden)
+ */
+let enableWrapping: boolean = true
+
 const csvEditorWrapper = _getById('csv-editor-wrapper')
 const csvEditorDiv = _getById('csv-editor')
 const helModalDiv = _getById('help-modal')

@@ -128,9 +128,14 @@ type CsvEditSettings = {
 	quoteAllFields: boolean
 
 	/**
-	 * true: Initially hides rows with comments found in the table, false: not hide rows with comments
+	 * true: initially hides rows with comments found in the table, false: not hide rows with comments
 	 */
 	initiallyHideComments: boolean
+
+	/**
+	 * true: cell content is wrapped and the row height is changed, false: no wrapping (content is hidden)
+	 */
+	enableWrapping: boolean
 }
 
 /* --- frontend settings --- */

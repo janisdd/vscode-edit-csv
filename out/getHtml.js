@@ -20,6 +20,7 @@ exports.getResourcePath = getResourcePath;
 function createEditorHtml(context, initialContent) {
     const _getResourcePath = getResourcePath.bind(undefined, context);
     let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.min.css');
+    // let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.css')
     let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js');
     // let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js')
     let papaparseJs = _getResourcePath('thirdParty/papaparse.min.js');

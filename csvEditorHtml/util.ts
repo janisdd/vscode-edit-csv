@@ -446,6 +446,7 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 	}
 
 	highlightCsvComments = initialConfig.highlightCsvComments
+	enableWrapping = initialConfig.enableWrapping
 
 	//apply settings from extension
 

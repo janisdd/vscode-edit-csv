@@ -25,6 +25,7 @@ const defaultConfig: CsvEditSettings = {
 	selectTextAfterBeginEditCell: false,
 	quoteAllFields: false,
 	initiallyHideComments: false,
+	enableWrapping: true,
 }
 
 /**
