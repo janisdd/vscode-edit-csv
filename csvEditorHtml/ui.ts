@@ -406,6 +406,9 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		//plugins
 		comments: false,
 		wordWrap: enableWrapping,
+		autoColumnSize: initialColumnWidth > 0 ? {
+			maxColumnWidth: initialColumnWidth
+		} : true,
 		//keep this undefined/disabled because else performance is very very very bad for large files 
 		//(for every row the height is calculated even if not rendered, on plugin startup and when a col is resized?)
 		//i also don't understand the benefit of it... maybe for non text content?

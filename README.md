@@ -106,6 +106,8 @@ There are two things missing...
 To compile (and watch) the files in `csvEditorHtml` run
 
 ```bash
+tsc -w#or just tsc to transpile only once
+# new terminal
 cd csvEditorHtml
 tsc -w #or just tsc to transpile only once
 ```

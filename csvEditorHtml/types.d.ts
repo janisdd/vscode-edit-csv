@@ -136,6 +136,11 @@ type CsvEditSettings = {
 	 * true: cell content is wrapped and the row height is changed, false: no wrapping (content is hidden)
 	 */
 	enableWrapping: boolean
+
+	/**
+	 * the initial width for columns, 0 or a negative number will disable this and auto column size is used on initial render
+	 */
+	initialColumnWidth: number
 }
 
 /* --- frontend settings --- */

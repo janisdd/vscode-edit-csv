@@ -78,6 +78,10 @@ let highlightCsvComments: boolean = true
  * false: no wrapping (content is hidden)
  */
 let enableWrapping: boolean = true
+/**
+ * the initial width for columns, 0 or a negative number will disable this and auto column size is used on initial render
+ */
+let initialColumnWidth: number = 0
 
 const csvEditorWrapper = _getById('csv-editor-wrapper')
 const csvEditorDiv = _getById('csv-editor')

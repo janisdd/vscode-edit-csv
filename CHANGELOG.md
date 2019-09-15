@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## 0.1.4
+
+- added option to specify initial max column width `initialColumnWidth` (disabled by default)
+	- use 0 or a negative number to disable the option (to use auto column size)
+- fixed issue where new lines inside a cell are collapsed when the option `enableWrapping` was disabled
+
 ## 0.1.3
 
 - added option for cell content wrapping (fixes issue #7)
