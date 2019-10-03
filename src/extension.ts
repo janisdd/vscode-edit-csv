@@ -252,7 +252,9 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 		sourceUri: uri,
 		editorUri: uri.with({
 			scheme: editorUriScheme
-		})
+		}),
+		hasChanges: false,
+		originalTitle: title,
 	}
 
 	try {
@@ -332,10 +334,13 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 				break
 			}
 
-			default: {
-				vscode.window.showErrorMessage(`Received unknown post message from extension: ${JSON.stringify(message)}`);
+			case "setHasChanges": {
+				instance.hasChanges = message.hasChanges
+				setEditorHasChanges(instance, message.hasChanges)
 				break
 			}
+
+			default: notExhaustive(message, `Received unknown post message from extension: ${JSON.stringify(message)}`)
 		}
 
 	}, undefined, context.subscriptions)
@@ -371,7 +376,7 @@ function applyContent(instance: Instance, newContent: string, saveSourceFile: bo
 			vscode.workspace.applyEdit(edit)
 				.then(
 					editsApplied => {
-						_afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterApply)
+						_afterEditsApplied(instance, document, editsApplied, saveSourceFile, openSourceFileAfterApply)
 					},
 					(reason) => {
 						console.warn(`Error applying edits`)
@@ -404,7 +409,7 @@ function applyContent(instance: Instance, newContent: string, saveSourceFile: bo
 			})
 }
 
-function _afterEditsApplied(document: vscode.TextDocument, editsApplied: boolean, saveSourceFile: boolean, openSourceFileAfterApply: boolean) {
+function _afterEditsApplied(instance: Instance, document: vscode.TextDocument, editsApplied: boolean, saveSourceFile: boolean, openSourceFileAfterApply: boolean) {
 
 	const afterShowDocument = () => {
 		if (!editsApplied) {
@@ -420,14 +425,20 @@ function _afterEditsApplied(document: vscode.TextDocument, editsApplied: boolean
 						if (!wasSaved) {
 							console.warn(`Could not save csv file`)
 							vscode.window.showErrorMessage(`Could not save csv file`)
+							return
 						}
+
+						setEditorHasChanges(instance, false)
 					},
 					(reason) => {
 						console.warn(`Error saving csv file`)
 						console.warn(reason); //will be null e.g. no permission denied when saved manually
 						vscode.window.showErrorMessage(`Error saving csv file`)
 					})
+			return
 		}
+
+		setEditorHasChanges(instance, false)
 	}
 
 	//also works for unnamed files... they will not be displayed after save
@@ -466,6 +477,16 @@ function getActiveEditorInstance(instanceManager: InstanceManager): Instance | n
 
 	return instance
 }
+
+function notExhaustive(x: never, message: string): never {
+	vscode.window.showErrorMessage(message);
+	throw new Error(message)
+}
+
+function setEditorHasChanges(instance: Instance, hasChanges: boolean) {
+	instance.panel.title = `${hasChanges ? '* ' : ''}${instance.originalTitle}`
+}
+
 
 // class CsvEditStateSerializer  implements vscode.WebviewPanelSerializer{
 

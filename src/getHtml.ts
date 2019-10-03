@@ -23,10 +23,10 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 
 	let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.min.css')
 	// let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.css')
-	let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js')
-	// let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js')
-	let papaparseJs = _getResourcePath('thirdParty/papaparse.min.js')
-	// let papaparseJs = _getResourcePath('thirdParty/papaparse.js')
+	// let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js')
+	let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js')
+	// let papaparseJs = _getResourcePath('thirdParty/papaparse.min.js')
+	let papaparseJs = _getResourcePath('thirdParty/papaparse.js')
 
 	let fontAwesomeCss = _getResourcePath('node_modules/@fortawesome/fontawesome-free/css/all.min.css')
 	//we need to load the font manually because the url() seems to not work properly with vscode-resource

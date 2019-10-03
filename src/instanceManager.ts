@@ -13,6 +13,16 @@ export interface Instance {
 	 * the uri of the editor webview
 	 */
 	editorUri: vscode.Uri
+
+	/**
+	 * true: edit has unsaved changes, false: not
+	 */
+	hasChanges: boolean
+
+	/**
+	 * the original title for the tab
+	 */
+	originalTitle: string
 }
 
 export interface InstanceStorage  {

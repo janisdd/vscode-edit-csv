@@ -399,6 +399,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			// 	? `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
 			// 	: `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
 		} as any,
+		afterChange: onAnyChange, //only called when cell value changed (e.g. not when col/row removed)
 		fillHandle: false,
 		colHeaders: defaultColHeaderFunc as any,
 		currentColClassName: 'foo', //actually used to overwrite highlighting
@@ -693,6 +694,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 				headerRowWithIndex.row.splice(physicalIndex, 0, ...Array(amount).fill(null))
 				//hot automatically re-renders after this
 			}
+			onAnyChange()
 		},
 		afterRemoveCol: function (visualColIndex, amount) {
 
@@ -718,6 +720,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 				hot.getPlugin('columnSorting').clearSort()
 			}
 
+			onAnyChange()
 		},
 		//inspired by https://github.com/handsontable/handsontable/blob/master/src/plugins/hiddenRows/hiddenRows.js
 		//i absolutely don't understand how handsontable implementation is working... 
@@ -735,6 +738,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 					hiddenPhysicalRowIndices[i] += amount
 				}
 			}
+			onAnyChange()
 		},
 		afterRemoveRow: function (visualRowIndex, amount) {
 			//we need to modify some or all hiddenPhysicalRowIndices...
@@ -758,6 +762,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 				}
 			}
 
+			onAnyChange()
 		},
 		//called when we select a row via row header
 		beforeSetRangeStartOnly: function (coords) {
@@ -878,6 +883,31 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 	//select first cell by default so we have always a context
 	hot.selectCell(0, 0)
+}
+
+
+/**
+ * should be called if anything was changes
+ * then we set the editor to has changes
+ */
+function onAnyChange(changes?: CellChanges[] | null, reason?: string) {
+
+	//this is the case on init (because initial data set)
+	//also when we reset data (button)
+	//when we trim all cells (because this sets the data value via hot.updateSettings)
+	if (changes === null && reason && reason.toLowerCase() === 'loaddata') {
+		return
+	}
+
+	if (reason && reason === 'edit' && changes && changes.length > 0) {
+
+		//handsontable even emits an event if the value stayed the same...
+		const hasChanges = changes.some(p => p[2] !== p[3])
+		if (!hasChanges) return
+	}
+
+	console.log(`arguments`, arguments)
+	postSetEditorHasChanges(true)
 }
 
 //not needed really now because of bug in handson table, see https://github.com/handsontable/handsontable/issues/3328
@@ -1103,6 +1133,10 @@ function trimAllCells() {
 	hot.updateSettings({
 		data: allData
 	}, false)
+
+	//hot.updateSettings reloads data and thus afterChange hook is triggered
+	//BUT the change reason is loadData and thus we ignore it...
+	onAnyChange()
 
 	// const afterData = getData()
 

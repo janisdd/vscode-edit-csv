@@ -16,6 +16,9 @@ Execute the command `edit as csv` to open an editor for the current file.
 
 - On initial load all rows are expanded so that all rows have equal length (number of cells)
 
+- Quotes from quoted fields (where the quotes are not needed) are removed
+	- this is because the file is parsed as csv and thus the quotes are removed. If the quotes are needed (for escaping) then the resulting field will be properly quoted
+
 - Comment row (rows starting with a comment) will only export the first cell
 	- if you accidentally added comment text to a cell other than the first cell you will notice it (color)
 

@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## 0.2.0
+
+- added `unsaved changes` indicator (`*`) to the editor title
+- `Read options` panel now shows a `⇥` as detected delimiter if a tab was detected
+
 ## 0.1.4
 
 - added option to specify initial max column width `initialColumnWidth` (disabled by default)

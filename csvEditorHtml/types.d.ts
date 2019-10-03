@@ -283,7 +283,12 @@ type CopyToClipboardMessage = {
 	text: string
 }
 
-type PostMessage = ReadyMessage | DisplayMessageBoxMessage | OverwriteFileMessage | CopyToClipboardMessage
+type SetEditorHasChangesMessage = {
+	command: 'setHasChanges'
+	hasChanges: boolean
+}
+
+type PostMessage = ReadyMessage | DisplayMessageBoxMessage | OverwriteFileMessage | CopyToClipboardMessage | SetEditorHasChangesMessage
 
 type VsState = {
 	readOptionIsCollapsed: boolean
@@ -335,3 +340,8 @@ type MergedCellDef = {
 	rowspan: number
 	colspan: number
 }
+
+/**
+ * [row, col, oldValue, newValue]
+ */
+type CellChanges = [number, number | string, string, string]

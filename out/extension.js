@@ -193,7 +193,9 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
         sourceUri: uri,
         editorUri: uri.with({
             scheme: exports.editorUriScheme
-        })
+        }),
+        hasChanges: false,
+        originalTitle: title,
     };
     try {
         instanceManager.addInstance(instance);
@@ -256,10 +258,12 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
                 vscode.env.clipboard.writeText(message.text);
                 break;
             }
-            default: {
-                vscode.window.showErrorMessage(`Received unknown post message from extension: ${JSON.stringify(message)}`);
+            case "setHasChanges": {
+                instance.hasChanges = message.hasChanges;
+                setEditorHasChanges(instance, message.hasChanges);
                 break;
             }
+            default: notExhaustive(message, `Received unknown post message from extension: ${JSON.stringify(message)}`);
         }
     }, undefined, context.subscriptions);
     panel.onDidDispose(() => {
@@ -282,7 +286,7 @@ function applyContent(instance, newContent, saveSourceFile, openSourceFileAfterA
         edit.replace(document.uri, textRange, newContent);
         vscode.workspace.applyEdit(edit)
             .then(editsApplied => {
-            _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterApply);
+            _afterEditsApplied(instance, document, editsApplied, saveSourceFile, openSourceFileAfterApply);
         }, (reason) => {
             console.warn(`Error applying edits`);
             console.warn(reason);
@@ -309,7 +313,7 @@ function applyContent(instance, newContent, saveSourceFile, openSourceFileAfterA
         vscode.window.showErrorMessage(`Could not find the source file`);
     });
 }
-function _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFileAfterApply) {
+function _afterEditsApplied(instance, document, editsApplied, saveSourceFile, openSourceFileAfterApply) {
     const afterShowDocument = () => {
         if (!editsApplied) {
             console.warn(`Edits could not be applied`);
@@ -322,13 +326,17 @@ function _afterEditsApplied(document, editsApplied, saveSourceFile, openSourceFi
                 if (!wasSaved) {
                     console.warn(`Could not save csv file`);
                     vscode.window.showErrorMessage(`Could not save csv file`);
+                    return;
                 }
+                setEditorHasChanges(instance, false);
             }, (reason) => {
                 console.warn(`Error saving csv file`);
                 console.warn(reason); //will be null e.g. no permission denied when saved manually
                 vscode.window.showErrorMessage(`Error saving csv file`);
             });
+            return;
         }
+        setEditorHasChanges(instance, false);
     };
     //also works for unnamed files... they will not be displayed after save
     if (openSourceFileAfterApply) {
@@ -360,6 +368,13 @@ function getActiveEditorInstance(instanceManager) {
         return null;
     }
     return instance;
+}
+function notExhaustive(x, message) {
+    vscode.window.showErrorMessage(message);
+    throw new Error(message);
+}
+function setEditorHasChanges(instance, hasChanges) {
+    instance.panel.title = `${hasChanges ? '* ' : ''}${instance.originalTitle}`;
 }
 // class CsvEditStateSerializer  implements vscode.WebviewPanelSerializer{
 // 	static state: VsState = {

@@ -56,7 +56,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] |
 	defaultCsvWriteOptions.delimiter = parseResult.meta.delimiter
 	newLineFromInput = parseResult.meta.linebreak
 
-	readDelimiterTooltip.setAttribute('data-tooltip', `${readDelimiterTooltipText} (detected: ${defaultCsvWriteOptions.delimiter})`)
+	readDelimiterTooltip.setAttribute('data-tooltip', `${readDelimiterTooltipText} (detected: ${defaultCsvWriteOptions.delimiter.replace("\t", "⇥")})`)
 
 	return parseResult.data
 }
@@ -267,7 +267,7 @@ function postVsError(text: string) {
 
 /**
  * called to copy the text to the clipboard through vs code
- * @param text the text to copy 
+ * @param text the text to copy
  */
 function postCopyToClipboard(text: string) {
 
@@ -279,6 +279,23 @@ function postCopyToClipboard(text: string) {
 	vscode.postMessage({
 		command: 'copyToClipboard',
 		text
+	})
+}
+
+/**
+ * called to change the editor title through vs code
+ * @param text the new title
+ */
+function postSetEditorHasChanges(hasChanges: boolean) {
+
+	if (!vscode) {
+		console.log(`postSetEditorHasChanges (but in browser)`)
+		return
+	}
+
+	vscode.postMessage({
+		command: 'setHasChanges',
+		hasChanges
 	})
 }
 
@@ -375,8 +392,9 @@ function onReceiveCsvContentSlice(slice: StringSlice) {
 
 /**
  * performs the last steps to actually show the data (set status, render table, ...)
+ * also called on reset data
  */
-function startRenderData() {
+function startRenderData(){
 
 	statusInfo.innerText = `Rendering table...`
 
@@ -390,6 +408,8 @@ function startRenderData() {
 		if (!defaultCsvReadOptions._hasHeader) { //when we apply header this will reset the status for us
 			setTimeout(() => {
 				statusInfo.innerText = '';
+
+				postSetEditorHasChanges(false)
 			}, 0)
 		}
 		
