@@ -101,6 +101,7 @@ const hideCommentsBtn = _getById('hide-comments-btn') as HTMLButtonElement
 //add this to the first wrong column
 const warningTooltipTextWhenCommentRowNotFirstCellIsUsed = `Please use only the first cell in comment row (others are not exported)`
 
+const unsavedChangesIndicator = _getById('unsaved-changes-indicator') as HTMLSpanElement
 
 /* main */
 

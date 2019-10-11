@@ -651,7 +651,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			}
 		},
 
-		afterColumnMove: function (aa, bbb) {
+		afterColumnMove: function (startCol: number, endCol: number) {
 
 			if (!hot) throw new Error('table was null')
 
@@ -659,6 +659,11 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			// hot.updateSettings({
 			// 	colHeaders: defaultColHeaderFunc as any
 			// }, false)
+			onAnyChange()
+		},
+		afterRowMove: function(startRow: number, endRow: number) {
+			if (!hot) throw new Error('table was null')
+			onAnyChange()
 		},
 		afterGetRowHeader: function (visualRowIndex: number, th: any) {
 			const tr = th.parentNode as HTMLTableRowElement
@@ -906,7 +911,6 @@ function onAnyChange(changes?: CellChanges[] | null, reason?: string) {
 		if (!hasChanges) return
 	}
 
-	console.log(`arguments`, arguments)
 	postSetEditorHasChanges(true)
 }
 
@@ -1172,4 +1176,12 @@ function showOrHideAllComments(show: boolean) {
 	if (!hot) return
 
 	hot.render()
+}
+
+function _setHasUnsavedChangesUiIndicator(hasUnsavedChanges: boolean) {
+	if (hasUnsavedChanges) {
+		unsavedChangesIndicator.classList.remove('op-hidden')
+	} else {
+		unsavedChangesIndicator.classList.add('op-hidden')
+	}
 }

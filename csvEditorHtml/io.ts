@@ -288,6 +288,8 @@ function postCopyToClipboard(text: string) {
  */
 function postSetEditorHasChanges(hasChanges: boolean) {
 
+	_setHasUnsavedChangesUiIndicator(hasChanges)
+
 	if (!vscode) {
 		console.log(`postSetEditorHasChanges (but in browser)`)
 		return
@@ -305,6 +307,8 @@ function postSetEditorHasChanges(hasChanges: boolean) {
  * @param saveSourceFile 
  */
 function _postApplyContent(csvContent: string, saveSourceFile: boolean) {
+
+	_setHasUnsavedChangesUiIndicator(false)
 
 	if (!vscode) {
 		console.log(`_postApplyContent (but in browser)`)

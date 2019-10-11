@@ -2,9 +2,9 @@
 
 ## [Unreleased]
 
-## 0.2.0
+## 0.1.5
 
-- added `unsaved changes` indicator (`*`) to the editor title
+- added `unsaved changes` indicator (`*`) to the editor title and icon to ui
 - `Read options` panel now shows a `⇥` as detected delimiter if a tab was detected
 
 ## 0.1.4

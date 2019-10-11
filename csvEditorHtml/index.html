@@ -212,16 +212,24 @@
 				<div>
 					<div class="options-title">
 						<span class="clickable" onclick="togglePreview()">Preview</span>
-						<span><button class="button is-light is-small" style="vertical-align: middle;"
-								onclick="generateCsvPreview()">Generate</button></span>
+						<span>
+							<button class="button is-light is-small" style="vertical-align: middle;" onclick="generateCsvPreview()">Generate
+							</button>
+							</span>
 						<span class="clickable" onclick="togglePreview()">
 							<i id="preview-icon" class="fas fa-chevron-right"></i>
 						</span>
 
+						<!-- no css tooltip because we want a delay-->
 						<span class="mar-left-half clickable" onclick="copyPreviewToClipboard()"
 							title="Creates the preview and copies it to the clipboard">
 							<i id="preview-copy-icon" class="fas fa-paste"></i>
 						</span>
+
+							<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"
+								data-tooltip="You might have unsaved changes">
+								<i class="fas fa-save"></i>
+							</span>
 					</div>
 
 				</div>
@@ -266,7 +274,7 @@
 						<i class="fas fa-reply"></i>
 					</span>
 					<span>Apply</span>
-					<span class="tooltip mar-left-half" data-tooltip="Applies the csv content back to the source file">
+					<span class="tooltip mar-left-half is-tooltip-multiline" data-tooltip="Applies the csv content back to the source file. After this the editor has no unsaved changes.">
 						<i class="fas fa-question-circle"></i>
 					</span>
 				</button>
@@ -379,6 +387,7 @@
 				<h3 class="title is-3">Hints</h3>
 				<div class="content">
 					<ul>
+						<li>The unsaved changes indicator is display on any change (never cleared until you apply the changes, even if you revert manually)</li>
 						<li>You can right-click on the table to get a context menu</li>
 						<li>Hidden rows are also exported</li>
 						<li>Comment rows will export only the first cell/column. If you use a cell other than the first for comments the cell color will indicate this. </li>

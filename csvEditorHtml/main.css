@@ -82,6 +82,15 @@ html, body {
 	opacity: 1;
 }
 
+.unsaved-changes-indicator {
+	color: rgb(224, 193, 69);
+	transition: opacity 0.5s ease-in-out;
+}
+
+.op-hidden {
+	opacity: 0;
+	pointer-events: none;
+}
 
 input.input {
 	width: 110px;

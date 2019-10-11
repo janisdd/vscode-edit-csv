@@ -23,10 +23,10 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 
 	let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.min.css')
 	// let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.css')
-	// let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js')
-	let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js')
-	// let papaparseJs = _getResourcePath('thirdParty/papaparse.min.js')
-	let papaparseJs = _getResourcePath('thirdParty/papaparse.js')
+	let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js')
+	// let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js')
+	let papaparseJs = _getResourcePath('thirdParty/papaparse.min.js')
+	// let papaparseJs = _getResourcePath('thirdParty/papaparse.js')
 
 	let fontAwesomeCss = _getResourcePath('node_modules/@fortawesome/fontawesome-free/css/all.min.css')
 	//we need to load the font manually because the url() seems to not work properly with vscode-resource
@@ -52,18 +52,18 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 	 {
 		bodyPageHtml= `
 		<div class="page full-h">
-	
+
 			<div class="all-options">
-	
+
 				<div class="options-bar">
 					<div class="flexed">
 						<div class="options-title clickable" onclick="toggleReadOptions()">Read options <i id="read-options-icon"
 								class="fas fa-chevron-right"></i></div>
 					</div>
-	
+
 					<div id="read-options-content" class="options-content">
 						<div>
-	
+
 							<div class="field">
 								<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked"
 									onchange="applyHasHeader(true, false)">
@@ -75,7 +75,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</div>
-	
+
 							<!-- this makes the row data invalid if we have more than 1 col-->
 							<!-- <div class="field">
 									<input id="skip-empty-lines" type="checkbox" name="skip-empty-lines" class="switch is-rounded" checked="checked" onchange="setSkipEmptyLines()" disabled>
@@ -86,7 +86,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 										</span>
 									</label>
 							</div> -->
-	
+
 							<!-- delimiter and comment -->
 							<div class="flexed">
 								<div class="field">
@@ -101,7 +101,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 									<input id="delimiter-string" class="input" type="text" placeholder="auto"
 										oninput="setDelimiterString()">
 								</div>
-	
+
 								<div class="field mar-left">
 									<label>
 										<span>Comment</span>
@@ -114,7 +114,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 										oninput="setCommentString()">
 								</div>
 							</div>
-	
+
 							<!-- quote and escape -->
 							<div class="flexed">
 								<div class="field">
@@ -123,7 +123,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 									</label>
 									<input id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()">
 								</div>
-	
+
 								<div class="field mar-left">
 									<label>
 										<span>EscapeChar</span>
@@ -131,8 +131,8 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 									<input id="escape-char-string" class="input" type="text" oninput="setEscapeCharString()">
 								</div>
 							</div>
-	
-	
+
+
 							<button class="button is-light" onclick="toggleAskReadAgainModal(true)">
 								<span>Reset data</span>
 								<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
@@ -140,17 +140,17 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</button>
-	
+
 						</div>
 					</div>
 				</div>
-	
+
 				<div class="options-bar">
 					<div>
 						<div class="options-title clickable" onclick="toggleWriteOptions()">Write options <i id="write-options-icon"
 								class="fas fa-chevron-right"></i></div>
 					</div>
-	
+
 					<div id="write-options-content" class="options-content">
 						<div class="field">
 							<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded"
@@ -162,7 +162,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</div>
-	
+
 						<!-- delimiter and comment -->
 						<div class="flexed">
 							<div class="field">
@@ -179,7 +179,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 								<input id="delimiter-string-write" class="input" type="text" placeholder="auto"
 									oninput="setDelimiterStringWrite()">
 							</div>
-	
+
 							<div class="field mar-left">
 								<label for="comment-string-write">
 									<label>
@@ -194,7 +194,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 									oninput="setCommentStringWrite()">
 							</div>
 						</div>
-	
+
 						<!-- quote and escape -->
 						<div class="flexed">
 							<div class="field">
@@ -203,7 +203,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 								</label>
 								<input id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()">
 							</div>
-	
+
 							<div class="field mar-left">
 								<label>
 									<span>EscapeChar</span>
@@ -211,9 +211,9 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 								<input id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()">
 							</div>
 						</div>
-	
+
 						<div class="flexed">
-	
+
 							<div class="field">
 								<input id="quote-all-fields-write" type="checkbox" name="quote-all-fields-write" class="switch is-rounded"
 									checked="checked" onchange="setQuoteAllFieldsWrite()">
@@ -221,9 +221,9 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 									<span>Quote all fields</span>
 								</label>
 							</div>
-	
+
 						</div>
-	
+
 						<!-- see help modal why -->
 						<div class="field" style="display: none;">
 							<label for="comment-string-write">NewLine</label>
@@ -235,37 +235,45 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 								</select>
 							</div>
 						</div>
-	
+
 					</div>
 				</div>
-	
+
 				<div class="options-bar" style="flex: 1;">
 					<div>
 						<div class="options-title">
 							<span class="clickable" onclick="togglePreview()">Preview</span>
-							<span><button class="button is-light is-small" style="vertical-align: middle;"
-									onclick="generateCsvPreview()">Generate</button></span>
+							<span>
+								<button class="button is-light is-small" style="vertical-align: middle;" onclick="generateCsvPreview()">Generate
+								</button>
+								</span>
 							<span class="clickable" onclick="togglePreview()">
 								<i id="preview-icon" class="fas fa-chevron-right"></i>
 							</span>
-	
+
+							<!-- no css tooltip because we want a delay-->
 							<span class="mar-left-half clickable" onclick="copyPreviewToClipboard()"
 								title="Creates the preview and copies it to the clipboard">
 								<i id="preview-copy-icon" class="fas fa-paste"></i>
 							</span>
+
+								<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"
+									data-tooltip="You might have unsaved changes">
+									<i class="fas fa-save"></i>
+								</span>
 						</div>
-	
+
 					</div>
-	
+
 					<div id="preview-content" class="options-content">
 						<textarea id="csv-preview" class="textarea preview-csv-textarea"></textarea>
 					</div>
-	
+
 				</div>
 			</div>
-	
+
 			<div class="table-action-buttons">
-	
+
 				<div class="separated-btns">
 					<button class="button is-outlined" onclick="addRow()">
 						<span class="icon is-small">
@@ -273,14 +281,14 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 						</span>
 						<span>Add row</span>
 					</button>
-	
+
 					<button class="button is-outlined" onclick="addColumn()">
 						<span class="icon is-small">
 							<i class="fas fa-plus"></i>
 						</span>
 						<span>Add column</span>
 					</button>
-	
+
 					<button class="button is-outlined mar-left" onclick="postApplyContent(true)">
 						<span class="icon is-small">
 							<i class="fas fa-save"></i>
@@ -291,25 +299,25 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 							<i class="fas fa-question-circle"></i>
 						</span>
 					</button>
-	
+
 					<button class="button is-outlined" onclick="postApplyContent(false)">
 						<span class="icon is-small">
 							<i class="fas fa-reply"></i>
 						</span>
 						<span>Apply</span>
-						<span class="tooltip mar-left-half" data-tooltip="Applies the csv content back to the source file">
+						<span class="tooltip mar-left-half is-tooltip-multiline" data-tooltip="Applies the csv content back to the source file. After this the editor has no unsaved changes.">
 							<i class="fas fa-question-circle"></i>
 						</span>
 					</button>
-	
+
 					<div id="status-info-wrapper">
 						<div>
 							<span id="status-info"></span>
 						</div>
 					</div>
-	
+
 					<div class="flexed">
-	
+
 						<div>
 							<button id="show-comments-btn" style="margin-right: 1em" class="button is-outlined" onclick="showOrHideAllComments(true)">
 								<span class="icon is-small">
@@ -328,18 +336,18 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 								</span>
 							</button>
 						</div>
-	
+
 						<button style="margin-right: 1em" class="button is-outlined" onclick="trimAllCells()">
 							<span class="icon is-small">
 								<i class="fas fa-hand-scissors"></i>
 							</span>
 							<span>Trim</span>
 							<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
-							data-tooltip="Trims ever cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo!">
+								data-tooltip="Trims ever cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo!">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</button>
-	
+
 						<button class="button is-outlined" onclick="toggleHelpModal(true)">
 							<span class="icon is-small">
 								<i class="fas fa-question"></i>
@@ -347,20 +355,20 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 							<span>Help</span>
 						</button>
 					</div>
-	
+
 				</div>
 				<div id="received-csv-prog-bar-wrapper">
 					<progress id="received-csv-prog-bar" class="progress is-info" value="50" max="100"></progress>
 				</div>
 			</div>
-	
-	
-	
+
+
+
 			<!-- main editor/grid area -->
 			<div id="csv-editor-wrapper" class="csv-editor-wrapper">
 				<div id="csv-editor"></div>
 			</div>
-	
+
 		</div>
 		`
 	 }
@@ -415,6 +423,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 				<h3 class="title is-3">Hints</h3>
 				<div class="content">
 					<ul>
+						<li>The unsaved changes indicator is display on any change (never cleared until you apply the changes, even if you revert manually)</li>
 						<li>You can right-click on the table to get a context menu</li>
 						<li>Hidden rows are also exported</li>
 						<li>Comment rows will export only the first cell/column. If you use a cell other than the first for comments the cell color will indicate this. </li>
