@@ -329,6 +329,26 @@ type StringSlice = {
 	totalSlices: number
 }
 
+/*+
+ * see https://handsontable.com/docs/6.2.2/demo-searching.html
+ */
+type HandsontableSearchResult = {
+	/**
+	 * the visual index?
+	 */
+	row: number
+		/**
+	 * the visual index?
+	 */
+	col: number
+
+	/**
+	 * the cell data if any
+	 * from source this is: this.hot.getDataAtCell(rowIndex, colIndex);
+	 */
+	data: null | undefined | string
+}
+
 type HeaderRowWithIndex = {
 	row: Array<string | null>
 	physicalIndex: number
@@ -345,3 +365,8 @@ type MergedCellDef = {
  * [row, col, oldValue, newValue]
  */
 type CellChanges = [number, number | string, string, string]
+
+type Point = {
+	x: number
+	y: number
+}

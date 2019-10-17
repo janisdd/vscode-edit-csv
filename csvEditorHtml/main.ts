@@ -103,6 +103,27 @@ const warningTooltipTextWhenCommentRowNotFirstCellIsUsed = `Please use only the 
 
 const unsavedChangesIndicator = _getById('unsaved-changes-indicator') as HTMLSpanElement
 
+//--- find widget controls
+const findWidget = _getById('find-widget') as HTMLDivElement
+const findWidgetInput = _getById('find-widget-input') as HTMLInputElement
+const findWidgetInfo = _getById('find-widget-info') as HTMLSpanElement
+
+const findWidgetOptionMatchCase = _getById('find-window-option-match-case') as HTMLDivElement
+const findWidgetOptionWholeWord = _getById('find-window-option-whole-word') as HTMLDivElement
+const findWidgetOptionRegex = _getById('find-window-option-regex') as HTMLDivElement
+
+const findWidgetPrevious = _getById('find-widget-previous') as HTMLDivElement
+const findWidgetNext = _getById('find-widget-next') as HTMLDivElement
+let findWidgetGripperIsMouseDown = false
+let findWidgetDownPointOffsetInPx = 0 //gripper relative to the find widget
+
+/**
+ * stores the last find results
+ */
+let lastFindResults: HandsontableSearchResult[] = []
+let currentFindIndex = 0
+
+
 /* main */
 
 //set defaults when we are in browser
@@ -144,7 +165,7 @@ let _data = parseCsv(initialContent, defaultCsvReadOptions)
 
 if (_data && !vscode) {
 	//@ts-ignore
-	// _data = Handsontable.helper.createSpreadsheetData(100, 20)
+	_data = Handsontable.helper.createSpreadsheetData(100, 20)
 	displayData(_data, defaultCsvReadOptions)
 }
 

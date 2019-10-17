@@ -169,3 +169,7 @@ body.vscode-dark {
 .vscode-dark .htContextMenu table.htCore {
 	border-color: #5c5c5c !important;
 }
+
+.vscode-dark .search-result-cell {
+	background-color: #7b7b03!important;
+}

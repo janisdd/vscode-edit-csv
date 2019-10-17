@@ -8,6 +8,9 @@
 	<!-- <script src="../node_modules/papaparse/papaparse.js"></script> -->
 	<script src="../thirdParty/papaparse.min.js"></script>
 
+	<script src="../node_modules/mousetrap/mousetrap.min.js"></script>
+	<script src="../node_modules/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js"></script>
+
 	<link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
 
 	<link rel="stylesheet" href="../node_modules/bulma/css/bulma.min.css">
@@ -19,6 +22,59 @@
 </head>
 
 <body class="vscode-dark" style="background-color: #003b49">
+
+	<div id="find-widget" class="find-widget" style="display: none; right: 100px;;">
+
+		<div class="gripper" onmousedown="onFindWidgetGripperMouseDown(event)">
+			<i class="fas fa-grip-vertical"></i>
+		</div>
+
+		<div class="search-input-wrapper">
+			<input id="find-widget-input" placeholder="Find..." class="input" />
+		</div>
+
+		<div class="info">
+			<span id="find-widget-info">0/0</span>
+		</div>
+
+		<div class="divider"></div>
+		
+		<!-- search options -->
+		<div class="flexed">
+			<div id="find-window-option-match-case" class="btn option" onclick="toggleFindWindowMatchCase()" title="Match Case">
+				<span>Aa</span>
+			</div>
+
+			<div id="find-window-option-whole-word" class="btn option" onclick="toggleFindWindowWholeWord()" title="Match Whole Word">
+				<span style="text-decoration: underline overline;">Abl</span>
+			</div>
+
+			<div id="find-window-option-regex" class="btn option" onclick="toggleFindWindowRegex()" title="Use Regular Expression">
+				<span>
+					<i class="fas fa-square-full" style="font-size: 5px;"></i>
+					<i class="fas fa-asterisk" style="vertical-align: top; font-size: 8px;"></i>
+				</span>
+			</div>
+		</div>
+
+		<div class="divider"></div>
+
+		<!-- search navigation buttons-->
+		<div class="flexed">
+			<div id="find-widget-previous" class="btn" onclick="gotoPreviousFindMatch()" title="Previous match (⇧F3)">
+				<i class="fas fa-chevron-up"></i>
+			</div>
+	
+			<div id="find-widget-next" class=" btn" onclick="gotoNextFindMatch()" title="Next match (F3)">
+				<i class="fas fa-chevron-down"></i>
+			</div>
+	
+			<div class="btn" onclick="showOrHideFindWidget(false)" title="Close (Escape)">
+					<i class="fas fa-times"></i>
+			</div>
+		</div>
+
+	</div>
 
 	<div class="page full-h">
 

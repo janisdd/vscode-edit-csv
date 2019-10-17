@@ -406,6 +406,10 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		currentRowClassName: 'foo', //actually used to overwrite highlighting
 		//plugins
 		comments: false,
+		search: {
+			queryMethod: customSearchMethod,
+			searchResultClass: 'search-result-cell'
+		} as any, //typing is wrong, see https://handsontable.com/docs/6.2.2/demo-searching.html
 		wordWrap: enableWrapping,
 		autoColumnSize: initialColumnWidth > 0 ? {
 			maxColumnWidth: initialColumnWidth
@@ -888,8 +892,10 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 	//select first cell by default so we have always a context
 	hot.selectCell(0, 0)
-}
 
+	//enable all find connected stuff
+	setupFind()
+}
 
 /**
  * should be called if anything was changes
@@ -1184,4 +1190,190 @@ function _setHasUnsavedChangesUiIndicator(hasUnsavedChanges: boolean) {
 	} else {
 		unsavedChangesIndicator.classList.add('op-hidden')
 	}
+}
+
+//--- find widget
+
+function setupFind() {
+
+	Mousetrap.unbind('meta+f')
+	Mousetrap.unbind('esc')
+
+	Mousetrap.bindGlobal('meta+f', (e) => {
+		e.preventDefault()
+		toggleFindWidgetVisibility()
+	})
+
+	findWidgetInput.removeEventListener('keyup', onSearchInput)
+	findWidgetInput.addEventListener('keyup', onSearchInput)
+
+	Mousetrap.bindGlobal('esc', (e) => {
+		showOrHideFindWidget(false)
+	})
+
+	Mousetrap.bindGlobal('f3', (e) => {
+		if (isFindWidgetDisplayed() === false && lastFindResults.length === 0) return
+		gotoNextFindMatch()
+	})
+
+	Mousetrap.bindGlobal('shift+f3', (e) => {
+		if (isFindWidgetDisplayed() === false && lastFindResults.length === 0) return
+		gotoPreviousFindMatch()
+	})
+
+}
+
+function onSearchInput(e: KeyboardEvent) {
+
+	if (!hot || findWidgetInput.value === "") return
+
+	let searchPlugin = hot.getPlugin('search')
+
+	//@ts-ignore
+	lastFindResults = searchPlugin.query(findWidgetInput.value)
+
+	//jump to the first found match
+	gotoFindMatchByIndex(0)
+
+	//to render highlighting
+	hot.render()
+}
+
+/**
+ * shows or hides the find widget 
+ * @param show 
+ */
+function showOrHideFindWidget(show: boolean) {
+	
+	findWidget.style.display = show ? 'flex' : 'none'
+	findWidgetInput.focus()
+}
+
+function isFindWidgetDisplayed(): boolean {
+	return findWidget.style.display  !== 'none'
+}
+
+/**
+ * toggles the find widget visibility
+ */
+function toggleFindWidgetVisibility() {
+	showOrHideFindWidget(findWidget.style.display  === 'none')
+}
+
+
+//--- find widget options
+
+function toggleFindWindowMatchCase() {
+	setFindWindowMatchCase(findWidgetOptionMatchCase.classList.contains(`active`) ? false : true)
+}
+
+function setFindWindowMatchCase(enabled: boolean) {
+
+	if (enabled) {
+		findWidgetOptionMatchCase.classList.add(`active`)
+	} else {
+		findWidgetOptionMatchCase.classList.remove(`active`)
+	}
+}
+
+function toggleFindWindowWholeWord() {
+	setFindWindowWholeWord(findWidgetOptionWholeWord.classList.contains(`active`) ? false : true)
+}
+
+function setFindWindowWholeWord(enabled: boolean) {
+
+	if (enabled) {
+		findWidgetOptionWholeWord.classList.add(`active`)
+	} else {
+		findWidgetOptionWholeWord.classList.remove(`active`)
+	}
+}
+
+function toggleFindWindowRegex() {
+	setFindWindowRegex(findWidgetOptionRegex.classList.contains(`active`) ? false : true)
+}
+
+function setFindWindowRegex(enabled: boolean) {
+
+	if (enabled) {
+		findWidgetOptionRegex.classList.add(`active`)
+	} else {
+		findWidgetOptionRegex.classList.remove(`active`)
+	}
+}
+
+//--- find matches
+
+function gotoPreviousFindMatch() {
+	gotoFindMatchByIndex(currentFindIndex-1)
+}
+
+function gotoNextFindMatch() {
+	gotoFindMatchByIndex(currentFindIndex+1)
+}
+
+/**
+ * moves the table to the given find match by index
+ * also sets the {@link currentFindIndex}
+ * @param matchIndex if the index is invalid we cycle
+ */
+function gotoFindMatchByIndex(matchIndex: number) {
+
+	if (!hot) return
+
+	if (lastFindResults.length === 0) {
+		findWidgetInfo.innerText = `No results`
+		return
+	}
+
+	if (matchIndex >= lastFindResults.length) {
+		gotoFindMatchByIndex(0)
+		return
+	}
+
+	if (matchIndex < 0) {
+		gotoFindMatchByIndex(lastFindResults.length - 1)
+		return
+	}
+
+	let match = lastFindResults[matchIndex]
+	
+	hot.selectCell(match.row, match.col)
+	hot.scrollViewportTo(match.row)
+	findWidgetInfo.innerText = `${matchIndex+1}/${lastFindResults.length}`
+	currentFindIndex = matchIndex
+}
+
+function onFindWidgetGripperMouseDown(e: MouseEvent) {
+	e.preventDefault()
+	findWidgetGripperIsMouseDown = true
+	let xFromRight = document.body.clientWidth - e.clientX 
+
+	if (findWidget.style.right === null || findWidget.style.right === "") {
+		return
+	}
+
+	let rightString = findWidget.style.right.substr(0, findWidget.style.right.length-2)
+	findWidgetDownPointOffsetInPx = xFromRight - parseInt(rightString)
+
+	document.addEventListener('mouseup', onFindWidgetDragEnd)
+	document.addEventListener('mousemove', onFindWidgetDrag)
+}
+
+function onFindWidgetDrag(e: MouseEvent) {
+	e.preventDefault()
+
+	let xFromRight = document.body.clientWidth - e.clientX 
+	let newRight = xFromRight- findWidgetDownPointOffsetInPx
+	
+	//keep the find widget in window bounds
+	if (newRight < 0 || findWidget.clientWidth + newRight > document.body.clientWidth) return
+
+	findWidget.style.right = `${newRight}px`
+}
+
+function onFindWidgetDragEnd(e: MouseEvent) {
+	findWidgetGripperIsMouseDown = false
+	document.removeEventListener('mousemove', onFindWidgetDrag)
+	document.removeEventListener('mouseup', onFindWidgetDragEnd)
 }

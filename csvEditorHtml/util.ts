@@ -607,3 +607,15 @@ function _setPreviewCollapsedVsState(isCollapsed: boolean) {
 		// vscode.setState(newState)
 	}
 }
+
+/**
+ * a custom search method for the table
+ * @param query 
+ * @param value 
+ */
+function customSearchMethod(query: string | undefined | null, value: string | undefined | null): boolean {
+
+	if (query === null || query === undefined || value === null || value === undefined) return false
+
+	return query === value
+}

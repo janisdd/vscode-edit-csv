@@ -241,7 +241,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	const title = getEditorTitle(activeTextEditor.document)
 
 	let panel = vscode.window.createWebviewPanel('csv-editor', title, getCurrentViewColumn(), {
-		enableFindWidget: true,
+		enableFindWidget: false, //we use our own find widget...
 		enableCommandUris: true,
 		enableScripts: true,
 		retainContextWhenHidden: true

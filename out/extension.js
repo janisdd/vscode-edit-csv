@@ -183,7 +183,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
     const initialText = activeTextEditor.document.getText();
     const title = getEditorTitle(activeTextEditor.document);
     let panel = vscode.window.createWebviewPanel('csv-editor', title, util_1.getCurrentViewColumn(), {
-        enableFindWidget: true,
+        enableFindWidget: false,
         enableCommandUris: true,
         enableScripts: true,
         retainContextWhenHidden: true

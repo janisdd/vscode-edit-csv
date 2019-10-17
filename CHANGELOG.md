@@ -4,6 +4,8 @@
 
 ## 0.1.5
 
+- replaced built-in vs code find widget with custom find widget
+	- tries to stay close to the vs code find widget
 - added `unsaved changes` indicator (`*`) to the editor title and icon to ui
 - `Read options` panel now shows a `⇥` as detected delimiter if a tab was detected
 

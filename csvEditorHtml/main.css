@@ -261,4 +261,73 @@ tr.hidden-row-previous-row > th:after {
 	bottom: -4px;
 }
 
+.find-widget {
+	display: flex;
+	position: fixed;
+	/* right: 100px; */ /* set this directly in html so we can access it via .style*/
+	top: 0;
+	height: 34px;
 
+	background: rgb(51, 51, 51);
+	box-shadow: 0 2px 8px #000000;
+	z-index: 2;
+	width: 440px;
+}
+.find-widget #find-widget-info {
+	font-size: 13px;
+}
+
+.find-widget .gripper {
+	cursor: grab;
+	margin: 5px;
+}
+.find-widget .gripper:active {
+	cursor: grabbing;
+}
+
+.find-widget .btn {
+	opacity: 0.7;
+	cursor: pointer;
+	margin: 5px;
+}
+
+.find-widget .btn.option {
+	font-size: 13px;
+	min-width: 15px;
+	margin: 5px 2px;
+}
+
+.find-widget .btn span {
+	vertical-align: middle;
+	line-height: 27px;
+	text-align: center;
+	padding: 3px;
+}
+
+.find-widget .btn.active {
+	background-color: #3384ff;
+}
+
+.find-widget .btn:hover {
+	opacity: 1;
+}
+
+.find-widget .info {
+	align-self: center;
+	margin: 5px;
+}
+.find-widget .search-input-wrapper {
+	margin: 5px;
+	flex: 1;
+}
+.find-widget .search-input-wrapper .input {
+	height: 23px;
+	width: 100%;
+	padding: 4px;
+	border-radius: 0;
+}
+.find-widget .divider {
+	margin: 3px 5px;
+	width: 2px;
+	background-color: #4c4c4c;;
+}

@@ -66,3 +66,7 @@ body.vscode-light {
 .vscode-light .htContextMenu table.htCore {
 	/* border-color: #5c5c5c !important; */
 }
+
+.vscode-light .search-result-cell {
+	background-color: #ffff00!important;
+}

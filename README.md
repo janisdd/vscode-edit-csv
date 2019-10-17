@@ -102,6 +102,7 @@ There are two things missing...
 	- with small custom modifications to handle comments specially
 - for grid/table element: [handsontable](https://github.com/handsontable/handsontable)
 - for ui: [bulma](https://github.com/jgthms/bulma), [bulma-extension](https://github.com/Wikiki/bulma-extensions), [fontawesome](https://github.com/FortAwesome/Font-Awesome)
+- for shortcuts: [mousetrap](https://github.com/ccampbell/mousetrap)
 
 
 ## How to build locally

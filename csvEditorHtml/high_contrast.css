@@ -129,18 +129,22 @@ body.vscode-high-contrast {
 }
 
 /* context menu */
-.vscode-high-contrast  .htContextMenu table tbody tr td {
+.vscode-high-contrast .htContextMenu table tbody tr td {
 	background-color: black !important;
 	border-color: #5c5c5c !important;
 }
 
-.vscode-high-contrast  .htContextMenu table tbody tr td:hover {
+.vscode-high-contrast .htContextMenu table tbody tr td:hover {
 	background-color: #ff0d0d !important;
 }
-.vscode-high-contrast  .htContextMenu table tbody tr td.htDisabled:hover {
+.vscode-high-contrast .htContextMenu table tbody tr td.htDisabled:hover {
 	background-color: black !important;
 }
 
-.vscode-high-contrast  .htContextMenu table.htCore {
+.vscode-high-contrast .htContextMenu table.htCore {
 	border-color: #5c5c5c !important;
+}
+
+.vscode-high-contrast .search-result-cell {
+	background-color: #9d00ff!important;
 }
