@@ -145,6 +145,6 @@ body.vscode-high-contrast {
 	border-color: #5c5c5c !important;
 }
 
-.vscode-high-contrast .search-result-cell {
+.vscode-high-contrast .ht_master tr> td.search-result-cell {
 	background-color: #9d00ff!important;
 }

@@ -419,6 +419,22 @@ function throttle(func: Function, wait: number) {
 	}
 }
 
+//from https://davidwalsh.name/javascript-debounce-function
+function debounce(func: Function, wait: number, immediate = false) {
+	var timeout: any;
+	return function (this: any) {
+		var context = this, args = arguments;
+		var later = function () {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+}
+
 function _error(text: string) {
 	postVsError(text)
 	throw new Error(text)
@@ -617,5 +633,34 @@ function customSearchMethod(query: string | undefined | null, value: string | un
 
 	if (query === null || query === undefined || value === null || value === undefined) return false
 
-	return query === value
+	if (query === '') return false
+
+	if (!findOptionMatchCaseCache) {
+		value = value.toLowerCase()
+		query = query.toLowerCase()
+	}
+
+	if (findOptionUseRegexCase) {
+
+		if (findWidgetCurrRegex === null) {
+			throw new Error('should not happen...')
+		}
+
+		let result = findWidgetCurrRegex.exec(value)
+
+		//TODO hat to do here???
+		// if (findOptionMatchWholeWordCache) {
+			
+		// } 
+
+		return result !== null
+
+	} else {
+
+		if (findOptionMatchWholeWordCache) {
+			return value === query
+		} 
+
+		return value.indexOf(query) !== -1
+	}
 }

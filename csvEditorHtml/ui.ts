@@ -379,6 +379,10 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		hiddenPhysicalRowIndices = _getCommentIndices(data, csvReadConfig)
 	}
 
+		//enable all find connected stuff
+		//we need to setup this first so we get the events before handsontable... e.g. document keydown
+		setupFind()
+
 	//@ts-ignore
 	hot = new Handsontable(container, {
 		data,
@@ -892,9 +896,6 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 	//select first cell by default so we have always a context
 	hot.selectCell(0, 0)
-
-	//enable all find connected stuff
-	setupFind()
 }
 
 /**
@@ -1198,14 +1199,20 @@ function setupFind() {
 
 	Mousetrap.unbind('meta+f')
 	Mousetrap.unbind('esc')
+	Mousetrap.unbind('f3')
+	Mousetrap.unbind('shift+f3')
 
 	Mousetrap.bindGlobal('meta+f', (e) => {
 		e.preventDefault()
-		toggleFindWidgetVisibility()
+		e.stopImmediatePropagation()
+		showOrHideFindWidget(true)
 	})
 
-	findWidgetInput.removeEventListener('keyup', onSearchInput)
-	findWidgetInput.addEventListener('keyup', onSearchInput)
+	findWidgetInput.removeEventListener('keyup', onSearchInputPreDebounced)
+	findWidgetInput.addEventListener('keyup', onSearchInputPreDebounced)
+
+	document.documentElement.removeEventListener('keydown', onDocumentRootKeyDown)
+	document.documentElement.addEventListener('keydown', onDocumentRootKeyDown)
 
 	Mousetrap.bindGlobal('esc', (e) => {
 		showOrHideFindWidget(false)
@@ -1221,22 +1228,117 @@ function setupFind() {
 		gotoPreviousFindMatch()
 	})
 
+	window.removeEventListener('resize', onWindowResizeThrottled)
+	window.addEventListener('resize', onWindowResizeThrottled)
 }
 
-function onSearchInput(e: KeyboardEvent) {
+function onDocumentRootKeyDown(e: ExtendedKeyboardEvent) {
 
-	if (!hot || findWidgetInput.value === "") return
+	if (isFindWidgetDisplayed()) {
+
+		//when the find widget is displayed do not pass the event to handsontable
+		//else we would input into the cell editor...
+		//see editorManager.js > init (`instance.runHooks('afterDocumentKeyDown', event);`) > _baseEditor.js > beginEditing (`this.focus();`) > textEditor.js > focus
+		e.stopImmediatePropagation()
+
+		//but we need to be able to close the find...
+		if (e.key === 'Escape') {
+			Mousetrap.trigger('esc')
+		}
+	}
+
+}
+
+function onSearchInputPre(e: KeyboardEvent | null) {
+
+	if (e && (
+		e.key.indexOf('Meta') !== -1 || e.key.indexOf('Escape') !== -1
+		)) return
+
+	onSearchInput(e, false, true, null)
+}
+
+function onSearchInput(e: KeyboardEvent | null, isOpeningFindWidget: boolean, jumpToResult: boolean, pretendedText: string | null) {
+
+	if (!hot ) return
+
+	//when we open the find widget and input is empty then ddn't do anything
+	if (isOpeningFindWidget === true && findWidgetInput.value === "") {
+		findWidgetInput.focus()
+		return
+	}
+
+	if (findOptionUseRegexCase) {
+		let regexIsValid = refreshFindWidgetRegex(false)
+
+		if (!regexIsValid) {
+			findWidgetInput.focus()
+			return
+		}
+	}
 
 	let searchPlugin = hot.getPlugin('search')
 
-	//@ts-ignore
-	lastFindResults = searchPlugin.query(findWidgetInput.value)
+	if (pretendedText === null) {
+		//use real value
+		//@ts-ignore
+		lastFindResults = searchPlugin.query(findWidgetInput.value)
 
-	//jump to the first found match
-	gotoFindMatchByIndex(0)
+	} else {
+			//@ts-ignore
+		lastFindResults = searchPlugin.query(pretendedText)
+	}
+	
+
+	if (jumpToResult) {
+		//jump to the first found match
+		gotoFindMatchByIndex(0)
+	}
 
 	//to render highlighting
 	hot.render()
+
+	//render will auto focus the editor (hot input textarea)
+	//see copyPaste.js > onAfterSelectionEnd > `this.focusableElement.focus();`
+	//and
+	//see selection.js > setRangeEnd(coords) > `this.runLocalHooks('afterSetRangeEnd', coords);` > ... > textEditor.js > focus > `this.TEXTAREA.select();`
+
+	//this should run after all handsontable hooks... and the search input should keep focus
+	setTimeout(() => {
+		findWidgetInput.focus()
+		console.log(`focus`)
+	},0)
+}
+
+
+/**
+ * refreshes the {@link findWidgetCurrRegex} from the {@link findWidgetInput}
+ * @returns true: the find widget regex is valid (!= null), false: regex is invalid
+ */
+function refreshFindWidgetRegex(forceReset: boolean): boolean {
+
+	if (forceReset) {
+		findWidgetCurrRegex = null
+		findWWidgetErrorMessage.innerText = ''
+		findWidgetInput.classList.remove('error-input')
+		return false
+	}
+
+	try {
+		findWidgetCurrRegex = new RegExp(findWidgetInput.value, 'g')
+		findWWidgetErrorMessage.innerText = ''
+		findWidgetInput.classList.remove('error-input')
+
+		return true
+
+	} catch (error) {
+		console.log(`error:`, error.message)
+		findWidgetCurrRegex = null
+		findWWidgetErrorMessage.innerText = error.message
+		findWidgetInput.classList.add('error-input')
+
+		return false
+	}
 }
 
 /**
@@ -1245,8 +1347,34 @@ function onSearchInput(e: KeyboardEvent) {
  */
 function showOrHideFindWidget(show: boolean) {
 	
+	if (!hot) return
+
+	let currIsSown = isFindWidgetDisplayed()
+
+	if (currIsSown === show) return
+
 	findWidget.style.display = show ? 'flex' : 'none'
-	findWidgetInput.focus()
+
+	if (show) {
+
+		// hot.updateSettings({
+		// 	search: {
+		// 		searchResultClass: findMatchCellClass
+		// 	}
+		// } as any, false)
+		onSearchInput(null, true, false, null)
+	} else {
+		
+		
+			onSearchInput(null, false, false, '')
+
+		// hot.updateSettings({
+		// 	search: {
+		// 		searchResultClass: findOldMatchCellClass
+		// 	}
+		// } as any, false)
+	}
+	
 }
 
 function isFindWidgetDisplayed(): boolean {
@@ -1274,6 +1402,8 @@ function setFindWindowMatchCase(enabled: boolean) {
 	} else {
 		findWidgetOptionMatchCase.classList.remove(`active`)
 	}
+	findOptionMatchCaseCache = enabled
+	onSearchInput(null, false, true, null)
 }
 
 function toggleFindWindowWholeWord() {
@@ -1287,19 +1417,29 @@ function setFindWindowWholeWord(enabled: boolean) {
 	} else {
 		findWidgetOptionWholeWord.classList.remove(`active`)
 	}
+	findOptionMatchWholeWordCache = enabled
+	onSearchInput(null, false, true, null)
 }
 
 function toggleFindWindowRegex() {
 	setFindWindowRegex(findWidgetOptionRegex.classList.contains(`active`) ? false : true)
 }
 
+/**
+ * also refreshes the {@link findWidgetCurrRegex} when enabled (in {@link onSearchInput})
+ * @param enabled 
+ */
 function setFindWindowRegex(enabled: boolean) {
 
 	if (enabled) {
 		findWidgetOptionRegex.classList.add(`active`)
+		refreshFindWidgetRegex(false)
 	} else {
 		findWidgetOptionRegex.classList.remove(`active`)
+		refreshFindWidgetRegex(true)
 	}
+	findOptionUseRegexCase = enabled
+	onSearchInput(null, false, true, null)
 }
 
 //--- find matches
@@ -1342,6 +1482,7 @@ function gotoFindMatchByIndex(matchIndex: number) {
 	hot.scrollViewportTo(match.row)
 	findWidgetInfo.innerText = `${matchIndex+1}/${lastFindResults.length}`
 	currentFindIndex = matchIndex
+	findWidgetInput.focus()
 }
 
 function onFindWidgetGripperMouseDown(e: MouseEvent) {
@@ -1367,7 +1508,8 @@ function onFindWidgetDrag(e: MouseEvent) {
 	let newRight = xFromRight- findWidgetDownPointOffsetInPx
 	
 	//keep the find widget in window bounds
-	if (newRight < 0 || findWidget.clientWidth + newRight > document.body.clientWidth) return
+	newRight = Math.max(newRight, 0)
+	newRight = Math.min(newRight, document.body.clientWidth - findWidget.clientWidth)
 
 	findWidget.style.right = `${newRight}px`
 }
@@ -1376,4 +1518,18 @@ function onFindWidgetDragEnd(e: MouseEvent) {
 	findWidgetGripperIsMouseDown = false
 	document.removeEventListener('mousemove', onFindWidgetDrag)
 	document.removeEventListener('mouseup', onFindWidgetDragEnd)
+}
+
+function onWindowResize(e: UIEvent) {
+
+	//ensure the find widget is in bounds...
+	if (findWidget.style.right === null || findWidget.style.right === "") {
+		return
+	}
+	let rightString = findWidget.style.right.substr(0, findWidget.style.right.length-2)
+	let currRight = parseInt(rightString)
+
+	currRight = Math.max(currRight, 0)
+	currRight = Math.min(currRight, document.body.clientWidth - findWidget.clientWidth)
+	findWidget.style.right = `${currRight}px`
 }

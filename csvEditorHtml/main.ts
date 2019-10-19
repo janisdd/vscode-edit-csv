@@ -106,6 +106,7 @@ const unsavedChangesIndicator = _getById('unsaved-changes-indicator') as HTMLSpa
 //--- find widget controls
 const findWidget = _getById('find-widget') as HTMLDivElement
 const findWidgetInput = _getById('find-widget-input') as HTMLInputElement
+const findWWidgetErrorMessage = _getById('find-widget-error-message') as HTMLDivElement
 const findWidgetInfo = _getById('find-widget-info') as HTMLSpanElement
 
 const findWidgetOptionMatchCase = _getById('find-window-option-match-case') as HTMLDivElement
@@ -116,6 +117,20 @@ const findWidgetPrevious = _getById('find-widget-previous') as HTMLDivElement
 const findWidgetNext = _getById('find-widget-next') as HTMLDivElement
 let findWidgetGripperIsMouseDown = false
 let findWidgetDownPointOffsetInPx = 0 //gripper relative to the find widget
+
+//cache the state for query method to not interact with dom
+let findOptionMatchCaseCache = false
+let findOptionMatchWholeWordCache = false
+let findOptionUseRegexCase = false
+
+let findWidgetCurrRegex: RegExp | null = null
+
+const findMatchCellClass = 'search-result-cell'
+//we swap .search-result-cell with this class so we don't need to redo the search after reopening the find widget
+const findOldMatchCellClass = 'old-search-result-cell'
+
+const onWindowResizeThrottled = throttle(onWindowResize, 200)
+const onSearchInputPreDebounced = debounce(onSearchInputPre, 200)
 
 /**
  * stores the last find results

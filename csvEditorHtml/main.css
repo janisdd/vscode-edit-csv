@@ -280,6 +280,7 @@ tr.hidden-row-previous-row > th:after {
 .find-widget .gripper {
 	cursor: grab;
 	margin: 5px;
+	color: #6d6d6d;
 }
 .find-widget .gripper:active {
 	cursor: grabbing;
@@ -317,6 +318,7 @@ tr.hidden-row-previous-row > th:after {
 	margin: 5px;
 }
 .find-widget .search-input-wrapper {
+	position: relative;
 	margin: 5px;
 	flex: 1;
 }
@@ -325,7 +327,25 @@ tr.hidden-row-previous-row > th:after {
 	width: 100%;
 	padding: 4px;
 	border-radius: 0;
+	border: 1px solid transparent;
 }
+
+.find-widget .error-input {
+	border: 1px solid rgb(190, 17, 0)!important;;
+}
+
+.find-widget .error-input:focus + .error-message {
+	display: block;
+}
+
+.find-widget .error-message {
+	display: none;
+	padding: 5px;
+	font-size: 13px;
+	background-color: rgb(90, 29, 29);
+	border: 1px solid rgb(190, 17, 0);
+}
+
 .find-widget .divider {
 	margin: 3px 5px;
 	width: 2px;
