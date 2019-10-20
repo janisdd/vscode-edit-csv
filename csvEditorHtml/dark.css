@@ -108,19 +108,11 @@ body.vscode-dark {
 	background-color: #262c2e;
 	border-color: #5c5c5c;
 }
-/* we swap .search-result-cell with this class so we don't need to redo the search after reopening the find widget*/
-/* vscode-dark .ht_master tr:nth-of-type(odd) > td.old-search-result-cell {
-	background-color: #262c2e!important;
-} */
 
 .vscode-dark .ht_master tr:nth-of-type(even) > td {
 	background-color: #2d3436;
 	border-color: #5c5c5c;
 }
-/* we swap .search-result-cell with this class so we don't need to redo the search after reopening the find widget*/
-/* .vscode-dark .ht_master tr:nth-of-type(even) > td.old-search-result-cell {
-	background-color: #2d3436!important;
-} */
 
 .vscode-dark .ht_clone_left th {
 	background-color:rgb(26, 29, 29);

@@ -412,7 +412,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 		comments: false,
 		search: {
 			queryMethod: customSearchMethod,
-			searchResultClass: 'search-result-cell'
+			searchResultClass: 'search-result-cell',
 		} as any, //typing is wrong, see https://handsontable.com/docs/6.2.2/demo-searching.html
 		wordWrap: enableWrapping,
 		autoColumnSize: initialColumnWidth > 0 ? {
@@ -1204,7 +1204,6 @@ function setupFind() {
 
 	Mousetrap.bindGlobal('meta+f', (e) => {
 		e.preventDefault()
-		e.stopImmediatePropagation()
 		showOrHideFindWidget(true)
 	})
 
@@ -1251,18 +1250,32 @@ function onDocumentRootKeyDown(e: ExtendedKeyboardEvent) {
 
 function onSearchInputPre(e: KeyboardEvent | null) {
 
+	//don't trigger on meta/super and escape but this should already be catched by value changed check below
 	if (e && (
 		e.key.indexOf('Meta') !== -1 || e.key.indexOf('Escape') !== -1
 		)) return
 
+	//because we debounced the input we sometimes get an input "f" here when we repeatedly open and close the find widget
+	//so only fire when the input value really changed
+	if (findWidgetInput.value === findWidgetInputValueCache) return
+
+	findWidgetInputValueCache = findWidgetInput.value
+
 	onSearchInput(e, false, true, null)
 }
 
-function onSearchInput(e: KeyboardEvent | null, isOpeningFindWidget: boolean, jumpToResult: boolean, pretendedText: string | null) {
+/**
+ * 
+ * @param e 
+ * @param isOpeningFindWidget 
+ * @param jumpToResult 
+ * @param pretendedText if this is a string we search synchronous!
+ */
+async function onSearchInput(e: KeyboardEvent | null, isOpeningFindWidget: boolean, jumpToResult: boolean, pretendedText: string | null) {
 
 	if (!hot ) return
 
-	//when we open the find widget and input is empty then ddn't do anything
+	//when we open the find widget and input is empty then didn't do anything
 	if (isOpeningFindWidget === true && findWidgetInput.value === "") {
 		findWidgetInput.focus()
 		return
@@ -1282,13 +1295,26 @@ function onSearchInput(e: KeyboardEvent | null, isOpeningFindWidget: boolean, ju
 	if (pretendedText === null) {
 		//use real value
 		//@ts-ignore
-		lastFindResults = searchPlugin.query(findWidgetInput.value)
+		// lastFindResults = searchPlugin.query(findWidgetInput.value)
+
+		findWidgetProgressbar.setValue(0)
+		findWidgetProgressbar.show()
+
+		console.time('query')
+
+		findWidgetQueryCancellationToken.isCancellationRequested = false
+		showOrHideSearchCancel(true)
+
+		//when we increment to e.g. only update after 10% then the time will improve!
+		//@ts-ignore
+		lastFindResults = await searchPlugin.queryAsync(findWidgetInput.value, _onSearchProgress, 5, findWidgetQueryCancellationToken)
 
 	} else {
 			//@ts-ignore
 		lastFindResults = searchPlugin.query(pretendedText)
 	}
-	
+
+	findWidgetQueryCancellationToken.isCancellationRequested = false
 
 	if (jumpToResult) {
 		//jump to the first found match
@@ -1306,10 +1332,37 @@ function onSearchInput(e: KeyboardEvent | null, isOpeningFindWidget: boolean, ju
 	//this should run after all handsontable hooks... and the search input should keep focus
 	setTimeout(() => {
 		findWidgetInput.focus()
-		console.log(`focus`)
 	},0)
+	console.log(`finished`)
 }
 
+function _onSearchProgress(index: number, maxIndex: number, percentage: number) {
+
+		findWidgetProgressbar.setValue(percentage)
+		console.log(`per`, percentage)
+		if (index >= maxIndex) {
+			_onSearchFinished()
+		}
+}
+
+function _onSearchFinished() {
+	showOrHideSearchCancel(false)
+	//small delay so we see the 100% finished progress bar
+	setTimeout(() => {
+		findWidgetProgressbar.hide()
+	}, 100)
+}
+
+function onCancelSearch() {
+	findWidgetQueryCancellationToken.isCancellationRequested = true
+	_onSearchFinished()
+	console.log(`cancelled`)
+}
+
+function showOrHideSearchCancel(show: boolean) {
+	findWidgetCancelSearch.style.display = show ? 'block' : 'none'
+	findWidgetInfo.style.display = show ? 'none' : 'block'
+}
 
 /**
  * refreshes the {@link findWidgetCurrRegex} from the {@link findWidgetInput}
@@ -1356,25 +1409,25 @@ function showOrHideFindWidget(show: boolean) {
 	findWidget.style.display = show ? 'flex' : 'none'
 
 	if (show) {
+		hot.updateSettings({
+			search: {
+				isSuspended: false
+			}
+		} as any, false)
 
-		// hot.updateSettings({
-		// 	search: {
-		// 		searchResultClass: findMatchCellClass
-		// 	}
-		// } as any, false)
-		onSearchInput(null, true, false, null)
+		//handsontable probably tries to grab the focus...
+		setTimeout(() => {
+			findWidgetInput.focus()
+		}, 0);
+
 	} else {
-		
-		
-			onSearchInput(null, false, false, '')
-
-		// hot.updateSettings({
-		// 	search: {
-		// 		searchResultClass: findOldMatchCellClass
-		// 	}
-		// } as any, false)
+		hot.updateSettings({
+			search: {
+				isSuspended: true
+			}
+		} as any, false)
 	}
-	
+
 }
 
 function isFindWidgetDisplayed(): boolean {

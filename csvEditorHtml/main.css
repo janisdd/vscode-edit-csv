@@ -317,6 +317,7 @@ tr.hidden-row-previous-row > th:after {
 	align-self: center;
 	margin: 5px;
 }
+
 .find-widget .search-input-wrapper {
 	position: relative;
 	margin: 5px;
@@ -349,5 +350,16 @@ tr.hidden-row-previous-row > th:after {
 .find-widget .divider {
 	margin: 3px 5px;
 	width: 2px;
-	background-color: #4c4c4c;;
+	background-color: #4c4c4c;
+}
+
+.find-widget .progress-bar {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: none;
+
+	height: 2px;
+	background-color: #3384ff;
 }

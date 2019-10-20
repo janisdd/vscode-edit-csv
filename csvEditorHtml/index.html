@@ -4,7 +4,7 @@
 <head>
 	<title>Csv editor</title>
 	<link rel="stylesheet" href="../node_modules/handsontable/dist/handsontable.css">
-	<script src="../node_modules/handsontable/dist/handsontable.js"></script>
+	<script src="../node_modules/handsontable/dist/handsontable.js?5"></script>
 	<!-- <script src="../node_modules/papaparse/papaparse.js"></script> -->
 	<script src="../thirdParty/papaparse.min.js"></script>
 
@@ -23,7 +23,9 @@
 
 <body class="vscode-dark" style="background-color: #003b49">
 
-	<div id="find-widget" class="find-widget" style="display: none; right: 100px;;">
+	<div id="find-widget" class="find-widget" style="display: none; right: 100px;">
+
+		<div id="find-widget-progress-bar" class="progress-bar"></div>
 
 		<div class="gripper" onmousedown="onFindWidgetGripperMouseDown(event)">
 			<i class="fas fa-grip-vertical"></i>
@@ -38,6 +40,9 @@
 
 		<div class="info">
 			<span id="find-widget-info">0/0</span>
+			<span id="find-widget-cancel-search" title="Cancel search" class="clickable" onclick="onCancelSearch()" style="display: none;">
+				<i class="fas fa-hand-paper"></i>
+			</span>
 		</div>
 
 		<div class="divider"></div>
@@ -48,7 +53,7 @@
 				<span>Aa</span>
 			</div>
 
-			<div id="find-window-option-whole-word" class="btn option" onclick="toggleFindWindowWholeWord()" title="Match Whole Word">
+			<div id="find-window-option-whole-word" class="btn option" onclick="toggleFindWindowWholeWord()" title="Match Whole Cell Value">
 				<span style="text-decoration: underline overline;">Abl</span>
 			</div>
 
@@ -497,6 +502,7 @@
 	</div>
 
 
+	<script src="out/progressbar.js"></script>
 	<script src="out/io.js"></script>
 	<script src="out/ui.js"></script>
 	<script src="out/util.js"></script>

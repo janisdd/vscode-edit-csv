@@ -23,8 +23,8 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 
 	let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.min.css')
 	// let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.css')
-	let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js')
-	// let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js')
+	// let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js')
+	let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js')
 	let papaparseJs = _getResourcePath('thirdParty/papaparse.min.js')
 	// let papaparseJs = _getResourcePath('thirdParty/papaparse.js')
 
@@ -40,6 +40,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 	const hightContrastThemeCss = _getResourcePath('csvEditorHtml/high_contrast.css')
 
 	//scripts
+	const progressJs = _getResourcePath('csvEditorHtml/out/progressbar.js')
 	const ioJs = _getResourcePath('csvEditorHtml/out/io.js')
 	const uiJs = _getResourcePath('csvEditorHtml/out/ui.js')
 	const utilJs = _getResourcePath('csvEditorHtml/out/util.js')
@@ -519,6 +520,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 	var initialConfig = ${JSON.stringify(config)};
 </script>
 
+	 <script src="${progressJs}"></script>
 	 <script src="${ioJs}"></script>
 	 <script src="${utilJs}"></script>
 	 <script src="${uiJs}"></script>

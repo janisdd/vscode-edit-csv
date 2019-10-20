@@ -108,6 +108,7 @@ const findWidget = _getById('find-widget') as HTMLDivElement
 const findWidgetInput = _getById('find-widget-input') as HTMLInputElement
 const findWWidgetErrorMessage = _getById('find-widget-error-message') as HTMLDivElement
 const findWidgetInfo = _getById('find-widget-info') as HTMLSpanElement
+const findWidgetCancelSearch = _getById('find-widget-cancel-search') as HTMLSpanElement
 
 const findWidgetOptionMatchCase = _getById('find-window-option-match-case') as HTMLDivElement
 const findWidgetOptionWholeWord = _getById('find-window-option-whole-word') as HTMLDivElement
@@ -117,6 +118,14 @@ const findWidgetPrevious = _getById('find-widget-previous') as HTMLDivElement
 const findWidgetNext = _getById('find-widget-next') as HTMLDivElement
 let findWidgetGripperIsMouseDown = false
 let findWidgetDownPointOffsetInPx = 0 //gripper relative to the find widget
+
+let findWidgetInputValueCache = ''
+
+const findWidgetProgressbar = new Progressbar('find-widget-progress-bar')
+
+let findWidgetQueryCancellationToken: {isCancellationRequested: boolean} = {
+	isCancellationRequested: false
+}
 
 //cache the state for query method to not interact with dom
 let findOptionMatchCaseCache = false
@@ -181,6 +190,8 @@ let _data = parseCsv(initialContent, defaultCsvReadOptions)
 if (_data && !vscode) {
 	//@ts-ignore
 	_data = Handsontable.helper.createSpreadsheetData(100, 20)
+	// _data = Handsontable.helper.createSpreadsheetData(10000, 21)
+	// _data = Handsontable.helper.createSpreadsheetData(100000, 20)
 	displayData(_data, defaultCsvReadOptions)
 }
 

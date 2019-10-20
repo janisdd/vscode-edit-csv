@@ -649,9 +649,11 @@ function customSearchMethod(query: string | undefined | null, value: string | un
 		let result = findWidgetCurrRegex.exec(value)
 
 		//TODO hat to do here???
-		// if (findOptionMatchWholeWordCache) {
-			
-		// } 
+		if (findOptionMatchWholeWordCache) {
+			if (result !== null && result.length > 0) {
+				return result[0] === value
+			}
+		} 
 
 		return result !== null
 
