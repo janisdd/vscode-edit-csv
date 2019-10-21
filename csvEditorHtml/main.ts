@@ -108,10 +108,12 @@ const findWidget = _getById('find-widget') as HTMLDivElement
 const findWidgetInput = _getById('find-widget-input') as HTMLInputElement
 const findWWidgetErrorMessage = _getById('find-widget-error-message') as HTMLDivElement
 const findWidgetInfo = _getById('find-widget-info') as HTMLSpanElement
+const findWidgetOutdatedSearch = _getById('find-widget-outdated-search') as HTMLSpanElement
 const findWidgetCancelSearch = _getById('find-widget-cancel-search') as HTMLSpanElement
 
 const findWidgetOptionMatchCase = _getById('find-window-option-match-case') as HTMLDivElement
-const findWidgetOptionWholeWord = _getById('find-window-option-whole-word') as HTMLDivElement
+const findWidgetOptionWholeCell = _getById('find-window-option-whole-cell') as HTMLDivElement
+const findWidgetOptionWholeCellTrimmed = _getById('find-window-option-whole-cell-trimmed') as HTMLDivElement
 const findWidgetOptionRegex = _getById('find-window-option-regex') as HTMLDivElement
 
 const findWidgetPrevious = _getById('find-widget-previous') as HTMLDivElement
@@ -129,7 +131,8 @@ let findWidgetQueryCancellationToken: {isCancellationRequested: boolean} = {
 
 //cache the state for query method to not interact with dom
 let findOptionMatchCaseCache = false
-let findOptionMatchWholeWordCache = false
+let findOptionMatchWholeCellCache = false
+let findOptionTrimCellCache = false
 let findOptionUseRegexCase = false
 
 let findWidgetCurrRegex: RegExp | null = null

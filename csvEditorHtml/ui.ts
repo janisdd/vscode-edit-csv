@@ -918,6 +918,8 @@ function onAnyChange(changes?: CellChanges[] | null, reason?: string) {
 		if (!hasChanges) return
 	}
 
+	showOrHideOutdatedSearch(true)
+
 	postSetEditorHasChanges(true)
 }
 
@@ -1198,10 +1200,6 @@ function _setHasUnsavedChangesUiIndicator(hasUnsavedChanges: boolean) {
 function setupFind() {
 
 	Mousetrap.unbind('meta+f')
-	Mousetrap.unbind('esc')
-	Mousetrap.unbind('f3')
-	Mousetrap.unbind('shift+f3')
-
 	Mousetrap.bindGlobal('meta+f', (e) => {
 		e.preventDefault()
 		showOrHideFindWidget(true)
@@ -1213,15 +1211,18 @@ function setupFind() {
 	document.documentElement.removeEventListener('keydown', onDocumentRootKeyDown)
 	document.documentElement.addEventListener('keydown', onDocumentRootKeyDown)
 
+	Mousetrap.unbind('esc')
 	Mousetrap.bindGlobal('esc', (e) => {
 		showOrHideFindWidget(false)
 	})
+
 
 	Mousetrap.bindGlobal('f3', (e) => {
 		if (isFindWidgetDisplayed() === false && lastFindResults.length === 0) return
 		gotoNextFindMatch()
 	})
 
+	Mousetrap.unbind('shift+f3')
 	Mousetrap.bindGlobal('shift+f3', (e) => {
 		if (isFindWidgetDisplayed() === false && lastFindResults.length === 0) return
 		gotoPreviousFindMatch()
@@ -1233,9 +1234,9 @@ function setupFind() {
 
 function onDocumentRootKeyDown(e: ExtendedKeyboardEvent) {
 
-	if (isFindWidgetDisplayed()) {
+	if (isFindWidgetDisplayed() && document.activeElement === findWidgetInput) {
 
-		//when the find widget is displayed do not pass the event to handsontable
+		//when the find widget is displayed AND has focus do not pass the event to handsontable
 		//else we would input into the cell editor...
 		//see editorManager.js > init (`instance.runHooks('afterDocumentKeyDown', event);`) > _baseEditor.js > beginEditing (`this.focus();`) > textEditor.js > focus
 		e.stopImmediatePropagation()
@@ -1250,18 +1251,27 @@ function onDocumentRootKeyDown(e: ExtendedKeyboardEvent) {
 
 function onSearchInputPre(e: KeyboardEvent | null) {
 
-	//don't trigger on meta/super and escape but this should already be catched by value changed check below
-	if (e && (
-		e.key.indexOf('Meta') !== -1 || e.key.indexOf('Escape') !== -1
-		)) return
+	let forceSearch = false
+
+	if (e) {
+		//allow to quickly refresh search
+		if (e.key === 'Enter') {
+			forceSearch = true
+		} else {
+		//don't trigger on meta/super and escape but this should already be caught by value changed check below
+		if (
+			e.key.indexOf('Meta') !== -1 || e.key.indexOf('Escape') !== -1
+		) return
+		}
+	} 
 
 	//because we debounced the input we sometimes get an input "f" here when we repeatedly open and close the find widget
 	//so only fire when the input value really changed
-	if (findWidgetInput.value === findWidgetInputValueCache) return
+	if (findWidgetInput.value === findWidgetInputValueCache && forceSearch === false) return
 
 	findWidgetInputValueCache = findWidgetInput.value
 
-	onSearchInput(e, false, true, null)
+	onSearchInput(false, true, null)
 }
 
 /**
@@ -1271,7 +1281,7 @@ function onSearchInputPre(e: KeyboardEvent | null) {
  * @param jumpToResult 
  * @param pretendedText if this is a string we search synchronous!
  */
-async function onSearchInput(e: KeyboardEvent | null, isOpeningFindWidget: boolean, jumpToResult: boolean, pretendedText: string | null) {
+async function onSearchInput(isOpeningFindWidget: boolean, jumpToResult: boolean, pretendedText: string | null) {
 
 	if (!hot ) return
 
@@ -1280,6 +1290,8 @@ async function onSearchInput(e: KeyboardEvent | null, isOpeningFindWidget: boole
 		findWidgetInput.focus()
 		return
 	}
+
+	showOrHideOutdatedSearch(false)
 
 	if (findOptionUseRegexCase) {
 		let regexIsValid = refreshFindWidgetRegex(false)
@@ -1444,45 +1456,75 @@ function toggleFindWidgetVisibility() {
 
 //--- find widget options
 
-function toggleFindWindowMatchCase() {
-	setFindWindowMatchCase(findWidgetOptionMatchCase.classList.contains(`active`) ? false : true)
+function toggleFindWindowOptionMatchCase() {
+	setFindWindowOptionMatchCase(findWidgetOptionMatchCase.classList.contains(`active`) ? false : true)
 }
 
-function setFindWindowMatchCase(enabled: boolean) {
+function setFindWindowOptionMatchCase(enabled: boolean) {
 
 	if (enabled) {
 		findWidgetOptionMatchCase.classList.add(`active`)
 	} else {
 		findWidgetOptionMatchCase.classList.remove(`active`)
 	}
+
 	findOptionMatchCaseCache = enabled
-	onSearchInput(null, false, true, null)
+
+	//empty content should not trigger new search
+	if (findWidgetInputValueCache === '') return
+
+	onSearchInput(false, true, null)
 }
 
-function toggleFindWindowWholeWord() {
-	setFindWindowWholeWord(findWidgetOptionWholeWord.classList.contains(`active`) ? false : true)
+function toggleFindWindowOptionWholeCell() {
+	setFindWindowOptionWholeCell(findWidgetOptionWholeCell.classList.contains(`active`) ? false : true)
 }
 
-function setFindWindowWholeWord(enabled: boolean) {
+function setFindWindowOptionWholeCell(enabled: boolean) {
 
 	if (enabled) {
-		findWidgetOptionWholeWord.classList.add(`active`)
+		findWidgetOptionWholeCell.classList.add(`active`)
 	} else {
-		findWidgetOptionWholeWord.classList.remove(`active`)
+		findWidgetOptionWholeCell.classList.remove(`active`)
 	}
-	findOptionMatchWholeWordCache = enabled
-	onSearchInput(null, false, true, null)
+
+	findOptionMatchWholeCellCache = enabled
+
+	//empty content should not trigger new search
+	if (findWidgetInputValueCache === '') return
+
+	onSearchInput(false, true, null)
 }
 
-function toggleFindWindowRegex() {
-	setFindWindowRegex(findWidgetOptionRegex.classList.contains(`active`) ? false : true)
+function toggleFindWindowOptionMatchTrimmedCell() {
+	setFindWindowOptionMatchTrimmedCell(findWidgetOptionWholeCellTrimmed.classList.contains(`active`) ? false : true)
+}
+
+function setFindWindowOptionMatchTrimmedCell(enabled: boolean) {
+
+	if (enabled) {
+		findWidgetOptionWholeCellTrimmed.classList.add(`active`)
+	} else {
+		findWidgetOptionWholeCellTrimmed.classList.remove(`active`)
+	}
+
+	findOptionTrimCellCache = enabled
+
+	//empty content should not trigger new search
+	if (findWidgetInputValueCache === '') return
+
+	onSearchInput(false, true, null)
+}
+
+function toggleFindWindowOptionRegex() {
+	setFindWindowOptionRegex(findWidgetOptionRegex.classList.contains(`active`) ? false : true)
 }
 
 /**
  * also refreshes the {@link findWidgetCurrRegex} when enabled (in {@link onSearchInput})
  * @param enabled 
  */
-function setFindWindowRegex(enabled: boolean) {
+function setFindWindowOptionRegex(enabled: boolean) {
 
 	if (enabled) {
 		findWidgetOptionRegex.classList.add(`active`)
@@ -1491,8 +1533,13 @@ function setFindWindowRegex(enabled: boolean) {
 		findWidgetOptionRegex.classList.remove(`active`)
 		refreshFindWidgetRegex(true)
 	}
+
 	findOptionUseRegexCase = enabled
-	onSearchInput(null, false, true, null)
+
+	//empty content should not trigger new search
+	if (findWidgetInputValueCache === '') return
+
+	onSearchInput(false, true, null)
 }
 
 //--- find matches
@@ -1585,4 +1632,12 @@ function onWindowResize(e: UIEvent) {
 	currRight = Math.max(currRight, 0)
 	currRight = Math.min(currRight, document.body.clientWidth - findWidget.clientWidth)
 	findWidget.style.right = `${currRight}px`
+}
+
+function showOrHideOutdatedSearch(isOutdated: boolean) {
+	findWidgetOutdatedSearch.style.display = isOutdated ? 'block' : 'none'
+}
+
+function refreshCurrentSearch() {
+	onSearchInput(false, true, null)
 }

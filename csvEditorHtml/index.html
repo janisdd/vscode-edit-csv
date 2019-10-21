@@ -43,6 +43,10 @@
 			<span id="find-widget-cancel-search" title="Cancel search" class="clickable" onclick="onCancelSearch()" style="display: none;">
 				<i class="fas fa-hand-paper"></i>
 			</span>
+			<span id="find-widget-outdated-search" class="outdated-search clickable" style="display: none;" onclick="refreshCurrentSearch()"
+				title="The table has changed, thus the search is outdated. Click to refresh the search.">
+				<i class="fas fa-exclamation-triangle"></i>
+			</span>
 		</div>
 
 		<div class="divider"></div>
@@ -53,11 +57,15 @@
 				<span>Aa</span>
 			</div>
 
-			<div id="find-window-option-whole-word" class="btn option" onclick="toggleFindWindowWholeWord()" title="Match Whole Cell Value">
+			<div id="find-window-option-whole-cell" class="btn option" onclick="toggleFindWindowOptionWholeCell()" title="Match Whole Cell Value">
 				<span style="text-decoration: underline overline;">Abl</span>
 			</div>
 
-			<div id="find-window-option-regex" class="btn option" onclick="toggleFindWindowRegex()" title="Use Regular Expression">
+			<div id="find-window-option-whole-cell-trimmed" class="btn option" onclick="toggleFindWindowOptionMatchTrimmedCell()" title="Trims the cell value before comparing">
+				<span style="text-decoration: underline overline;">_A_</span>
+			</div>
+
+			<div id="find-window-option-regex" class="btn option" onclick="toggleFindWindowOptionRegex()" title="Use Regular Expression">
 				<span>
 					<i class="fas fa-square-full" style="font-size: 5px;"></i>
 					<i class="fas fa-asterisk" style="vertical-align: top; font-size: 8px;"></i>

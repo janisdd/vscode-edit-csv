@@ -314,8 +314,10 @@ tr.hidden-row-previous-row > th:after {
 }
 
 .find-widget .info {
-	align-self: center;
+	display: flex;
 	margin: 5px;
+	align-self: center;
+	align-items: center;
 }
 
 .find-widget .search-input-wrapper {
@@ -329,6 +331,11 @@ tr.hidden-row-previous-row > th:after {
 	padding: 4px;
 	border-radius: 0;
 	border: 1px solid transparent;
+}
+
+.outdated-search {
+	color: #c9be29;
+	margin-left: 5px;
 }
 
 .find-widget .error-input {

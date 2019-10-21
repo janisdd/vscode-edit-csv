@@ -640,6 +640,10 @@ function customSearchMethod(query: string | undefined | null, value: string | un
 		query = query.toLowerCase()
 	}
 
+	if (findOptionTrimCellCache) {
+		value = value.trim()
+	}
+
 	if (findOptionUseRegexCase) {
 
 		if (findWidgetCurrRegex === null) {
@@ -648,8 +652,7 @@ function customSearchMethod(query: string | undefined | null, value: string | un
 
 		let result = findWidgetCurrRegex.exec(value)
 
-		//TODO hat to do here???
-		if (findOptionMatchWholeWordCache) {
+		if (findOptionMatchWholeCellCache) {
 			if (result !== null && result.length > 0) {
 				return result[0] === value
 			}
@@ -659,7 +662,7 @@ function customSearchMethod(query: string | undefined | null, value: string | un
 
 	} else {
 
-		if (findOptionMatchWholeWordCache) {
+		if (findOptionMatchWholeCellCache) {
 			return value === query
 		} 
 
