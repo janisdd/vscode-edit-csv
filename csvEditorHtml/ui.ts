@@ -918,7 +918,9 @@ function onAnyChange(changes?: CellChanges[] | null, reason?: string) {
 		if (!hasChanges) return
 	}
 
-	showOrHideOutdatedSearch(true)
+	if (findWidgetInput.value !== '') {
+		showOrHideOutdatedSearch(true)
+	}
 
 	postSetEditorHasChanges(true)
 }
@@ -1305,21 +1307,25 @@ async function onSearchInput(isOpeningFindWidget: boolean, jumpToResult: boolean
 	let searchPlugin = hot.getPlugin('search')
 
 	if (pretendedText === null) {
-		//use real value
-		//@ts-ignore
-		// lastFindResults = searchPlugin.query(findWidgetInput.value)
 
 		findWidgetProgressbar.setValue(0)
 		findWidgetProgressbar.show()
 
-		console.time('query')
 
 		findWidgetQueryCancellationToken.isCancellationRequested = false
+		enableOrDisableFindWidgetInput(false)
 		showOrHideSearchCancel(true)
+
+		// console.time('query')
 
 		//when we increment to e.g. only update after 10% then the time will improve!
 		//@ts-ignore
 		lastFindResults = await searchPlugin.queryAsync(findWidgetInput.value, _onSearchProgress, 5, findWidgetQueryCancellationToken)
+
+		//old sync way
+		//@ts-ignore
+		// lastFindResults = searchPlugin.query(findWidgetInput.value)
+		// console.timeEnd('query')
 
 	} else {
 			//@ts-ignore
@@ -1327,14 +1333,18 @@ async function onSearchInput(isOpeningFindWidget: boolean, jumpToResult: boolean
 	}
 
 	findWidgetQueryCancellationToken.isCancellationRequested = false
+	statusInfo.innerText = `Rendering table...`
 
 	if (jumpToResult) {
 		//jump to the first found match
 		gotoFindMatchByIndex(0)
 	}
 
-	//to render highlighting
-	hot.render()
+	//in a new macro task so that we can see the 100% progress (hot.render will block and take some time)
+	setTimeout(() => {
+		//to render highlighting
+		hot!.render()
+	}, 0)
 
 	//render will auto focus the editor (hot input textarea)
 	//see copyPaste.js > onAfterSelectionEnd > `this.focusableElement.focus();`
@@ -1342,33 +1352,30 @@ async function onSearchInput(isOpeningFindWidget: boolean, jumpToResult: boolean
 	//see selection.js > setRangeEnd(coords) > `this.runLocalHooks('afterSetRangeEnd', coords);` > ... > textEditor.js > focus > `this.TEXTAREA.select();`
 
 	//this should run after all handsontable hooks... and the search input should keep focus
+	//hide the progress bar after we re-render the table (this macro task will be queued after the previous)
 	setTimeout(() => {
+		statusInfo.innerText = ``
+		enableOrDisableFindWidgetInput(true)
+		findWidgetProgressbar.hide()
 		findWidgetInput.focus()
 	},0)
-	console.log(`finished`)
 }
 
 function _onSearchProgress(index: number, maxIndex: number, percentage: number) {
-
 		findWidgetProgressbar.setValue(percentage)
-		console.log(`per`, percentage)
 		if (index >= maxIndex) {
 			_onSearchFinished()
 		}
 }
 
 function _onSearchFinished() {
+	//findWidgetQueryCancellationToken.isCancellationRequested = false is done in search func
 	showOrHideSearchCancel(false)
-	//small delay so we see the 100% finished progress bar
-	setTimeout(() => {
-		findWidgetProgressbar.hide()
-	}, 100)
 }
 
 function onCancelSearch() {
 	findWidgetQueryCancellationToken.isCancellationRequested = true
 	_onSearchFinished()
-	console.log(`cancelled`)
 }
 
 function showOrHideSearchCancel(show: boolean) {
@@ -1640,4 +1647,8 @@ function showOrHideOutdatedSearch(isOutdated: boolean) {
 
 function refreshCurrentSearch() {
 	onSearchInput(false, true, null)
+}
+
+function enableOrDisableFindWidgetInput(isEnable: boolean) {
+	findWidgetInput.disabled = !isEnable
 }

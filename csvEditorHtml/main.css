@@ -333,8 +333,12 @@ tr.hidden-row-previous-row > th:after {
 	border: 1px solid transparent;
 }
 
+.find-widget .search-input-wrapper .input:disabled {
+	color: #757575;
+}
+
 .outdated-search {
-	color: #c9be29;
+	color: rgb(224, 193, 69);
 	margin-left: 5px;
 }
 
