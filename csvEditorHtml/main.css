@@ -374,3 +374,8 @@ tr.hidden-row-previous-row > th:after {
 	height: 2px;
 	background-color: #3384ff;
 }
+
+.div-disabled {
+	opacity: 0.2!important;
+	pointer-events: none;
+}

@@ -32,7 +32,7 @@
 		</div>
 
 		<div class="search-input-wrapper">
-			<input id="find-widget-input" placeholder="Find..." class="input" />
+			<input id="find-widget-input" placeholder="Find..." class="input" title="Enter to start search" />
 
 			<div id="find-widget-error-message" class="error-message">
 			</div>
@@ -40,7 +40,7 @@
 
 		<div class="info">
 			<span id="find-widget-info">0/0</span>
-			<span id="find-widget-cancel-search" title="Cancel search" class="clickable" onclick="onCancelSearch()" style="display: none;">
+			<span id="find-widget-cancel-search" title="Cancel search (Escape)" class="clickable" onclick="onCancelSearch()" style="display: none;">
 				<i class="fas fa-hand-paper"></i>
 			</span>
 			<span id="find-widget-outdated-search" class="outdated-search clickable" style="display: none;" onclick="refreshCurrentSearch()"
@@ -53,7 +53,7 @@
 		
 		<!-- search options -->
 		<div class="flexed">
-			<div id="find-window-option-match-case" class="btn option" onclick="toggleFindWindowMatchCase()" title="Match Case">
+			<div id="find-window-option-match-case" class="btn option" onclick="toggleFindWindowOptionMatchCase()" title="Match Case">
 				<span>Aa</span>
 			</div>
 
