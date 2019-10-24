@@ -635,24 +635,25 @@ function customSearchMethod(query: string | undefined | null, value: string | un
 
 	if (query === '') return false
 
-	if (!findOptionMatchCaseCache) {
+	
+	if (!findWidgetInstance.findOptionMatchCaseCache) {
 		value = value.toLowerCase()
 		query = query.toLowerCase()
 	}
 
-	if (findOptionTrimCellCache) {
+	if (findWidgetInstance.findOptionTrimCellCache) {
 		value = value.trim()
 	}
 
-	if (findOptionUseRegexCase) {
+	if (findWidgetInstance.findOptionUseRegexCache) {
 
-		if (findWidgetCurrRegex === null) {
+		if (findWidgetInstance.findWidgetCurrRegex === null) {
 			throw new Error('should not happen...')
 		}
 
-		let result = findWidgetCurrRegex.exec(value)
+		let result = findWidgetInstance.findWidgetCurrRegex.exec(value)
 
-		if (findOptionMatchWholeCellCache) {
+		if (findWidgetInstance.findOptionMatchWholeCellCache) {
 			if (result !== null && result.length > 0) {
 				return result[0] === value
 			}
@@ -662,7 +663,7 @@ function customSearchMethod(query: string | undefined | null, value: string | un
 
 	} else {
 
-		if (findOptionMatchWholeCellCache) {
+		if (findWidgetInstance.findOptionMatchWholeCellCache) {
 			return value === query
 		} 
 

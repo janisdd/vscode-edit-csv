@@ -21,8 +21,8 @@ function createEditorHtml(context, initialContent) {
     const _getResourcePath = getResourcePath.bind(undefined, context);
     let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.min.css');
     // let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.css')
-    let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js');
-    // let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js')
+    // let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js')
+    let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js');
     let papaparseJs = _getResourcePath('thirdParty/papaparse.min.js');
     // let papaparseJs = _getResourcePath('thirdParty/papaparse.js')
     let fontAwesomeCss = _getResourcePath('node_modules/@fortawesome/fontawesome-free/css/all.min.css');
@@ -35,6 +35,7 @@ function createEditorHtml(context, initialContent) {
     const lightThemeCss = _getResourcePath('csvEditorHtml/light.css');
     const hightContrastThemeCss = _getResourcePath('csvEditorHtml/high_contrast.css');
     //scripts
+    const progressJs = _getResourcePath('csvEditorHtml/out/progressbar.js');
     const ioJs = _getResourcePath('csvEditorHtml/out/io.js');
     const uiJs = _getResourcePath('csvEditorHtml/out/ui.js');
     const utilJs = _getResourcePath('csvEditorHtml/out/util.js');
@@ -508,6 +509,7 @@ function createEditorHtml(context, initialContent) {
 	var initialConfig = ${JSON.stringify(config)};
 </script>
 
+	 <script src="${progressJs}"></script>
 	 <script src="${ioJs}"></script>
 	 <script src="${utilJs}"></script>
 	 <script src="${uiJs}"></script>
