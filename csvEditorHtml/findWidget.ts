@@ -6,6 +6,7 @@
 class FindWidget {
 
 	findWidget: HTMLDivElement
+	findWidgetStartSearch: HTMLSpanElement
 	findWidgetInput: HTMLInputElement
 	findWWidgetErrorMessage: HTMLDivElement
 	findWidgetInfo: HTMLSpanElement
@@ -60,6 +61,7 @@ class FindWidget {
 	constructor() {
 
 		this.findWidget = _getById('find-widget') as HTMLDivElement
+		this.findWidgetStartSearch = _getById('find-widget-start-search') as HTMLSpanElement
 		this.findWidgetInput = _getById('find-widget-input') as HTMLInputElement
 		this.findWWidgetErrorMessage = _getById('find-widget-error-message') as HTMLDivElement
 		this.findWidgetInfo = _getById('find-widget-info') as HTMLSpanElement
@@ -589,6 +591,7 @@ class FindWidget {
 	showOrHideSearchCancel(show: boolean) {
 		this.findWidgetCancelSearch.style.display = show ? 'block' : 'none'
 		this.findWidgetInfo.style.display = show ? 'none' : 'block'
+		this.findWidgetStartSearch.style.display = show ? 'none' : 'block'
 	}
 
 	/**

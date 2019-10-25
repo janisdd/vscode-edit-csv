@@ -12,9 +12,10 @@ Execute the command `edit as csv` to open an editor for the current file.
 
 **Note that the data flow is one way (editor to source file). If you make changes to the source file (.csv) while the editor is open, the editor will not be updated!**
 
-## Important Notes
+## ¡ Important Notes !
 
-- On initial load all rows are expanded so that all rows have equal length (number of cells)
+- On initial load all rows are expanded so that all rows have equal length (number of cells (if necessary)
+	- if that happens you will see the `unsaved changes` indicator right from the start
 
 - Quotes from quoted fields (where the quotes are not needed) are removed
 	- this is because the file is parsed as csv and thus the quotes are removed. If the quotes are needed (for escaping) then the resulting field will be properly quoted
@@ -22,7 +23,7 @@ Execute the command `edit as csv` to open an editor for the current file.
 - Comment row (rows starting with a comment) will only export the first cell
 	- if you accidentally added comment text to a cell other than the first cell you will notice it (color)
 
-- Adding new lines to comments rows (via alt + enter) will have no effect when exporting (new lines are removed in comments)
+- Adding new lines to comments rows (via alt + enter) will have no effect when exporting (lines breaks are removed in comments!)
 	- leading spaces will be removed in comment rows!
 
 - Starting with Version **0.1.0** the table has a context menu (right-click the table)

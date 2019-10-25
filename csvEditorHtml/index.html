@@ -39,6 +39,10 @@
 		</div>
 
 		<div class="info">
+			<span id="find-widget-start-search" class="clickable" style="margin-right: 7px;" onclick="findWidgetInstance.refreshCurrentSearch()"
+				title="Start search (Enter)">
+				<i class="fas fa-search"></i>
+			</span>
 			<span id="find-widget-info">0/0</span>
 			<span id="find-widget-cancel-search" title="Cancel search (Escape)" class="clickable" onclick="findWidgetInstance.onCancelSearch()" style="display: none;">
 				<i class="fas fa-hand-paper"></i>
@@ -62,7 +66,7 @@
 			</div>
 
 			<div id="find-window-option-whole-cell-trimmed" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionMatchTrimmedCell()" title="Trims the cell value before comparing">
-				<span style="text-decoration: underline overline;">_A_</span>
+				<span style="text-decoration: underline;">_A_</span>
 			</div>
 
 			<div id="find-window-option-regex" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionRegex()" title="Use Regular Expression">
@@ -76,7 +80,7 @@
 		<div class="divider"></div>
 
 		<!-- search navigation buttons-->
-		<div class="flexed">
+		<div class="flexed" style="margin-right: 5px;">
 			<div id="find-widget-previous" class="btn" onclick="findWidgetInstance.gotoPreviousFindMatch()" title="Previous match (⇧F3)">
 				<i class="fas fa-chevron-up"></i>
 			</div>
@@ -460,6 +464,7 @@
 				<div class="content">
 					<ul>
 						<li>The unsaved changes indicator is display on any change (never cleared until you apply the changes, even if you revert manually)</li>
+						<li>When you see the unsaved changes indicator right after the table was loaded then some rows were expanded (to ensure all rows have the same length)</li>
 						<li>You can right-click on the table to get a context menu</li>
 						<li>Hidden rows are also exported</li>
 						<li>Comment rows will export only the first cell/column. If you use a cell other than the first for comments the cell color will indicate this. </li>

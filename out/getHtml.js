@@ -36,6 +36,7 @@ function createEditorHtml(context, initialContent) {
     const hightContrastThemeCss = _getResourcePath('csvEditorHtml/high_contrast.css');
     //scripts
     const progressJs = _getResourcePath('csvEditorHtml/out/progressbar.js');
+    const findWidgetJs = _getResourcePath('csvEditorHtml/out/findWidget.js');
     const ioJs = _getResourcePath('csvEditorHtml/out/io.js');
     const uiJs = _getResourcePath('csvEditorHtml/out/ui.js');
     const utilJs = _getResourcePath('csvEditorHtml/out/util.js');
@@ -510,6 +511,7 @@ function createEditorHtml(context, initialContent) {
 </script>
 
 	 <script src="${progressJs}"></script>
+	 <script src="${findWidgetJs}"></script>
 	 <script src="${ioJs}"></script>
 	 <script src="${utilJs}"></script>
 	 <script src="${uiJs}"></script>

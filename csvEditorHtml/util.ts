@@ -46,6 +46,7 @@ function _normalizeDataArray(data: string[][], csvReadConfig: CsvReadOptions, fi
 
 		if (row.length < maxCols) {
 			row.push(...Array.from(Array(maxCols - row.length), (p, index) => fillString))
+			_setHasUnsavedChangesUiIndicator(true)
 		}
 
 		//trim cell values to normalize

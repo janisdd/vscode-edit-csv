@@ -355,12 +355,12 @@
 		"vscode": "^1.1.25",
 		"tslint": "^5.8.0",
 		"@types/node": "^8.10.25",
-		"@types/mocha": "^2.2.42"
-	},
-	"dependencies": {
+		"@types/mocha": "^2.2.42",
 		"@fortawesome/fontawesome-free": "5.6.3",
 		"@types/mousetrap": "^1.6.3",
-		"@types/papaparse": "4.5.6",
+		"@types/papaparse": "4.5.6"
+	},
+	"dependencies": {
 		"bulma": "0.7.4",
 		"bulma-extensions": "4.0.1",
 		"handsontable": "github:janisdd/handsontable#6.2.3",
