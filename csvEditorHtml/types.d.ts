@@ -334,13 +334,23 @@ type StringSlice = {
  */
 type HandsontableSearchResult = {
 	/**
-	 * the visual index?
+	 * the visual index
 	 */
 	row: number
+
+	/**
+	 * the physical row index (needed because the visual index depends on sorting (and maybe virtual rendering?))
+	 */
+	rowReal: number
 		/**
-	 * the visual index?
+	 * the visual index
 	 */
 	col: number
+
+	/**
+	 * the physical col index (needed because the visual index depends on sorting (and maybe virtual rendering?))
+	 */
+	colReal: number
 
 	/**
 	 * the cell data if any

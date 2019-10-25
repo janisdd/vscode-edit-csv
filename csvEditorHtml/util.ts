@@ -651,6 +651,8 @@ function customSearchMethod(query: string | undefined | null, value: string | un
 			throw new Error('should not happen...')
 		}
 
+		//this is needed when we use the global flag and we call exec on the same regex instance
+		// findWidgetInstance.findWidgetCurrRegex.lastIndex = 0
 		let result = findWidgetInstance.findWidgetCurrRegex.exec(value)
 
 		if (findWidgetInstance.findOptionMatchWholeCellCache) {

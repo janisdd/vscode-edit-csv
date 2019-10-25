@@ -308,6 +308,7 @@ class FindWidget {
 			//when we increment to e.g. only update after 10% then the time will improve!
 			//@ts-ignore
 			this.lastFindResults = await searchPlugin.queryAsync(this.findWidgetInput.value, this.findWidgetQueryCancellationToken, this._onSearchProgress.bind(this), 5)
+			this._getRealIndicesFromFindResult()
 
 			//old sync way
 			//@ts-ignore
@@ -317,6 +318,7 @@ class FindWidget {
 		} else {
 			//@ts-ignore
 			this.lastFindResults = searchPlugin.query(pretendedText)
+			this._getRealIndicesFromFindResult()
 		}
 
 		// console.log(`this.lastFindResults`, this.lastFindResults)
@@ -367,6 +369,26 @@ class FindWidget {
 			this.findWidgetProgressbar.hide()
 			this.findWidgetInput.focus()
 		}, 0)
+	}
+
+	/**
+	 * sets the physical row indices for {@link lastFindResults}
+	 * this is needed because when we use the next/previous btns we jump to the cell index and after sorting the 
+	 * visual index might have changed
+	 * 
+	 * @note one thing to keep in mind is that the order of the results depend on the current sorting
+	 */
+	_getRealIndicesFromFindResult() {
+
+		if (!hot) return
+		//actually this is pretty fast... e.g. for 2 million rows it took only ~700ms
+
+		for (let i = 0; i < this.lastFindResults.length; i++) {
+			const findResult = this.lastFindResults[i];
+			findResult.rowReal = hot.toPhysicalRow(findResult.row)
+			findResult.colReal = hot.toPhysicalColumn(findResult.col)
+		}
+		console.log(this.lastFindResults)
 	}
 
 	_onSearchProgress(index: number, maxIndex: number, percentage: number) {
@@ -489,7 +511,8 @@ class FindWidget {
 		}
 
 		try {
-			this.findWidgetCurrRegex = new RegExp(this.findWidgetInput.value, 'g')
+			//global flag is not needed here because we only want the first match
+			this.findWidgetCurrRegex = new RegExp(this.findWidgetInput.value, '')
 			this.findWWidgetErrorMessage.innerText = ''
 			this.findWidgetInput.classList.remove('error-input')
 
@@ -617,8 +640,68 @@ class FindWidget {
 
 		let match = this.lastFindResults[matchIndex]
 
-		hot.selectCell(match.row, match.col)
-		hot.scrollViewportTo(match.row)
+		//make sure the cell is in view
+		{
+			const autoColumnSizePlugin = hot.getPlugin('autoColumnSize')
+			const autoRowSizePlugin = hot.getPlugin('autoRowSize')
+	
+			const visualRowIndex = hot.toVisualRow(match.rowReal)
+			const visualColIndex = hot.toPhysicalColumn(match.colReal)
+	
+			//what is bad that when we scroll to a cell that is outside of the view it will show up at the bottom (when scrolling down) or top (scrolling top)
+			//but it would be good if we show the cell centered in the viewport when we scroll (to a new location)
+	
+			const _firstVisualRow = autoRowSizePlugin.getFirstVisibleRow()
+			const _lastVisualRow = autoRowSizePlugin.getLastVisibleRow()
+	
+			const _firstVisualCol = autoColumnSizePlugin.getFirstVisibleColumn()
+			const _lastVisualCol = autoColumnSizePlugin.getLastVisibleColumn()
+	
+			let virtualColumnIndexToScrollTo: number | undefined = undefined
+			let virtualRowIndexToScrollTo: number | undefined = undefined
+	
+			let useAutoScroll = true
+			let useAutoScrollRow = false;
+			let useAutoScrollCol = false;
+	
+			//cell is outside if current viewport?
+			if (visualRowIndex < _firstVisualRow || visualRowIndex > _lastVisualRow) {
+				useAutoScroll = false
+				useAutoScrollRow = true
+			}
+			if (visualColIndex < _firstVisualCol || visualColIndex > _lastVisualCol) {
+				useAutoScroll = false
+				useAutoScrollCol = true
+			}
+	
+			//scrolling with true is good because it will only scroll the table if the cell is out of view
+			hot.selectCell(visualRowIndex, visualColIndex, undefined, undefined, useAutoScroll)
+	
+			if(useAutoScroll === false) {
+	
+				if (useAutoScrollRow) {
+					//center row in view
+					const rowsToSubtract = Math.floor((_lastVisualRow - _firstVisualRow) / 2)
+					//keep the value in bounds, max must not be checked because even if the index is the last row we subtract >= 0
+					const clampedVisualRowIndex = Math.max(visualRowIndex - rowsToSubtract, 0)
+					virtualRowIndexToScrollTo = clampedVisualRowIndex
+				}
+	
+				if (useAutoScrollCol) {
+					//center col in view
+					const rowsToSubtract = Math.floor((_lastVisualCol - _firstVisualCol) / 2)
+					//keep the value in bounds, max must not be checked because even if the index is the last col we subtract >= 0
+					const clampedVisualRowIndex = Math.max(visualColIndex - rowsToSubtract, 0)
+					virtualColumnIndexToScrollTo = clampedVisualRowIndex
+				}
+				
+				//when virtualRowIndexToScrollTo is undefined we stay in the same row
+				hot.scrollViewportTo(virtualRowIndexToScrollTo, virtualColumnIndexToScrollTo)
+			}
+		}
+		
+
+		// hot.scrollViewportTo(visualRowIndex)
 		this.findWidgetInfo.innerText = `${matchIndex + 1}/${this.lastFindResults.length}`
 		this.currentFindIndex = matchIndex
 
