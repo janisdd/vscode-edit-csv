@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## 0.2.1
+
+- fixed issue where empty `Read options > Comment` would cause all rows to be comments (#14)
+
 ## 0.2.0
 
 - replaced built-in vs code find widget with custom find widget

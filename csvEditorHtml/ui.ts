@@ -1192,6 +1192,10 @@ function showOrHideAllComments(show: boolean) {
 	hot.render()
 }
 
+function getAreCommentsDisplayed(): boolean {
+	return showCommentsBtn.style.display === 'none'
+}
+
 function _setHasUnsavedChangesUiIndicator(hasUnsavedChanges: boolean) {
 	if (hasUnsavedChanges) {
 		unsavedChangesIndicator.classList.remove('op-hidden')

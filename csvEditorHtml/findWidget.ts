@@ -694,6 +694,14 @@ class FindWidget {
 				useAutoScrollCol = true
 			}
 
+			if (getAreCommentsDisplayed() === false) {
+				//comments are hidden but rows are displayed with 0 (or 0.x height) so they count as visible e.g. for autoRowSizePlugin.getFirstVisibleRow
+				//so to make things easier use the sometimes ugly auto scroll (where the cell is not centered automatically)
+				useAutoScroll = true
+				useAutoScrollRow = false
+				useAutoScrollCol = false
+			}
+
 			//scrolling with true is good because it will only scroll the table if the cell is out of view
 			hot.selectCell(visualRowIndex, visualColIndex, undefined, undefined, useAutoScroll)
 

@@ -8,8 +8,15 @@ vsc-extension-quickstart.md
 **/tslint.json
 **/*.map
 **/*.ts
-thirdParty/papaparse.js
 TODO.md
 node_modules/@types
 backup
 scripts.md
+thirdParty/bulma.css
+thirdParty/handsontable/handsontable.css
+thirdParty/handsontable/handsontable.d.ts
+thirdParty/handsontable/handsontable.js
+thirdParty/handsontable/handsontable.js.map
+thirdParty/mousetrap/mousetrap.js
+thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.js
+thirdParty/papaparse/papaparse.js
