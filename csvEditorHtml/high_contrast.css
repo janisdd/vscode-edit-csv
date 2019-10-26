@@ -148,3 +148,21 @@ body.vscode-high-contrast {
 .vscode-high-contrast .ht_master tr> td.search-result-cell {
 	background-color: #9d00ff!important;
 }
+
+.vscode-high-contrast .find-widget{
+	background-color: black;
+	color: white;
+	border: 2px solid #6fc3df;
+}
+
+.vscode-high-contrast .find-widget .divider {
+	background-color: #676767;
+}
+
+.vscode-high-contrast  .find-widget .btn.active {
+	background-color: #0064ff;
+}
+
+.vscode-high-contrast .find-widget .error-message {
+	color: white;
+}

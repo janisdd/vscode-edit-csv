@@ -70,3 +70,19 @@ body.vscode-light {
 .vscode-light .ht_master tr> td.search-result-cell {
 	background-color: #ffff00!important;
 }
+
+.vscode-light .find-widget {
+	background-color: rgb(221, 221, 221);
+}
+
+.vscode-light .find-widget .divider {
+	background-color: #c7c7c7;
+}
+
+.vscode-light .find-widget .btn.active {
+	background-color: #a3c7ff;
+}
+
+.vscode-light .find-widget .error-message {
+	color: white;
+}

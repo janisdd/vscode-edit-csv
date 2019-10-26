@@ -3,18 +3,17 @@
 
 <head>
 	<title>Csv editor</title>
-	<link rel="stylesheet" href="../node_modules/handsontable/dist/handsontable.css">
-	<script src="../node_modules/handsontable/dist/handsontable.js?5"></script>
-	<!-- <script src="../node_modules/papaparse/papaparse.js"></script> -->
-	<script src="../thirdParty/papaparse.min.js"></script>
+	<link rel="stylesheet" href="../thirdParty/handsontable/handsontable.css">
+	<script src="../thirdParty/handsontable/handsontable.js"></script>
+	<script src="../thirdParty/papaparse/papaparse.min.js"></script>
 
-	<script src="../node_modules/mousetrap/mousetrap.min.js"></script>
-	<script src="../node_modules/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js"></script>
+	<script src="../thirdParty/mousetrap/mousetrap.min.js"></script>
+	<script src="../thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js"></script>
 
-	<link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+	<link rel="stylesheet" href="../thirdParty/fortawesome/fontawesome-free/css/all.min.css">
 
-	<link rel="stylesheet" href="../node_modules/bulma/css/bulma.min.css">
-	<link rel="stylesheet" href="../node_modules/bulma-extensions/dist/css/bulma-extensions.min.css">
+	<link rel="stylesheet" href="../thirdParty/bulma/bulma.min.css">
+	<link rel="stylesheet" href="../thirdParty/bulma-extensions/bulma-extensions.min.css">
 	<link rel="stylesheet" href="./main.css">
 	<link rel="stylesheet" href="./dark.css">
 	<link rel="stylesheet" href="./light.css">
@@ -72,7 +71,7 @@
 			<div id="find-window-option-regex" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionRegex()" title="Use Regular Expression">
 				<span>
 					<i class="fas fa-square-full" style="font-size: 5px;"></i>
-					<i class="fas fa-asterisk" style="vertical-align: top; font-size: 8px;"></i>
+					<i class="fas fa-asterisk" style="vertical-align: top; font-size: 8px; margin-top: 3px;"></i>
 				</span>
 			</div>
 		</div>
@@ -340,7 +339,7 @@
 					</span>
 					<span>Apply and save</span>
 					<span class="tooltip is-tooltip-multiline mar-left-half"
-						data-tooltip="Applies the csv content back to the source file and saves the source file">
+						data-tooltip="Applies the csv content back to the source file and saves the source file (if something changed)">
 						<i class="fas fa-question-circle"></i>
 					</span>
 				</button>
@@ -350,7 +349,7 @@
 						<i class="fas fa-reply"></i>
 					</span>
 					<span>Apply</span>
-					<span class="tooltip mar-left-half is-tooltip-multiline" data-tooltip="Applies the csv content back to the source file. After this the editor has no unsaved changes.">
+					<span class="tooltip mar-left-half is-tooltip-multiline" data-tooltip="Applies the csv content back to the source file (if something changed). After this the editor has no unsaved changes.">
 						<i class="fas fa-question-circle"></i>
 					</span>
 				</button>

@@ -18,7 +18,7 @@ if (typeof initialConfig === 'undefined') {
 
 const csv: typeof import('papaparse') = (window as any).Papa
 //handsontable instance
-let hot: import('../node_modules/handsontable/handsontable') | null
+let hot: import('../thirdParty/handsontable/handsontable') | null
 
 /**
  * the default csv content to used if we get empty content
@@ -151,8 +151,8 @@ let _data = parseCsv(initialContent, defaultCsvReadOptions)
 
 if (_data && !vscode) {
 	//@ts-ignore
-	// _data = Handsontable.helper.createSpreadsheetData(100, 20)
-	_data = Handsontable.helper.createSpreadsheetData(1000, 20)
+	_data = Handsontable.helper.createSpreadsheetData(100, 20)
+	// _data = Handsontable.helper.createSpreadsheetData(1000, 20)
 	// _data = Handsontable.helper.createSpreadsheetData(10000, 21)
 	// _data = Handsontable.helper.createSpreadsheetData(100000, 20)
 	displayData(_data, defaultCsvReadOptions)

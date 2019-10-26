@@ -1,7 +1,7 @@
-type ContextMenuSettings = import("../node_modules/handsontable/handsontable").contextMenu.Settings
+type ContextMenuSettings = import("../thirdParty/handsontable/handsontable").contextMenu.Settings
 
 
-type GridSettings = import("../node_modules/handsontable/handsontable").GridSettings
+type GridSettings = import("../thirdParty/handsontable/handsontable").GridSettings
 
 /* --- common helpers --- */
 
@@ -1062,6 +1062,8 @@ function resetData(content: string, csvReadOptions: CsvReadOptions) {
 function resetDataFromResetDialog() {
 
 	toggleAskReadAgainModal(false)
+
+	postSetEditorHasChanges(false)
 
 	startRenderData()
 }

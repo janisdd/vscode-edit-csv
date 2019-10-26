@@ -283,6 +283,10 @@ function applyContent(instance, newContent, saveSourceFile, openSourceFileAfterA
         var firstLine = document.lineAt(0);
         var lastLine = document.lineAt(document.lineCount - 1);
         var textRange = new vscode.Range(0, firstLine.range.start.character, document.lineCount - 1, lastLine.range.end.character);
+        //don't apply if the content didn't change
+        if (document.getText() === newContent) {
+            return;
+        }
         edit.replace(document.uri, textRange, newContent);
         vscode.workspace.applyEdit(edit)
             .then(editsApplied => {

@@ -372,6 +372,11 @@ function applyContent(instance: Instance, newContent: string, saveSourceFile: bo
 				document.lineCount - 1,
 				lastLine.range.end.character);
 
+				//don't apply if the content didn't change
+				if (document.getText() === newContent) {
+					return
+				}
+
 			edit.replace(document.uri, textRange, newContent)
 			vscode.workspace.applyEdit(edit)
 				.then(

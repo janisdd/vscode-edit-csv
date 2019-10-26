@@ -105,6 +105,7 @@ There are two things missing...
 - for ui: [bulma](https://github.com/jgthms/bulma), [bulma-extension](https://github.com/Wikiki/bulma-extensions), [fontawesome](https://github.com/FortAwesome/Font-Awesome)
 - for shortcuts: [mousetrap](https://github.com/ccampbell/mousetrap)
 
+*see `thirdParty` folder*
 
 ## How to build locally
 

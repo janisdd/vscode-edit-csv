@@ -2,12 +2,22 @@
 
 ## [Unreleased]
 
-## 0.1.5
+## 0.2.0
 
 - replaced built-in vs code find widget with custom find widget
 	- tries to stay close to the vs code find widget
+	- some key features
+		- async search
+		- options (match case, trim cell value, regex, ...)
+		- move widget
+- removed all node_modules production dependencies
+	- we now use the `thirdParty` folder for this
+
+## 0.1.5
+
 - added `unsaved changes` indicator (`*`) to the editor title and icon to ui
 - `Read options` panel now shows a `⇥` as detected delimiter if a tab was detected
+- when expanding rows initially we now show the `unsaved changes` indicator
 
 ## 0.1.4
 

@@ -41,12 +41,18 @@ function _normalizeDataArray(data: string[][], csvReadConfig: CsvReadOptions, fi
 
 	const maxCols = data.reduce((prev, curr) => curr.length > prev ? curr.length : prev, 0)
 
+	let someRowWasExpanded = false
+
 	for (let i = 0; i < data.length; i++) {
 		const row = data[i];
 
 		if (row.length < maxCols) {
 			row.push(...Array.from(Array(maxCols - row.length), (p, index) => fillString))
-			_setHasUnsavedChangesUiIndicator(true)
+
+			//comment rows are also expanded...
+			if (row.length > 0 && isCommentCell(row[0], csvReadConfig) === false) {
+				someRowWasExpanded = true
+			}
 		}
 
 		//trim cell values to normalize
@@ -59,6 +65,10 @@ function _normalizeDataArray(data: string[][], csvReadConfig: CsvReadOptions, fi
 		// 	}
 		// }
 
+	}
+
+	if (someRowWasExpanded) {
+		postSetEditorHasChanges(true)
 	}
 
 }

@@ -3,6 +3,8 @@ Papa Parse
 v5.0.0
 https://github.com/mholt/PapaParse
 License: MIT
+commit: 49170b76b382317356c2f707e2e4191430b8d495
+comment: we need this to support custom comment handling...
 */
 
 (function(root, factory)

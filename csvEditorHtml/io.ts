@@ -412,8 +412,6 @@ function startRenderData(){
 		if (!defaultCsvReadOptions._hasHeader) { //when we apply header this will reset the status for us
 			setTimeout(() => {
 				statusInfo.innerText = '';
-
-				postSetEditorHasChanges(false)
 			}, 0)
 		}
 		

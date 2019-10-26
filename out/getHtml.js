@@ -19,17 +19,19 @@ exports.getResourcePath = getResourcePath;
  */
 function createEditorHtml(context, initialContent) {
     const _getResourcePath = getResourcePath.bind(undefined, context);
-    let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.min.css');
-    // let handsontableCss = _getResourcePath('node_modules/handsontable/dist/handsontable.css')
-    // let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.min.js')
-    let handsontableJs = _getResourcePath('node_modules/handsontable/dist/handsontable.js');
-    let papaparseJs = _getResourcePath('thirdParty/papaparse.min.js');
-    // let papaparseJs = _getResourcePath('thirdParty/papaparse.js')
-    let fontAwesomeCss = _getResourcePath('node_modules/@fortawesome/fontawesome-free/css/all.min.css');
+    let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.min.css');
+    // let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
+    // let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js')
+    let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js');
+    let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js');
+    // let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
+    const mousetrapJs = _getResourcePath('thirdParty/mousetrap/mousetrap.min.js');
+    const mousetrapBindGlobalJs = _getResourcePath('thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js');
+    let fontAwesomeCss = _getResourcePath('thirdParty/fortawesome/fontawesome-free/css/all.min.css');
     //we need to load the font manually because the url() seems to not work properly with vscode-resource
-    const iconFont = _getResourcePath('node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2');
-    let bulmaCss = _getResourcePath('node_modules/bulma/css/bulma.min.css');
-    let bulmaExtensionCss = _getResourcePath('node_modules/bulma-extensions/dist/css/bulma-extensions.min.css');
+    const iconFont = _getResourcePath('thirdParty/fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2');
+    let bulmaCss = _getResourcePath('thirdParty/bulma/bulma.min.css');
+    let bulmaExtensionCss = _getResourcePath('thirdParty/bulma-extensions/bulma-extensions.min.css');
     const mainCss = _getResourcePath('csvEditorHtml/main.css');
     const darkThemeCss = _getResourcePath('csvEditorHtml/dark.css');
     const lightThemeCss = _getResourcePath('csvEditorHtml/light.css');
@@ -43,6 +45,83 @@ function createEditorHtml(context, initialContent) {
     const mainJs = _getResourcePath('csvEditorHtml/out/main.js');
     const config = configurationHelper_1.getExtensionConfiguration();
     //use blocks so vs code adds folding
+    let findWidgetHtml = ``;
+    {
+        findWidgetHtml = `
+		<div id="find-widget" class="find-widget find-widget-themed" style="display: none; right: 100px;">
+
+		<div id="find-widget-progress-bar" class="progress-bar"></div>
+
+		<div class="gripper" onmousedown="findWidgetInstance.onFindWidgetGripperMouseDown(event)">
+			<i class="fas fa-grip-vertical"></i>
+		</div>
+
+		<div class="search-input-wrapper">
+			<input id="find-widget-input" placeholder="Find..." class="input" title="Enter to start search" />
+
+			<div id="find-widget-error-message" class="error-message">
+			</div>
+		</div>
+
+		<div class="info">
+			<span id="find-widget-start-search" class="clickable" style="margin-right: 7px;" onclick="findWidgetInstance.refreshCurrentSearch()"
+				title="Start search (Enter)">
+				<i class="fas fa-search"></i>
+			</span>
+			<span id="find-widget-info">0/0</span>
+			<span id="find-widget-cancel-search" title="Cancel search (Escape)" class="clickable" onclick="findWidgetInstance.onCancelSearch()" style="display: none;">
+				<i class="fas fa-hand-paper"></i>
+			</span>
+			<span id="find-widget-outdated-search" class="outdated-search clickable" style="display: none;" onclick="findWidgetInstance.refreshCurrentSearch()"
+				title="The table has changed, thus the search is outdated. Click to refresh the search.">
+				<i class="fas fa-exclamation-triangle"></i>
+			</span>
+		</div>
+
+		<div class="divider"></div>
+		
+		<!-- search options -->
+		<div class="flexed">
+			<div id="find-window-option-match-case" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionMatchCase()" title="Match Case">
+				<span>Aa</span>
+			</div>
+
+			<div id="find-window-option-whole-cell" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionWholeCell()" title="Match Whole Cell Value">
+				<span style="text-decoration: underline overline;">Abl</span>
+			</div>
+
+			<div id="find-window-option-whole-cell-trimmed" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionMatchTrimmedCell()" title="Trims the cell value before comparing">
+				<span style="text-decoration: underline;">_A_</span>
+			</div>
+
+			<div id="find-window-option-regex" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionRegex()" title="Use Regular Expression">
+				<span>
+					<i class="fas fa-square-full" style="font-size: 5px;"></i>
+					<i class="fas fa-asterisk" style="vertical-align: top; font-size: 8px; margin-top: 3px;"></i>
+				</span>
+			</div>
+		</div>
+
+		<div class="divider"></div>
+
+		<!-- search navigation buttons-->
+		<div class="flexed" style="margin-right: 5px;">
+			<div id="find-widget-previous" class="btn" onclick="findWidgetInstance.gotoPreviousFindMatch()" title="Previous match (⇧F3)">
+				<i class="fas fa-chevron-up"></i>
+			</div>
+	
+			<div id="find-widget-next" class=" btn" onclick="findWidgetInstance.gotoNextFindMatch()" title="Next match (F3)">
+				<i class="fas fa-chevron-down"></i>
+			</div>
+	
+			<div class="btn" onclick="findWidgetInstance.showOrHideWidget(false)" title="Close (Escape)">
+					<i class="fas fa-times"></i>
+			</div>
+		</div>
+
+	</div>
+		`;
+    }
     let bodyPageHtml = ``;
     {
         bodyPageHtml = `
@@ -290,7 +369,7 @@ function createEditorHtml(context, initialContent) {
 						</span>
 						<span>Apply and save</span>
 						<span class="tooltip is-tooltip-multiline mar-left-half"
-							data-tooltip="Applies the csv content back to the source file and saves the source file">
+							data-tooltip="Applies the csv content back to the source file and saves the source file (if something changed)">
 							<i class="fas fa-question-circle"></i>
 						</span>
 					</button>
@@ -300,7 +379,7 @@ function createEditorHtml(context, initialContent) {
 							<i class="fas fa-reply"></i>
 						</span>
 						<span>Apply</span>
-						<span class="tooltip mar-left-half is-tooltip-multiline" data-tooltip="Applies the csv content back to the source file. After this the editor has no unsaved changes.">
+						<span class="tooltip mar-left-half is-tooltip-multiline" data-tooltip="Applies the csv content back to the source file (if something changed). After this the editor has no unsaved changes.">
 							<i class="fas fa-question-circle"></i>
 						</span>
 					</button>
@@ -418,6 +497,7 @@ function createEditorHtml(context, initialContent) {
 				<div class="content">
 					<ul>
 						<li>The unsaved changes indicator is display on any change (never cleared until you apply the changes, even if you revert manually)</li>
+						<li>When you see the unsaved changes indicator right after the table was loaded then some rows were expanded (to ensure all rows have the same length)</li>
 						<li>You can right-click on the table to get a context menu</li>
 						<li>Hidden rows are also exported</li>
 						<li>Comment rows will export only the first cell/column. If you use a cell other than the first for comments the cell color will indicate this. </li>
@@ -469,7 +549,8 @@ function createEditorHtml(context, initialContent) {
 			</div>
 		</div>
 		<button class="modal-close is-large" aria-label="close" onclick="toggleAskReadAgainModal(false)"></button>
-	</div>`;
+	</div>
+	`;
     }
     return `
 	<!DOCTYPE html>
@@ -488,9 +569,11 @@ function createEditorHtml(context, initialContent) {
 		<link rel="stylesheet" href="${handsontableCss}">
 		<script src="${handsontableJs}"></script>
 		<script src="${papaparseJs}"></script>
-	
+		<script src="${mousetrapJs}"></script>
+		<script src="${mousetrapBindGlobalJs}"></script>
+
 		<link rel="stylesheet" href="${fontAwesomeCss}">
-	
+
 		<link rel="stylesheet" href="${bulmaCss}">
 		<link rel="stylesheet" href="${bulmaExtensionCss}">
 		<link rel="stylesheet" href="${mainCss}">
@@ -500,6 +583,8 @@ function createEditorHtml(context, initialContent) {
 	</head>
 	<body>
 	
+	${findWidgetHtml}
+
 	${bodyPageHtml}
 
 	${helpModalHtml}

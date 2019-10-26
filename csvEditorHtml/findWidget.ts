@@ -32,23 +32,26 @@ class FindWidget {
 	findOptionTrimCellCache = false
 	findOptionUseRegexCache = false
 
-	findWidgetQueryCancellationToken: {isCancellationRequested: boolean} = {
+	findWidgetQueryCancellationToken: { isCancellationRequested: boolean } = {
 		isCancellationRequested: false
 	}
-	
-	
+
+
 	findWidgetCurrRegex: RegExp | null = null
-	
+
 	findMatchCellClass = 'search-result-cell'
 	//we swap .search-result-cell with this class so we don't need to redo the search after reopening the find widget
 	findOldMatchCellClass = 'old-search-result-cell'
-	
+
 	onWindowResizeThrottled: () => void
 	onWindowResizeThrottledBound: () => void
 	onSearchInputPreDebounced: (e: KeyboardEvent | null) => void
 	onSearchInputPreDebouncedBound: (e: KeyboardEvent | null) => void
 	onDocumentRootKeyDownBound: (e: ExtendedKeyboardEvent) => void
-	
+
+	onFindWidgetDragEndBound: (e: MouseEvent) => void
+	onFindWidgetDragBound: (e: MouseEvent) => void
+
 	/**
 	 * stores the last find results
 	 */
@@ -85,6 +88,10 @@ class FindWidget {
 		this.onWindowResizeThrottledBound = this.onWindowResizeThrottled.bind(this)
 		this.onSearchInputPreDebouncedBound = this.onSearchInputPre.bind(this)
 		this.onDocumentRootKeyDownBound = this.onDocumentRootKeyDown.bind(this)
+
+		//event 100ms throttle feels ugly...
+		this.onFindWidgetDragEndBound = this.onFindWidgetDragEnd.bind(this)
+		this.onFindWidgetDragBound = this.onFindWidgetDrag.bind(this)
 
 		this.findWidgetProgressbar = new Progressbar('find-widget-progress-bar')
 	}
@@ -205,7 +212,17 @@ class FindWidget {
 			//when the find widget is displayed AND has focus do not pass the event to handsontable
 			//else we would input into the cell editor...
 			//see editorManager.js > init (`instance.runHooks('afterDocumentKeyDown', event);`) > _baseEditor.js > beginEditing (`this.focus();`) > textEditor.js > focus
-			e.stopImmediatePropagation()
+
+			//whitelist so that we e.g. allow to show the cmd palette in vs code
+			if (
+				(e.metaKey && e.key === 'p') || //macos
+				(e.ctrlKey && e.key === 'p') || //windows / linux
+				(e.key === 'F1') //linux
+			) {
+
+			} else {
+				e.stopImmediatePropagation()
+			}
 
 			//but we need to be able to close the find...
 			if (e.key === 'Escape') {
@@ -390,7 +407,7 @@ class FindWidget {
 			findResult.rowReal = hot.toPhysicalRow(findResult.row)
 			findResult.colReal = hot.toPhysicalColumn(findResult.col)
 		}
-		console.log(this.lastFindResults)
+		// console.log(this.lastFindResults)
 	}
 
 	_onSearchProgress(index: number, maxIndex: number, percentage: number) {
@@ -436,7 +453,7 @@ class FindWidget {
 		this.findOptionMatchCaseCache = enabled
 
 		//don't auto refresh
-			// this.refreshCurrentSearch()
+		// this.refreshCurrentSearch()
 	}
 
 	toggleFindWindowOptionWholeCell() {
@@ -454,7 +471,7 @@ class FindWidget {
 		this.findOptionMatchWholeCellCache = enabled
 
 		//don't auto refresh
-			// this.refreshCurrentSearch()
+		// this.refreshCurrentSearch()
 	}
 
 	toggleFindWindowOptionMatchTrimmedCell() {
@@ -472,7 +489,7 @@ class FindWidget {
 		this.findOptionTrimCellCache = enabled
 
 		//don't auto refresh
-			// this.refreshCurrentSearch()
+		// this.refreshCurrentSearch()
 	}
 
 	toggleFindWindowOptionRegex() {
@@ -647,26 +664,26 @@ class FindWidget {
 		{
 			const autoColumnSizePlugin = hot.getPlugin('autoColumnSize')
 			const autoRowSizePlugin = hot.getPlugin('autoRowSize')
-	
+
 			const visualRowIndex = hot.toVisualRow(match.rowReal)
-			const visualColIndex = hot.toPhysicalColumn(match.colReal)
-	
+			const visualColIndex = hot.toVisualColumn(match.colReal)
+
 			//what is bad that when we scroll to a cell that is outside of the view it will show up at the bottom (when scrolling down) or top (scrolling top)
 			//but it would be good if we show the cell centered in the viewport when we scroll (to a new location)
-	
+
 			const _firstVisualRow = autoRowSizePlugin.getFirstVisibleRow()
 			const _lastVisualRow = autoRowSizePlugin.getLastVisibleRow()
-	
+
 			const _firstVisualCol = autoColumnSizePlugin.getFirstVisibleColumn()
 			const _lastVisualCol = autoColumnSizePlugin.getLastVisibleColumn()
-	
+
 			let virtualColumnIndexToScrollTo: number | undefined = undefined
 			let virtualRowIndexToScrollTo: number | undefined = undefined
-	
+
 			let useAutoScroll = true
 			let useAutoScrollRow = false;
 			let useAutoScrollCol = false;
-	
+
 			//cell is outside if current viewport?
 			if (visualRowIndex < _firstVisualRow || visualRowIndex > _lastVisualRow) {
 				useAutoScroll = false
@@ -676,12 +693,12 @@ class FindWidget {
 				useAutoScroll = false
 				useAutoScrollCol = true
 			}
-	
+
 			//scrolling with true is good because it will only scroll the table if the cell is out of view
 			hot.selectCell(visualRowIndex, visualColIndex, undefined, undefined, useAutoScroll)
-	
-			if(useAutoScroll === false) {
-	
+
+			if (useAutoScroll === false) {
+
 				if (useAutoScrollRow) {
 					//center row in view
 					const rowsToSubtract = Math.floor((_lastVisualRow - _firstVisualRow) / 2)
@@ -689,7 +706,7 @@ class FindWidget {
 					const clampedVisualRowIndex = Math.max(visualRowIndex - rowsToSubtract, 0)
 					virtualRowIndexToScrollTo = clampedVisualRowIndex
 				}
-	
+
 				if (useAutoScrollCol) {
 					//center col in view
 					const rowsToSubtract = Math.floor((_lastVisualCol - _firstVisualCol) / 2)
@@ -697,12 +714,12 @@ class FindWidget {
 					const clampedVisualRowIndex = Math.max(visualColIndex - rowsToSubtract, 0)
 					virtualColumnIndexToScrollTo = clampedVisualRowIndex
 				}
-				
+
 				//when virtualRowIndexToScrollTo is undefined we stay in the same row
 				hot.scrollViewportTo(virtualRowIndexToScrollTo, virtualColumnIndexToScrollTo)
 			}
 		}
-		
+
 
 		// hot.scrollViewportTo(visualRowIndex)
 		this.findWidgetInfo.innerText = `${matchIndex + 1}/${this.lastFindResults.length}`
@@ -711,7 +728,7 @@ class FindWidget {
 		//we need to queue this else handsontable somehow grabs focus (focus the cell and input would go into the cell)...
 		setTimeout(() => {
 			this.findWidgetInput.focus()
-		},0)
+		}, 0)
 	}
 
 	/**
@@ -730,8 +747,8 @@ class FindWidget {
 		let rightString = this.findWidget.style.right.substr(0, this.findWidget.style.right.length - 2)
 		this.findWidgetDownPointOffsetInPx = xFromRight - parseInt(rightString)
 
-		document.addEventListener('mouseup', this.onFindWidgetDragEnd)
-		document.addEventListener('mousemove', this.onFindWidgetDrag)
+		document.addEventListener('mouseup', this.onFindWidgetDragEndBound)
+		document.addEventListener('mousemove', this.onFindWidgetDragBound)
 	}
 
 	/**
@@ -753,8 +770,8 @@ class FindWidget {
 
 	onFindWidgetDragEnd(e: MouseEvent) {
 		this.findWidgetGripperIsMouseDown = false
-		document.removeEventListener('mousemove', this.onFindWidgetDrag)
-		document.removeEventListener('mouseup', this.onFindWidgetDragEnd)
+		document.removeEventListener('mousemove', this.onFindWidgetDragBound)
+		document.removeEventListener('mouseup', this.onFindWidgetDragEndBound)
 	}
 
 	/**
