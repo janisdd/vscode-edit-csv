@@ -181,8 +181,8 @@ class FindWidget {
 	 * prepares the find widget (re-setup all listeners...)
 	 */
 	setupFind() {
-		Mousetrap.unbind('meta+f')
-		Mousetrap.bindGlobal('meta+f', (e) => {
+		Mousetrap.unbind(['meta+f', 'ctrl+f'])
+		Mousetrap.bindGlobal(['meta+f', 'ctrl+f'], (e) => {
 			e.preventDefault()
 			this.showOrHideWidget(true)
 		})
