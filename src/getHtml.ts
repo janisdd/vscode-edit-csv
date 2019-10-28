@@ -23,8 +23,8 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 
 	let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.min.css')
 	// let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
-	// let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js')
-	let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js')
+	let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js')
+	// let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js')
 	let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js')
 	// let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
 
@@ -57,7 +57,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 	let findWidgetHtml = ``
 	{
 		findWidgetHtml = `
-		<div id="find-widget" class="find-widget find-widget-themed" style="display: none; right: 100px;">
+		<div id="find-widget" class="find-widget" style="display: none; right: 100px;">
 
 		<div id="find-widget-progress-bar" class="progress-bar"></div>
 

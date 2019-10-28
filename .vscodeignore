@@ -2,6 +2,8 @@
 .vscode-test/**
 out/test/**
 src/**
+csvEditorHtml/index.html
+*.vsix
 .gitignore
 vsc-extension-quickstart.md
 **/tsconfig.json
@@ -12,11 +14,13 @@ TODO.md
 node_modules/@types
 backup
 scripts.md
-thirdParty/bulma.css
+thirdParty/info.md
+thirdParty/bulma/bulma.css
 thirdParty/handsontable/handsontable.css
 thirdParty/handsontable/handsontable.d.ts
 thirdParty/handsontable/handsontable.js
 thirdParty/handsontable/handsontable.js.map
 thirdParty/mousetrap/mousetrap.js
 thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.js
+thirdParty/mousetrap/plugins/global-bind/README.md
 thirdParty/papaparse/papaparse.js

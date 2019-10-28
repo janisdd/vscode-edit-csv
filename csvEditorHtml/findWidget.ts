@@ -322,9 +322,9 @@ class FindWidget {
 		}
 
 		this.findOptionMatchCasePreviousCache = this.findOptionMatchCaseCache
-		this.findOptionMatchWholeCellCache = this.findOptionMatchWholeCellCache
-		this.findOptionTrimCellCache = this.findOptionTrimCellCache
-		this.findOptionUseRegexCache = this.findOptionUseRegexCache
+		this.findOptionMatchWholeCellPreviousCache = this.findOptionMatchWholeCellCache
+		this.findOptionTrimCellPreviousCache = this.findOptionTrimCellCache
+		this.findOptionUseRegexPreviousCache = this.findOptionUseRegexCache
 		this.tableHasChangedAfterSearch = false
 
 		let searchPlugin = hot.getPlugin('search')
@@ -485,7 +485,7 @@ class FindWidget {
 			//if the table has changes and we set the option to the previous state...
 			//then do not clear the outdated indicator because of the table changes!
 
-			if (enabled !== this.findOptionMatchCasePreviousCache) {
+			if (this._hasAnyFindOptionChanged()) {
 				this.showOrHideOutdatedSearchIndicator(true)
 			} else {
 
@@ -522,7 +522,7 @@ class FindWidget {
 			//if the table has changes and we set the option to the previous state...
 			//then do not clear the outdated indicator because of the table changes!
 
-			if (enabled !== this.findOptionMatchWholeCellPreviousCache) {
+			if (this._hasAnyFindOptionChanged()) {
 				this.showOrHideOutdatedSearchIndicator(true)
 			} else {
 
@@ -559,7 +559,7 @@ class FindWidget {
 			//if the table has changes and we set the option to the previous state...
 			//then do not clear the outdated indicator because of the table changes!
 
-			if (enabled !== this.findOptionTrimCellPreviousCache) {
+			if (this._hasAnyFindOptionChanged()) {
 				this.showOrHideOutdatedSearchIndicator(true)
 			} else {
 
@@ -602,7 +602,7 @@ class FindWidget {
 			//if the table has changes and we set the option to the previous state...
 			//then do not clear the outdated indicator because of the table changes!
 
-			if (enabled !== this.findOptionUseRegexPreviousCache) {
+			if (this._hasAnyFindOptionChanged()) {
 				this.showOrHideOutdatedSearchIndicator(true)
 			} else {
 
@@ -617,6 +617,23 @@ class FindWidget {
 
 		//don't auto refresh
 		// this.refreshCurrentSearch()
+	}
+
+
+	/**
+	 * returns true if any find option was changed after the last search
+	 */
+	_hasAnyFindOptionChanged(): boolean {
+
+		if (this.findOptionMatchCasePreviousCache !== this.findOptionMatchCaseCache) return true
+
+		if (this.findOptionMatchWholeCellPreviousCache !== this.findOptionMatchWholeCellCache) return true
+
+		if (this.findOptionTrimCellPreviousCache !== this.findOptionTrimCellCache) return true
+
+		if (this.findOptionUseRegexPreviousCache !== this.findOptionUseRegexCache) return true
+
+		return false
 	}
 
 	/**

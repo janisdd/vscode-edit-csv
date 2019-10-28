@@ -21,8 +21,8 @@ function createEditorHtml(context, initialContent) {
     const _getResourcePath = getResourcePath.bind(undefined, context);
     let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.min.css');
     // let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
-    // let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js')
-    let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js');
+    let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js');
+    // let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js')
     let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js');
     // let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
     const mousetrapJs = _getResourcePath('thirdParty/mousetrap/mousetrap.min.js');
@@ -48,7 +48,7 @@ function createEditorHtml(context, initialContent) {
     let findWidgetHtml = ``;
     {
         findWidgetHtml = `
-		<div id="find-widget" class="find-widget find-widget-themed" style="display: none; right: 100px;">
+		<div id="find-widget" class="find-widget" style="display: none; right: 100px;">
 
 		<div id="find-widget-progress-bar" class="progress-bar"></div>
 

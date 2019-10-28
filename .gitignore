@@ -5,3 +5,4 @@ TODO.md
 .vscode-test
 scripts.md
 backup
+*.vsix
