@@ -919,7 +919,10 @@ function onAnyChange(changes?: CellChanges[] | null, reason?: string) {
 	}
 
 	
-	if (findWidgetInstance.findWidgetInput.value !== '') {
+	//we need to check the value cache because the user could have cleared the input and then closed the widget
+	//but if we have an old search we re-open the old search which is now invalid...
+	if (findWidgetInstance.findWidgetInputValueCache !== '') {
+		findWidgetInstance.tableHasChangedAfterSearch = true
 		findWidgetInstance.showOrHideOutdatedSearchIndicator(true)
 	}
 

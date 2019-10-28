@@ -32,6 +32,18 @@ class FindWidget {
 	findOptionTrimCellCache = false
 	findOptionUseRegexCache = false
 
+	//store old toggle state to show refresh search only when options really change
+	findOptionMatchCasePreviousCache = false
+	findOptionMatchWholeCellPreviousCache = false
+	findOptionTrimCellPreviousCache = false
+	findOptionUseRegexPreviousCache = false
+
+	/**
+	 * we need this to be sure if we need to show the outdated search indicator
+	 * this should be reset when we re-searched
+	 */
+	tableHasChangedAfterSearch = false
+
 	findWidgetQueryCancellationToken: { isCancellationRequested: boolean } = {
 		isCancellationRequested: false
 	}
@@ -309,6 +321,12 @@ class FindWidget {
 			}
 		}
 
+		this.findOptionMatchCasePreviousCache = this.findOptionMatchCaseCache
+		this.findOptionMatchWholeCellCache = this.findOptionMatchWholeCellCache
+		this.findOptionTrimCellCache = this.findOptionTrimCellCache
+		this.findOptionUseRegexCache = this.findOptionUseRegexCache
+		this.tableHasChangedAfterSearch = false
+
 		let searchPlugin = hot.getPlugin('search')
 
 		if (pretendedText === null) {
@@ -326,7 +344,7 @@ class FindWidget {
 
 			//when we increment to e.g. only update after 10% then the time will improve!
 			//@ts-ignore
-			this.lastFindResults = await searchPlugin.queryAsync(this.findWidgetInput.value, this.findWidgetQueryCancellationToken, this._onSearchProgress.bind(this), 5)
+			this.lastFindResults = await searchPlugin.queryAsync(this.findWidgetInput.value, this.findWidgetQueryCancellationToken, this._onSearchProgress.bind(this), 5) //updat every 5 %
 			this._getRealIndicesFromFindResult()
 
 			//old sync way
@@ -344,7 +362,16 @@ class FindWidget {
 
 		statusInfo.innerText = `Rendering table...`
 
-		if (jumpToResult) {
+		if (this.lastFindResults.length === 0) {
+
+			if (this.findWidgetQueryCancellationToken.isCancellationRequested === false) {
+				this.findWidgetInfo.innerText = `No results`
+			} else {
+				this.findWidgetInfo.innerText = `Cancelled`
+			}
+		}
+
+		if (jumpToResult && this.lastFindResults.length > 0) {
 			//jump to the first found match
 			this.gotoFindMatchByIndex(0)
 		}
@@ -452,6 +479,25 @@ class FindWidget {
 
 		this.findOptionMatchCaseCache = enabled
 
+		//we have an old search
+		if (this.findWidgetInputValueCache !== '') {
+
+			//if the table has changes and we set the option to the previous state...
+			//then do not clear the outdated indicator because of the table changes!
+
+			if (enabled !== this.findOptionMatchCasePreviousCache) {
+				this.showOrHideOutdatedSearchIndicator(true)
+			} else {
+
+				//we set the option to the previous state
+				if (this.tableHasChangedAfterSearch) {
+
+				} else {
+					this.showOrHideOutdatedSearchIndicator(false)
+				}
+			}
+		}
+
 		//don't auto refresh
 		// this.refreshCurrentSearch()
 	}
@@ -470,6 +516,25 @@ class FindWidget {
 
 		this.findOptionMatchWholeCellCache = enabled
 
+		//we have an old search
+		if (this.findWidgetInputValueCache !== '') {
+
+			//if the table has changes and we set the option to the previous state...
+			//then do not clear the outdated indicator because of the table changes!
+
+			if (enabled !== this.findOptionMatchWholeCellPreviousCache) {
+				this.showOrHideOutdatedSearchIndicator(true)
+			} else {
+
+				//we set the option to the previous state
+				if (this.tableHasChangedAfterSearch) {
+
+				} else {
+					this.showOrHideOutdatedSearchIndicator(false)
+				}
+			}
+		}
+
 		//don't auto refresh
 		// this.refreshCurrentSearch()
 	}
@@ -487,6 +552,25 @@ class FindWidget {
 		}
 
 		this.findOptionTrimCellCache = enabled
+
+		//we have an old search
+		if (this.findWidgetInputValueCache !== '') {
+
+			//if the table has changes and we set the option to the previous state...
+			//then do not clear the outdated indicator because of the table changes!
+
+			if (enabled !== this.findOptionTrimCellPreviousCache) {
+				this.showOrHideOutdatedSearchIndicator(true)
+			} else {
+
+				//we set the option to the previous state
+				if (this.tableHasChangedAfterSearch) {
+
+				} else {
+					this.showOrHideOutdatedSearchIndicator(false)
+				}
+			}
+		}
 
 		//don't auto refresh
 		// this.refreshCurrentSearch()
@@ -511,6 +595,25 @@ class FindWidget {
 		}
 
 		this.findOptionUseRegexCache = enabled
+
+		//we have an old search
+		if (this.findWidgetInputValueCache !== '') {
+
+			//if the table has changes and we set the option to the previous state...
+			//then do not clear the outdated indicator because of the table changes!
+
+			if (enabled !== this.findOptionUseRegexPreviousCache) {
+				this.showOrHideOutdatedSearchIndicator(true)
+			} else {
+
+				//we set the option to the previous state
+				if (this.tableHasChangedAfterSearch) {
+
+				} else {
+					this.showOrHideOutdatedSearchIndicator(false)
+				}
+			}
+		}
 
 		//don't auto refresh
 		// this.refreshCurrentSearch()
@@ -642,11 +745,6 @@ class FindWidget {
 	gotoFindMatchByIndex(matchIndex: number) {
 
 		if (!hot) return
-
-		if (this.lastFindResults.length === 0) {
-			this.findWidgetInfo.innerText = `No results`
-			return
-		}
 
 		if (matchIndex >= this.lastFindResults.length) {
 			this.gotoFindMatchByIndex(0)
