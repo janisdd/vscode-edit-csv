@@ -22,7 +22,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] |
 	const parseResult = csv.parse(content, {
 		...csvReadOptions,
 		comments: false, //false gives use all lines we later check each line if it's a comment to merge the cells in that row
-		rowInsertCommentLines_commentsString: typeof csvReadOptions.comments === 'string' ? csvReadOptions.comments : null,
+		rowInsertCommentLines_commentsString: typeof csvReadOptions.comments === 'string' && csvReadOptions.comments !== '' ? csvReadOptions.comments : null,
 		// fastMode: false //monkeypatch must work with normal and fast mode...
 	} as any)
 

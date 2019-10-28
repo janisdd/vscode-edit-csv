@@ -24,7 +24,7 @@ function isCommentCell(value: string | null, csvReadConfig: CsvReadOptions) {
 
 	if (value === null) return false
 
-	if (typeof csvReadConfig.comments === 'string') {
+	if (typeof csvReadConfig.comments === 'string' && csvReadConfig.comments !== '') {
 		return value.trimLeft().startsWith(csvReadConfig.comments)
 	}
 
