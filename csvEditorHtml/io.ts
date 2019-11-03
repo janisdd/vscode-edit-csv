@@ -22,6 +22,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] |
 	const parseResult = csv.parse(content, {
 		...csvReadOptions,
 		comments: false, //false gives use all lines we later check each line if it's a comment to merge the cells in that row
+		//left trimmed lines are comments and if !== null we want to include comments as one celled row
 		rowInsertCommentLines_commentsString: typeof csvReadOptions.comments === 'string' && csvReadOptions.comments !== '' ? csvReadOptions.comments : null,
 		// fastMode: false //monkeypatch must work with normal and fast mode...
 	} as any)
@@ -201,7 +202,9 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 	//not documented in papaparse...
 	//@ts-ignore
 	_conf['skipEmptyLines'] = false
+
 	//a custom param
+	//rowInsertCommentLines_commentsString: trim left comment lines and only export first cell
 	//@ts-ignore
 	_conf['rowInsertCommentLines_commentsString'] = typeof csvWriteOptions.comments === 'string' ? csvWriteOptions.comments : null
 

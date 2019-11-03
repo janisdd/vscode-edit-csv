@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## 0.2.2
+
+- added `ctrl+f`find shortcut for windows/linux
+
 ## 0.2.1
 
 - fixed issue where empty `Read options > Comment` would cause all rows to be comments (#14)

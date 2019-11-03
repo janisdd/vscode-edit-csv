@@ -6,6 +6,15 @@ License: MIT
 commit: 49170b76b382317356c2f707e2e4191430b8d495
 comment: we need this to support custom comment handling...
 */
+/*
+changelog:
+
+- added parse/unparse option `rowInsertCommentLines_commentsString`
+	- used to treat comments as normal 1 cell rows
+	- parse: rowInsertCommentLines_commentsString !== null, left trimmed strings starting with it are treated as comments and are parsed into a row with 1 cell
+	- unparse: rowInsertCommentLines_commentsString !== null, left trimmed strings first cells will be trimmed left and only the first cell will be exported
+
+*/
 
 (function(root, factory)
 {
