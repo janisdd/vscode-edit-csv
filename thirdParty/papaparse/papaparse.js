@@ -274,7 +274,7 @@ changelog:
 	{
 		// Default configuration
 
-		/** whether to surround every datum with quotes */
+		/** @type {boolean | boolean[]} whether to surround every datum with quotes */
 		var _quotes = false;
 
 		/** whether to write headers */
@@ -302,6 +302,9 @@ changelog:
 		 * only the first row data is exported
 		 */
 		var _rowInsertCommentLines_commentsString = null
+
+		/** @type {boolean[] | null} */
+		var _columnIsQuoted = null
 
 		unpackConfig();
 
@@ -385,6 +388,10 @@ changelog:
 			if (_config.rowInsertCommentLines_commentsString !== null) {
 				_rowInsertCommentLines_commentsString = _config.rowInsertCommentLines_commentsString
 			}
+
+			if (typeof _config.columnIsQuoted !== 'undefined') {
+				_columnIsQuoted = _config.columnIsQuoted
+			}
 		}
 
 
@@ -403,6 +410,15 @@ changelog:
 		function serialize(fields, data, skipEmptyLines)
 		{
 			var csv = '';
+
+			if (_quotes) {
+				//we quote all fields so no need for this
+				_columnIsQuoted = false
+			}
+
+			if (_columnIsQuoted) {
+				_quotes = _columnIsQuoted
+			}
 
 			if (typeof fields === 'string')
 				fields = JSON.parse(fields);
@@ -473,8 +489,12 @@ changelog:
 		/** Encloses a value around quotes if needed (makes a value safe for CSV insertion) */
 		function safe(str, col)
 		{
-			if (typeof str === 'undefined' || str === null)
+			if (typeof str === 'undefined' || str === null) {
+				if (_quotes) {
+					return _quoteChar + '' + _quoteChar
+				}
 				return '';
+			}
 
 			if (str.constructor === Date)
 				return JSON.stringify(str).slice(1, 25);
@@ -1416,6 +1436,24 @@ changelog:
 
 		var rowInsertCommentLines_commentsString = config.rowInsertCommentLines_commentsString
 
+		/**
+		 * normally when parsing quotes are discarded as they don't change the retrieved data
+		 * true: quote information are returned as part of the parse result, for each column:
+		 * 	 true: column was quoted
+		 * 	 false: column was not quoted
+		 * false: quote information is returned as null or undefined (falsy)
+		 * 
+		 * to determine if a column is quoted we use the first cell only (if a column has no cells then it's not quoted)
+		 * so if the first line has only 3 columns and all other more than 3 (e.g. 4) then all columns starting from 4 are treated as not quoted!!
+		 * not that there is no difference if we have column headers (first row is used)
+		 * comment rows are ignored for this
+		 */
+		var retainQuoteInformation = config.retainQuoteInformation
+		/** @type {boolean[]} */
+		var columnIsQuoted = null
+		//quote row has is not empty
+		var firstQuoteInformationRowFound = false
+
 		// Delimiter must be valid
 		if (typeof delim !== 'string'
 			|| Papa.BAD_DELIMITERS.indexOf(delim) > -1)
@@ -1487,12 +1525,25 @@ changelog:
 					{
 						data = [];
 						pushRow(!isCommentRow ? row.split(delim) : [row]);
+
+						if (data.length === 1 && retainQuoteInformation) {
+							//in fast mode there are now quote characters...
+							columnIsQuoted = Array(data[0].length).fill(false)
+						}
+
 						doStep();
 						if (aborted)
 							return returnable();
 					}
-					else
+					else {
 						pushRow(!isCommentRow ? row.split(delim) : [row]);
+
+						if (data.length === 1 && retainQuoteInformation) {
+							//in fast mode there are now quote characters...
+							columnIsQuoted = Array(data[0].length).fill(false)
+						}
+					}
+						
 					if (preview && i >= preview)
 					{
 						data = data.slice(0, preview);
@@ -1506,6 +1557,8 @@ changelog:
 			var nextNewline = input.indexOf(newline, cursor);
 			var quoteCharRegex = new RegExp(escapeRegExp(escapeChar) + escapeRegExp(quoteChar), 'g');
 			var quoteSearch = input.indexOf(quoteChar, cursor);
+			//we don't use fast mode so we assume some field is quoted...
+			columnIsQuoted = []
 
 			// Parser loop
 			for (;;)
@@ -1515,6 +1568,10 @@ changelog:
 				{
 					// Start our search for the closing quote where the cursor is
 					quoteSearch = cursor;
+
+					if (retainQuoteInformation && firstQuoteInformationRowFound === false) {
+						columnIsQuoted.push(true)
+					}
 
 					// Skip the opening quote
 					cursor++;
@@ -1622,6 +1679,10 @@ changelog:
 					continue;
 				}
 
+				if (retainQuoteInformation && firstQuoteInformationRowFound === false) {
+					columnIsQuoted.push(false)
+				}
+
 				// Comment found at start of new line
 				if (comments && row.length === 0 && input.substr(cursor, commentsLen) === comments)
 				{
@@ -1652,12 +1713,12 @@ changelog:
 				if (nextDelim !== -1 && (nextDelim < nextNewline || nextNewline === -1))
 				{
 					// we check, if we have quotes, because delimiter char may be part of field enclosed in quotes
-					if (quoteSearch !== -1) {
+					if (quoteSearch > nextDelim) { //patched
 						// we have quotes, so we try to find the next delimiter not enclosed in quotes and also next starting quote char
 						var nextDelimObj = getNextUnqotedDelimiter(nextDelim, quoteSearch, nextNewline);
 
 						// if we have next delimiter char which is not enclosed in quotes
-						if (nextDelimObj && nextDelimObj.nextDelim) {
+						if (nextDelimObj && typeof nextDelimObj.nextDelim !== 'undefined') {
 							nextDelim = nextDelimObj.nextDelim;
 							quoteSearch = nextDelimObj.quoteSearch;
 							row.push(input.substring(cursor, nextDelim));
@@ -1679,6 +1740,8 @@ changelog:
 				{
 					row.push(input.substring(cursor, nextNewline));
 					saveRow(nextNewline + newlineLen);
+
+					if (firstQuoteInformationRowFound)
 
 					if (stepIsFunction)
 					{
@@ -1704,6 +1767,16 @@ changelog:
 			{
 				data.push(row);
 				lastCursor = cursor;
+
+				if (firstQuoteInformationRowFound === false) {
+
+					if (row.length === 1 && row[0] === '') { //empty row
+						firstQuoteInformationRowFound = false
+						columnIsQuoted = [] //reset for next row
+					} else {
+						firstQuoteInformationRowFound = true
+					}
+				}
 			}
 
 			/**
@@ -1766,7 +1839,8 @@ changelog:
 						aborted: aborted,
 						truncated: !!stopped,
 						cursor: lastCursor + (baseIndex || 0)
-					}
+					},
+					columnIsQuoted
 				};
 			}
 
