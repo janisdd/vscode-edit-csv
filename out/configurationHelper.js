@@ -26,6 +26,8 @@ const defaultConfig = {
     initiallyHideComments: false,
     enableWrapping: true,
     initialColumnWidth: 0,
+    retainQuoteInformation: true,
+    newColumnQuoteInformationIsQuoted: false,
 };
 /**
  * returns the configuration for this extension

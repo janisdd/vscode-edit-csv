@@ -141,6 +141,16 @@ type CsvEditSettings = {
 	 * the initial width for columns, 0 or a negative number will disable this and auto column size is used on initial render
 	 */
 	initialColumnWidth: number
+
+	/**
+	 * true: information about quoted fields are retained during parsing (for more details see readme), false: information about quoted field is discarded
+	 */
+	retainQuoteInformation: boolean
+
+	/**
+	 * true: new columns will get true as quote information (also for added columns via expanding), false: new columns will get false as quote information
+	 */
+	newColumnQuoteInformationIsQuoted: boolean
 }
 
 /* --- frontend settings --- */
@@ -174,6 +184,7 @@ type CsvReadOptions = {
 	escapeChar: string
 	/**
 	 * if false we have invalid rows ... always only 1 col
+	 * also when unparsing empty rows become real rows...
 	 */
 	skipEmptyLines: true,
 	/**
@@ -220,6 +231,11 @@ type CsvWriteOptions = {
 	 * true: to always quote fields, false: not (only if necessary)
 	 */
 	quoteAllFields: boolean
+
+	/**
+	 * true: information about quoted fields are retained during parsing and written to output(for more details see readme), false: information about quoted field is discarded
+	 */
+	retainQuoteInformation: boolean
 }
 
 type MiscOptions = {
@@ -360,7 +376,16 @@ type HandsontableSearchResult = {
 }
 
 type HeaderRowWithIndex = {
+	/**
+	 * entries can be null e.g. for new columns
+	 * for null we display the column name 'column X' where X is the number of the column
+	 * however, after opening the cell editor null becomes the empty string (after committing the value)...
+	 */
 	row: Array<string | null>
+/**
+ * the physical row index of the header row
+ * this is needed if we want to insert the header row back into the table (or remove)
+ */
 	physicalIndex: number
 }
 
@@ -379,4 +404,9 @@ type CellChanges = [number, number | string, string, string]
 type Point = {
 	x: number
 	y: number
+}
+
+type ExtendedCsvParseResult = {
+	data: string[][]
+	columnIsQuoted: boolean[]
 }

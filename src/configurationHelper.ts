@@ -27,6 +27,8 @@ const defaultConfig: CsvEditSettings = {
 	initiallyHideComments: false,
 	enableWrapping: true,
 	initialColumnWidth: 0,
+	retainQuoteInformation: true,
+	newColumnQuoteInformationIsQuoted: false,
 }
 
 /**

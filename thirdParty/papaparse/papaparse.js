@@ -1451,7 +1451,8 @@ changelog:
 		var retainQuoteInformation = config.retainQuoteInformation
 		/** @type {boolean[]} */
 		var columnIsQuoted = null
-		//quote row has is not empty
+		//when we set this to true we got the right quote information
+		//(when need to skip empty & comment rows and during this we might reset columnIsQuoted multiple times)
 		var firstQuoteInformationRowFound = false
 
 		// Delimiter must be valid
@@ -1512,7 +1513,12 @@ changelog:
 				{
 					row = rows[i];
 
-					var isCommentRow = treatCommentsSpecially && row.trimLeft().startsWith(rowInsertCommentLines_commentsString)
+					//we could trim left here but this would not be compatible with not fast mode...
+					var isCommentRow = treatCommentsSpecially && row.startsWith(rowInsertCommentLines_commentsString)
+					var _row = null
+
+					//although we know that there are no quotes (--> columnIsQuoted must be all false entries...)
+					//but we want/need to set the right length for the quote array (first real row)
 
 					cursor += row.length;
 					if (i !== rows.length - 1)
@@ -1524,24 +1530,28 @@ changelog:
 					if (stepIsFunction)
 					{
 						data = [];
-						pushRow(!isCommentRow ? row.split(delim) : [row]);
 
-						if (data.length === 1 && retainQuoteInformation) {
-							//in fast mode there are now quote characters...
-							columnIsQuoted = Array(data[0].length).fill(false)
+						_row = !isCommentRow ? row.split(delim) : [row]
+
+						if (retainQuoteInformation && firstQuoteInformationRowFound === false) {
+							//in fast mode there are no quote characters...
+							columnIsQuoted = Array(_row.length).fill(false)
 						}
 
+						pushRow(_row);
 						doStep();
 						if (aborted)
 							return returnable();
 					}
 					else {
-						pushRow(!isCommentRow ? row.split(delim) : [row]);
+						_row = !isCommentRow ? row.split(delim) : [row]
 
-						if (data.length === 1 && retainQuoteInformation) {
-							//in fast mode there are now quote characters...
-							columnIsQuoted = Array(data[0].length).fill(false)
+						if (retainQuoteInformation && firstQuoteInformationRowFound === false) {
+							//in fast mode there are no quote characters...
+							columnIsQuoted = Array(_row.length).fill(false)
 						}
+
+						pushRow(_row);
 					}
 						
 					if (preview && i >= preview)
@@ -1763,6 +1773,9 @@ changelog:
 			return finish();
 
 
+			/**
+			 * @param {string[]} row
+			 */
 			function pushRow(row)
 			{
 				data.push(row);
@@ -1770,7 +1783,9 @@ changelog:
 
 				if (firstQuoteInformationRowFound === false) {
 
-					if (row.length === 1 && row[0] === '') { //empty row
+					if (row.length === 1 && 
+						(row[0] === '' //empty row is skipped in ui --> no quote information
+						|| treatCommentsSpecially && row[0].startsWith(rowInsertCommentLines_commentsString))) { //comment row should not give 
 						firstQuoteInformationRowFound = false
 						columnIsQuoted = [] //reset for next row
 					} else {

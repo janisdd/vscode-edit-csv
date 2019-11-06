@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+- added option to store/retain quote information from parsing
+- fixed issue where enabling `has header` option and then moving column will only move data but not the header data
+- fixed issue where all empty fields first line was not recognized as csv row
+- fixed issue where quote all fields will not quote all empty field rows
+
 ## 0.2.2
 
 - added `ctrl+f`find shortcut for windows/linux

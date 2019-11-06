@@ -17,8 +17,12 @@ Execute the command `edit as csv` to open an editor for the current file.
 - On initial load all rows are expanded so that all rows have equal length (number of cells (if necessary)
 	- if that happens you will see the `unsaved changes` indicator right from the start
 
-- Quotes from quoted fields (where the quotes are not needed) are removed
-	- this is because the file is parsed as csv and thus the quotes are removed. If the quotes are needed (for escaping) then the resulting field will be properly quoted
+- empty lines are skipped!
+	- this will not trigger the `unsaved changes` indicator
+	- (during parsing) a row is also empty when it only contains `""`
+		- this can be problematic if you have only 1 column...
+
+- We try to retain quote information (default) but in *some cases* fields could get unquoted on save (see [Retain Quote Information Rules](##%20retain%20quote%20information%20rules))
 
 - Comment row (rows starting with a comment) will only export the first cell
 	- if you accidentally added comment text to a cell other than the first cell you will notice it (color)
@@ -32,7 +36,31 @@ Execute the command `edit as csv` to open an editor for the current file.
 - Plugin Version **0.0.11** had an issue with loading and saving files with more than \~1 MB
 	- saved files were corrupted (content of the first \~1MB was repeated after the first \~1MB until the file size was reached)
 
+## Retain Quote Information Rules
+
+during parsing information about the quotes are stored
+
+- quote information is only stored for columns
+- only the first non-comment, not empty row (no fields) is used to gather quote information
+- if the first row has less cells than other rows
+	- then missing entries are filled with `csv-edit.newColumnQuoteInformationIsQuoted` (default is not quoted)
+- manually added columns will get `csv-edit.newColumnQuoteInformationIsQuoted` quote information
+- moving columns will also "move" the quote information
+	- e.g. column 3 was quoted and is now column 1 then column 1 is quoted after moving
+
+
+Implications of this
+
+- columns with mixed cells (quoted and not quoted fields) will get homogeneously quoted
+
+
+This can be turned off by setting `csv-edit.retainQuoteInformation` to `false`
+In this case all unnecessary quotes are removed
+
+
 ## How this extension works
+
+*essentially it's just import csv and export csv*
 
 When you click on `edit csv file`
 
@@ -74,7 +102,7 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 	- thus changes can no longer be saved/applied
 	- maybe this can be resolved when https://github.com/Microsoft/vscode/issues/43768 is closed
 
-- there are probably *some* issues which enabling/disabling `hasHeader` and undoing/redoing that
+- there are probably *some* issues which enabling/disabling `hasHeader` together with undo/redo
 	- there are some issues when switching `hasHeader` option in combination with hiding comment rows and and undo/redo
 
 ## Alternatives

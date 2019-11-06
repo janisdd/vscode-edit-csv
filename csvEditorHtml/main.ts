@@ -38,6 +38,19 @@ let headerRowWithIndex: HeaderRowWithIndex | null = null
 
 let hiddenPhysicalRowIndices: number[] = []
 
+/**
+ * this is part of the output from papaparse
+ * for each column 
+ * 	true: column was originally quoted
+ * 	false: was not quoted
+ * 
+ * this is expanded via {@link _normalizeDataArray} so we have information about every column
+ * see {@link parseCsv} for quoting rules (e.g. header rows, ...)
+ * 
+ * so this is set in {@link displayData} and should be kept up-to-date because it's used for unparsing
+ */
+let columnIsQuoted: boolean[]
+
 //csv reader options + some ui options
 //this gets overwritten with the real configuration in setCsvReadOptionsInitial
 let defaultCsvReadOptions: CsvReadOptions = {
@@ -62,6 +75,7 @@ let defaultCsvWriteOptions: CsvWriteOptions = {
 	quoteChar: '"',
 	escapeChar: '"',
 	quoteAllFields: false,
+	retainQuoteInformation: true,
 }
 let newLineFromInput = '\n'
 
@@ -74,6 +88,12 @@ let lastHandsonMoveWas: 'tab' | 'enter' | null = null
  * false: no additional highlighting (comments are still treated as comments)
  */
 let highlightCsvComments: boolean = true
+
+/**
+ * true: new columns will get true as quote information (also for added columns via expanding),
+ * false: new columns will get false as quote information
+ */
+let newColumnQuoteInformationIsQuoted: boolean = false
 
 /**
  * true: cell content is wrapped and the row height is changed,

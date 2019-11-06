@@ -344,11 +344,11 @@ function copyPreviewToClipboard() {
  * if we have rows this sets the 
  * @see headerRow and enables the has header option
  * if we have data we convert it to match a rectangle (every row must have the same number of columns / cells)
- * @param {string[][]} data array with the rows or null to just destroy the old table
+ * @param {string[][]} csvParseResult array with the rows or null to just destroy the old table
  */
-function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
+function displayData(csvParseResult: ExtendedCsvParseResult | null, csvReadConfig: CsvReadOptions) {
 
-	if (data === null) {
+	if (csvParseResult === null) {
 		if (hot) {
 			hot.getInstance().destroy()
 			hot = null
@@ -357,7 +357,8 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 	}
 
 	//this will also expand comment rows but we only use the first column value...
-	_normalizeDataArray(data, csvReadConfig)
+	_normalizeDataArray(csvParseResult, csvReadConfig)
+	columnIsQuoted = csvParseResult.columnIsQuoted
 
 	//reset header row
 	headerRowWithIndex = null
@@ -376,7 +377,7 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 	const initiallyHideComments = initialConfig ? initialConfig.initiallyHideComments : false
 
 	if (initiallyHideComments && typeof csvReadConfig.comments === 'string') {
-		hiddenPhysicalRowIndices = _getCommentIndices(data, csvReadConfig)
+		hiddenPhysicalRowIndices = _getCommentIndices(csvParseResult.data, csvReadConfig)
 	}
 
 		//enable all find connected stuff
@@ -385,15 +386,15 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 
 	//@ts-ignore
 	hot = new Handsontable(container, {
-		data,
+		data: csvParseResult.data,
 		trimWhitespace: false,
-		rowHeaderWidth: getRowHeaderWidth(data.length),
+		rowHeaderWidth: getRowHeaderWidth(csvParseResult.data.length),
 		//false to enable virtual rendering
 		renderAllRows: false, //use false and small table size for fast initial render, see https://handsontable.com/docs/7.0.2/Options.html#renderAllRows
 		rowHeaders: function (row: number) { //the visual row index
 			let text = (row + 1).toString()
 
-			if (data.length === 1) {
+			if (csvParseResult.data.length === 1) {
 				return `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
 			}
 
@@ -659,7 +660,12 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			}
 		},
 
-		afterColumnMove: function (startCol: number, endCol: number) {
+		/**
+		 * this is an array if we e.g. move consecutive columns (2,3)
+		 *   but maybe there is a way... this func should handle this anyway
+		 * endColVisualIndex: the column is inserted left to this index
+		 */
+		afterColumnMove: (function (startColVisualIndices: number[], endColVisualIndex: number) {
 
 			if (!hot) throw new Error('table was null')
 
@@ -667,8 +673,78 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			// hot.updateSettings({
 			// 	colHeaders: defaultColHeaderFunc as any
 			// }, false)
+
+			//dirty copy of below!!!
+			if (headerRowWithIndex) {
+				//same as in columnIsQuoted... see below for docs
+
+					//@ts-ignore
+					const headerRowTexts: string[] = startColVisualIndices.map(p => headerRowWithIndex.row[p])
+
+					let headerRowCopy: Array<string | null> = []
+
+					for (let i = 0; i <= headerRowWithIndex.row.length; i++) {
+						const colText = i < headerRowWithIndex.row.length ? headerRowWithIndex.row[i] : null;
+	
+						let startIndex = startColVisualIndices.indexOf(i)
+	
+						if (startIndex !== -1) {
+							continue
+						}
+	
+						if (i === endColVisualIndex) {
+							headerRowCopy.push(...headerRowTexts)
+						}
+	
+						if (i >= headerRowWithIndex.row.length) continue
+	
+						headerRowCopy.push(colText)
+					}
+	
+					headerRowWithIndex.row = headerRowCopy
+			}
+
+			if (columnIsQuoted) {
+				//we can use visual indices here because we keep {@link columnIsQuoted} up-to-date
+				//so after e.g. col 3 is moved to 0 columnIsQuoted[0] will contain the data from the old columnIsQuoted[3]
+
+				//@ts-ignore
+				const startQuoteInformation: boolean[] = startColVisualIndices.map(p => columnIsQuoted[p])
+
+				//we could calculate with the indices and mutate them...
+				//i guess it's easier to just create a new array...
+
+				let quoteCopy: boolean[] = []
+
+				//endColVisualIndex can be columnIsQuoted.length
+				//e.g. when we move the first col behind the last we need to iterate to columnIsQuoted.length
+				//else we won't insert the quote information from the first field
+				for (let i = 0; i <= columnIsQuoted.length; i++) {
+					const quoteInfo = i < columnIsQuoted.length ? columnIsQuoted[i] : false;
+
+					let startIndex = startColVisualIndices.indexOf(i)
+
+					if (startIndex !== -1) {
+						continue
+					}
+
+					if (i === endColVisualIndex) {
+						//insert all moved
+						quoteCopy.push(...startQuoteInformation)
+					}
+
+					//we iterate more than we have columnIsQuoted information
+					//e.g. when we move the first col behind the last we need to iterate to columnIsQuoted.length
+					if (i >= columnIsQuoted.length) continue
+
+					quoteCopy.push(quoteInfo)
+				}
+
+				columnIsQuoted = quoteCopy
+			}
+
 			onAnyChange()
-		},
+		} as any),
 		afterRowMove: function(startRow: number, endRow: number) {
 			if (!hot) throw new Error('table was null')
 			onAnyChange()
@@ -707,6 +783,12 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 				headerRowWithIndex.row.splice(physicalIndex, 0, ...Array(amount).fill(null))
 				//hot automatically re-renders after this
 			}
+
+			if (columnIsQuoted) {
+				const physicalIndex = hot.toPhysicalColumn(visualColIndex)
+				columnIsQuoted.splice(physicalIndex, 0, ...Array(amount).fill(newColumnQuoteInformationIsQuoted))
+			}
+
 			onAnyChange()
 		},
 		afterRemoveCol: function (visualColIndex, amount) {
@@ -731,6 +813,11 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 			//if we removed some col that was sorted then clear sorting...
 			if (sortedColumnIds.some(p => removedColIds.includes(p))) {
 				hot.getPlugin('columnSorting').clearSort()
+			}
+
+			if (columnIsQuoted) {
+				const physicalIndex = hot.toPhysicalColumn(visualColIndex)
+				columnIsQuoted.splice(physicalIndex, amount)
 			}
 
 			onAnyChange()
@@ -894,8 +981,10 @@ function displayData(data: string[][] | null, csvReadConfig: CsvReadOptions) {
 	//make sure we see something (right size)...
 	onResizeGrid()
 
-	//select first cell by default so we have always a context
-	hot.selectCell(0, 0)
+	if (hot) {
+		//select first cell by default so we have always a context
+		hot.selectCell(0, 0)
+	}
 }
 
 /**
@@ -972,7 +1061,7 @@ function onResizeGrid() {
 }
 
 /**
- * generates the default html wrapper code for the given column name
+ * generates the default html wrapper code for the given column name OR uses {@link headerRowWithIndex}
  * we add a delete icon
  * @param {number} colIndex the physical column index (user could have moved cols so visual  first col is not the physical second) use https://handsontable.com/docs/6.2.2/RecordTranslator.html to translate
  * 	call like hot.toVisualColumn(colIndex)
@@ -984,9 +1073,13 @@ function defaultColHeaderFunc(colIndex: number, colName: string | undefined | nu
 
 	if (headerRowWithIndex !== null && colIndex < headerRowWithIndex.row.length) {
 		let visualIndex = colIndex
-		if (hot)
-			visualIndex = hot!.toVisualColumn(colIndex)
+		if (hot) {
+			visualIndex = hot.toVisualColumn(colIndex) //use visual column because we keep headerRowWithIndex up-to-date
+			//when adding/removing/moving columns
+		}
 		const data = headerRowWithIndex.row[visualIndex]
+
+		//however, after opening the cell editor null becomes the empty string (after committing the value)...
 		if (data !== null) {
 			text = data
 		}

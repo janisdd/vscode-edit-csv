@@ -12,7 +12,7 @@
 * @param {string} content 
 * @returns {[string[], string[][], string[]]| null} [0] comments before, [1] csv data, [2] comments after
 */
-function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] | null {
+function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvParseResult | null {
 
 	if (content === '') {
 		content = defaultCsvContentIfEmpty
@@ -22,12 +22,24 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] |
 	const parseResult = csv.parse(content, {
 		...csvReadOptions,
 		comments: false, //false gives use all lines we later check each line if it's a comment to merge the cells in that row
-		//left trimmed lines are comments and if !== null we want to include comments as one celled row
+		//left trimmed lines are comments and if !== null we want to include comments as one celled row (in the ui)
+		//papaparse parses comments with this only if the begin with the comment string (no space before!!)
 		rowInsertCommentLines_commentsString: typeof csvReadOptions.comments === 'string' && csvReadOptions.comments !== '' ? csvReadOptions.comments : null,
 		// fastMode: false //monkeypatch must work with normal and fast mode...
+		/**
+		 * normally when parsing quotes are discarded as they don't change the retrieved data
+		 * true: quote information are returned as part of the parse result, for each column:
+		 * 	 true: column was quoted
+		 * 	 false: column was not quoted
+		 * false: quote information is returned as null or undefined (falsy)
+		 * 
+		 * to determine if a column is quoted we use the first cell only (if a column has no cells then it's not quoted)
+		 * so if the first line has only 3 columns and all other more than 3 (e.g. 4) then all columns starting from 4 are treated as not quoted!!
+		 * not that there is no difference if we have column headers (first row is used)
+		 * comment rows are ignored for this
+		 */
+		retainQuoteInformation: true, //we keep true here and decide if we use it whe nwe output data
 	} as any)
-
-	
 
 	if (parseResult.errors.length === 1 && parseResult.errors[0].type === 'Delimiter' && parseResult.errors[0].code === 'UndetectableDelimiter') {
 		//this is ok papaparse will default to ,
@@ -59,7 +71,10 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): string[][] |
 
 	readDelimiterTooltip.setAttribute('data-tooltip', `${readDelimiterTooltipText} (detected: ${defaultCsvWriteOptions.delimiter.replace("\t", "⇥")})`)
 
-	return parseResult.data
+	return {
+		data: parseResult.data,
+		columnIsQuoted: (parseResult as any).columnIsQuoted
+	}
 }
 
 
@@ -207,6 +222,9 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 	//rowInsertCommentLines_commentsString: trim left comment lines and only export first cell
 	//@ts-ignore
 	_conf['rowInsertCommentLines_commentsString'] = typeof csvWriteOptions.comments === 'string' ? csvWriteOptions.comments : null
+
+	//@ts-ignore
+	_conf['columnIsQuoted'] = csvWriteOptions.retainQuoteInformation ? columnIsQuoted : null
 
 	let dataAsString = csv.unparse(data, _conf)
 

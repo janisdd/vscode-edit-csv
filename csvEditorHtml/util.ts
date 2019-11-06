@@ -33,27 +33,46 @@ function isCommentCell(value: string | null, csvReadConfig: CsvReadOptions) {
 
 /**
  * ensures that all rows inside data have the same length
- * @param data 
+ * @param csvParseResult 
  * @param csvReadConfig 
  */
-function _normalizeDataArray(data: string[][], csvReadConfig: CsvReadOptions, fillString = '') {
+function _normalizeDataArray(csvParseResult: ExtendedCsvParseResult, csvReadConfig: CsvReadOptions, fillString = '') {
 
 
-	const maxCols = data.reduce((prev, curr) => curr.length > prev ? curr.length : prev, 0)
+	const maxCols = csvParseResult.data.reduce((prev, curr) => curr.length > prev ? curr.length : prev, 0)
 
 	let someRowWasExpanded = false
+	let firstRealRowExpandedWasFound = false
 
-	for (let i = 0; i < data.length; i++) {
-		const row = data[i];
+	for (let i = 0; i < csvParseResult.data.length; i++) {
+		const row = csvParseResult.data[i];
+
+		//first real row (not a comment)
+		//we might need to expand the quote information array
+		//this works always because
+		//case 1: first real row is the row with max columns --> maxCols === row.length --> we push empty and because of spread operator we don't push anything
+		//case 2: first real row has less rows --> row.length < maxCols --> we push
+		if (isCommentCell(row[0], csvReadConfig) === false && firstRealRowExpandedWasFound === false) {
+			firstRealRowExpandedWasFound = true
+
+			//if the first row is expanded we need to expand the quote information
+			if (row.length < maxCols && csvParseResult.columnIsQuoted !== null) {
+				csvParseResult.columnIsQuoted.push(...Array.from(Array(maxCols - row.length), (p, index) => newColumnQuoteInformationIsQuoted))
+			}
+		}
 
 		if (row.length < maxCols) {
 			row.push(...Array.from(Array(maxCols - row.length), (p, index) => fillString))
 
 			//comment rows are also expanded...
+			//but comment rows only export the first cell so they are not really affect the expanded state
 			if (row.length > 0 && isCommentCell(row[0], csvReadConfig) === false) {
 				someRowWasExpanded = true
 			}
 		}
+
+		//because we mutate the array the csv parse result will be changed...
+		//papaparse not automatically expands the rows
 
 		//trim cell values to normalize
 		// if(trimWhitespace) {
@@ -475,6 +494,7 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 	highlightCsvComments = initialConfig.highlightCsvComments
 	enableWrapping = initialConfig.enableWrapping
 	initialColumnWidth = initialConfig.initialColumnWidth
+	newColumnQuoteInformationIsQuoted = initialConfig.newColumnQuoteInformationIsQuoted
 
 	//apply settings from extension
 
@@ -488,7 +508,7 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 		comments: initialConfig.readOption_comment,
 		_hasHeader: initialConfig.readOption_hasHeader === 'true' ? true : false,
 		escapeChar: initialConfig.readOption_escapeChar,
-		quoteChar: initialConfig.readOption_quoteChar,
+		quoteChar: initialConfig.readOption_quoteChar
 	})
 
 	const copyWriteOptions = {
@@ -503,8 +523,8 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 		escapeChar: initialConfig.writeOption_escapeChar,
 		quoteChar: initialConfig.writeOption_quoteChar,
 		quoteAllFields: initialConfig.quoteAllFields,
+		retainQuoteInformation: initialConfig.retainQuoteInformation
 	})
-
 
 	switch (initialConfig.readOptionsAppearance) {
 		case 'expanded': {

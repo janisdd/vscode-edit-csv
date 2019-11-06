@@ -322,7 +322,7 @@
 				"csv-edit.quoteAllFields": {
 					"type": "boolean",
 					"default": false,
-					"description": "true: to always quote fields, false: not (only if necessary)"
+					"description": "true: to always quote fields, false: not (only if necessary, and respect retainQuoteInformation)"
 				},
 				"csv-edit.initiallyHideComments": {
 					"type": "boolean",
@@ -338,6 +338,16 @@
 					"type": "integer",
 					"default": 0,
 					"description": "the initial width for columns, 0 or a negative number will disable this and auto column size is used on initial render"
+				},
+				"csv-edit.retainQuoteInformation": {
+					"type": "boolean",
+					"default": true,
+					"description": "true: information about quoted fields are retained during parsing (for more details see readme), false: information about quoted field is discarded"
+				},
+				"csv-edit.newColumnQuoteInformationIsQuoted": {
+					"type": "boolean",
+					"default": false,
+					"description": "true: new columns will get true as quote information (also for added columns via expanding), false: new columns will get false as quote information"
 				}
 			}
 		}
