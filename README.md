@@ -17,6 +17,8 @@ Execute the command `edit as csv` to open an editor for the current file.
 - On initial load all rows are expanded so that all rows have equal length (number of cells (if necessary)
 	- if that happens you will see the `unsaved changes` indicator right from the start
 
+- enabling/disabling the `has header` read option will **clear the undo/redo stack!**
+
 - empty lines are skipped!
 	- this will not trigger the `unsaved changes` indicator
 	- (during parsing) a row is also empty when it only contains `""`

@@ -2,10 +2,18 @@
 
 ## [Unreleased]
 
-- added option to store/retain quote information from parsing
+## 0.2.3
+
+- added option to retain/store quote information from parsing
+	- changed papaparse
 - fixed issue where enabling `has header` option and then moving column will only move data but not the header data
 - fixed issue where all empty fields first line was not recognized as csv row
 - fixed issue where quote all fields will not quote all empty field rows
+- fixed issue where the initial value of read option `has header` would keep undo items (header row)
+	- we now clear the undo stack after we set the initial value for read option `has header` and
+	- `reset data` will now correctly re-apply the `has header` value
+- after applying `has header` read option the undo/redo stack is cleared!
+	- it's just too complicated to get this 100% right
 
 ## 0.2.2
 

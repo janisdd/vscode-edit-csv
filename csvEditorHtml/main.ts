@@ -100,6 +100,13 @@ let newColumnQuoteInformationIsQuoted: boolean = false
  * false: no wrapping (content is hidden)
  */
 let enableWrapping: boolean = true
+
+/**
+ * true: we started with has header option enabled which caused an event
+ *   because we change the table when removing the header row from the table body we need to clear the undo...
+ * false: nothing to do
+ */
+let isFirstHasHeaderChangedEvent = true
 /**
  * the initial width for columns, 0 or a negative number will disable this and auto column size is used on initial render
  */
@@ -124,6 +131,9 @@ const hideCommentsBtn = _getById('hide-comments-btn') as HTMLButtonElement
 const warningTooltipTextWhenCommentRowNotFirstCellIsUsed = `Please use only the first cell in comment row (others are not exported)`
 
 const unsavedChangesIndicator = _getById('unsaved-changes-indicator') as HTMLSpanElement
+
+
+const hasHeaderReadOptionInput = _getById('has-header') as HTMLInputElement
 
 //--- find widget controls
 

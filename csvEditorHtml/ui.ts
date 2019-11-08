@@ -133,7 +133,8 @@ function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLE
  */
 function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 
-	const el = _getById('has-header') as HTMLInputElement //or defaultCsvReadOptions._hasHeader
+	console.log(`applyHasHeader`)
+	const el = hasHeaderReadOptionInput //or defaultCsvReadOptions._hasHeader
 
 	const elWrite = _getById('has-header-write') as HTMLInputElement //or defaultCsvWriteOptions.header
 
@@ -164,6 +165,21 @@ function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			defaultCsvWriteOptions.header = true
 			defaultCsvReadOptions._hasHeader = true
 
+			// if (isFirstHasHeaderChangedEvent) {
+
+			// 	//@ts-ignore
+			// 	let undoPlugin = hot.undoRedo
+			// 	undoPlugin.clear()
+				
+			// 	isFirstHasHeaderChangedEvent = false
+			// }
+
+			//we now always clear the undo after changing the read has header option
+			//because it's too complicated to get this right...
+			//@ts-ignore
+			let undoPlugin = hot.undoRedo
+			undoPlugin.clear()
+
 			return
 		}
 	
@@ -184,6 +200,21 @@ function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 		elWrite.checked = false
 		defaultCsvWriteOptions.header = false
 		defaultCsvReadOptions._hasHeader = false
+
+		// if (isFirstHasHeaderChangedEvent) {
+
+		// 	// @ts-ignore
+		// 	let undoPlugin = hot.undoRedo
+		// 	undoPlugin.clear()
+			
+		// 	isFirstHasHeaderChangedEvent = false
+		// }
+
+		//we now always clear the undo after changing the read has header option
+		//because it's too complicated to get this right...
+		//@ts-ignore
+		let undoPlugin = hot.undoRedo
+		undoPlugin.clear()
 	
 		//we changed headerRowWithIndex / header row so force a re-render so that hot calls defaultColHeaderFunc again
 		hot.render()
@@ -384,7 +415,6 @@ function displayData(csvParseResult: ExtendedCsvParseResult | null, csvReadConfi
 		//we need to setup this first so we get the events before handsontable... e.g. document keydown
 		findWidgetInstance.setupFind()
 
-	//@ts-ignore
 	hot = new Handsontable(container, {
 		data: csvParseResult.data,
 		trimWhitespace: false,
@@ -406,6 +436,7 @@ function displayData(csvParseResult: ExtendedCsvParseResult | null, csvReadConfi
 		} as any,
 		afterChange: onAnyChange, //only called when cell value changed (e.g. not when col/row removed)
 		fillHandle: false,
+		undo: true,
 		colHeaders: defaultColHeaderFunc as any,
 		currentColClassName: 'foo', //actually used to overwrite highlighting
 		currentRowClassName: 'foo', //actually used to overwrite highlighting
@@ -634,30 +665,39 @@ function displayData(csvParseResult: ExtendedCsvParseResult | null, csvReadConfi
 		},
 		afterUndo: function (action: any) {
 
-			if (headerRowWithIndex && action.actionType === 'remove_row' && action.index === headerRowWithIndex.physicalIndex) {
-				//remove header row
-				defaultCsvReadOptions._hasHeader = false
-				const el = _getById('has-header') as HTMLInputElement
-				const elWrite = _getById('has-header-write') as HTMLInputElement
-				el.checked = false
-				elWrite.checked = false
+			// console.log(`afterUndo`, action)
+			// //this is the case when we have a header row -> undo -> then we should have no header row
+			// if (headerRowWithIndex && action.actionType === 'remove_row' && action.index === headerRowWithIndex.physicalIndex) {
+			// 	//remove header row
 
-				applyHasHeader(true, true)
-			}
+			// 	//set all settings manually because we don't use much of applyHasHeader
+			// 	//because this would insert/remove the header row but this is already done by the undo/redo
+			// 	defaultCsvReadOptions._hasHeader = false
+			// 	const el = _getById('has-header') as HTMLInputElement
+			// 	const elWrite = _getById('has-header-write') as HTMLInputElement
+			// 	el.checked = false
+			// 	elWrite.checked = false
+			// 	headerRowWithIndex = null
+
+			// 	applyHasHeader(true, true)
+			// }
 
 		},
 		beforeRedo: function (action: any) {
-			if (headerRowWithIndex && action.actionType === 'remove_row' && action.index === headerRowWithIndex.physicalIndex) { //first row cannot be removed normally so it must be the header row option
-				//we re insert header row
 
-				defaultCsvReadOptions._hasHeader = false
-				const el = _getById('has-header') as HTMLInputElement
-				const elWrite = _getById('has-header-write') as HTMLInputElement
-				el.checked = true
-				elWrite.checked = true
+			// console.log(`beforeRedo`, action)
 
-				applyHasHeader(true, true)
-			}
+			// if (headerRowWithIndex && action.actionType === 'remove_row' && action.index === headerRowWithIndex.physicalIndex) { //first row cannot be removed normally so it must be the header row option
+			// 	//we re insert header row
+
+			// 	defaultCsvReadOptions._hasHeader = true
+			// 	const el = _getById('has-header') as HTMLInputElement
+			// 	const elWrite = _getById('has-header-write') as HTMLInputElement
+			// 	el.checked = true
+			// 	elWrite.checked = true
+
+			// 	applyHasHeader(true, true)
+			// }
 		},
 
 		/**
@@ -675,11 +715,11 @@ function displayData(csvParseResult: ExtendedCsvParseResult | null, csvReadConfi
 			// }, false)
 
 			//dirty copy of below!!!
-			if (headerRowWithIndex) {
+			if (headerRowWithIndex !== null) {
 				//same as in columnIsQuoted... see below for docs
+				let temp = headerRowWithIndex
 
-					//@ts-ignore
-					const headerRowTexts: string[] = startColVisualIndices.map(p => headerRowWithIndex.row[p])
+					const headerRowTexts: (string | null)[] = startColVisualIndices.map(p => temp.row[p]) //for some reason we need tmp here else can be null??
 
 					let headerRowCopy: Array<string | null> = []
 
@@ -708,7 +748,6 @@ function displayData(csvParseResult: ExtendedCsvParseResult | null, csvReadConfi
 				//we can use visual indices here because we keep {@link columnIsQuoted} up-to-date
 				//so after e.g. col 3 is moved to 0 columnIsQuoted[0] will contain the data from the old columnIsQuoted[3]
 
-				//@ts-ignore
 				const startQuoteInformation: boolean[] = startColVisualIndices.map(p => columnIsQuoted[p])
 
 				//we could calculate with the indices and mutate them...
@@ -779,7 +818,7 @@ function displayData(csvParseResult: ExtendedCsvParseResult | null, csvReadConfi
 
 			if (headerRowWithIndex) {
 				const physicalIndex = hot.toPhysicalColumn(visualColIndex)
-				//@ts-ignore
+
 				headerRowWithIndex.row.splice(physicalIndex, 0, ...Array(amount).fill(null))
 				//hot automatically re-renders after this
 			}
@@ -1087,7 +1126,6 @@ function defaultColHeaderFunc(colIndex: number, colName: string | undefined | nu
 
 	//null can also happen if we enable header, add column, disable header, enable header (then the new column have null values)
 	if (colName !== undefined && colName !== null) {
-		//@ts-ignore
 		text = colName
 	}
 

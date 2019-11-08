@@ -502,11 +502,20 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 		...defaultCsvReadOptions
 	}
 
+	let _readOption_hasHeader = initialConfig.readOption_hasHeader === 'true' ? true : false
+
+	if (_readOption_hasHeader) {
+		isFirstHasHeaderChangedEvent = true
+	} else {
+		//when this is not initially set then we don't want to clear the undo after we enabled this option
+		isFirstHasHeaderChangedEvent = false
+	}
+
 	setCsvReadOptionsInitial({
 		...copyReadOptions,
 		delimiter: initialConfig.readOption_delimiter,
 		comments: initialConfig.readOption_comment,
-		_hasHeader: initialConfig.readOption_hasHeader === 'true' ? true : false,
+		_hasHeader: _readOption_hasHeader,
 		escapeChar: initialConfig.readOption_escapeChar,
 		quoteChar: initialConfig.readOption_quoteChar
 	})

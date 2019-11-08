@@ -9,6 +9,10 @@ comment: we need this to support custom comment handling...
 /*
 changelog:
 
+- added option to parsing to retain quote information for columns
+	- the returned type is now: oldResult & {columnIsQuoted: boolean[] or null if option is not set}
+	- the parse option is: retainQuoteInformation: {boolean}
+
 - added parse/unparse option `rowInsertCommentLines_commentsString`
 	- used to treat comments as normal 1 cell rows
 	- parse: rowInsertCommentLines_commentsString !== null, left trimmed strings starting with it are treated as comments and are parsed into a row with 1 cell

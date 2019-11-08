@@ -155,7 +155,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 									<span>Has header</span>
 								</label>
 								<span class="tooltip is-tooltip-right is-tooltip-multiline"
-									data-tooltip="The first row is used as header. Note that changing this option will also change the write header option.">
+								data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack!">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</div>
@@ -427,7 +427,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 							</span>
 							<span>Trim</span>
 							<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
-								data-tooltip="Trims ever cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo!">
+							data-tooltip="Trims ever cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo stack!">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</button>

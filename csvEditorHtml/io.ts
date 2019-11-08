@@ -423,6 +423,17 @@ function startRenderData(){
 
 	statusInfo.innerText = `Rendering table...`
 
+	//TODO as we don't longer use undo/redo with has header option this might not be necessary any longer...
+	//we need to change defaultCsvReadOptions because the undo/redo might mess up our
+	//defaultCsvReadOptions._hasHeader state... so ensure it's in sync with the ui
+	if (hasHeaderReadOptionInput.checked) {
+		isFirstHasHeaderChangedEvent = true
+		defaultCsvReadOptions._hasHeader = true
+	} else {
+		isFirstHasHeaderChangedEvent = false
+		defaultCsvReadOptions._hasHeader = false
+	}
+
 	call_after_DOM_updated(() => {
 
 		resetData(initialContent, defaultCsvReadOptions)
