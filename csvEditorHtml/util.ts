@@ -495,6 +495,15 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 	enableWrapping = initialConfig.enableWrapping
 	initialColumnWidth = initialConfig.initialColumnWidth
 	newColumnQuoteInformationIsQuoted = initialConfig.newColumnQuoteInformationIsQuoted
+	fixFirstXRows = Math.max(initialConfig.fixFirstXRows, 0)
+	disableBorders = initialConfig.disableBorders
+
+	if (disableBorders) {
+		const style = document.createElement('style');
+		style.type = 'text/css';
+		style.innerHTML = `.vscode-dark td, th { border: 0px !important; }`;
+		document.getElementsByTagName('head')[0].appendChild(style);
+	}
 
 	//apply settings from extension
 

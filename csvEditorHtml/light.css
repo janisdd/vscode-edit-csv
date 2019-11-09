@@ -33,6 +33,20 @@ body.vscode-light {
 	color: #657b83 !important;
 }
 
+/* fixed rows top */
+.vscode-light .ht_clone_top tr:nth-of-type(odd)> td {
+	background-color: white;
+}
+
+.vscode-light .ht_clone_top tr:nth-of-type(even)> td {
+	background-color: #f7f7f7;
+}
+
+.vscode-light .ht_clone_top tr:last-child > td {
+	border-bottom-color: #3c3c3c;
+}
+
+/* normal rows */
 .vscode-light .ht_master tr:nth-of-type(odd) > td {
 	background-color: white;
 }

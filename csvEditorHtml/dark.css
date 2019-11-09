@@ -104,6 +104,22 @@ body.vscode-dark {
   border-color: #5c5c5c;
 }
 
+/* fixed rows top */
+.vscode-dark .ht_clone_top tr:nth-of-type(odd)> td {
+	background-color: #262c2e;
+	border-color: #5c5c5c;
+}
+
+.vscode-dark .ht_clone_top tr:nth-of-type(even)> td {
+	background-color: #2d3436;
+	border-color: #5c5c5c;
+}
+
+.vscode-dark .ht_clone_top tr:last-child > td {
+	border-bottom-color: #b7b7b7;
+}
+
+/* normal rows */
 .vscode-dark .ht_master tr:nth-of-type(odd) > td {
 	background-color: #262c2e;
 	border-color: #5c5c5c;
@@ -129,8 +145,9 @@ body.vscode-dark {
   background-color: #0251b5;
 }
 
+/* we don't need this... first real column... light css doesn't even have this*/
 .vscode-dark .handsontable th:nth-child(2) {
-	border-left: 1px solid #5c5c5c !important;
+	/* border-left: 1px solid #5c5c5c !important; */
 }
 .vscode-dark .ht_clone_top thead tr:nth-child(2) {
 	border: 0 !important;

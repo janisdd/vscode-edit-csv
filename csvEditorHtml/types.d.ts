@@ -73,6 +73,10 @@ type CsvEditSettings = {
 	/**
  * true: first row is the header row
  * false: first row is a normal data row
+ * This option and {@link fixFirstXRows} are mutually exclusive.
+ * This option has priority over {@link fixFirstXRows}.
+ * 
+ * Allowing both has some problems when when toggling this option in the ui...
  * 
  * we use a string in case we want to add other options...
  */
@@ -151,6 +155,16 @@ type CsvEditSettings = {
 	 * true: new columns will get true as quote information (also for added columns via expanding), false: new columns will get false as quote information
 	 */
 	newColumnQuoteInformationIsQuoted: boolean
+
+	/**
+	 * true: borders are set to 0 (in css). This helps if you encounter some border color issues, false: normal borders
+	 */
+	disableBorders: boolean
+	
+	/**
+	 * fixes the first X rows so they will stay in view even if you scroll. This option and {@link readOption_hasHeader} are mutually exclusive
+	 */
+	fixFirstXRows: number
 }
 
 /* --- frontend settings --- */

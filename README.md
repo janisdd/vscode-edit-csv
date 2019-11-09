@@ -24,7 +24,7 @@ Execute the command `edit as csv` to open an editor for the current file.
 	- (during parsing) a row is also empty when it only contains `""`
 		- this can be problematic if you have only 1 column...
 
-- We try to retain quote information (default) but in *some cases* fields could get unquoted on save (see [Retain Quote Information Rules](##%20retain%20quote%20information%20rules))
+- We try to retain quote information (default) but in *some cases* fields could get unquoted on save (see [Retain Quote Information Rules](##retain-quote-information-rules))
 
 - Comment row (rows starting with a comment) will only export the first cell
 	- if you accidentally added comment text to a cell other than the first cell you will notice it (color)
@@ -104,8 +104,6 @@ There are some settings for this plugin. Open the VS Code Settings and search fo
 	- thus changes can no longer be saved/applied
 	- maybe this can be resolved when https://github.com/Microsoft/vscode/issues/43768 is closed
 
-- there are probably *some* issues which enabling/disabling `hasHeader` together with undo/redo
-	- there are some issues when switching `hasHeader` option in combination with hiding comment rows and and undo/redo
 
 ## Alternatives
 

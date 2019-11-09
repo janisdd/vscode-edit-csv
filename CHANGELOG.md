@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## 0.2.4
+
+- added option to fix the first X rows (`fixFirstXRows`)
+- added option to disable borders (`disableBorders`)
+	- this and `has header` option are mutually exclusive
+		- `has header` has priority
+- fixed issue where enabled initial state of `has header` would trigger `has changes` indicator
+
 ## 0.2.3
 
 - added option to retain/store quote information from parsing

@@ -28,6 +28,8 @@ const defaultConfig = {
     initialColumnWidth: 0,
     retainQuoteInformation: true,
     newColumnQuoteInformationIsQuoted: false,
+    disableBorders: false,
+    fixFirstXRows: 1,
 };
 /**
  * returns the configuration for this extension

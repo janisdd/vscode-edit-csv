@@ -102,6 +102,17 @@ let newColumnQuoteInformationIsQuoted: boolean = false
 let enableWrapping: boolean = true
 
 /**
+ * true: borders are set to 0 (in css). This helps if you encounter some border color issues,
+ * false: normal borders
+ */
+let disableBorders: boolean = false
+
+/**
+ * fixes the first X rows so they will stay in view even if you scroll
+ */
+let fixFirstXRows: number = 0
+
+/**
  * true: we started with has header option enabled which caused an event
  *   because we change the table when removing the header row from the table body we need to clear the undo...
  * false: nothing to do
@@ -180,11 +191,20 @@ setupAndApplyInitialConfigPart1(initialConfig)
 let _data = parseCsv(initialContent, defaultCsvReadOptions)
 
 if (_data && !vscode) {
+
+	let _exampleData: string[][] = []
+
 	//@ts-ignore
-	_data = Handsontable.helper.createSpreadsheetData(100, 20)
-	// _data = Handsontable.helper.createSpreadsheetData(1000, 20)
-	// _data = Handsontable.helper.createSpreadsheetData(10000, 21)
-	// _data = Handsontable.helper.createSpreadsheetData(100000, 20)
+	_exampleData = Handsontable.helper.createSpreadsheetData(100, 20)
+	// _exampleData = Handsontable.helper.createSpreadsheetData(1000, 20)
+	// _exampleData = Handsontable.helper.createSpreadsheetData(10000, 21)
+	// _exampleData = Handsontable.helper.createSpreadsheetData(100000, 20)
+
+	_data = {
+		columnIsQuoted: _exampleData[0].map(p => false),
+		data: _exampleData
+	}
+
 	displayData(_data, defaultCsvReadOptions)
 }
 

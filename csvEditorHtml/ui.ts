@@ -120,6 +120,7 @@ function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLE
 	wrapper.style.display = 'block'
 
 	onResizeGrid()
+
 }
 
 
@@ -133,7 +134,6 @@ function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLE
  */
 function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 
-	console.log(`applyHasHeader`)
 	const el = hasHeaderReadOptionInput //or defaultCsvReadOptions._hasHeader
 
 	const elWrite = _getById('has-header-write') as HTMLInputElement //or defaultCsvWriteOptions.header
@@ -159,20 +159,26 @@ function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 	
 			headerRowWithIndex = dataWithIndex
 	
+			hot.updateSettings({
+				fixedRowsTop: 0
+			}, false)
+
+			let hasAnyChangesBefore = getHasAnyChangesUi()
+
 			hot.alter('remove_row', headerRowWithIndex.physicalIndex);
 	
 			elWrite.checked = true
 			defaultCsvWriteOptions.header = true
 			defaultCsvReadOptions._hasHeader = true
 
-			// if (isFirstHasHeaderChangedEvent) {
+			if (isFirstHasHeaderChangedEvent) {
 
-			// 	//@ts-ignore
-			// 	let undoPlugin = hot.undoRedo
-			// 	undoPlugin.clear()
+				if (hasAnyChangesBefore === false) {
+					_setHasUnsavedChangesUiIndicator(false)
+				}
 				
-			// 	isFirstHasHeaderChangedEvent = false
-			// }
+				isFirstHasHeaderChangedEvent = false
+			}
 
 			//we now always clear the undo after changing the read has header option
 			//because it's too complicated to get this right...
@@ -180,6 +186,8 @@ function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			let undoPlugin = hot.undoRedo
 			undoPlugin.clear()
 
+			//maybe we don't need this... worked without...
+			hot.render()
 			return
 		}
 	
@@ -189,6 +197,8 @@ function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			throw new Error('could not insert header row')
 		}
 	
+		let hasAnyChangesBefore = getHasAnyChangesUi()
+
 		hot.alter('insert_row', headerRowWithIndex.physicalIndex)
 		const visualRow = hot.toVisualRow(headerRowWithIndex.physicalIndex)
 		const visualCol = hot.toVisualColumn(0)
@@ -201,14 +211,18 @@ function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 		defaultCsvWriteOptions.header = false
 		defaultCsvReadOptions._hasHeader = false
 
-		// if (isFirstHasHeaderChangedEvent) {
+		hot.updateSettings({
+			fixedRowsTop: fixFirstXRows
+		}, false)
 
-		// 	// @ts-ignore
-		// 	let undoPlugin = hot.undoRedo
-		// 	undoPlugin.clear()
+		if (isFirstHasHeaderChangedEvent) {
+
+			if (hasAnyChangesBefore === false) {
+				_setHasUnsavedChangesUiIndicator(false)
+			}
 			
-		// 	isFirstHasHeaderChangedEvent = false
-		// }
+			isFirstHasHeaderChangedEvent = false
+		}
 
 		//we now always clear the undo after changing the read has header option
 		//because it's too complicated to get this right...
@@ -218,6 +232,8 @@ function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 	
 		//we changed headerRowWithIndex / header row so force a re-render so that hot calls defaultColHeaderFunc again
 		hot.render()
+
+	
 	}
 
 	if (displayRenderInformation) {
@@ -459,6 +475,7 @@ function displayData(csvParseResult: ExtendedCsvParseResult | null, csvReadConfi
 		manualColumnMove: true,
 		manualColumnResize: true,
 		columnSorting: true,
+		fixedRowsTop: fixFirstXRows,
 		//see https://handsontable.com/docs/7.1.0/demo-context-menu.html
 		contextMenu: {
 			callback: function (key: string, ...others) {
@@ -1015,6 +1032,13 @@ function displayData(csvParseResult: ExtendedCsvParseResult | null, csvReadConfi
 
 	if (settingsApplied === true && defaultCsvReadOptions._hasHeader === true) { //this must be applied else we get duplicate first row
 		applyHasHeader(true, false)
+
+		//settings are mutually exclusive
+		if (fixFirstXRows <= 0) {
+			hot.updateSettings({
+				fixedRowsTop: 0
+			}, false)
+		}
 	}
 
 	//make sure we see something (right size)...
@@ -1336,4 +1360,8 @@ function _setHasUnsavedChangesUiIndicator(hasUnsavedChanges: boolean) {
 	} else {
 		unsavedChangesIndicator.classList.add('op-hidden')
 	}
+}
+
+function getHasAnyChangesUi(): boolean {
+	return unsavedChangesIndicator.classList.contains("op-hidden") === false
 }

@@ -241,7 +241,7 @@
 				"csv-edit.readOption_hasHeader": {
 					"type": "string",
 					"default": "false",
-					"description": "whether the first data line is a header line",
+					"description": "whether the first data line is a header line. This option and fixFirstXRows are mutually exclusive. This option has priority over fixFirstXRows",
 					"enum": [
 						"true",
 						"false"
@@ -348,6 +348,16 @@
 					"type": "boolean",
 					"default": false,
 					"description": "true: new columns will get true as quote information (also for added columns via expanding), false: new columns will get false as quote information"
+				},
+				"csv-edit.disableBorders": {
+					"type": "boolean",
+					"default": false,
+					"description": "true: borders are set to 0 (in css). This helps if you encounter some border color issues, false: normal borders"
+				},
+				"csv-edit.fixFirstXRows": {
+					"type": "number",
+					"default": 0,
+					"description": "fixes the first X rows so they will stay in view even if you scroll. This option and readOption_hasHeader are mutually exclusive"
 				}
 			}
 		}

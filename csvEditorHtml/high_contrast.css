@@ -79,6 +79,22 @@ body.vscode-high-contrast {
   border-color: #5c5c5c;
 }
 
+/* fixed rows top */
+.vscode-high-contrast .ht_clone_top tr:nth-of-type(odd)> td {
+	background-color: black;
+	border-color: #5c5c5c;
+}
+
+.vscode-high-contrast .ht_clone_top tr:nth-of-type(even)> td {
+	background-color: #1d1d1d;
+	border-color: #5c5c5c;
+}
+
+.vscode-high-contrast .ht_clone_top tr:last-child > td {
+	border-bottom-color: red;
+}
+
+/* normal rows */
 .vscode-high-contrast .ht_master tr:nth-of-type(odd) > td {
 	background-color: black;
 	border-color: #5c5c5c;
@@ -104,9 +120,11 @@ body.vscode-high-contrast {
   background-color: red;
 }
 
+/* we don't need this... first real column...*/
 .vscode-high-contrast .handsontable th:nth-child(2) {
-	border-left: 1px solid #5c5c5c !important;
+	/* border-left: 1px solid #5c5c5c !important; */
 }
+
 .vscode-high-contrast .ht_clone_top thead tr:nth-child(2) {
 	border: 0 !important;
 }
