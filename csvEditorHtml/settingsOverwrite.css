@@ -42,6 +42,10 @@ body.vs-code-settings-font-size .switch[type=checkbox]+label::after, .switch[typ
 	top: calc(0.2px * var(--vscode-editor-font-size));
 }
 
+body.vs-code-settings-font-size .textarea {
+	font-size: calc(1px * var(--vscode-editor-font-size));
+}
+
 /* END use font size from editor */
 
 /* use font size from extension settings */
@@ -77,6 +81,9 @@ body.extension-settings-font-size .switch[type=checkbox]+label::after, .switch[t
 	height: calc(1px * var(--extension-font-size));
 	width: calc(1px * var(--extension-font-size));
 	top: calc(0.2px * var(--extension-font-size));
+}
+body.extension-settings-font-size .textarea {
+	font-size: calc(1px * var(--extension-font-size));
 }
 
 /* END use font size from extension settings */

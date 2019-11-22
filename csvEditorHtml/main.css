@@ -30,40 +30,6 @@ html, body {
 	height: 200px;
 }
 
-.options-bar {
-	padding: 0.3em;
-	border: 1px solid#adadad;
-	border-radius: 10px;
-	/* display: flex;
-	flex-direction: column; */
-	min-width: 180px;
-}
-
-.options-bar:not(:last-child) {
-	margin-right: 5px;
-}
-
-.all-options {
-	display: flex;
-	align-items: stretch;
-}
-
-
-
-.options-title {
-	font-size: 150%;
-	/* transform: rotate(180deg);
-	writing-mode: vertical-rl; */
-}
-
-.options-title i {
-	vertical-align: text-bottom
-}
-
-.options-content {
-	margin-top: 0.5em;
-}
-
 .hoverable {
 	opacity: 0.7;
 }
@@ -175,7 +141,7 @@ input.input {
 }
 
 .preview-csv-textarea {
-	resize: horizontal;
+	resize: vertical;
 	min-width: 200px;
 	height: 100%;
 }
@@ -372,3 +338,49 @@ tr.hidden-row-previous-row > th:after {
 	opacity: 0.2!important;
 	pointer-events: none;
 }
+
+/* options bar*/
+
+.all-options {
+	display: flex;
+	align-items: stretch;
+}
+.all-options th {
+	vertical-align: middle;
+}
+
+.all-options td {
+	height: 100%;
+}
+
+.all-options table {
+	width: 100%;
+}
+
+.options-bar {
+	padding: 0.3em;
+}
+
+.options-bar:not(:last-child) {
+	margin-right: 5px;
+}
+
+.options-title {
+	padding: 0 10px;
+	white-space: nowrap;
+}	
+
+.options-title i {
+	vertical-align: text-bottom
+}
+
+.all-options tbody td:not(:last-child) .options-content {
+	padding: 0.5em 2.5em 0.5em 0.5em;
+}
+
+.options-content {
+	padding: 0.5em 0.5em 0.5em 0.5em;
+	height: 100%;
+}
+
+/* END options bar*/

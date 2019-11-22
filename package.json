@@ -199,43 +199,17 @@
 						"create a new column"
 					]
 				},
-				"csv-edit.readOptionsAppearance": {
+				"csv-edit.optionsBarAppearance": {
 					"type": "string",
 					"default": "collapsed",
-					"description": "the appearance of the read option section",
+					"description": "the appearance of the options bar",
 					"enum": [
 						"expanded",
 						"collapsed"
 					],
 					"enumDescriptions": [
-						"read options will always start expanded",
-						"read options will always start collapsed"
-					]
-				},
-				"csv-edit.writeOptionsAppearance": {
-					"type": "string",
-					"default": "collapsed",
-					"description": "the appearance of the write option section",
-					"enum": [
-						"expanded",
-						"collapsed"
-					],
-					"enumDescriptions": [
-						"write options will always start expanded",
-						"write options will always start collapsed"
-					]
-				},
-				"csv-edit.previewOptionsAppearance": {
-					"type": "string",
-					"default": "collapsed",
-					"description": "the appearance of the preview section",
-					"enum": [
-						"expanded",
-						"collapsed"
-					],
-					"enumDescriptions": [
-						"preview section will always start expanded",
-						"preview section will always start collapsed"
+						"options bar will always start expanded",
+						"options bar will always start collapsed"
 					]
 				},
 				"csv-edit.readOption_hasHeader": {

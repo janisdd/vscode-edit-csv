@@ -481,9 +481,7 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 
 		//probably in browser here...
 
-		toggleReadOptions(true)
-		toggleWriteOptions(true)
-		togglePreview(true)
+		toggleOptionsBar(true)
 
 		showCommentsBtn.style.display = 'none'
 		hideCommentsBtn.style.display = 'initial'
@@ -546,62 +544,22 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 		retainQuoteInformation: initialConfig.retainQuoteInformation
 	})
 
-	switch (initialConfig.readOptionsAppearance) {
+	switch (initialConfig.optionsBarAppearance) {
 		case 'expanded': {
-			toggleReadOptions(false)
+			toggleOptionsBar(false)
 			break
 		}
 		case 'collapsed': {
-			toggleReadOptions(true)
+			toggleOptionsBar(true)
 			break
 		}
 		// case 'remember': {
-		// 	//TODO
-		// 	toggleReadOptions(true)
+		// 	toggleOptionsBar(true)
 		// 	break
 		// }
 		default: {
-			_error(`unknown readOptionsAppearance: ${initialConfig.readOptionsAppearance}`)
-			break;
-		}
-	}
-
-	switch (initialConfig.writeOptionsAppearance) {
-		case 'expanded': {
-			toggleWriteOptions(false)
-			break
-		}
-		case 'collapsed': {
-			toggleWriteOptions(true)
-			break
-		}
-		// case 'remember': {
-		// 	//TODO
-		// 	toggleWriteOptions(true)
-		// 	break
-		// }
-		default: {
-			_error(`unknown writeOptionsAppearance: ${initialConfig.writeOptionsAppearance}`)
-			break;
-		}
-	}
-
-	switch (initialConfig.previewOptionsAppearance) {
-		case 'expanded': {
-			togglePreview(false)
-			break
-		}
-		case 'collapsed': {
-			togglePreview(true)
-			break
-		}
-		// case 'remember': {
-		// 	//TODO
-		// 	togglePreview(true)
-		// 	break
-		// }
-		default: {
-			_error(`unknown previewOptionsAppearance: ${initialConfig.previewOptionsAppearance}`)
+			_error(`unknown optionsBarAppearance: ${initialConfig.optionsBarAppearance}`)
+			notExhaustiveSwitch(initialConfig.optionsBarAppearance)
 			break;
 		}
 	}

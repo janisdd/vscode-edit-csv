@@ -100,3 +100,8 @@ body.vscode-light {
 .vscode-light .find-widget .error-message {
 	color: white;
 }
+
+.options-title {
+	font-size: 140%;
+	color: #657b83;
+}

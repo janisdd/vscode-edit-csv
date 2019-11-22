@@ -6,59 +6,25 @@ type GridSettings = import("../thirdParty/handsontable/handsontable").GridSettin
 /* --- common helpers --- */
 
 
-/**
- * displayed or hides the read options
- * @param shouldCollapse 
- */
-function toggleReadOptions(shouldCollapse: boolean) {
-	const el = _getById('read-options-icon')
-	const content = _getById('read-options-content') //the wrapper
-
-
-
-	if (shouldCollapse !== undefined) {
-		_setCollapsed(shouldCollapse, el, content)
-
-		_setReadOptionCollapsedVsState(shouldCollapse)
-		return
-	}
-
-	_toggleCollapse(el, content, _setReadOptionCollapsedVsState)
-}
 
 /**
- * displayed or hides the write options
+ * displayed or hides the options bar content
  * @param shouldCollapse 
  */
-function toggleWriteOptions(shouldCollapse: boolean) {
-	const el = _getById('write-options-icon')
-	const content = _getById('write-options-content') //the wrapper
+function toggleOptionsBar(shouldCollapse?: boolean) {
+	const el = _getById('options-bar-icon')
+	const readContent = _getById('read-options-content')
+	const writeContent = _getById('write-options-content')
+	const previewContent = _getById('preview-content')
 
-	if (vscode) {
-		const lastState = _getVsState()
-		vscode.setState({
-			...lastState,
-			writeOptionIsCollapsed: shouldCollapse
-		})
+	if (shouldCollapse === undefined) {
+		if (el.classList.contains('fa-chevron-down')) {
+			//down is expanded and we want to toggle
+			shouldCollapse = true
+		} else {
+			shouldCollapse = false
+		}
 	}
-
-	if (shouldCollapse !== undefined) {
-		_setCollapsed(shouldCollapse, el, content)
-
-		_setWriteOptionCollapsedVsState(shouldCollapse)
-		return
-	}
-
-	_toggleCollapse(el, content, _setWriteOptionCollapsedVsState)
-}
-
-/**
- * displayed or hides the preview
- * @param shouldCollapse 
- */
-function togglePreview(shouldCollapse: boolean) {
-	const el = _getById('preview-icon')
-	const content = _getById('preview-content') //the wrapper
 
 	if (vscode) {
 		const lastState = _getVsState()
@@ -68,59 +34,30 @@ function togglePreview(shouldCollapse: boolean) {
 		})
 	}
 
-	if (shouldCollapse !== undefined) {
-		_setCollapsed(shouldCollapse, el, content)
-
-		_setPreviewCollapsedVsState(shouldCollapse)
-		return
-	}
-
-	_toggleCollapse(el, content, _setPreviewCollapsedVsState)
-}
-
-function _toggleCollapse(el: HTMLElement, wrapper: HTMLElement, afterToggled?: (isCollapsed: boolean) => void) {
-
-	if (el.classList.contains('fa-chevron-right')) {
-		//expand
-		_setCollapsed(false, el, wrapper)
-
-		if (afterToggled) afterToggled(false)
-		return
-	}
-
-	//collapse
-	_setCollapsed(true, el, wrapper)
-
-	if (afterToggled) afterToggled(true)
-}
-
-/**
- * sets a collapseable sections state
- * @param shouldCollapsed 
- * @param el 
- * @param wrapper 
- */
-function _setCollapsed(shouldCollapsed: boolean, el: HTMLElement, wrapper: HTMLElement) {
-
-	if (shouldCollapsed) {
+	if (shouldCollapse) {
 		el.classList.remove('fa-chevron-down')
 		el.classList.add('fa-chevron-right')
-		// el.classList.replace( 'fa-chevron-down','fa-chevron-right')
-		wrapper.style.display = 'none'
+
+		readContent.style.display = 'none'
+		writeContent.style.display = 'none'
+		previewContent.style.display = 'none'
 
 		onResizeGrid()
+
+		_setPreviewCollapsedVsState(shouldCollapse)
 		return
 	}
 
 	el.classList.add('fa-chevron-down')
 	el.classList.remove('fa-chevron-right')
 
-	// el.classList.replace('fa-chevron-right', 'fa-chevron-down')
-
-	wrapper.style.display = 'block'
+	readContent.style.display = 'block'
+	writeContent.style.display = 'block'
+	previewContent.style.display = 'block'
 
 	onResizeGrid()
 
+	_setPreviewCollapsedVsState(shouldCollapse)
 }
 
 
@@ -369,7 +306,7 @@ function generateCsvPreview() {
 	el.value = value
 
 	//open preview
-	togglePreview(false)
+	toggleOptionsBar(false)
 }
 
 function copyPreviewToClipboard() {

@@ -204,10 +204,21 @@ body.vscode-dark {
 	background-color: #4c4c4c;
 }
 
-.vscode-dark  .find-widget .btn.active {
+.vscode-dark .find-widget .btn.active {
 	background-color: #3384ff;
 }
 
 .vscode-light .find-widget .error-message {
 	
+}
+
+.vscode-dark .options-title {
+	font-size: 130%;
+	color: #d0d0d0;
+}
+
+.vscode-dark .all-options table {
+	border: 1px solid #8e8e8e;
+	border-collapse: initial;
+	border-radius: 10px;
 }

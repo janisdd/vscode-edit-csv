@@ -27,28 +27,12 @@ type CsvEditSettings = {
 	lastColumnTabBehavior: 'default' | 'createColumn'
 
 	/**
-	 * the appearance of the read option section
-	 * expanded: read options will always start expanded
-	 * collapsed: read options will always start collapsed
-	 * remember: read options will use the last state (across all edit session, we use the latest)
+	 * the appearance of the (top) option bar
+	 * expanded: option bar will always start expanded
+	 * collapsed: option bar will always start collapsed
+	 * remember: option bar will use the last state (across all edit session, we use the latest)
 	 */
-	readOptionsAppearance: 'expanded' | 'collapsed' //| 'remember'
-	/**
-	 * the appearance of the write option section
-	 * 
-	 * 
-	 * same as readOptionsAppearance but for write options
-	 */
-	writeOptionsAppearance: 'expanded' | 'collapsed' //| 'remember'
-	/**
-	 * the appearance of the preview section
-	 * 
-	 * 
-	  same as readOptionsAppearance but for preview
-	 */
-	previewOptionsAppearance: 'expanded' | 'collapsed' //| 'remember'
-
-
+	optionsBarAppearance: 'expanded' | 'collapsed' //| 'remember'
 
 	/**
 	 * the delimiter to use, empty string to auto detect

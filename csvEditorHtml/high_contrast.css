@@ -188,3 +188,8 @@ body.vscode-high-contrast {
 .vscode-high-contrast .find-widget .error-message {
 	color: white;
 }
+
+.options-title {
+	font-size: 140%;
+	color: white;
+}
