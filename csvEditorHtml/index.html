@@ -18,9 +18,10 @@
 	<link rel="stylesheet" href="./dark.css">
 	<link rel="stylesheet" href="./light.css">
 	<link rel="stylesheet" href="./high_contrast.css">
+	<link rel="stylesheet" href="./settingsOverwrite.css">
 </head>
 
-<body class="vscode-dark" style="background-color: #003b49">
+<body class="vscode-dark vs-code-settings-font-size" style="background-color: #003b49">
 
 	<div id="find-widget" class="find-widget" style="display: none; right: 100px;">
 
@@ -283,7 +284,7 @@
 				</div>
 			</div>
 
-			<div class="options-bar" style="flex: 1;">
+			<div class="options-bar" style="flex: 1; display: flex; flex-direction: column;">
 				<div>
 					<div class="options-title">
 						<span class="clickable" onclick="togglePreview()">Preview</span>
@@ -301,15 +302,20 @@
 							<i id="preview-copy-icon" class="fas fa-paste"></i>
 						</span>
 
-							<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"
-								data-tooltip="You might have unsaved changes">
-								<i class="fas fa-save"></i>
-							</span>
+						<span class="mar-left-half clickable" onclick="reRenderTable()"
+							title="Redraws the table. This can fix some measure issues">
+							<i id="re-render-table-icon" class="fas fa-ruler-combined"></i>
+						</span>
+
+						<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"
+							data-tooltip="You might have unsaved changes">
+							<i class="fas fa-save"></i>
+						</span>
 					</div>
 
 				</div>
 
-				<div id="preview-content" class="options-content">
+				<div id="preview-content" class="options-content" style="flex: 1;">
 					<textarea id="csv-preview" class="textarea preview-csv-textarea"></textarea>
 				</div>
 

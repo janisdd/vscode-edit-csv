@@ -387,8 +387,14 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 			break
 		}
 
+		case 'changeFontSizeInPx': {
+			changeFontSizeInPx(message.fontSizeInPx)
+			break
+		}
+
 		default: {
 			_error('received unknown message from vs code')
+			notExhaustiveSwitch(message)
 			break
 		}
 	}
@@ -456,4 +462,8 @@ function startRenderData(){
 function call_after_DOM_updated(fn: any) {
 	var intermediate = function () { window.requestAnimationFrame(fn) }
 	window.requestAnimationFrame(intermediate)
+}
+
+function notExhaustiveSwitch(x: never): never {
+	throw new Error('not exhaustive switch')
 }

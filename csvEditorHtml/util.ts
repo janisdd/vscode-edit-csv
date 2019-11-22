@@ -505,6 +505,8 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 		document.getElementsByTagName('head')[0].appendChild(style);
 	}
 
+	changeFontSizeInPx(initialConfig.fontSizeInPx)
+
 	//apply settings from extension
 
 	const copyReadOptions = {

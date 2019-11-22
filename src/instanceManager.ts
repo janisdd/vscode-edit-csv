@@ -42,7 +42,7 @@ export class InstanceManager {
 	private instances: InstanceStorage = {}
 
 
-	private getAllInstances(): Instance[] {
+	public getAllInstances(): Instance[] {
 		const keys = Object.keys(this.instances)
 		const allInstances = keys.map(p => this.instances[p])
 		return allInstances

@@ -30,7 +30,8 @@ const defaultConfig: CsvEditSettings = {
 	retainQuoteInformation: true,
 	newColumnQuoteInformationIsQuoted: false,
 	disableBorders: false,
-	fixFirstXRows: 1,
+	fixFirstXRows: 0,
+	fontSizeInPx: 16,
 }
 
 /**

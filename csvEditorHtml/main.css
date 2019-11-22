@@ -45,13 +45,13 @@ html, body {
 
 .all-options {
 	display: flex;
-	align-items: baseline;
+	align-items: stretch;
 }
 
 
 
 .options-title {
-	font-size: 1.3rem;
+	font-size: 150%;
 	/* transform: rotate(180deg);
 	writing-mode: vertical-rl; */
 }
@@ -62,7 +62,6 @@ html, body {
 
 .options-content {
 	margin-top: 0.5em;
-	height: 216px;
 }
 
 .hoverable {

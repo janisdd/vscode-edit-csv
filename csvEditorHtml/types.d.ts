@@ -165,6 +165,11 @@ type CsvEditSettings = {
 	 * fixes the first X rows so they will stay in view even if you scroll. This option and {@link readOption_hasHeader} are mutually exclusive
 	 */
 	fixFirstXRows: number
+
+	/**
+	 * the font size in px, 0 or -x to sync the font size with the editor, +x to overwrite the font size (changing will rerender the table)
+	 */
+	fontSizeInPx: number
 }
 
 /* --- frontend settings --- */
@@ -284,7 +289,13 @@ type RequestApplyPressMessage = {
 type RequestApplyAndSavePressMessage = {
 	command: 'applyAndSavePress'
 }
-type ReceivedMessageFromVsCode = CsvUpdateMessage | RequestApplyPressMessage | RequestApplyAndSavePressMessage
+
+type RequestChangeFontSiteInPxMessage = {
+	command: 'changeFontSizeInPx'
+	fontSizeInPx: number
+}
+
+type ReceivedMessageFromVsCode = CsvUpdateMessage | RequestApplyPressMessage | RequestApplyAndSavePressMessage | RequestChangeFontSiteInPxMessage
 
 /**
  * send by the webview indicating that it has rendered and the webview has set up the listener to receive content

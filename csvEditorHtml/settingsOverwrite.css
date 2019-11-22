@@ -1,0 +1,82 @@
+
+/*
+this file is used to apply extension settings via css variables
+*/
+
+html {
+	--extension-font-size: 16
+}
+
+/* use font size from editor */
+
+body.vs-code-settings-font-size {
+	font-size: calc(1px * var(--vscode-editor-font-size));
+}
+
+body.vs-code-settings-font-size .input {
+	font-size: calc(1px * var(--vscode-editor-font-size));
+}
+
+body.vs-code-settings-font-size .button {
+	font-size: calc(1px * var(--vscode-editor-font-size));
+}
+
+body.vs-code-settings-font-size .switch[type=checkbox]+label {
+	font-size: calc(1px * var(--vscode-editor-font-size));
+	padding-left: calc(4px * var(--vscode-editor-font-size));
+	padding-top: 0;
+}
+
+body.vs-code-settings-font-size .switch[type=checkbox]+label span {
+	/* margin-left: calc(1px * var(--vscode-editor-font-size)); */
+}
+
+body.vs-code-settings-font-size .switch[type=checkbox]+label::before, .switch[type=checkbox]+label:before {
+	height: calc(1.3px * var(--vscode-editor-font-size));
+	width: calc(3px * var(--vscode-editor-font-size));
+}
+
+body.vs-code-settings-font-size .switch[type=checkbox]+label::after, .switch[type=checkbox]+label:after {
+	height: calc(1px * var(--vscode-editor-font-size));
+	width: calc(1px * var(--vscode-editor-font-size));
+	top: calc(0.2px * var(--vscode-editor-font-size));
+}
+
+/* END use font size from editor */
+
+/* use font size from extension settings */
+
+body.extension-settings-font-size {
+	font-size: calc(1px * var(--extension-font-size));
+}
+
+body.extension-settings-font-size .input {
+	font-size: calc(1px * var(--extension-font-size));
+}
+
+body.extension-settings-font-size .button {
+	font-size: calc(1px * var(--extension-font-size));
+}
+
+body.extension-settings-font-size .switch[type=checkbox]+label {
+	font-size: calc(1px * var(--extension-font-size));
+	padding-left: calc(4px * var(--extension-font-size));
+	padding-top: 0;
+}
+
+body.extension-settings-font-size .switch[type=checkbox]+label span {
+	/* margin-left: calc(1px * var(--extension-font-size)); */
+}
+
+body.extension-settings-font-size .switch[type=checkbox]+label::before, .switch[type=checkbox]+label:before {
+	height: calc(1.3px * var(--extension-font-size));
+	width: calc(3px * var(--extension-font-size));
+}
+
+body.extension-settings-font-size .switch[type=checkbox]+label::after, .switch[type=checkbox]+label:after {
+	height: calc(1px * var(--extension-font-size));
+	width: calc(1px * var(--extension-font-size));
+	top: calc(0.2px * var(--extension-font-size));
+}
+
+/* END use font size from extension settings */

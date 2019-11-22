@@ -94,6 +94,10 @@ body.vscode-high-contrast {
 	border-bottom-color: red;
 }
 
+.vscode-dark .handsontable tr {
+	background: #5c5c5c;
+}
+
 /* normal rows */
 .vscode-high-contrast .ht_master tr:nth-of-type(odd) > td {
 	background-color: black;

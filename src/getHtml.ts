@@ -41,6 +41,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 	const darkThemeCss = _getResourcePath('csvEditorHtml/dark.css')
 	const lightThemeCss = _getResourcePath('csvEditorHtml/light.css')
 	const hightContrastThemeCss = _getResourcePath('csvEditorHtml/high_contrast.css')
+	const settingsOverwriteCss = _getResourcePath('csvEditorHtml/settingsOverwrite.css')
 
 	//scripts
 	const progressJs = _getResourcePath('csvEditorHtml/out/progressbar.js')
@@ -323,7 +324,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 					</div>
 				</div>
 
-				<div class="options-bar" style="flex: 1;">
+				<div class="options-bar" style="flex: 1; display: flex; flex-direction: column;">
 					<div>
 						<div class="options-title">
 							<span class="clickable" onclick="togglePreview()">Preview</span>
@@ -341,15 +342,20 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 								<i id="preview-copy-icon" class="fas fa-paste"></i>
 							</span>
 
-								<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"
-									data-tooltip="You might have unsaved changes">
-									<i class="fas fa-save"></i>
-								</span>
+							<span class="mar-left-half clickable" onclick="reRenderTable()"
+							title="Redraws the table. This can fix some measure issues">
+								<i id="re-render-table-icon" class="fas fa-ruler-combined"></i>
+							</span>
+
+							<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"
+								data-tooltip="You might have unsaved changes">
+								<i class="fas fa-save"></i>
+							</span>
 						</div>
 
 					</div>
 
-					<div id="preview-content" class="options-content">
+					<div id="preview-content" class="options-content" style="flex: 1;">
 						<textarea id="csv-preview" class="textarea preview-csv-textarea"></textarea>
 					</div>
 
@@ -594,8 +600,9 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 		<link rel="stylesheet" href="${darkThemeCss}">
 		<link rel="stylesheet" href="${lightThemeCss}">
 		<link rel="stylesheet" href="${hightContrastThemeCss}">
+		<link rel="stylesheet" href="${settingsOverwriteCss}">
 	</head>
-	<body>
+	<body class="vs-code vs-code-settings-font-size">
 	
 	${findWidgetHtml}
 

@@ -166,6 +166,8 @@ function activate(context) {
     //not needed because this changes only initial configuration...
     // vscode.workspace.onDidChangeConfiguration((args) => {
     // })
+    const onDidChangeConfigurationCallback = onDidChangeConfiguration.bind(undefined, instanceManager);
+    vscode.workspace.onDidChangeConfiguration(onDidChangeConfigurationCallback);
     context.subscriptions.push(editCsvCommand);
     context.subscriptions.push(gotoSourceCsvCommand);
     context.subscriptions.push(applyCsvCommand);
@@ -175,6 +177,24 @@ exports.activate = activate;
 // this method is called when your extension is deactivated
 function deactivate() { }
 exports.deactivate = deactivate;
+/**
+ * called when the (extension?) config changes
+ * can be called manually to force update all instances
+ * @param e null to manually update all instances
+ */
+function onDidChangeConfiguration(instanceManager, e) {
+    if (e === null || e.affectsConfiguration('csv-edit.fontSizeInPx')) {
+        const newFontSize = configurationHelper_1.getExtensionConfiguration().fontSizeInPx;
+        const instances = instanceManager.getAllInstances();
+        for (let i = 0; i < instances.length; i++) {
+            const instance = instances[i];
+            instance.panel.webview.postMessage({
+                command: 'changeFontSizeInPx',
+                fontSizeInPx: newFontSize
+            });
+        }
+    }
+}
 function getEditorTitle(document) {
     return `CSV edit ${path.basename(document.fileName)}`;
 }

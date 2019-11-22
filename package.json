@@ -358,6 +358,11 @@
 					"type": "number",
 					"default": 0,
 					"description": "fixes the first X rows so they will stay in view even if you scroll. This option and readOption_hasHeader are mutually exclusive"
+				},
+				"csv-edit.fontSizeInPx": {
+					"type": "number",
+					"default": 16,
+					"description": "the font size in px, 0 or -x to sync the font size with the editor, +x to overwrite the font size (changing will rerender the table)"
 				}
 			}
 		}

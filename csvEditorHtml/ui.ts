@@ -382,6 +382,22 @@ function copyPreviewToClipboard() {
 
 }
 
+/**
+ * renders the hot table again
+ */
+function reRenderTable() {
+
+	if (!hot) return
+
+	statusInfo.innerText = `Rendering table...`
+	call_after_DOM_updated(() => {
+		hot!.render()
+		setTimeout(() => {
+			statusInfo.innerText = ``
+		}, 0)
+	})
+}
+
 
 /* --- other --- */
 
@@ -1364,4 +1380,26 @@ function _setHasUnsavedChangesUiIndicator(hasUnsavedChanges: boolean) {
 
 function getHasAnyChangesUi(): boolean {
 	return unsavedChangesIndicator.classList.contains("op-hidden") === false
+}
+
+/**
+ * changes to font size via updating the css variable and applying css classes
+ * also re renders the table to update the column widths (manually changed column width will stay the same (tested) on rerender)
+ */
+function changeFontSizeInPx(fontSizeInPx: number) {
+
+	document.documentElement.style.setProperty('--extension-font-size', fontSizeInPx.toString());
+
+	console.log(fontSizeInPx)
+
+	if (fontSizeInPx <= 0) {
+		//remove custom font size and use editor font size
+		document.body.classList.remove('extension-settings-font-size')
+		document.body.classList.add('vs-code-settings-font-size')
+	} else {
+		document.body.classList.add('extension-settings-font-size')
+		document.body.classList.remove('vs-code-settings-font-size')
+	}
+
+	reRenderTable()
 }
