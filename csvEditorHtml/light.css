@@ -101,7 +101,13 @@ body.vscode-light {
 	color: white;
 }
 
-.options-title {
-	font-size: 140%;
+.vscode-light .options-title {
+	font-size: 130%;
 	color: #657b83;
+}
+
+.vscode-light .all-options table {
+	border: 1px solid #8e8e8e;
+	border-collapse: initial;
+	border-radius: 10px;
 }

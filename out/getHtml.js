@@ -160,7 +160,7 @@ function createEditorHtml(context, initialContent) {
 											<i id="preview-copy-icon" class="fas fa-paste"></i>
 										</span>
 				
-										<span class="mar-left-half clickable" onclick="reRenderTable()"
+										<span class="mar-left-half clickable" onclick="reRenderTable()" style="margin-left: 2em;"
 											title="Redraws the table. This can fix some measuring issues (e.g. after the font size changed)">
 											<i id="re-render-table-icon" class="fas fa-ruler-combined"></i>
 										</span>

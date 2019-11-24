@@ -1325,9 +1325,7 @@ function getHasAnyChangesUi(): boolean {
  */
 function changeFontSizeInPx(fontSizeInPx: number) {
 
-	document.documentElement.style.setProperty('--extension-font-size', fontSizeInPx.toString());
-
-	console.log(fontSizeInPx)
+	document.documentElement.style.setProperty('--extension-font-size', fontSizeInPx.toString())
 
 	if (fontSizeInPx <= 0) {
 		//remove custom font size and use editor font size
