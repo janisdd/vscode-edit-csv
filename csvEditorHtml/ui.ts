@@ -1231,6 +1231,7 @@ function trimAllCells() {
 	const numCols = hot.countCols()
 	const allData = getData()
 	let data: string = ''
+	let hasAnyChanges = false
 
 	for (let row = 0; row < numRows; row++) {
 		for (let col = 0; col < numCols; col++) {
@@ -1242,6 +1243,10 @@ function trimAllCells() {
 			}
 
 			allData[row][col] = data.trim()
+
+			if (allData[row][col] !== data) {
+				hasAnyChanges = true
+			}
 			//tooo slow for large tables
 			// hot.setDataAtCell(row, col, data.trim())
 		}
@@ -1256,6 +1261,10 @@ function trimAllCells() {
 			}
 
 			headerRowWithIndex.row[col] = data.trim();
+
+			if (headerRowWithIndex.row[col] !== data) {
+				hasAnyChanges = true
+			}
 		}
 	}
 
@@ -1265,7 +1274,9 @@ function trimAllCells() {
 
 	//hot.updateSettings reloads data and thus afterChange hook is triggered
 	//BUT the change reason is loadData and thus we ignore it...
-	onAnyChange()
+	if (hasAnyChanges) {
+		onAnyChange()
+	}
 
 	// const afterData = getData()
 

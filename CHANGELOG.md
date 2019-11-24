@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## 0.2.5
+
+- added option `fontSizeInPx` to set the font size in the webview (or to sync it with the editor)
+- moved ui options (read/write/preview) into one panel
+	- replaced options `writeOptionsAppearance`, `readOptionsAppearance`, `previewOptionsAppearance` with `optionsBarAppearance`
+- `trim` feature now only shows `unsaved changes` when at least one cell changed
+
 ## 0.2.4
 
 - added option to fix the first X rows (`fixFirstXRows`)
