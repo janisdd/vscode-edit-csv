@@ -440,7 +440,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 							</span>
 							<span>Trim</span>
 							<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
-								data-tooltip="Trims ever cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo stack!">
+								data-tooltip="Trims every cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo stack!">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</button>
