@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## 0.2.6
+
+- fixes issue #21 - past into search widget not working on mac
+- fixed issue where shortcut for opening the search widget not focused search input when the cell editor had focus and the find widget was already displayed
+- some more shortcuts should now work again when the find widget is open (everything with meta or ctrl is passed through to vs code)
+
 ## 0.2.5
 
 - added option `fontSizeInPx` to set the font size in the webview (or to sync it with the editor)

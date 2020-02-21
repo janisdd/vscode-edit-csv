@@ -118,7 +118,15 @@ class FindWidget {
 
 		let currIsSown = this.isFindWidgetDisplayed()
 
-		if (currIsSown === show) return
+		if (currIsSown === show) {
+			//e.g. when we focuse a cell and the find widget is already displayed then we want to focus again
+			if (show) {
+				setTimeout(() => {
+					this.findWidgetInput.focus()
+				}, 0)
+			}
+			return
+		}
 
 		this.findWidget.style.display = show ? 'flex' : 'none'
 
@@ -224,14 +232,17 @@ class FindWidget {
 			//when the find widget is displayed AND has focus do not pass the event to handsontable
 			//else we would input into the cell editor...
 			//see editorManager.js > init (`instance.runHooks('afterDocumentKeyDown', event);`) > _baseEditor.js > beginEditing (`this.focus();`) > textEditor.js > focus
+			//when we don't stopImmediatePropagation then check: focus a cell, open the search and start typing would input into the cell editor
 
 			//whitelist so that we e.g. allow to show the cmd palette in vs code
 			if (
-				(e.metaKey && e.key === 'p') || //macos
-				(e.ctrlKey && e.key === 'p') || //windows / linux
-				(e.key === 'F1') //linux
+				// (e.metaKey && e.key === 'p') || //macos
+				// (e.ctrlKey && e.key === 'p') || //windows / linux
+				(e.key === 'F1') || //mac / windows /linux shows also command palette
+				(e.metaKey || e.ctrlKey) //mac and windows / linux command platte 
 			) {
-
+				//@ts-ignore
+				let xyz = 1
 			} else {
 				e.stopImmediatePropagation()
 			}
@@ -260,6 +271,10 @@ class FindWidget {
 	}
 
 
+	/**
+	 * called on every keydown
+	 * currently not use because we don't start a new search on keydown
+	 */
 	onSearchInputPre(e: KeyboardEvent | null) {
 
 		// let forceSearch = false
@@ -295,7 +310,7 @@ class FindWidget {
 
 
 	/**
-	 * 
+	 * called to start the search
 	 * @param isOpeningFindWidget 
 	 * @param jumpToResult 
 	 * @param pretendedText if this is a string we search synchronous!
