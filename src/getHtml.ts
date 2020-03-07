@@ -244,7 +244,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 												<div class="flexed">
 													<div class="field">
 														<label>
-															<span>QuotChar</span>
+															<span>QuoteChar</span>
 														</label>
 														<input id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()">
 													</div>
@@ -318,7 +318,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 											<div class="flexed">
 												<div class="field">
 													<label>
-														<span>QuotChar</span>
+														<span>QuoteChar</span>
 													</label>
 													<input id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()">
 												</div>

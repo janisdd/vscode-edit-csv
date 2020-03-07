@@ -24,3 +24,4 @@ thirdParty/mousetrap/mousetrap.js
 thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.js
 thirdParty/mousetrap/plugins/global-bind/README.md
 thirdParty/papaparse/papaparse.js
+promtUploadbuild.js

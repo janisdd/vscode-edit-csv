@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- fixed typo `QuotChar` -> `QuoteChar`
+
 ## 0.2.6
 
 - fixes issue #21 - past into search widget not working on mac
