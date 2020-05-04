@@ -342,10 +342,12 @@
 		}
 	},
 	"scripts": {
+		"preinstall": "npx npm-force-resolutions",
 		"vscode:prepublish": "npm audit && npm run compile && npm run promptUp",
 		"compile": "tsc -p ./ && tsc -p ./csvEditorHtml/tsconfig.json",
 		"watch": "tsc -watch -p ./",
 		"postinstall": "node ./node_modules/vscode/bin/install",
+		"package": "vsce package",
 		"test": "npm run compile && node ./node_modules/vscode/bin/test",
 		"lint": "npx tslint -p . && npx tslint -p ./csvEditorHtml/tsconfig.json",
 		"promptUp": "node ./promtUploadbuild.js"
@@ -357,7 +359,11 @@
 		"@types/papaparse": "4.5.6",
 		"tslint": "^5.8.0",
 		"typescript": "^3.1.4",
-		"vscode": "^1.1.36"
+		"vscode": "^1.1.36",
+		"minimist": ">=0.2.1"
 	},
-	"dependencies": {}
+	"dependencies": {},
+	"resolutions": {
+		"minimist": "1.2.5"
+	}
 }
