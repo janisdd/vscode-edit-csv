@@ -259,7 +259,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 						
 						
 												<button class="button is-light" onclick="toggleAskReadAgainModal(true)">
-													<span>Reset data</span>
+													<span>Reset data and apply read options</span>
 													<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
 														data-tooltip="The input file content was stored locally and used as data. Thus this view is independent of the source file">
 														<i class="fas fa-question-circle"></i>
@@ -372,36 +372,36 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 			<div class="table-action-buttons">
 
 				<div class="separated-btns">
-					<button class="button is-outlined" onclick="addRow()">
+					<button data-test="ui.btn.addRow" class="button is-outlined" onclick="addRow()">
 						<span class="icon is-small">
 							<i class="fas fa-plus"></i>
 						</span>
 						<span>Add row</span>
 					</button>
 
-					<button class="button is-outlined" onclick="addColumn()">
+					<button data-test="ui.btn.addCol"  class="button is-outlined" onclick="addColumn()">
 						<span class="icon is-small">
 							<i class="fas fa-plus"></i>
 						</span>
 						<span>Add column</span>
 					</button>
 
-					<button class="button is-outlined mar-left" onclick="postApplyContent(true)">
+					<button data-test="ui.btn.applyAndSave" class="button is-outlined mar-left" onclick="postApplyContent(true)">
 						<span class="icon is-small">
 							<i class="fas fa-save"></i>
 						</span>
-						<span>Apply and save</span>
+						<span>Apply changes to file and save</span>
 						<span class="tooltip is-tooltip-multiline mar-left-half"
 							data-tooltip="Applies the csv content back to the source file and saves the source file (if something changed)">
 							<i class="fas fa-question-circle"></i>
 						</span>
 					</button>
 
-					<button class="button is-outlined" onclick="postApplyContent(false)">
+					<button data-test="ui.btn.apply" class="button is-outlined" onclick="postApplyContent(false)">
 						<span class="icon is-small">
 							<i class="fas fa-reply"></i>
 						</span>
-						<span>Apply</span>
+						<span>Apply changes to file</span>
 						<span class="tooltip mar-left-half is-tooltip-multiline" data-tooltip="Applies the csv content back to the source file (if something changed). After this the editor has no unsaved changes.">
 							<i class="fas fa-question-circle"></i>
 						</span>
@@ -445,7 +445,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 							</span>
 						</button>
 
-						<button class="button is-outlined" onclick="toggleHelpModal(true)">
+						<button data-test="ui.btn.showHelpModal" class="button is-outlined" onclick="toggleHelpModal(true)">
 							<span class="icon is-small">
 								<i class="fas fa-question"></i>
 							</span>
@@ -555,11 +555,12 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<div class="box">
-				<h3 class="title is-3">Reset data</h3>
+				<h3 class="title is-3">Reset data and apply read options</h3>
 
 				<p>
-					Are you sure you want to overwrite the table?
-					This will use the initial data when you opened the csv editor and discard all changes!
+					Are you sure you want to overwrite the table with the initial content of the file? <br />
+					This will use the initial data (when you opened the csv editor) and discard all changes applied to the table! <br />
+					Note that this will not reread or reload the csv file content (a snapshot of the file was stored in memory when you opened the csv editor)!
 				</p>
 
 				<div style="margin-top: 1em">
