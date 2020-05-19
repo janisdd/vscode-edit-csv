@@ -2,7 +2,14 @@
 
 ## [Unreleased]
 
+## 0.2.8
+
+- added shortcut (ctrl+s/cmd+s) to `apply changes to file and save`
+
+## 0.2.7
+
 - fixed typo `QuotChar` -> `QuoteChar`
+- changed some labels
 
 ## 0.2.6
 

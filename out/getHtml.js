@@ -382,7 +382,7 @@ function createEditorHtml(context, initialContent) {
 						</span>
 						<span>Apply changes to file and save</span>
 						<span class="tooltip is-tooltip-multiline mar-left-half"
-							data-tooltip="Applies the csv content back to the source file and saves the source file (if something changed)">
+							data-tooltip="Applies the csv content back to the source file and saves the source file (if something changed) [ctrl+s/cmd+s]">
 							<i class="fas fa-question-circle"></i>
 						</span>
 					</button>

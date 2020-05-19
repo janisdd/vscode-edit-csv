@@ -218,3 +218,16 @@ if (vscode) {
 	_postReadyMessage()
 	// console.log(JSON.stringify(vscode.getState()))
 }
+
+
+//-------------------------------------------------- global shortcuts 
+//only in vs code not in browser
+
+if (vscode) {
+	Mousetrap.bindGlobal(['meta+s', 'ctrl+s'], (e) => {
+		e.preventDefault()
+		postApplyContent(true)
+	})
+	
+}
+
