@@ -377,8 +377,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 		}
 	}, null, context.subscriptions)
 
-
-	panel.webview.html = createEditorHtml(context, initialText)
+	panel.webview.html = createEditorHtml(panel.webview, context, initialText)
 
 }
 

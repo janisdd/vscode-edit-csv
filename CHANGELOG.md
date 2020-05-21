@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## 0.2.9
+
+- adopted webview's asWebviewUri api
+- minimal vscode version is now 1.38
+
 ## 0.2.8
 
 - added shortcut (ctrl+s/cmd+s) to `apply changes to file and save`

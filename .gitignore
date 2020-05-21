@@ -6,3 +6,5 @@ TODO.md
 scripts.md
 backup
 *.vsix
+src/test
+out/test

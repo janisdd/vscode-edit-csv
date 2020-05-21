@@ -294,7 +294,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
             vscode.window.showErrorMessage(`Could not destroy an editor instance, error: ${error.message}`);
         }
     }, null, context.subscriptions);
-    panel.webview.html = getHtml_1.createEditorHtml(context, initialText);
+    panel.webview.html = getHtml_1.createEditorHtml(panel.webview, context, initialText);
 }
 function applyContent(instance, newContent, saveSourceFile, openSourceFileAfterApply) {
     vscode.workspace.openTextDocument(instance.sourceUri)

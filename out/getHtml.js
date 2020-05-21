@@ -1,15 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const vscode = require("vscode");
 const path = require("path");
 const configurationHelper_1 = require("./configurationHelper");
 /**
  * returns a local file path relative to the extension root dir
  * @param filePath
  */
-function getResourcePath(context, filePath) {
+function getResourcePath(webview, context, filePath) {
     //fix for windows because there path.join will use \ as separator and when we inline this string in html/js
     //we get specials strings e.g. c:\n
-    return `vscode-resource:${path.join(context.extensionPath, filePath).replace(/\\/g, '/')}`;
+    // return `vscode-resource:${path.join(context.extensionPath, filePath).replace(/\\/g, '/')}`
+    return `${webview.asWebviewUri(vscode.Uri.file(path.join(context.extensionPath, filePath).replace(/\\/g, '/')))}`;
 }
 exports.getResourcePath = getResourcePath;
 /**
@@ -17,8 +19,8 @@ exports.getResourcePath = getResourcePath;
  * @param context
  * @param initialContent
  */
-function createEditorHtml(context, initialContent) {
-    const _getResourcePath = getResourcePath.bind(undefined, context);
+function createEditorHtml(webview, context, initialContent) {
+    const _getResourcePath = getResourcePath.bind(undefined, webview, context);
     let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.min.css');
     // let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
     let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js');
@@ -570,7 +572,7 @@ function createEditorHtml(context, initialContent) {
 	<!DOCTYPE html>
 	<html>
 	<head>
-		<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: data:; script-src vscode-resource: 'unsafe-inline'; style-src vscode-resource: 'unsafe-inline'; font-src vscode-resource:;">
+		<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} data:; script-src ${webview.cspSource} 'unsafe-inline'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource};">
 
 		<style>
 			@font-face {
@@ -608,7 +610,7 @@ function createEditorHtml(context, initialContent) {
 
 	<script>
 	var initialConfig = ${JSON.stringify(config)};
-</script>
+	</script>
 
 	 <script src="${progressJs}"></script>
 	 <script src="${findWidgetJs}"></script>

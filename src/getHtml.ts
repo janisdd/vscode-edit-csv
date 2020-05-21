@@ -6,10 +6,11 @@ import { getExtensionConfiguration } from './configurationHelper';
  * returns a local file path relative to the extension root dir
  * @param filePath 
  */
-export function getResourcePath(context: vscode.ExtensionContext, filePath: string): string {
+export function getResourcePath(webview: vscode.Webview, context: vscode.ExtensionContext, filePath: string): string {
 	//fix for windows because there path.join will use \ as separator and when we inline this string in html/js
 	//we get specials strings e.g. c:\n
-	return `vscode-resource:${path.join(context.extensionPath, filePath).replace(/\\/g, '/')}`
+	// return `vscode-resource:${path.join(context.extensionPath, filePath).replace(/\\/g, '/')}`
+	return `${webview.asWebviewUri(vscode.Uri.file(path.join(context.extensionPath, filePath).replace(/\\/g, '/')))}`
 }
 
 /**
@@ -17,9 +18,9 @@ export function getResourcePath(context: vscode.ExtensionContext, filePath: stri
  * @param context 
  * @param initialContent 
  */
-export function createEditorHtml(context: vscode.ExtensionContext, initialContent: string): string {
+export function createEditorHtml(webview: vscode.Webview, context: vscode.ExtensionContext, initialContent: string): string {
 
-	const _getResourcePath = getResourcePath.bind(undefined, context)
+	const _getResourcePath = getResourcePath.bind(undefined, webview, context)
 
 	let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.min.css')
 	// let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
@@ -584,7 +585,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 	<!DOCTYPE html>
 	<html>
 	<head>
-		<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: data:; script-src vscode-resource: 'unsafe-inline'; style-src vscode-resource: 'unsafe-inline'; font-src vscode-resource:;">
+		<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${webview.cspSource} data:; script-src ${webview.cspSource} 'unsafe-inline'; style-src ${webview.cspSource} 'unsafe-inline'; font-src ${webview.cspSource};">
 
 		<style>
 			@font-face {
@@ -622,7 +623,7 @@ export function createEditorHtml(context: vscode.ExtensionContext, initialConten
 
 	<script>
 	var initialConfig = ${JSON.stringify(config)};
-</script>
+	</script>
 
 	 <script src="${progressJs}"></script>
 	 <script src="${findWidgetJs}"></script>
