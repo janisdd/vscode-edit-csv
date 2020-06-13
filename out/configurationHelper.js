@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getExtensionConfiguration = void 0;
 const vscode = require("vscode");
 const extension_1 = require("./extension");
 const defaultConfig = {
@@ -29,6 +30,7 @@ const defaultConfig = {
     disableBorders: false,
     fixFirstXRows: 0,
     fontSizeInPx: 16,
+    showColumnHeaderNamesWithLettersLikeExcel: false,
 };
 /**
  * returns the configuration for this extension

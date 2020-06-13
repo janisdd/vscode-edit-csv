@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.InstanceManager = void 0;
 /**
  * we need keep track of all editor instances
  * so we can ensure that e.g. we open only one editor per csv file,

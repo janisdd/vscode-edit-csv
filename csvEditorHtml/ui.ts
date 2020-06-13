@@ -346,7 +346,7 @@ function reRenderTable() {
  * if we have data we convert it to match a rectangle (every row must have the same number of columns / cells)
  * @param {string[][]} csvParseResult array with the rows or null to just destroy the old table
  */
-function displayData(csvParseResult: ExtendedCsvParseResult | null, csvReadConfig: CsvReadOptions) {
+function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, csvReadConfig: CsvReadOptions) {
 
 	if (csvParseResult === null) {
 		if (hot) {
@@ -379,10 +379,14 @@ function displayData(csvParseResult: ExtendedCsvParseResult | null, csvReadConfi
 	if (initiallyHideComments && typeof csvReadConfig.comments === 'string') {
 		hiddenPhysicalRowIndices = _getCommentIndices(csvParseResult.data, csvReadConfig)
 	}
-
+	
 		//enable all find connected stuff
 		//we need to setup this first so we get the events before handsontable... e.g. document keydown
 		findWidgetInstance.setupFind()
+
+		const showColumnHeaderNamesWithLettersLikeExcel = initialConfig?.showColumnHeaderNamesWithLettersLikeExcel ?? false
+
+		let defaultColHeaderFuncBound = defaultColHeaderFunc.bind(this, showColumnHeaderNamesWithLettersLikeExcel)
 
 	hot = new Handsontable(container, {
 		data: csvParseResult.data,
@@ -406,7 +410,7 @@ function displayData(csvParseResult: ExtendedCsvParseResult | null, csvReadConfi
 		afterChange: onAnyChange, //only called when cell value changed (e.g. not when col/row removed)
 		fillHandle: false,
 		undo: true,
-		colHeaders: defaultColHeaderFunc as any,
+		colHeaders: defaultColHeaderFuncBound as any,
 		currentColClassName: 'foo', //actually used to overwrite highlighting
 		currentRowClassName: 'foo', //actually used to overwrite highlighting
 		//plugins
@@ -1079,13 +1083,16 @@ function onResizeGrid() {
 /**
  * generates the default html wrapper code for the given column name OR uses {@link headerRowWithIndex}
  * we add a delete icon
- * @param {number} colIndex the physical column index (user could have moved cols so visual  first col is not the physical second) use https://handsontable.com/docs/6.2.2/RecordTranslator.html to translate
+ * @param {number} colIndex the physical column index (user could have moved cols so visual first col is not the physical second) use https://handsontable.com/docs/6.2.2/RecordTranslator.html to translate
  * 	call like hot.toVisualColumn(colIndex)
  * @param {string | undefined | null} colName 
+ * @param useLettersAsColumnNames true: use excel like letters for column names, false: use the index BUT an explicit colName will take precedence over this setting
  */
-function defaultColHeaderFunc(colIndex: number, colName: string | undefined | null) {
+function defaultColHeaderFunc(useLettersAsColumnNames: boolean, colIndex: number, colName: string | undefined | null) {
 
-	let text = getSpreadsheetColumnLabel(colIndex)
+	let text = useLettersAsColumnNames
+		? spreadsheetColumnLetterLabel(colIndex)
+		: getSpreadsheetColumnLabel(colIndex)
 
 	if (headerRowWithIndex !== null && colIndex < headerRowWithIndex.row.length) {
 		let visualIndex = colIndex

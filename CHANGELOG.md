@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## 0.2.10
+
+- added option to display column names like Excel (with letters): `showColumnHeaderNamesWithLettersLikeExcel`
+	- we use the long name because one can search for `letters` or `excel` and will find it
+
 ## 0.2.9
 
 - adopted webview's asWebviewUri api

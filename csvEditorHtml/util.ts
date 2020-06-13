@@ -144,6 +144,57 @@ function getSpreadsheetColumnLabel(index: number) {
 	return `column ${index+1}`
 }
 
+//idea from handsontable
+const COLUMN_LABEL_BASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+const COLUMN_LABEL_BASE_LENGTH = COLUMN_LABEL_BASE.length
+/**
+ * generates spreadsheet-like column names: A, B, C, ..., Z, AA, AB
+ * 
+ * DO NOT CHANGE THIS !!! IF YOU NEED TO TAKE A LOOK AT THE TESTS IN THE PLUGIN
+ * @param {Number} index Column index (starting with 0)
+ */
+function spreadsheetColumnLetterLabel(index: number) {
+  //e.g. we have index 
+	/*
+	0 --> A
+	1 --> B
+	...
+	25 --> Z
+	26 --> AA
+	27 --> AB
+	...
+  2*26-1=51 --> AZ
+  52 --> BA
+  3*26-1=77 --> BZ
+	*/
+  let num = index
+  let columnLabel = ''
+
+  //see https://stackoverflow.com/questions/34813980/getting-an-array-of-column-names-at-sheetjs
+  while (num >= 0) {
+    columnLabel = COLUMN_LABEL_BASE[num % 26] + columnLabel //this will cover the last "bit" in range 0-25 so we get the last letter
+    num = Math.floor(num / 26)-1 //e.g. 27 would get us 27/26 = 1 but this is actually AB so we do -1
+		//e.g. 52 -> first (right) letter is A, 52 / 26 = 2 --> 2-1 = 1 = B --> BA
+    //so this works only because the number is not changed before getting the first letter
+	}
+	return columnLabel
+}
+//this is ~ 2x slower because of parseInt (and maybe a bit more because of String.fromCharCode)
+//this is the original from handson table
+// function spreadsheetColumnLabel(index: number): string {
+//   let dividend = index + 1
+//   let columnLabel = ''
+//   let modulo
+
+//   while (dividend > 0) {
+//     modulo = (dividend - 1) % COLUMN_LABEL_BASE_LENGTH;
+//     columnLabel = String.fromCharCode(65 + modulo) + columnLabel;
+//     dividend = parseInt((dividend - modulo) / COLUMN_LABEL_BASE_LENGTH, 10);
+//   }
+
+//   return columnLabel;
+// }
+
 /**
  * adds a new column at the end
  * @param {boolean} selectNewColumn true: scrolls to the new column

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.deactivate = exports.activate = exports.editorUriScheme = void 0;
 const vscode = require("vscode");
 const path = require("path");
 const util_1 = require("./util");
@@ -15,6 +16,9 @@ exports.editorUriScheme = 'csv-edit';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
+    //from https://stackoverflow.com/questions/38267360/vscode-extension-api-identify-file-or-folder-click-in-explorer-context-menu
+    //to get a list of all known languages for: resourceLangId
+    // vscode.languages.getLanguages().then(l => console.log('languages', l));
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
     let instanceManager = new instanceManager_1.InstanceManager();

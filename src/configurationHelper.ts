@@ -30,6 +30,7 @@ const defaultConfig: CsvEditSettings = {
 	disableBorders: false,
 	fixFirstXRows: 0,
 	fontSizeInPx: 16,
+	showColumnHeaderNamesWithLettersLikeExcel: false,
 }
 
 /**

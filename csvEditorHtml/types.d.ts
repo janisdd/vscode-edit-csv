@@ -154,6 +154,11 @@ type CsvEditSettings = {
 	 * the font size in px, 0 or -x to sync the font size with the editor, +x to overwrite the font size (changing will rerender the table)
 	 */
 	fontSizeInPx: number
+
+	/**
+	 * true: show column names with letters e.g. A, B, ..., Z (like Excel), false: use numbers for column names e.g. 1, 2, ...
+	 */
+	showColumnHeaderNamesWithLettersLikeExcel: boolean //we use the bloaty name because we want to find (via search) this with something like "excel" or "letters"
 }
 
 /* --- frontend settings --- */

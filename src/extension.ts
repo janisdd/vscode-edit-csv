@@ -20,6 +20,10 @@ export const editorUriScheme = 'csv-edit'
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
+	//from https://stackoverflow.com/questions/38267360/vscode-extension-api-identify-file-or-folder-click-in-explorer-context-menu
+	//to get a list of all known languages for: resourceLangId
+	// vscode.languages.getLanguages().then(l => console.log('languages', l));
+
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 

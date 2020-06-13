@@ -337,6 +337,11 @@
 					"type": "number",
 					"default": 16,
 					"description": "the font size in px, 0 or -x to sync the font size with the editor, +x to overwrite the font size (changing will rerender the table)"
+				},
+				"csv-edit.showColumnHeaderNamesWithLettersLikeExcel": {
+					"type": "boolean",
+					"default": false,
+					"description": "true: show column names with letters e.g. A, B, ..., Z (like Excel), false: use numbers for column names e.g. 1, 2, ..."
 				}
 			}
 		}
@@ -348,17 +353,21 @@
 		"watch": "tsc -watch -p ./",
 		"package": "vsce package",
 		"test": "npm run compile && node ./node_modules/vscode/bin/test",
+		"test2": "echo 'to run the tests compile and then go to the debug tab and start Extension Tests'",
 		"lint": "npx tslint -p . && npx tslint -p ./csvEditorHtml/tsconfig.json",
 		"promptUp": "node ./promtUploadbuild.js"
 	},
 	"devDependencies": {
-		"@types/mocha": "^2.2.42",
+		"@types/glob": "^7.1.2",
+		"@types/mocha": "^2.2.48",
 		"@types/mousetrap": "^1.6.3",
 		"@types/node": "^8.10.25",
 		"@types/papaparse": "4.5.6",
 		"@types/vscode": "^1.38.0",
+		"glob": "^7.1.6",
+		"mocha": "^8.0.1",
 		"tslint": "^5.8.0",
-		"typescript": "^3.1.4",
+		"typescript": "^3.9.5",
 		"vscode-test": "^1.3.0"
 	}
 }

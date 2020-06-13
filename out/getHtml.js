@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createEditorHtml = exports.getResourcePath = void 0;
 const vscode = require("vscode");
 const path = require("path");
 const configurationHelper_1 = require("./configurationHelper");
