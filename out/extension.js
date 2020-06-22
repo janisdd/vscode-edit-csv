@@ -204,7 +204,6 @@ function getEditorTitle(document) {
 }
 function createNewEditorInstance(context, activeTextEditor, instanceManager) {
     const uri = activeTextEditor.document.uri;
-    const initialText = activeTextEditor.document.getText();
     const title = getEditorTitle(activeTextEditor.document);
     let panel = vscode.window.createWebviewPanel('csv-editor', title, util_1.getCurrentViewColumn(), {
         enableFindWidget: false,
@@ -235,6 +234,9 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
         switch (message.command) {
             case 'ready': {
                 util_1.debugLog('received ready from webview');
+                instance.hasChanges = false;
+                setEditorHasChanges(instance, false);
+                let initialText = activeTextEditor.document.getText();
                 const textSlices = util_1.partitionString(initialText, 1024 * 1024); //<1MB less should be loaded in a blink
                 for (let i = 0; i < textSlices.length; i++) {
                     const textSlice = textSlices[i];
@@ -298,7 +300,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
             vscode.window.showErrorMessage(`Could not destroy an editor instance, error: ${error.message}`);
         }
     }, null, context.subscriptions);
-    panel.webview.html = getHtml_1.createEditorHtml(panel.webview, context, initialText);
+    panel.webview.html = getHtml_1.createEditorHtml(panel.webview, context);
 }
 function applyContent(instance, newContent, saveSourceFile, openSourceFileAfterApply) {
     vscode.workspace.openTextDocument(instance.sourceUri)

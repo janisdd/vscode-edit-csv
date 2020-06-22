@@ -18,9 +18,8 @@ exports.getResourcePath = getResourcePath;
 /**
  * creates the html for the csv editor
  * @param context
- * @param initialContent
  */
-function createEditorHtml(webview, context, initialContent) {
+function createEditorHtml(webview, context) {
     const _getResourcePath = getResourcePath.bind(undefined, webview, context);
     let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.min.css');
     // let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
@@ -166,6 +165,11 @@ function createEditorHtml(webview, context, initialContent) {
 										<span class="mar-left-half clickable" onclick="reRenderTable()" style="margin-left: 2em;"
 											title="Redraws the table. This can fix some measuring issues (e.g. after the font size changed)">
 											<i id="re-render-table-icon" class="fas fa-ruler-combined"></i>
+										</span>
+
+										<span id="reload-file" class="clickable" onclick="preReloadFileFromDisk()" style="margin-left: 2em;"
+											title="Reload the csv file content (from disk)">
+											<i class="fas fa-sync-alt"></i>
 										</span>
 				
 										<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"
@@ -365,21 +369,21 @@ function createEditorHtml(webview, context, initialContent) {
 			<div class="table-action-buttons">
 
 				<div class="separated-btns">
-					<button data-test="ui.btn.addRow" class="button is-outlined" onclick="addRow()">
+					<button class="button is-outlined" onclick="addRow()">
 						<span class="icon is-small">
 							<i class="fas fa-plus"></i>
 						</span>
 						<span>Add row</span>
 					</button>
 
-					<button data-test="ui.btn.addCol"  class="button is-outlined" onclick="addColumn()">
+					<button class="button is-outlined" onclick="addColumn()">
 						<span class="icon is-small">
 							<i class="fas fa-plus"></i>
 						</span>
 						<span>Add column</span>
 					</button>
 
-					<button data-test="ui.btn.applyAndSave" class="button is-outlined mar-left" onclick="postApplyContent(true)">
+					<button class="button is-outlined mar-left" onclick="postApplyContent(true)">
 						<span class="icon is-small">
 							<i class="fas fa-save"></i>
 						</span>
@@ -390,7 +394,7 @@ function createEditorHtml(webview, context, initialContent) {
 						</span>
 					</button>
 
-					<button data-test="ui.btn.apply" class="button is-outlined" onclick="postApplyContent(false)">
+					<button class="button is-outlined" onclick="postApplyContent(false)">
 						<span class="icon is-small">
 							<i class="fas fa-reply"></i>
 						</span>
@@ -438,7 +442,7 @@ function createEditorHtml(webview, context, initialContent) {
 							</span>
 						</button>
 
-						<button data-test="ui.btn.showHelpModal" class="button is-outlined" onclick="toggleHelpModal(true)">
+						<button class="button is-outlined" onclick="toggleHelpModal(true)">
 							<span class="icon is-small">
 								<i class="fas fa-question"></i>
 							</span>
@@ -465,7 +469,7 @@ function createEditorHtml(webview, context, initialContent) {
     let helpModalHtml = ``;
     {
         helpModalHtml = `
-		<div id="help-modal" class="modal help-modal">
+		<div id="help-modal" class="modal my-modal">
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<div class="box">
@@ -541,7 +545,7 @@ function createEditorHtml(webview, context, initialContent) {
     let askReadAgainModalHtml = ``;
     {
         askReadAgainModalHtml = `
-		<div id="ask-read-again-modal" class="modal help-modal">
+		<div id="ask-read-again-modal" class="modal my-modal centered">
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<div class="box">
@@ -568,6 +572,37 @@ function createEditorHtml(webview, context, initialContent) {
 		<button class="modal-close is-large" aria-label="close" onclick="toggleAskReadAgainModal(false)"></button>
 	</div>
 	`;
+    }
+    let askReloadFileModalHtml = ``;
+    {
+        askReloadFileModalHtml = `
+		<div id="ask-reload-file-modal" class="modal my-modal centered">
+		<div class="modal-background"></div>
+		<div class="modal-content">
+			<div class="box">
+				<h3 class="title is-3">Reload file content and discard changes</h3>
+
+				<p>
+					Are you sure you want to read the source file again? <br />
+					All changes to the table will be discarded! <br />
+					This will also update the snapshot of the file that is used for the reset data feature.
+				</p>
+
+				<div style="margin-top: 1em">
+					<button class="button is-warning" onclick="reloadFileFromDisk()">
+						<span>Reload</span>
+					</button>
+
+					<button style="margin-left: 0.5em" class="button is-outlined" onclick="toggleAskReloadFileModalDiv(false)">
+						<span>Cancel</span>
+					</button>
+				</div>
+
+			</div>
+		</div>
+		<button class="modal-close is-large" aria-label="close" onclick="toggleAskReloadFileModalDiv(false)"></button>
+	</div>
+		`;
     }
     return `
 	<!DOCTYPE html>
@@ -608,6 +643,8 @@ function createEditorHtml(webview, context, initialContent) {
 	${helpModalHtml}
 
 	${askReadAgainModalHtml}
+
+	${askReloadFileModalHtml}
 
 	<script>
 	var initialConfig = ${JSON.stringify(config)};

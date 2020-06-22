@@ -127,6 +127,7 @@ const csvEditorWrapper = _getById('csv-editor-wrapper')
 const csvEditorDiv = _getById('csv-editor')
 const helModalDiv = _getById('help-modal')
 const askReadAgainModalDiv = _getById('ask-read-again-modal')
+const askReloadFileModalDiv = _getById('ask-reload-file-modal')
 
 const readDelimiterTooltip = _getById('read-delimiter-tooltip')
 const readDelimiterTooltipText = "Empty to auto detect"
@@ -142,6 +143,7 @@ const hideCommentsBtn = _getById('hide-comments-btn') as HTMLButtonElement
 const warningTooltipTextWhenCommentRowNotFirstCellIsUsed = `Please use only the first cell in comment row (others are not exported)`
 
 const unsavedChangesIndicator = _getById('unsaved-changes-indicator') as HTMLSpanElement
+const reloadFileSpan = _getById('reload-file') as HTMLSpanElement //reread the file content...
 
 
 const hasHeaderReadOptionInput = _getById('has-header') as HTMLInputElement

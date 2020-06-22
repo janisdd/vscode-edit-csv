@@ -238,6 +238,20 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
  * called to display the given text in vs code 
  * @param text 
  */
+function postReloadFile() {
+
+	if (!vscode) {
+		console.log(`postReloadFile (but in browser)`)
+		return
+	}
+
+	_postReadyMessage()
+}
+
+/**
+ * called to display the given text in vs code 
+ * @param text 
+ */
 function postVsInformation(text: string) {
 
 	if (!vscode) {

@@ -264,8 +264,6 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	const uri = activeTextEditor.document.uri
 
-	const initialText = activeTextEditor.document.getText()
-
 	const title = getEditorTitle(activeTextEditor.document)
 
 	let panel = vscode.window.createWebviewPanel('csv-editor', title, getCurrentViewColumn(), {
@@ -303,6 +301,11 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 			case 'ready': {
 
 				debugLog('received ready from webview')
+
+				instance.hasChanges = false
+				setEditorHasChanges(instance, false)
+				let initialText = activeTextEditor.document.getText()
+
 
 				const textSlices = partitionString(initialText, 1024 * 1024) //<1MB less should be loaded in a blink
 
@@ -381,7 +384,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 		}
 	}, null, context.subscriptions)
 
-	panel.webview.html = createEditorHtml(panel.webview, context, initialText)
+	panel.webview.html = createEditorHtml(panel.webview, context)
 
 }
 

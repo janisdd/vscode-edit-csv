@@ -146,16 +146,17 @@ input.input {
 	height: 100%;
 }
 
-.help-modal {
+
+.modal.my-modal {
 	z-index: 200; /*to be in front of handson table cols*/
 }
 
-#ask-read-again-modal .modal-content {
-	text-align: center;
+.modal.my-modal .modal-content {
+	width: 80%;
 }
 
-.help-modal .modal-content {
-	width: 80%;
+.centered .modal-content {
+	text-align: center;
 }
 
 /* from https://gist.github.com/jeromyanglim/3952143 */

@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## 0.2.11
+
+- added button to reload the file content (from disk)
+	- this also replaces the in-memory snapshot of the file (for the reset data feature)
+
 ## 0.2.10
 
 - added option to display column names like Excel (with letters): `showColumnHeaderNamesWithLettersLikeExcel`

@@ -1158,6 +1158,19 @@ function toggleAskReadAgainModal(isVisible: boolean) {
 	askReadAgainModalDiv.classList.remove('is-active')
 }
 
+/**
+ * displays or hides the ask read file gain modal
+ * @param isVisible 
+ */
+function toggleAskReloadFileModalDiv(isVisible: boolean) {
+
+	if (isVisible) {
+		askReloadFileModalDiv.classList.add('is-active')
+		return
+	}
+
+	askReloadFileModalDiv.classList.remove('is-active')
+}
 
 
 /**
@@ -1185,6 +1198,33 @@ function resetDataFromResetDialog() {
 
 	startRenderData()
 }
+
+/**
+ * we need this method first because in case we have unsaved changes we need to display a dialog
+ * if all changes are written to the file we can proceed without displaying a dialog
+ */
+function preReloadFileFromDisk() {
+	
+
+	const hasAnyChanges = getHasAnyChangesUi()
+
+	if (hasAnyChanges) {
+		toggleAskReloadFileModalDiv(true)
+		return
+	}
+
+	reloadFileFromDisk()
+}
+
+/**
+ * reloads the file from disk
+ */
+function reloadFileFromDisk() {
+	toggleAskReloadFileModalDiv(false)
+	_setHasUnsavedChangesUiIndicator(false)
+	postReloadFile()
+}
+
 
 function startReceiveCsvProgBar() {
 	receivedCsvProgBar.value = 0
