@@ -179,7 +179,36 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 											title="Reload the csv file content (from disk)">
 											<i class="fas fa-sync-alt"></i>
 										</span>
-				
+
+										<!-- fixed rows top -->
+										<div class="flexed changeable-indicator" style="margin-left: 2em;">
+											<div>
+												<span id="fixed-rows-icon" class="clickable" title="Set fixed rows top" onclick="_toggleFixedRowsText()">
+													<i class="rotated-90deg fas fa-align-left"></i>
+												</span>
+												<span id="fixed-rows-text" style="margin-left: 0.5rem;" class="dis-hidden">fixed rows:</span>
+											</div>
+											<div id="fixed-rows-top-info" class="text" style="margin-left: 0.5rem;">0</div>
+											<div class="changeable" style="margin-left: 0.5rem;">
+												<span class="clickable" onclick="incFixedRowsTop()"><i class="fas fa-chevron-up"></i></span>
+												<span class="clickable" onclick="decFixedRowsTop()"><i class="fas fa-chevron-down"></i></span>
+											</div>
+										</div>
+										<!-- fixed columns left -->
+										<div class="flexed changeable-indicator" style="margin-left: 1em;">
+											<div>
+												<span id="fixed-columns-icon" class="clickable" title="Set fixed columns left" onclick="_toggleFixedColumnsText()">
+													<i class="fas fa-align-left"></i>
+												</span>
+												<span id="fixed-columns-text" style="margin-left: 0.5rem;" class="dis-hidden">fixed columns:</span>
+											</div>
+											<div id="fixed-columns-top-info" class="text" style="margin-left: 0.5rem;">0</div>
+											<div class="changeable" style="margin-left: 0.5rem;">
+												<span class="clickable" onclick="incFixedColsLeft()"><i class="fas fa-chevron-up"></i></span>
+												<span class="clickable" onclick="decFixedColsLeft()"><i class="fas fa-chevron-down"></i></span>
+											</div>
+										</div>
+
 										<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"
 											data-tooltip="You might have unsaved changes">
 											<i class="fas fa-save"></i>
@@ -201,7 +230,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 														<span>Has header</span>
 													</label>
 													<span class="tooltip is-tooltip-right is-tooltip-multiline"
-														data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! This option and first fixed rows option are mutually exclusive.">
+														data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack!">
 														<i class="fas fa-question-circle"></i>
 													</span>
 												</div>

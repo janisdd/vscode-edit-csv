@@ -33,17 +33,27 @@ body.vscode-light {
 	color: #657b83 !important;
 }
 
-/* fixed rows top */
-.vscode-light .ht_clone_top tr:nth-of-type(odd)> td {
+/* fixed rows/columns */
+.vscode-light .ht_clone_top tr:nth-of-type(odd)> td,
+.vscode-light .ht_clone_left tr:nth-of-type(odd)> td,
+.vscode-light .ht_clone_top_left_corner tr:nth-of-type(odd)> td {
 	background-color: white;
 }
 
-.vscode-light .ht_clone_top tr:nth-of-type(even)> td {
+.vscode-light .ht_clone_top tr:nth-of-type(even)> td,
+.vscode-light .ht_clone_left tr:nth-of-type(even)> td,
+.vscode-light .ht_clone_top_left_corner tr:nth-of-type(even)> td {
 	background-color: #f7f7f7;
 }
 
-.vscode-light .ht_clone_top tr:last-child > td {
+.vscode-light .ht_clone_top tr:last-child > td,
+.vscode-light .ht_clone_top_left_corner tr:last-child > td {
 	border-bottom-color: #3c3c3c;
+}
+
+.vscode-light .ht_clone_left tr > td:last-child,
+.vscode-light .ht_clone_top_left_corner tr > td:last-child {
+	border-right-color: #3c3c3c;
 }
 
 /* normal rows */

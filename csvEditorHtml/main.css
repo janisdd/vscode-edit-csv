@@ -57,6 +57,10 @@ html, body {
 	pointer-events: none;
 }
 
+.dis-hidden {
+	display: none;
+}
+
 input.input {
 	width: 110px;
 }
@@ -369,10 +373,43 @@ tr.hidden-row-previous-row > th:after {
 .options-title {
 	padding: 0 10px;
 	white-space: nowrap;
-}	
+}
 
 .options-title i {
 	vertical-align: text-bottom
+}
+
+/* e.g. fixed rows */
+.options-title .changeable-indicator {
+	vertical-align: middle;
+	display: inline-flex;
+	font-size: calc(var(--vscode-editor-font-size) + 2px);
+}
+
+.options-title .changeable-indicator .text {
+	min-width: 18px;
+}
+
+.options-title .changeable-indicator .changeable {
+	display: inline-flex;
+	flex-direction: column;
+	vertical-align: top;
+	margin-top: -3px;
+}
+
+
+
+.rotated-90deg {
+	transform: rotate(90deg);
+}
+
+.options-title .changeable-indicator .changeable div { /* this is the value of the indicator */
+	display: inline-block;
+	min-width: 16px;
+}
+
+.options-title .changeable-indicator .changeable span {
+	font-size: calc(var(--vscode-editor-font-size) - 3px);
 }
 
 .all-options tbody td:not(:last-child) .options-content {

@@ -239,8 +239,8 @@ export function deactivate() { }
  * can be called manually to force update all instances
  * @param e null to manually update all instances
  */
-function onDidChangeConfiguration(instanceManager: InstanceManager, e:vscode.ConfigurationChangeEvent | null) {
-	
+function onDidChangeConfiguration(instanceManager: InstanceManager, e: vscode.ConfigurationChangeEvent | null) {
+
 	if (e === null || e.affectsConfiguration('csv-edit.fontSizeInPx')) {
 		const newFontSize = getExtensionConfiguration().fontSizeInPx
 
@@ -402,10 +402,10 @@ function applyContent(instance: Instance, newContent: string, saveSourceFile: bo
 				document.lineCount - 1,
 				lastLine.range.end.character);
 
-				//don't apply if the content didn't change
-				if (document.getText() === newContent) {
-					return
-				}
+			//don't apply if the content didn't change
+			if (document.getText() === newContent) {
+				return
+			}
 
 			edit.replace(document.uri, textRange, newContent)
 			vscode.workspace.applyEdit(edit)

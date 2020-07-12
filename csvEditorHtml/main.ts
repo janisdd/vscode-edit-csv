@@ -110,7 +110,12 @@ let disableBorders: boolean = false
 /**
  * fixes the first X rows so they will stay in view even if you scroll
  */
-let fixFirstXRows: number = 0
+let fixedRowsTop: number = 0
+
+/**
+ * fixes the first X columns so they will stay in view even if you scroll
+ */
+let fixedColumnsLeft: number = 0
 
 /**
  * true: we started with has header option enabled which caused an event
@@ -135,6 +140,14 @@ const readDelimiterTooltipText = "Empty to auto detect"
 const receivedCsvProgBar = _getById('received-csv-prog-bar') as HTMLProgressElement
 const receivedCsvProgBarWrapper = _getById('received-csv-prog-bar-wrapper') as HTMLDivElement
 const statusInfo = _getById('status-info') as HTMLSpanElement
+
+const fixedRowsTopInfoSpan = _getById('fixed-rows-top-info') as HTMLDivElement
+const fixedRowsTopIcon = _getById('fixed-rows-icon') as HTMLSpanElement
+const fixedRowsTopText = _getById('fixed-rows-text') as HTMLSpanElement
+
+const fixedColumnsTopInfoSpan = _getById('fixed-columns-top-info') as HTMLDivElement
+const fixedColumnsTopIcon = _getById('fixed-columns-icon') as HTMLSpanElement
+const fixedColumnsTopText = _getById('fixed-columns-text') as HTMLSpanElement
 
 const showCommentsBtn = _getById('show-comments-btn') as HTMLButtonElement
 const hideCommentsBtn = _getById('hide-comments-btn') as HTMLButtonElement

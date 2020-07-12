@@ -28,7 +28,8 @@ const defaultConfig = {
     retainQuoteInformation: true,
     newColumnQuoteInformationIsQuoted: false,
     disableBorders: false,
-    fixFirstXRows: 0,
+    initiallyFixedRowsTop: 0,
+    initiallyFixedColumnsLeft: 0,
     fontSizeInPx: 16,
     showColumnHeaderNamesWithLettersLikeExcel: false,
 };

@@ -57,8 +57,6 @@ type CsvEditSettings = {
 	/**
  * true: first row is the header row
  * false: first row is a normal data row
- * This option and {@link fixFirstXRows} are mutually exclusive.
- * This option has priority over {@link fixFirstXRows}.
  * 
  * Allowing both has some problems when when toggling this option in the ui...
  * 
@@ -146,9 +144,14 @@ type CsvEditSettings = {
 	disableBorders: boolean
 	
 	/**
-	 * fixes the first X rows so they will stay in view even if you scroll. This option and {@link readOption_hasHeader} are mutually exclusive
+	 * the first X rows are pinned so they will stay in view even if you scroll. This option and readOption_hasHeader are mutually exclusive
 	 */
-	fixFirstXRows: number
+	initiallyFixedRowsTop: number
+
+	/**
+	 * the first X columns are pinned so they will stay in view even if you scroll. This option and readOption_hasHeader are mutually exclusive
+	 */
+	initiallyFixedColumnsLeft: number
 
 	/**
 	 * the font size in px, 0 or -x to sync the font size with the editor, +x to overwrite the font size (changing will rerender the table)

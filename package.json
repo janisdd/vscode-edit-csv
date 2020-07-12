@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.2.11",
+	"version": "0.3.0",
 	"license": "MIT",
 	"publisher": "janisdd",
 	"engines": {
@@ -215,7 +215,7 @@
 				"csv-edit.readOption_hasHeader": {
 					"type": "string",
 					"default": "false",
-					"description": "whether the first data line is a header line. This option and fixFirstXRows are mutually exclusive. This option has priority over fixFirstXRows",
+					"description": "whether the first data line is a header line",
 					"enum": [
 						"true",
 						"false"
@@ -328,10 +328,15 @@
 					"default": false,
 					"description": "true: borders are set to 0 (in css). This helps if you encounter some border color issues, false: normal borders"
 				},
-				"csv-edit.fixFirstXRows": {
+				"csv-edit.initiallyFixedRowsTop": {
 					"type": "number",
 					"default": 0,
-					"description": "fixes the first X rows so they will stay in view even if you scroll. This option and readOption_hasHeader are mutually exclusive"
+					"description": "the first X rows are pinned so they will stay in view even if you scroll"
+				},
+				"csv-edit.initiallyFixedColumnsLeft": {
+					"type": "number",
+					"default": 0,
+					"description": "the first X columns are pinned so they will stay in view even if you scroll"
 				},
 				"csv-edit.fontSizeInPx": {
 					"type": "number",

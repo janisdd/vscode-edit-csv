@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## 0.3.0
+
+- renamed option `fixFirstXRows` to `initiallyFixedRowsTop` (breaking change, old config gets invalid)
+- added option `initiallyFixedColumnsLeft`
+- `initiallyFixedRowsTop` and `initiallyFixedColumnsLeft` now work properly
+	- with has header (read option)
+	- when adding/removing rows/columns
+
 ## 0.2.11
 
 - added button to reload the file content (from disk)

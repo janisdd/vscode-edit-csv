@@ -544,7 +544,8 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 	enableWrapping = initialConfig.enableWrapping
 	initialColumnWidth = initialConfig.initialColumnWidth
 	newColumnQuoteInformationIsQuoted = initialConfig.newColumnQuoteInformationIsQuoted
-	fixFirstXRows = Math.max(initialConfig.fixFirstXRows, 0)
+	fixedRowsTop = Math.max(initialConfig.initiallyFixedRowsTop, 0)
+	fixedColumnsLeft = Math.max(initialConfig.initiallyFixedColumnsLeft, 0)
 	disableBorders = initialConfig.disableBorders
 
 	if (disableBorders) {
@@ -624,6 +625,9 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 		hideCommentsBtn.style.display = 'initial'
 	}
 
+	//--- other options
+	fixedRowsTopInfoSpan.innerText = fixedRowsTop + ''
+	fixedColumnsTopInfoSpan.innerText = fixedColumnsLeft + ''
 }
 
 

@@ -23,8 +23,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Version: 6.3.0
- * Release date: 19/12/2018 (built at 25/10/2019 14:47:37)
+ * Version: 6.3.1
+ * Release date: 19/12/2018 (built at 12/07/2020 15:38:34)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -11847,8 +11847,9 @@ function Core(rootElement, userSettings) {
               var totalRows = instance.countRows();
               var fixedRowsTop = instance.getSettings().fixedRowsTop;
 
-              if (fixedRowsTop >= calcIndex + 1) {
-                instance.getSettings().fixedRowsTop -= Math.min(groupAmount, fixedRowsTop - calcIndex);
+              if (fixedRowsTop >= calcIndex + 1) {// this had a bug here we could not set the fixed rows after removing a row...
+                // this will now: e.g. fixed rows: 3 [0,1,2] and we remove the first row the the 4-th row will be pushed so we have [1,2,3]
+                // instance.getSettings().fixedRowsTop -= Math.min(groupAmount, fixedRowsTop - calcIndex); // OLD
               }
 
               var fixedRowsBottom = instance.getSettings().fixedRowsBottom;
@@ -11905,8 +11906,8 @@ function Core(rootElement, userSettings) {
 
               var fixedColumnsLeft = instance.getSettings().fixedColumnsLeft;
 
-              if (fixedColumnsLeft >= calcIndex + 1) {
-                instance.getSettings().fixedColumnsLeft -= Math.min(groupAmount, fixedColumnsLeft - calcIndex);
+              if (fixedColumnsLeft >= calcIndex + 1) {// this is the same as for remove_row
+                // instance.getSettings().fixedColumnsLeft -= Math.min(groupAmount, fixedColumnsLeft - calcIndex); //OLD
               }
 
               if (Array.isArray(instance.getSettings().colHeaders)) {
@@ -29734,9 +29735,9 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "25/10/2019 14:47:37";
+Handsontable.buildDate = "12/07/2020 15:38:34";
 Handsontable.packageName = "handsontable";
-Handsontable.version = "6.3.0";
+Handsontable.version = "6.3.1";
 var baseVersion = "";
 
 if (baseVersion) {

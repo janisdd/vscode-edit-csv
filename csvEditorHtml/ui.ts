@@ -97,7 +97,8 @@ function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			headerRowWithIndex = dataWithIndex
 	
 			hot.updateSettings({
-				fixedRowsTop: 0
+				fixedRowsTop: 0,
+				fixedColumnsLeft: 0,
 			}, false)
 
 			let hasAnyChangesBefore = getHasAnyChangesUi()
@@ -149,7 +150,8 @@ function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 		defaultCsvReadOptions._hasHeader = false
 
 		hot.updateSettings({
-			fixedRowsTop: fixFirstXRows
+			fixedRowsTop: fixedRowsTop,
+			fixedColumnsLeft: fixedColumnsLeft,
 		}, false)
 
 		if (isFirstHasHeaderChangedEvent) {
@@ -432,7 +434,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		manualColumnMove: true,
 		manualColumnResize: true,
 		columnSorting: true,
-		fixedRowsTop: fixFirstXRows,
+		fixedRowsTop: fixedRowsTop,
+		fixedColumnsLeft: fixedColumnsLeft,
 		//see https://handsontable.com/docs/7.1.0/demo-context-menu.html
 		contextMenu: {
 			callback: function (key: string, ...others) {
@@ -803,6 +806,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			}
 
 			onAnyChange()
+			updateFixedRowsCols()
 		},
 		afterRemoveCol: function (visualColIndex, amount) {
 
@@ -834,6 +838,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			}
 
 			onAnyChange()
+			updateFixedRowsCols()
 		},
 		//inspired by https://github.com/handsontable/handsontable/blob/master/src/plugins/hiddenRows/hiddenRows.js
 		//i absolutely don't understand how handsontable implementation is working... 
@@ -852,6 +857,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				}
 			}
 			onAnyChange()
+			updateFixedRowsCols()
 		},
 		afterRemoveRow: function (visualRowIndex, amount) {
 			//we need to modify some or all hiddenPhysicalRowIndices...
@@ -876,6 +882,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			}
 
 			onAnyChange()
+			updateFixedRowsCols()
 		},
 		//called when we select a row via row header
 		beforeSetRangeStartOnly: function (coords) {
@@ -990,12 +997,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	if (settingsApplied === true && defaultCsvReadOptions._hasHeader === true) { //this must be applied else we get duplicate first row
 		applyHasHeader(true, false)
 
-		//settings are mutually exclusive
-		if (fixFirstXRows <= 0) {
-			hot.updateSettings({
-				fixedRowsTop: 0
-			}, false)
-		}
+		updateFixedRowsCols()
 	}
 
 	//make sure we see something (right size)...
@@ -1395,4 +1397,84 @@ function changeFontSizeInPx(fontSizeInPx: number) {
 	}
 
 	reRenderTable()
+}
+
+/**
+ * applies the fixed rows and cols settings (normally called after a row/col added/removed)
+ * ONLY if the {@link defaultCsvReadOptions._hasHeader} is false
+ */
+function updateFixedRowsCols() {
+
+	if (!hot) return
+
+	hot.updateSettings({
+		fixedRowsTop: Math.max(fixedRowsTop, 0),
+		fixedColumnsLeft: Math.max(fixedColumnsLeft, 0),
+	}, false)
+}
+
+/**
+ * increments the {@link fixedRowsTop} by 1
+ */
+function incFixedRowsTop() {
+	_changeFixedRowsTop(fixedRowsTop+1)
+}
+/**
+ * decrements the {@link fixedRowsTop} by 1
+ */
+function decFixedRowsTop() {
+	_changeFixedRowsTop(fixedRowsTop-1)
+}
+/**
+ * no use this directly in the ui as {@link fixedRowsTop} name could change
+ * @param newVal 
+ */
+function _changeFixedRowsTop(newVal: number) {
+	fixedRowsTop = Math.max(newVal, 0)
+	fixedRowsTopInfoSpan.innerText = fixedRowsTop.toString()
+	updateFixedRowsCols()
+}
+
+function _toggleFixedRowsText() {
+
+	const isHidden = fixedRowsTopText.classList.contains('dis-hidden')
+
+	if (isHidden) {
+		fixedRowsTopText.classList.remove('dis-hidden')
+	} else {
+		fixedRowsTopText.classList.add('dis-hidden')
+	}
+}
+
+/**
+ * increments the {@link fixedColumnsLeft} by 1
+ */
+function incFixedColsLeft() {
+	_changeFixedColsLeft(fixedColumnsLeft+1)
+}
+/**
+ * decrements the {@link fixedColumnsLeft} by 1
+ */
+function decFixedColsLeft() {
+	_changeFixedColsLeft(fixedColumnsLeft-1)
+}
+/**
+ * no use this directly in the ui as {@link fixedColumnsLeft} name could change
+ * @param newVal 
+ */
+function _changeFixedColsLeft(newVal: number) {
+	fixedColumnsLeft = Math.max(newVal, 0)
+	fixedColumnsTopInfoSpan.innerText = fixedColumnsLeft.toString()
+	updateFixedRowsCols()
+}
+
+function _toggleFixedColumnsText() {
+
+	const isHidden = fixedColumnsTopText.classList.contains('dis-hidden')
+
+	if (isHidden) {
+		fixedColumnsTopText.classList.remove('dis-hidden')
+	} else {
+		fixedColumnsTopText.classList.add('dis-hidden')
+	}
 }

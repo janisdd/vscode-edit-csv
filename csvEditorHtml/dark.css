@@ -104,19 +104,29 @@ body.vscode-dark {
   border-color: #5c5c5c;
 }
 
-/* fixed rows top */
-.vscode-dark .ht_clone_top tr:nth-of-type(odd)> td {
+/* fixed rows/columns */
+.vscode-dark .ht_clone_top tr:nth-of-type(odd)> td,
+.vscode-dark .ht_clone_left tr:nth-of-type(odd)> td,
+.vscode-dark .ht_clone_top_left_corner tr:nth-of-type(odd)> td {
 	background-color: #262c2e;
 	border-color: #5c5c5c;
 }
 
-.vscode-dark .ht_clone_top tr:nth-of-type(even)> td {
+.vscode-dark .ht_clone_top tr:nth-of-type(even)> td,
+.vscode-dark .ht_clone_left tr:nth-of-type(even)> td,
+.vscode-dark .ht_clone_top_left_corner tr:nth-of-type(even)> td {
 	background-color: #2d3436;
 	border-color: #5c5c5c;
 }
 
-.vscode-dark .ht_clone_top tr:last-child > td {
+.vscode-dark .ht_clone_top tr:last-child > td,
+.vscode-dark .ht_clone_top_left_corner tr:last-child > td {
 	border-bottom-color: #b7b7b7;
+}
+
+.vscode-dark .ht_clone_left tr > td:last-child,
+.vscode-dark .ht_clone_top_left_corner tr > td:last-child {
+	border-right-color: #b7b7b7;
 }
 
 .vscode-dark .handsontable tr {
