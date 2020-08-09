@@ -1,4 +1,14 @@
 
+/**
+ * some initial vars from the extension when the webview is created
+ */
+type InitialVars = {
+	/**
+	 * true: the extension is watching the source file for changes
+	 * false: not (e.g. file is not in the workspace or something other)
+	 */
+	isWatchingSourceFile: boolean
+}
 
 /**
  * the settings for the plugin
@@ -287,7 +297,11 @@ type RequestChangeFontSiteInPxMessage = {
 	fontSizeInPx: number
 }
 
-type ReceivedMessageFromVsCode = CsvUpdateMessage | RequestApplyPressMessage | RequestApplyAndSavePressMessage | RequestChangeFontSiteInPxMessage
+type SourceFileChangedMessage = {
+	command: 'sourceFileChanged'
+}
+
+type ReceivedMessageFromVsCode = CsvUpdateMessage | RequestApplyPressMessage | RequestApplyAndSavePressMessage | RequestChangeFontSiteInPxMessage | SourceFileChangedMessage
 
 /**
  * send by the webview indicating that it has rendered and the webview has set up the listener to receive content

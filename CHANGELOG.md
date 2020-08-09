@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## 0.4.0
+
+- added source file watchers (only works if the file is inside the current workspace)
+	- this will notify the webview and
+		- reload the file content into the webview (if the table has no changes)
+		- ask the user if the source file should be re-read (if the table has changes)
+	- if the file is not inside the current workspace an indicator is displayed in the ui
+- if the user hits apply changes and the source file was deleted (no .stats) then a temp file is created (then the user can decide to persist or discard it)
+- fixed issue where some modals are behind table elements
+
 ## 0.3.0
 
 - renamed option `fixFirstXRows` to `initiallyFixedRowsTop` (breaking change, old config gets invalid)

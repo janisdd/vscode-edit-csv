@@ -1174,6 +1174,20 @@ function toggleAskReloadFileModalDiv(isVisible: boolean) {
 	askReloadFileModalDiv.classList.remove('is-active')
 }
 
+/**
+ * displays or hides the source file changed modal
+ * @param isVisible 
+ */
+function toggleSourceFileChangedModalDiv(isVisible: boolean) {
+
+	if (isVisible) {
+		sourceFileChangedDiv.classList.add('is-active')
+		return
+	}
+
+	sourceFileChangedDiv.classList.remove('is-active')
+}
+
 
 /**
  * parses and displays the given data (csv)
@@ -1223,6 +1237,7 @@ function preReloadFileFromDisk() {
  */
 function reloadFileFromDisk() {
 	toggleAskReloadFileModalDiv(false)
+	toggleSourceFileChangedModalDiv(false)
 	_setHasUnsavedChangesUiIndicator(false)
 	postReloadFile()
 }
@@ -1377,6 +1392,14 @@ function _setHasUnsavedChangesUiIndicator(hasUnsavedChanges: boolean) {
 
 function getHasAnyChangesUi(): boolean {
 	return unsavedChangesIndicator.classList.contains("op-hidden") === false
+}
+
+function _setIsWatchingSourceFileUiIndicator(isWatching: boolean) {
+	if (isWatching) {
+		sourceFileUnwatchedIndicator.classList.add('op-hidden')
+	} else {
+		sourceFileUnwatchedIndicator.classList.remove('op-hidden')
+	}
 }
 
 /**

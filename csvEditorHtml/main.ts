@@ -1,9 +1,15 @@
 /// <reference path="findWidget.ts" />
 
 
+const defaultInitialVars: InitialVars = {
+	isWatchingSourceFile: false
+}
+
 declare var acquireVsCodeApi: any
 declare var initialContent: string
 declare var initialConfig: CsvEditSettings | undefined
+
+declare var initialVars: InitialVars
 
 let vscode: VsExtension | undefined = undefined
 
@@ -14,6 +20,10 @@ if (typeof acquireVsCodeApi !== 'undefined') {
 if (typeof initialConfig === 'undefined') {
 	// tslint:disable-next-line:no-duplicate-variable
 	var initialConfig = undefined as CsvEditSettings | undefined
+	// tslint:disable-next-line:no-duplicate-variable
+	var initialVars = {
+		...defaultInitialVars
+	}
 }
 
 const csv: typeof import('papaparse') = (window as any).Papa
@@ -133,6 +143,7 @@ const csvEditorDiv = _getById('csv-editor')
 const helModalDiv = _getById('help-modal')
 const askReadAgainModalDiv = _getById('ask-read-again-modal')
 const askReloadFileModalDiv = _getById('ask-reload-file-modal')
+const sourceFileChangedDiv = _getById('source-file-changed-modal')
 
 const readDelimiterTooltip = _getById('read-delimiter-tooltip')
 const readDelimiterTooltipText = "Empty to auto detect"
@@ -157,6 +168,8 @@ const warningTooltipTextWhenCommentRowNotFirstCellIsUsed = `Please use only the 
 
 const unsavedChangesIndicator = _getById('unsaved-changes-indicator') as HTMLSpanElement
 const reloadFileSpan = _getById('reload-file') as HTMLSpanElement //reread the file content...
+
+const sourceFileUnwatchedIndicator = _getById('source-file-unwatched-indicator') as HTMLSpanElement
 
 
 const hasHeaderReadOptionInput = _getById('has-header') as HTMLInputElement
@@ -200,7 +213,7 @@ if (!vscode) {
 }
 
 //set values from extension config
-setupAndApplyInitialConfigPart1(initialConfig)
+setupAndApplyInitialConfigPart1(initialConfig, initialVars)
 
 //see readDataAgain
 let _data = parseCsv(initialContent, defaultCsvReadOptions)

@@ -7,12 +7,20 @@ export interface Instance {
 	panel: vscode.WebviewPanel
 	/**
 	 * the uri of the source file
+	 * this is the same as in {@link document}
 	 */
 	sourceUri: vscode.Uri
 	/**
 	 * the uri of the editor webview
 	 */
 	editorUri: vscode.Uri
+
+	/**
+	 * the source file reference
+	 * might be closed 
+	 * or out of sync (for non-workspace files)
+	 */
+	document: vscode.TextDocument
 
 	/**
 	 * true: edit has unsaved changes, false: not
@@ -23,6 +31,11 @@ export interface Instance {
 	 * the original title for the tab
 	 */
 	originalTitle: string
+
+	/**
+	 * used to watch the source file and notify the extension view
+	 */
+	sourceFileWatcher: vscode.FileSystemWatcher
 }
 
 export interface InstanceStorage  {

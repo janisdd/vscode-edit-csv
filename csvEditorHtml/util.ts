@@ -79,7 +79,7 @@ function _normalizeDataArray(csvParseResult: ExtendedCsvParseResult, csvReadConf
 		// 	for (let j = 0; j < row.length; j++) {
 
 		// 		if (row[j] === null || row[j] === undefined) continue
-	
+
 		// 		row[j] = row[j].trim()
 		// 	}
 		// }
@@ -108,7 +108,7 @@ function _normalizeDataArray(csvParseResult: ExtendedCsvParseResult, csvReadConf
 // 			data[i] = [row.join(',')]// csv.unparse([row])
 
 // 		}
-		
+
 // 	}
 
 // }
@@ -141,7 +141,7 @@ function _getCommentIndices(data: string[][], csvReadConfig: CsvReadOptions): nu
  * @param index 0 based (where 0 will generate label 1 because this is probably more desired)
  */
 function getSpreadsheetColumnLabel(index: number) {
-	return `column ${index+1}`
+	return `column ${index + 1}`
 }
 
 //idea from handsontable
@@ -154,7 +154,7 @@ const COLUMN_LABEL_BASE_LENGTH = COLUMN_LABEL_BASE.length
  * @param {Number} index Column index (starting with 0)
  */
 function spreadsheetColumnLetterLabel(index: number) {
-  //e.g. we have index 
+	//e.g. we have index 
 	/*
 	0 --> A
 	1 --> B
@@ -167,15 +167,15 @@ function spreadsheetColumnLetterLabel(index: number) {
   52 --> BA
   3*26-1=77 --> BZ
 	*/
-  let num = index
-  let columnLabel = ''
+	let num = index
+	let columnLabel = ''
 
-  //see https://stackoverflow.com/questions/34813980/getting-an-array-of-column-names-at-sheetjs
-  while (num >= 0) {
-    columnLabel = COLUMN_LABEL_BASE[num % 26] + columnLabel //this will cover the last "bit" in range 0-25 so we get the last letter
-    num = Math.floor(num / 26)-1 //e.g. 27 would get us 27/26 = 1 but this is actually AB so we do -1
+	//see https://stackoverflow.com/questions/34813980/getting-an-array-of-column-names-at-sheetjs
+	while (num >= 0) {
+		columnLabel = COLUMN_LABEL_BASE[num % 26] + columnLabel //this will cover the last "bit" in range 0-25 so we get the last letter
+		num = Math.floor(num / 26) - 1 //e.g. 27 would get us 27/26 = 1 but this is actually AB so we do -1
 		//e.g. 52 -> first (right) letter is A, 52 / 26 = 2 --> 2-1 = 1 = B --> BA
-    //so this works only because the number is not changed before getting the first letter
+		//so this works only because the number is not changed before getting the first letter
 	}
 	return columnLabel
 }
@@ -454,7 +454,7 @@ function checkIfHasHeaderReadOptionIsAvailable(isInitialRender: boolean): boolea
 			canSetOption = false
 		}
 	}
-	
+
 	if (canSetOption) {
 		el.removeAttribute('disabled')
 
@@ -526,7 +526,14 @@ function _error(text: string) {
  * some options have impact e.g. on how to parse the data...
  * some options depend on the state after parse ... e.g. has before/after comments?
  */
-function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefined) {
+function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefined, initialVars: InitialVars) {
+
+
+	//first apply the initial vars
+	{
+		_setIsWatchingSourceFileUiIndicator(initialVars.isWatchingSourceFile)
+	}
+
 
 	if (initialConfig === undefined) {
 
@@ -699,7 +706,7 @@ function customSearchMethod(query: string | undefined | null, value: string | un
 
 	if (query === '') return false
 
-	
+
 	if (!findWidgetInstance.findOptionMatchCaseCache) {
 		value = value.toLowerCase()
 		query = query.toLowerCase()
@@ -723,7 +730,7 @@ function customSearchMethod(query: string | undefined | null, value: string | un
 			if (result !== null && result.length > 0) {
 				return result[0] === value
 			}
-		} 
+		}
 
 		return result !== null
 
@@ -731,7 +738,7 @@ function customSearchMethod(query: string | undefined | null, value: string | un
 
 		if (findWidgetInstance.findOptionMatchWholeCellCache) {
 			return value === query
-		} 
+		}
 
 		return value.indexOf(query) !== -1
 	}

@@ -57,6 +57,13 @@ html, body {
 	pointer-events: none;
 }
 
+#source-file-unwatched-indicator {
+	color: #dd514c;
+}
+#source-file-unwatched-indicator.tooltip.is-tooltip-left::before {
+	bottom: -37%; /* else we clip outside the viewport */
+}
+
 .dis-hidden {
 	display: none;
 }
@@ -150,13 +157,20 @@ input.input {
 	height: 100%;
 }
 
-
-.modal.my-modal {
+body .modal {
 	z-index: 200; /*to be in front of handson table cols*/
 }
 
-.modal.my-modal .modal-content {
+#help-modal .modal-content {
 	width: 80%;
+}
+
+#ask-reload-file-modal {
+
+}
+
+#source-file-changed-modal {
+	
 }
 
 .centered .modal-content {

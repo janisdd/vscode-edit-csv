@@ -235,7 +235,7 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 /* --- messages back to vs code --- */
 
 /**
- * called to display the given text in vs code 
+ * called to read the source file again
  * @param text 
  */
 function postReloadFile() {
@@ -403,6 +403,20 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 
 		case 'changeFontSizeInPx': {
 			changeFontSizeInPx(message.fontSizeInPx)
+			break
+		}
+
+		case 'sourceFileChanged': {
+
+			const hasAnyChanges = getHasAnyChangesUi()
+
+			if (!hasAnyChanges) {
+				//just relaod the file because we have no changes anyway...
+				reloadFileFromDisk()
+				return
+			}
+
+			toggleSourceFileChangedModalDiv(true)
 			break
 		}
 

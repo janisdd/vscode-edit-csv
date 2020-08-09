@@ -19,7 +19,7 @@ exports.getResourcePath = getResourcePath;
  * creates the html for the csv editor
  * @param context
  */
-function createEditorHtml(webview, context) {
+function createEditorHtml(webview, context, initialVars) {
     const _getResourcePath = getResourcePath.bind(undefined, webview, context);
     let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.min.css');
     // let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
@@ -201,6 +201,11 @@ function createEditorHtml(webview, context) {
 											</div>
 										</div>
 
+										<!-- is also works when the file is not in the workspace but opened (visible) in the vs code editor but that's too special -->
+										<span id="source-file-unwatched-indicator" class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline" style="float: right;margin-right: 5px;"
+											data-tooltip="The source file cannot be watched. Changes to it will not notify this view! This happens if you edit a file not inside your workspace. Actually it works when the file is not in your workspace and you ONLY edit the file inside vs code.">
+											<i class="fas fa-eye"></i>
+										</span>
 										<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"
 											data-tooltip="You might have unsaved changes">
 											<i class="fas fa-save"></i>
@@ -498,7 +503,7 @@ function createEditorHtml(webview, context) {
     let helpModalHtml = ``;
     {
         helpModalHtml = `
-		<div id="help-modal" class="modal my-modal">
+		<div id="help-modal" class="modal">
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<div class="box">
@@ -574,7 +579,7 @@ function createEditorHtml(webview, context) {
     let askReadAgainModalHtml = ``;
     {
         askReadAgainModalHtml = `
-		<div id="ask-read-again-modal" class="modal my-modal centered">
+		<div id="ask-read-again-modal" class="modal modal-centered">
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<div class="box">
@@ -605,7 +610,7 @@ function createEditorHtml(webview, context) {
     let askReloadFileModalHtml = ``;
     {
         askReloadFileModalHtml = `
-		<div id="ask-reload-file-modal" class="modal my-modal centered">
+		<div id="ask-reload-file-modal" class="modal modal-centered">
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<div class="box">
@@ -614,7 +619,8 @@ function createEditorHtml(webview, context) {
 				<p>
 					Are you sure you want to read the source file again? <br />
 					All changes to the table will be discarded! <br />
-					This will also update the snapshot of the file that is used for the reset data feature.
+					<br />
+					<i>This will also update the snapshot of the file that is used for the reset data feature.</i>
 				</p>
 
 				<div style="margin-top: 1em">
@@ -630,6 +636,39 @@ function createEditorHtml(webview, context) {
 			</div>
 		</div>
 		<button class="modal-close is-large" aria-label="close" onclick="toggleAskReloadFileModalDiv(false)"></button>
+	</div>
+		`;
+    }
+    let sourceFileChangedModalHtml = ``;
+    {
+        sourceFileChangedModalHtml = `
+		<div id="source-file-changed-modal" class="modal modal-centered">
+		<div class="modal-background"></div>
+		<div class="modal-content">
+			<div class="box">
+				<h3 class="title is-3">Source file changed</h3>
+
+				<p>
+					The source file changed, thus the tabel is not up-to-date. <br />
+					You can reload the file content which will discard all changes to the table! <br />
+					Or you can ignore the changes. <br />
+					<br />
+					<i>This will also update the snapshot of the file that is used for the reset data feature.</i>
+				</p>
+
+				<div style="margin-top: 1em">
+					<button class="button is-warning" onclick="reloadFileFromDisk()">
+						<span>Reload</span>
+					</button>
+
+					<button style="margin-left: 0.5em" class="button is-outlined" onclick="toggleSourceFileChangedModalDiv(false)">
+						<span>Cancel</span>
+					</button>
+				</div>
+
+			</div>
+		</div>
+		<button class="modal-close is-large" aria-label="close" onclick="toggleSourceFileChangedModalDiv(false)"></button>
 	</div>
 		`;
     }
@@ -675,8 +714,11 @@ function createEditorHtml(webview, context) {
 
 	${askReloadFileModalHtml}
 
+	${sourceFileChangedModalHtml}
+
 	<script>
 	var initialConfig = ${JSON.stringify(config)};
+	var initialVars = ${JSON.stringify(initialVars)};
 	</script>
 
 	 <script src="${progressJs}"></script>
