@@ -302,6 +302,12 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 		//not needed because on apply changes we create a new file if this is needed
 		watcher.onDidChange((e) => {
+			if (instance.ignoreNextChangeEvent) {
+				instance.ignoreNextChangeEvent = false
+				debugLog(`source file changed: ${e.fsPath}, ignored`)
+				return
+			}
+
 			debugLog(`source file changed: ${e.fsPath}`)
 			onSourceFileChanged(e.fsPath, instance)
 		})
@@ -318,7 +324,8 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 			sourceFileWatcher: watcher,
 			document: activeTextEditor.document,
 			supportsAutoReload: true,
-		} as InstanceWorkspaceSourceFile
+			ignoreNextChangeEvent: false,
+		}
 
 	} else {
 
@@ -326,6 +333,12 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 		const watcher = chokidar.watch(activeTextEditor.document.fileName)
 
 		watcher.on('change', (path) => {
+
+			if (instance.ignoreNextChangeEvent) {
+				instance.ignoreNextChangeEvent = false
+				debugLog(`source file (external) changed: ${path}, ignored`)
+				return
+			}
 			debugLog(`source file (external) changed: ${path}`)
 			onSourceFileChanged(path, instance)
 		})
@@ -341,8 +354,9 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 			originalTitle: title,
 			sourceFileWatcher: watcher,
 			document: activeTextEditor.document,
-			supportsAutoReload: false
-		} as InstanceExternalFile
+			supportsAutoReload: false,
+			ignoreNextChangeEvent: false,
+		}
 	}
 
 	try {
@@ -541,6 +555,7 @@ function applyContent(instance: Instance, newContent: string, saveSourceFile: bo
 
 			//don't apply if the content didn't change
 			if (document.getText() === newContent) {
+				debugLog(`content didn't change`)
 				return
 			}
 
@@ -607,6 +622,7 @@ function _afterEditsApplied(instance: Instance, document: vscode.TextDocument, e
 		}
 
 		if (saveSourceFile) {
+			instance.ignoreNextChangeEvent = true
 			document.save()
 				.then(
 					wasSaved => {

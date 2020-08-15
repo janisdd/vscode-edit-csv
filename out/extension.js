@@ -234,6 +234,11 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
         const watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, true);
         //not needed because on apply changes we create a new file if this is needed
         watcher.onDidChange((e) => {
+            if (instance.ignoreNextChangeEvent) {
+                instance.ignoreNextChangeEvent = false;
+                util_1.debugLog(`source file changed: ${e.fsPath}, ignored`);
+                return;
+            }
             util_1.debugLog(`source file changed: ${e.fsPath}`);
             onSourceFileChanged(e.fsPath, instance);
         });
@@ -249,12 +254,18 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
             sourceFileWatcher: watcher,
             document: activeTextEditor.document,
             supportsAutoReload: true,
+            ignoreNextChangeEvent: false,
         };
     }
     else {
         //the problem with this is that it is faster than the file model (in vs code) can sync the file...
         const watcher = chokidar.watch(activeTextEditor.document.fileName);
         watcher.on('change', (path) => {
+            if (instance.ignoreNextChangeEvent) {
+                instance.ignoreNextChangeEvent = false;
+                util_1.debugLog(`source file (external) changed: ${path}, ignored`);
+                return;
+            }
             util_1.debugLog(`source file (external) changed: ${path}`);
             onSourceFileChanged(path, instance);
         });
@@ -269,7 +280,8 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
             originalTitle: title,
             sourceFileWatcher: watcher,
             document: activeTextEditor.document,
-            supportsAutoReload: false
+            supportsAutoReload: false,
+            ignoreNextChangeEvent: false,
         };
     }
     try {
@@ -426,6 +438,7 @@ function applyContent(instance, newContent, saveSourceFile, openSourceFileAfterA
         var textRange = new vscode.Range(0, firstLine.range.start.character, document.lineCount - 1, lastLine.range.end.character);
         //don't apply if the content didn't change
         if (document.getText() === newContent) {
+            util_1.debugLog(`content didn't change`);
             return;
         }
         edit.replace(document.uri, textRange, newContent);
@@ -476,6 +489,7 @@ function _afterEditsApplied(instance, document, editsApplied, saveSourceFile, op
             return;
         }
         if (saveSourceFile) {
+            instance.ignoreNextChangeEvent = true;
             document.save()
                 .then(wasSaved => {
                 if (!wasSaved) {

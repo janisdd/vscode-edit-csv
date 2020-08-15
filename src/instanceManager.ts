@@ -39,6 +39,11 @@ export interface Instance {
 	 */
 	originalTitle: string
 
+	/**
+	 * when the table saves the file we need to ignore the next change else the disk change will trigger the table to reload (losing undo, ...)
+	 */
+	ignoreNextChangeEvent: boolean
+
 }
 
 export interface InstanceWorkspaceSourceFile extends Instance {
@@ -78,13 +83,13 @@ export class InstanceManager {
 	private instances: InstanceStorage = {}
 
 
-	public getAllInstances(): Instance[] {
+	public getAllInstances(): SomeInstance[] {
 		const keys = Object.keys(this.instances)
 		const allInstances = keys.map(p => this.instances[p])
 		return allInstances
 	}
 
-	public addInstance(instance: Instance) {
+	public addInstance(instance: SomeInstance) {
 
 		const oldInstance = this.instances[instance.sourceUri.toString()]
 
@@ -95,7 +100,7 @@ export class InstanceManager {
 		this.instances[instance.sourceUri.toString()] = instance
 	}
 
-	public removeInstance(instance: Instance) {
+	public removeInstance(instance: SomeInstance) {
 		const oldInstance = this.instances[instance.sourceUri.toString()]
 
 		if (!oldInstance) {
@@ -105,7 +110,7 @@ export class InstanceManager {
 		delete this.instances[instance.sourceUri.toString()]
 	}
 
-	public findInstanceBySourceUri(sourceUri: vscode.Uri): Instance | null {
+	public findInstanceBySourceUri(sourceUri: vscode.Uri): SomeInstance | null {
 
 		//key is the source uri ... but we might change that so use find
 		// const instance = this.instances[sourceUri.toString()]
@@ -116,7 +121,7 @@ export class InstanceManager {
 		return instance
 	}
 
-	public findInstanceByEditorUri(editorUri: vscode.Uri): Instance | null {
+	public findInstanceByEditorUri(editorUri: vscode.Uri): SomeInstance | null {
 
 		const instance = this.getAllInstances().find(p => p.editorUri === editorUri)
 
@@ -130,7 +135,7 @@ export class InstanceManager {
 		return activeInstances.length > 0 // or === 1 ?
 	}
 
-	public getActiveEditorInstance(): Instance {
+	public getActiveEditorInstance(): SomeInstance {
 		const activeInstances = this.getAllInstances().filter(p => p.panel.active)
 
 		if (activeInstances.length === 0) {
