@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as chokidar from "chokidar";
 
 export interface Instance {
 	/**
@@ -23,6 +24,12 @@ export interface Instance {
 	document: vscode.TextDocument
 
 	/**
+	 * currently external files cannot be auto
+	 * false: the user must open the file so that vs code refreshes the file model and switch back to the table and manually refresh
+	 */
+	supportsAutoReload: boolean
+
+	/**
 	 * true: edit has unsaved changes, false: not
 	 */
 	hasChanges: boolean
@@ -32,17 +39,33 @@ export interface Instance {
 	 */
 	originalTitle: string
 
+}
+
+export interface InstanceWorkspaceSourceFile extends Instance {
+	kind: 'workspaceFile'
+
 	/**
-	 * used to watch the source file and notify the extension view
-	 */
+	* used to watch the source file and notify the extension view
+	*/
 	sourceFileWatcher: vscode.FileSystemWatcher
 }
 
-export interface InstanceStorage  {
+export interface InstanceExternalFile extends Instance {
+	kind: 'externalFile'
+
+	/**
+ * used to watch the source file and notify the extension view
+ */
+	sourceFileWatcher: chokidar.FSWatcher
+}
+
+export type SomeInstance = InstanceWorkspaceSourceFile | InstanceExternalFile
+
+export interface InstanceStorage {
 	/**
 	 * the key is the source uri to string
 	 */
-	[sourceUriString: string]: Instance
+	[sourceUriString: string]: SomeInstance
 }
 
 /**

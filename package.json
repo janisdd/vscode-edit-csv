@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"license": "MIT",
 	"publisher": "janisdd",
 	"engines": {
@@ -362,15 +362,18 @@
 		"lint": "npx tslint -p . && npx tslint -p ./csvEditorHtml/tsconfig.json",
 		"promptUp": "node ./promtUploadbuild.js"
 	},
+	"dependencies": {
+		"chokidar": "3.4.2"
+	},
 	"devDependencies": {
 		"@types/glob": "^7.1.2",
 		"@types/mocha": "^2.2.48",
 		"@types/mousetrap": "^1.6.3",
 		"@types/node": "^8.10.25",
 		"@types/papaparse": "4.5.6",
-		"@types/vscode": "^1.38.0",
+		"@types/vscode": "^1.48.0",
 		"glob": "^7.1.6",
-		"mocha": "^8.0.1",
+		"mocha": "^8.1.1",
 		"tslint": "^5.8.0",
 		"typescript": "^3.9.5",
 		"vscode-test": "^1.3.0"

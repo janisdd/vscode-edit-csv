@@ -7,6 +7,7 @@ const util_1 = require("./util");
 const getHtml_1 = require("./getHtml");
 const instanceManager_1 = require("./instanceManager");
 const configurationHelper_1 = require("./configurationHelper");
+const chokidar = require("chokidar");
 // const debounceDocumentChangeInMs = 1000
 /**
  * for editor uris this is the scheme to use
@@ -218,41 +219,72 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
         enableScripts: true,
         retainContextWhenHidden: true
     });
+    //check if the file is in the current workspace
+    let isInCurrentWorkspace = activeTextEditor.document.uri.fsPath !== vscode.workspace.asRelativePath(activeTextEditor.document.uri.fsPath);
+    var conf = vscode.workspace.getConfiguration();
     //a file watcher works when the file is in the current workspace (folder) even if it's not opened
     //it also works when we open any file (not in the workspace) and 
     //	we edit the file inside vs code
     //	we edit outside vs code but the file is visible in vs code (active)
     //it does NOT work when the file is not in the workspace and we edit the file outside of vs code and the file is not visible in vs code (active)
-    const watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, false);
-    let instance = {
-        panel: null,
-        sourceUri: uri,
-        editorUri: uri.with({
-            scheme: exports.editorUriScheme
-        }),
-        hasChanges: false,
-        originalTitle: title,
-        sourceFileWatcher: watcher,
-        document: activeTextEditor.document
-    };
+    // const watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, true)
+    let instance;
+    if (isInCurrentWorkspace) {
+        //if the file is in the current workspace we the file model in vs code is always synced so is this (faster reads/cached)
+        const watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, true);
+        //not needed because on apply changes we create a new file if this is needed
+        watcher.onDidChange((e) => {
+            util_1.debugLog(`source file changed: ${e.fsPath}`);
+            onSourceFileChanged(e.fsPath, instance);
+        });
+        instance = {
+            kind: 'workspaceFile',
+            panel: null,
+            sourceUri: uri,
+            editorUri: uri.with({
+                scheme: exports.editorUriScheme
+            }),
+            hasChanges: false,
+            originalTitle: title,
+            sourceFileWatcher: watcher,
+            document: activeTextEditor.document,
+            supportsAutoReload: true,
+        };
+    }
+    else {
+        //the problem with this is that it is faster than the file model (in vs code) can sync the file...
+        const watcher = chokidar.watch(activeTextEditor.document.fileName);
+        watcher.on('change', (path) => {
+            util_1.debugLog(`source file (external) changed: ${path}`);
+            onSourceFileChanged(path, instance);
+        });
+        instance = {
+            kind: 'externalFile',
+            panel: null,
+            sourceUri: uri,
+            editorUri: uri.with({
+                scheme: exports.editorUriScheme
+            }),
+            hasChanges: false,
+            originalTitle: title,
+            sourceFileWatcher: watcher,
+            document: activeTextEditor.document,
+            supportsAutoReload: false
+        };
+    }
     try {
         instanceManager.addInstance(instance);
     }
     catch (error) {
         vscode.window.showErrorMessage(`Could not create an editor instance, error: ${error.message}`);
+        if (instance.kind === 'workspaceFile') {
+            instance.sourceFileWatcher.dispose();
+        }
+        else {
+            instance.sourceFileWatcher.close();
+        }
         return;
     }
-    //check if the file is in the current workspace
-    let isInCurrentWorkspace = instance.document.uri.fsPath !== vscode.workspace.asRelativePath(instance.document.uri.fsPath);
-    watcher.onDidChange((e) => {
-        util_1.debugLog(`source file changed: ${e.fsPath}`);
-        onSourceFileChanged(e, instance);
-    });
-    //not needed because on apply changes we create a new file if this is needed
-    // watcher.onDidDelete((e) => {
-    // 	console.log(`onDidDelete TODO`, e)
-    // 	//TODO!!
-    // })
     //just set the panel if we added the instance
     instance.panel = panel;
     const config = configurationHelper_1.getExtensionConfiguration();
@@ -277,7 +309,34 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
                         panel.webview.postMessage(msg);
                     }
                 };
-                if (activeTextEditor.document.isClosed) {
+                if (isInCurrentWorkspace === false) {
+                    //slow path
+                    //external files are normally not synced so better read the file...
+                    // vscode.workspace.fs.readFile(instance.sourceUri)
+                    // 	.then(content => {
+                    // 		console.log(`encoding`)
+                    // 		//TODO get encoding????
+                    // 		//see https://github.com/microsoft/vscode/issues/824
+                    // const text = Buffer.from(content).toString('utf-8')
+                    // 		funcSendContent(text)
+                    // 	}, error => {
+                    // 		vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
+                    // 	})
+                    //TODO
+                    //THIS might not get the up-to-date state of the file on the disk
+                    //but vs code api cannot get the file encoding (so that we could use vscode.workspace.fs.readFile)
+                    //or allow us to force to updat the memory model in vs code of the file...
+                    //see https://github.com/microsoft/vscode/issues/824
+                    //see https://github.com/microsoft/vscode/issues/3025
+                    //in case we closed the file (we have an old view/model of the file) open it again
+                    vscode.workspace.openTextDocument(instance.sourceUri)
+                        .then(document => {
+                        funcSendContent(document.getText());
+                    }, error => {
+                        vscode.window.showErrorMessage(`could not read the source file, error: ${error === null || error === void 0 ? void 0 : error.message}`);
+                    });
+                }
+                else if (activeTextEditor.document.isClosed) {
                     //slow path
                     //not synchronized anymore...
                     //we need to get the real file content from disk
@@ -340,14 +399,19 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
             vscode.window.showErrorMessage(`Could not destroy an editor instance, error: ${error.message}`);
         }
         try {
-            instance.sourceFileWatcher.dispose();
+            if (instance.kind === 'workspaceFile') {
+                instance.sourceFileWatcher.dispose();
+            }
+            else {
+                instance.sourceFileWatcher.close();
+            }
         }
         catch (error) {
-            vscode.window.showErrorMessage(`Could not dispose source file watcher, error: ${error.message}`);
+            vscode.window.showErrorMessage(`Could not dispose source file watcher for file ${instance.document.uri.fsPath}, error: ${error.message}`);
         }
     }, null, context.subscriptions);
     panel.webview.html = getHtml_1.createEditorHtml(panel.webview, context, {
-        isWatchingSourceFile: isInCurrentWorkspace
+        isWatchingSourceFile: instance.supportsAutoReload
     });
 }
 /**
@@ -391,7 +455,7 @@ function applyContent(instance, newContent, saveSourceFile, openSourceFileAfterA
     }, (reason) => {
         //maybe the source file was deleted...
         //see https://github.com/microsoft/vscode-extension-samples/pull/195/files
-        console.warn(`Could not find the source file`);
+        console.warn(`Could not find the source file, trying to access it and create a temp file with the same path...`);
         console.warn(reason);
         vscode.workspace.fs.stat(instance.sourceUri).
             then(fileStat => {
@@ -508,7 +572,13 @@ function notExhaustive(x, message) {
 function setEditorHasChanges(instance, hasChanges) {
     instance.panel.title = `${hasChanges ? '* ' : ''}${instance.originalTitle}`;
 }
-function onSourceFileChanged(e, instance) {
+function onSourceFileChanged(path, instance) {
+    if (!instance.supportsAutoReload) {
+        vscode.window.showWarningMessage(`The source file changed and it is not in the current workspace. Thus the content could not be automatically reloaded. Please open/display the file in vs code and switch back the to table. Then you need to manually reload the table with the reload button.`, {
+            modal: true
+        });
+        return;
+    }
     const msg = {
         command: 'sourceFileChanged'
     };

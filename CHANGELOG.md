@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## 0.4.1
+
+- file watchers now work for all files (not only inside the current workspace)
+	- but the automatic file reload only for files inside the current workspace!!
+
 ## 0.4.0
 
 - added source file watchers (only works if the file is inside the current workspace)

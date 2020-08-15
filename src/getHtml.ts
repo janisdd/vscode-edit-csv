@@ -209,9 +209,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 											</div>
 										</div>
 
-										<!-- is also works when the file is not in the workspace but opened (visible) in the vs code editor but that's too special -->
 										<span id="source-file-unwatched-indicator" class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline" style="float: right;margin-right: 5px;"
-											data-tooltip="The source file cannot be watched. Changes to it will not notify this view! This happens if you edit a file not inside your workspace. Actually it works when the file is not in your workspace and you ONLY edit the file inside vs code.">
+											data-tooltip="The source file cannot be automaically reloaded (because it's not in the current workpsace) if the file on disk changes. You will get notified if the file gets changed but then you need to open/display the file in vs code and manually refresh the table (refresh button).">
 											<i class="fas fa-eye"></i>
 										</span>
 										<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"
@@ -663,7 +662,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 				<p>
 					The source file changed, thus the tabel is not up-to-date. <br />
-					You can reload the file content which will discard all changes to the table! <br />
+					You can reload the file content which will discard all changes to the table! <br /><br />
 					Or you can ignore the changes. <br />
 					<br />
 					<i>This will also update the snapshot of the file that is used for the reset data feature.</i>
@@ -675,7 +674,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 					</button>
 
 					<button style="margin-left: 0.5em" class="button is-outlined" onclick="toggleSourceFileChangedModalDiv(false)">
-						<span>Cancel</span>
+						<span>Ignore</span>
 					</button>
 				</div>
 
