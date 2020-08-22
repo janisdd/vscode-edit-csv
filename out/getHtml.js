@@ -201,6 +201,7 @@ function createEditorHtml(webview, context, initialVars) {
 											</div>
 										</div>
 
+
 										<span id="source-file-unwatched-indicator" class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline" style="float: right;margin-right: 5px;"
 											data-tooltip="The csv source file cannot be automaically reloaded (because it's not in the current workpsace) if the file on disk changes. You will get notified if the file gets changed but then you need to open/display the file in vs code and manually refresh the table (refresh button). Alternatively just close this table and reopen it.">
 											<i class="fas fa-eye"></i>
@@ -493,7 +494,7 @@ function createEditorHtml(webview, context, initialVars) {
 
 			<!-- main editor/grid area -->
 			<div id="csv-editor-wrapper" class="csv-editor-wrapper">
-				<div id="csv-editor"></div>
+				<div id="csv-editor">No data received</div>
 			</div>
 
 		</div>
@@ -503,7 +504,7 @@ function createEditorHtml(webview, context, initialVars) {
     {
         helpModalHtml = `
 		<div id="help-modal" class="modal">
-		<div class="modal-background"></div>
+		<div class="modal-background" onclick="toggleHelpModal(false)"></div>
 		<div class="modal-content">
 			<div class="box">
 

@@ -434,6 +434,7 @@ function onReceiveCsvContentSlice(slice: StringSlice) {
 	if (slice.sliceNr === 1) {
 		initialContent = ''
 		statusInfo.innerText = `Receiving csv...`
+		csvEditorDiv.innerText = ``
 	}
 
 	initialContent += slice.text

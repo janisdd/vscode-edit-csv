@@ -208,8 +208,8 @@ if (initialContent === undefined) {
 // `
 
 if (!vscode) {
-	console.log("initialConfig: ", initialConfig);
-	console.log("initialContent: " + initialContent);
+	console.log("initialConfig: ", initialConfig)
+	console.log("initialContent: " + initialContent)
 }
 
 //set values from extension config
@@ -218,6 +218,7 @@ setupAndApplyInitialConfigPart1(initialConfig, initialVars)
 //see readDataAgain
 let _data = parseCsv(initialContent, defaultCsvReadOptions)
 
+//when we get data from vs code we receive it via messages
 if (_data && !vscode) {
 
 	let _exampleData: string[][] = []
