@@ -295,6 +295,8 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	let instance: SomeInstance
 
+	// NOTE that watching new files (untitled) is not supported by this is probably no issue...
+
 	if (isInCurrentWorkspace) {
 
 		let watcher: vscode.FileSystemWatcher | null = null

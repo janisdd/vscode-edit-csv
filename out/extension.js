@@ -230,6 +230,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
     //it does NOT work when the file is not in the workspace and we edit the file outside of vs code and the file is not visible in vs code (active)
     // const watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, true)
     let instance;
+    // NOTE that watching new files (untitled) is not supported by this is probably no issue...
     if (isInCurrentWorkspace) {
         let watcher = null;
         if (config.shouldWatchCsvSourceFile) {
