@@ -347,6 +347,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "true: show column names with letters e.g. A, B, ..., Z (like Excel), false: use numbers for column names e.g. 1, 2, ..."
+				},
+				"csv-edit.shouldWatchCsvSourceFile": {
+					"type": "boolean",
+					"default": true,
+					"description": "true: the source csv file is watched for changes. If changes happen the user is notified (maybe the table is automatically reloaded when the table has no changes). false: not watched the source csv file"
 				}
 			}
 		}
@@ -371,7 +376,7 @@
 		"@types/mousetrap": "^1.6.3",
 		"@types/node": "^8.10.25",
 		"@types/papaparse": "4.5.6",
-		"@types/vscode": "^1.48.0",
+		"@types/vscode": "^1.38.0",
 		"glob": "^7.1.6",
 		"mocha": "^8.1.1",
 		"tslint": "^5.8.0",

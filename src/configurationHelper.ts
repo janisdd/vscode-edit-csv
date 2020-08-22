@@ -32,6 +32,7 @@ const defaultConfig: CsvEditSettings = {
 	initiallyFixedColumnsLeft: 0,
 	fontSizeInPx: 16,
 	showColumnHeaderNamesWithLettersLikeExcel: false,
+	shouldWatchCsvSourceFile: true,
 }
 
 /**

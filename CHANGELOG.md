@@ -6,6 +6,7 @@
 
 - file watchers now work for all files (not only inside the current workspace)
 	- but the automatic file reload only for files inside the current workspace!!
+- added config option to disable source file watching
 
 ## 0.4.0
 

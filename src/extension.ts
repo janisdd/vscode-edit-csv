@@ -284,7 +284,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	//check if the file is in the current workspace
 	let isInCurrentWorkspace = activeTextEditor.document.uri.fsPath !== vscode.workspace.asRelativePath(activeTextEditor.document.uri.fsPath)
 
-	var conf = vscode.workspace.getConfiguration()
+	const config = getExtensionConfiguration()
 
 	//a file watcher works when the file is in the current workspace (folder) even if it's not opened
 	//it also works when we open any file (not in the workspace) and 
@@ -297,20 +297,24 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	if (isInCurrentWorkspace) {
 
-		//if the file is in the current workspace we the file model in vs code is always synced so is this (faster reads/cached)
-		const watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, true)
+		let watcher: vscode.FileSystemWatcher | null = null
 
-		//not needed because on apply changes we create a new file if this is needed
-		watcher.onDidChange((e) => {
-			if (instance.ignoreNextChangeEvent) {
-				instance.ignoreNextChangeEvent = false
-				debugLog(`source file changed: ${e.fsPath}, ignored`)
-				return
-			}
+		if (config.shouldWatchCsvSourceFile) {
+			//if the file is in the current workspace we the file model in vs code is always synced so is this (faster reads/cached)
+			watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, true)
 
-			debugLog(`source file changed: ${e.fsPath}`)
-			onSourceFileChanged(e.fsPath, instance)
-		})
+			//not needed because on apply changes we create a new file if this is needed
+			watcher.onDidChange((e) => {
+				if (instance.ignoreNextChangeEvent) {
+					instance.ignoreNextChangeEvent = false
+					debugLog(`source file changed: ${e.fsPath}, ignored`)
+					return
+				}
+
+				debugLog(`source file changed: ${e.fsPath}`)
+				onSourceFileChanged(e.fsPath, instance)
+			})
+		}
 
 		instance = {
 			kind: 'workspaceFile',
@@ -329,19 +333,23 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	} else {
 
-		//the problem with this is that it is faster than the file model (in vs code) can sync the file...
-		const watcher = chokidar.watch(activeTextEditor.document.fileName)
+		let watcher: chokidar.FSWatcher | null = null
 
-		watcher.on('change', (path) => {
+		if (config.shouldWatchCsvSourceFile) {
+			//the problem with this is that it is faster than the file model (in vs code) can sync the file...
+			watcher = chokidar.watch(activeTextEditor.document.fileName)
 
-			if (instance.ignoreNextChangeEvent) {
-				instance.ignoreNextChangeEvent = false
-				debugLog(`source file (external) changed: ${path}, ignored`)
-				return
-			}
-			debugLog(`source file (external) changed: ${path}`)
-			onSourceFileChanged(path, instance)
-		})
+			watcher.on('change', (path) => {
+
+				if (instance.ignoreNextChangeEvent) {
+					instance.ignoreNextChangeEvent = false
+					debugLog(`source file (external) changed: ${path}, ignored`)
+					return
+				}
+				debugLog(`source file (external) changed: ${path}`)
+				onSourceFileChanged(path, instance)
+			})
+		}
 
 		instance = {
 			kind: 'externalFile',
@@ -365,9 +373,9 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 		vscode.window.showErrorMessage(`Could not create an editor instance, error: ${error.message}`)
 
 		if (instance.kind === 'workspaceFile') {
-			instance.sourceFileWatcher.dispose()
+			instance.sourceFileWatcher?.dispose()
 		} else {
-			instance.sourceFileWatcher.close()
+			instance.sourceFileWatcher?.close()
 		}
 
 		return
@@ -376,7 +384,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	//just set the panel if we added the instance
 	instance.panel = panel
-	const config = getExtensionConfiguration()
+
 
 	panel.webview.onDidReceiveMessage((message: PostMessage) => {
 
@@ -520,9 +528,9 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 		try {
 
 			if (instance.kind === 'workspaceFile') {
-				instance.sourceFileWatcher.dispose()
+				instance.sourceFileWatcher?.dispose()
 			} else {
-				instance.sourceFileWatcher.close()
+				instance.sourceFileWatcher?.close()
 			}
 		} catch (error) {
 			vscode.window.showErrorMessage(`Could not dispose source file watcher for file ${instance.document.uri.fsPath}, error: ${error.message}`);
@@ -751,8 +759,9 @@ function setEditorHasChanges(instance: Instance, hasChanges: boolean) {
 function onSourceFileChanged(path: string, instance: Instance) {
 
 	if (!instance.supportsAutoReload) {
-		vscode.window.showWarningMessage(`The source file changed and it is not in the current workspace. Thus the content could not be automatically reloaded. Please open/display the file in vs code and switch back the to table. Then you need to manually reload the table with the reload button.`, {
-			modal: true
+		vscode.window.showWarningMessage(`The csv source file '${instance.document.fileName}' changed and it is not in the current workspace. Thus the content could not be automatically reloaded. Please open/display the file in vs code and switch back the to table. Then you need to manually reload the table with the reload button. Alternatively just close the table and reopen it.`, {
+			modal: false,
+
 		})
 		return
 	}

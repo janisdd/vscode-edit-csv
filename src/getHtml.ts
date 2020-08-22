@@ -210,7 +210,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 										</div>
 
 										<span id="source-file-unwatched-indicator" class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline" style="float: right;margin-right: 5px;"
-											data-tooltip="The source file cannot be automaically reloaded (because it's not in the current workpsace) if the file on disk changes. You will get notified if the file gets changed but then you need to open/display the file in vs code and manually refresh the table (refresh button).">
+											data-tooltip="The csv source file cannot be automaically reloaded (because it's not in the current workpsace) if the file on disk changes. You will get notified if the file gets changed but then you need to open/display the file in vs code and manually refresh the table (refresh button). Alternatively just close this table and reopen it.">
 											<i class="fas fa-eye"></i>
 										</span>
 										<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"

@@ -172,6 +172,11 @@ type CsvEditSettings = {
 	 * true: show column names with letters e.g. A, B, ..., Z (like Excel), false: use numbers for column names e.g. 1, 2, ...
 	 */
 	showColumnHeaderNamesWithLettersLikeExcel: boolean //we use the bloaty name because we want to find (via search) this with something like "excel" or "letters"
+
+	/**
+	 * true: the source csv file is watched for changes. If changes happen the user is notified (maybe the table is automatically reloaded when the table has no changes). false: not watched the source csv file
+	 */
+	shouldWatchCsvSourceFile: boolean
 }
 
 /* --- frontend settings --- */

@@ -32,6 +32,7 @@ const defaultConfig = {
     initiallyFixedColumnsLeft: 0,
     fontSizeInPx: 16,
     showColumnHeaderNamesWithLettersLikeExcel: false,
+    shouldWatchCsvSourceFile: true,
 };
 /**
  * returns the configuration for this extension

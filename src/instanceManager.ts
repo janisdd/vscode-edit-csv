@@ -52,7 +52,7 @@ export interface InstanceWorkspaceSourceFile extends Instance {
 	/**
 	* used to watch the source file and notify the extension view
 	*/
-	sourceFileWatcher: vscode.FileSystemWatcher
+	sourceFileWatcher: vscode.FileSystemWatcher | null
 }
 
 export interface InstanceExternalFile extends Instance {
@@ -61,7 +61,7 @@ export interface InstanceExternalFile extends Instance {
 	/**
  * used to watch the source file and notify the extension view
  */
-	sourceFileWatcher: chokidar.FSWatcher
+	sourceFileWatcher: chokidar.FSWatcher | null
 }
 
 export type SomeInstance = InstanceWorkspaceSourceFile | InstanceExternalFile
