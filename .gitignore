@@ -7,3 +7,4 @@ scripts.md
 backup
 *.vsix
 out/test
+cypress
