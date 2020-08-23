@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from "path";
 import { isCsvFile, getCurrentViewColumn, debugLog, partitionString } from './util';
 import { createEditorHtml } from './getHtml';
-import { InstanceManager, Instance, InstanceExternalFile, InstanceWorkspaceSourceFile, SomeInstance } from './instanceManager';
+import { InstanceManager, Instance, SomeInstance } from './instanceManager';
 import { getExtensionConfiguration } from './configurationHelper';
 import * as chokidar from "chokidar";
 
