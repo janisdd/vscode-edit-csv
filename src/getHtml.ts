@@ -35,7 +35,6 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	//we need to load the font manually because the url() seems to not work properly with vscode-resource
 	const iconFont = _getResourcePath('thirdParty/fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2')
 	let bulmaCss = _getResourcePath('thirdParty/bulma/bulma.min.css')
-	let bulmaExtensionCss = _getResourcePath('thirdParty/bulma-extensions/bulma-extensions.min.css')
 
 	const mainCss = _getResourcePath('csvEditorHtml/main.css')
 	const darkThemeCss = _getResourcePath('csvEditorHtml/dark.css')
@@ -300,7 +299,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 												<button class="button is-light" onclick="toggleAskReadAgainModal(true)">
 													<span>Reset data and apply read options</span>
 													<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
-														data-tooltip="The input file content was stored locally and used as data. Thus this view is independent of the source file">
+														data-tooltip="The input file content was stored locally and is used as data. Thus this view is independent of the source file">
 														<i class="fas fa-question-circle"></i>
 													</span>
 												</button>
@@ -387,7 +386,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 												<label for="comment-string-write">NewLine</label>
 												<div class="select">
 													<select id="newline-select-write" onchange="setNewLineWrite()">
-														<option value="">Same as input</option>
+														<option id="newline-same-as-input-option" value="">Same as input</option>
 														<option value="crlf">Windows (CRLF)</option>
 														<option value="lf">Linux/Mac (LF)</option>
 													</select>
@@ -425,7 +424,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 						<span>Add column</span>
 					</button>
 
-					<button class="button is-outlined mar-left" onclick="postApplyContent(true)">
+					<button id="btn-apply-changes-to-file-and-save" class="button is-outlined mar-left" onclick="postApplyContent(true)">
 						<span class="icon is-small">
 							<i class="fas fa-save"></i>
 						</span>
@@ -436,7 +435,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 						</span>
 					</button>
 
-					<button class="button is-outlined" onclick="postApplyContent(false)">
+					<button id="btn-apply-changes-to-file" class="button is-outlined" onclick="postApplyContent(false)">
 						<span class="icon is-small">
 							<i class="fas fa-reply"></i>
 						</span>
@@ -575,6 +574,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 						<li>If a row has more cell than the others empty cells are added to match the row with the highest cell
 							count</li>
 						<li>Extension configuration is only applied for new editors</li>
+						<li>You can delete multiple rows/cols by selecting them via shift and right click then remove</li>
 					</ul>
 				</div>
 
@@ -701,15 +701,10 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 		</style>
 
 		<link rel="stylesheet" href="${handsontableCss}">
-		<script src="${handsontableJs}"></script>
-		<script src="${papaparseJs}"></script>
-		<script src="${mousetrapJs}"></script>
-		<script src="${mousetrapBindGlobalJs}"></script>
 
 		<link rel="stylesheet" href="${fontAwesomeCss}">
 
 		<link rel="stylesheet" href="${bulmaCss}">
-		<link rel="stylesheet" href="${bulmaExtensionCss}">
 		<link rel="stylesheet" href="${mainCss}">
 		<link rel="stylesheet" href="${darkThemeCss}">
 		<link rel="stylesheet" href="${lightThemeCss}">
@@ -734,6 +729,11 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	var initialConfig = ${JSON.stringify(config)};
 	var initialVars = ${JSON.stringify(initialVars)};
 	</script>
+
+	<script src="${handsontableJs}"></script>
+	<script src="${papaparseJs}"></script>
+	<script src="${mousetrapJs}"></script>
+	<script src="${mousetrapBindGlobalJs}"></script>
 
 	 <script src="${progressJs}"></script>
 	 <script src="${findWidgetJs}"></script>

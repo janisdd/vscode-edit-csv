@@ -68,6 +68,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 
 	defaultCsvWriteOptions.delimiter = parseResult.meta.delimiter
 	newLineFromInput = parseResult.meta.linebreak
+	updateNewLineSelect()
 
 	readDelimiterTooltip.setAttribute('data-tooltip', `${readDelimiterTooltipText} (detected: ${defaultCsvWriteOptions.delimiter.replace("\t", "⇥")})`)
 
@@ -75,6 +76,13 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 		data: parseResult.data,
 		columnIsQuoted: (parseResult as any).columnIsQuoted
 	}
+}
+
+/*+
+* updates the new line select option (same as input) {@link newlineSameSsInputOption} from {@link newLineFromInput}
+*/
+function updateNewLineSelect() {
+	newlineSameSsInputOption.innerText = `${newlineSameSsInputOptionText} (${newLineFromInput === `\n` ? 'LF' : 'CRLF'})`
 }
 
 
@@ -308,6 +316,7 @@ function postCopyToClipboard(text: string) {
 
 	if (!vscode) {
 		console.log(`postCopyToClipboard (but in browser)`)
+		navigator.clipboard.writeText(text)
 		return
 	}
 

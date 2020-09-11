@@ -232,3 +232,7 @@ body.vscode-dark {
 	border-collapse: initial;
 	border-radius: 10px;
 }
+
+.vscode-dark a {
+	color: #5c9bff;
+}

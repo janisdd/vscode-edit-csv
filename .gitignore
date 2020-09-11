@@ -8,3 +8,5 @@ backup
 *.vsix
 out/test
 cypress
+csvEditorHtml/browser/dist
+csvEditorHtml/browser/imgs/private

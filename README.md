@@ -2,6 +2,10 @@
 
 This extensions allows you to edit csv files with an excel like table ui
 
+## Web version
+
+If you don't have vs code to hand, you can use the online version at https://edit-csv.net
+
 ## Features
 
 Execute the command `edit as csv` to open an editor for the current file.
@@ -14,7 +18,7 @@ Execute the command `edit as csv` to open an editor for the current file.
 
 ## ¡ Important Notes !
 
-- On initial load all rows are expanded so that all rows have equal length (number of cells (if necessary)
+- On initial load all rows are expanded so that all rows have equal length (number of cells (if necessary))
 	- if that happens you will see the `unsaved changes` indicator right from the start
 
 - enabling/disabling the `has header` read option will **clear the undo/redo stack!**

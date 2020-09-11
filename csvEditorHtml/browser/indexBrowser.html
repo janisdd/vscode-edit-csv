@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Edit csv</title>
+	<meta charset="UTF-8">
+	<meta name="description" content="Edit csv files online with a table ui">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+	<link rel="stylesheet" href="./cookies.css">
+	<link rel="stylesheet" href="../../thirdParty/handsontable/handsontable.min.css">
+
+	<link rel="preload" as="font" href="../../thirdParty/fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2"
+		data-path-keep-depth="1" crossorigin>
+	<link rel="preload" as="font" href="../../thirdParty/fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2"
+		data-path-keep-depth="1" crossorigin>
+
+	<link rel="preload" href="../../thirdParty/fortawesome/fontawesome-free/css/all.min.css" as="style"
+		onload="this.onload=null;this.rel='stylesheet'">
+	<noscript>
+		<link rel="stylesheet" href="../../thirdParty/fortawesome/fontawesome-free/css/all.min.css"></noscript>
+	<!-- <link rel="stylesheet" href="../../thirdParty/fortawesome/fontawesome-free/css/all.min.css"> -->
+
+	<!-- copy from node_modules -->
+	<link rel="preload" href="./third-party/sweetalert2/sweetalert2.min.css" as="style"
+		onload="this.onload=null;this.rel='stylesheet'">
+	<noscript>
+		<link rel="stylesheet" href="./third-party/sweetalert2/sweetalert2.min.css"></noscript>
+
+	<link id="sweetalert2-dark-theme-link" rel="stylesheet" href="./third-party/sweetalert2-themes/dark.min.css">
+	<!-- end copy from node_modules -->
+
+	<link rel="stylesheet" href="../../thirdParty/bulma/bulma.min.css">
+	<link rel="stylesheet" href="../main.css">
+	<link rel="stylesheet" href="../dark.css">
+	<link rel="stylesheet" href="../light.css">
+	<link rel="stylesheet" href="../high_contrast.css">
+	<link rel="stylesheet" href="../settingsOverwrite.css">
+	<link rel="stylesheet" href="./browser.css">
+	<script src="../out/browser/beforeDomLoaded.js"></script>
+
+	<script>
+		function gaOptout() {
+			var gaProperty = 'UA-177525551-1';
+			var disableStr = 'ga-disable-' + gaProperty;
+			document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+			window[disableStr] = true;
+			console.log(document.cookie);
+		}
+	</script>
+	<script src="../out/browser/cookies.js"></script>
+	
+	<script>
+		var gaProperty = 'UA-177525551-1';
+		var disableStr = 'ga-disable-' + gaProperty;
+		if (document.cookie.indexOf(disableStr + '=true') > -1) {
+			window[disableStr] = true;
+		}
+		function gaOptout() {
+			document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+			window[disableStr] = true;
+		}
+	</script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-177525551-1"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() { dataLayer.push(arguments); }
+		gtag('js', new Date());
+
+		gtag('config', 'UA-177525551-1', { 'anonymize_ip': true });
+	</script>
+	
+
+</head>
+
+<body class="vscode-dark vs-code-settings-font-size browser">
+
+	<div id="cookie-box-wrapper" class="cookie-box-wrapper">
+		<div class="cookie-box">
+
+			<div class="banner-content">
+				<span> This Website uses Cookies <i class="fas fa-cookie-bite"></i> (Google Analytics).
+					For more information see legal notice.</span>
+
+				<div class="multi-buttons">
+					<div id="toggleCookieDetails" class="as-button" style="margin-left: 1rem;" onclick="toggleDetails(true)">Show
+						details</div>
+					<div class="as-button" onclick="cookiesOk()">Ok</div>
+				</div>
+			</div>
+			<div class="details">
+				We use cookies to personalize content and ads, to provide social media features and to analyse our traffic.
+				We also share information about your use of our site with our social media, advertising and analytics partners
+				who
+				may combine it with other information that you've provided to them or that they've collected from your use of
+				their services.
+
+				<ul>
+					<li>To analyse traffic we use Google Analytics, to opt-out click <a href="javascript:gaOptout();">here</a>
+					</li>
+				</ul>
+
+			</div>
+		</div>
+	</div>
+
+	<div id="find-widget" class="find-widget" style="display: none; right: 100px;">
+
+		<div id="find-widget-progress-bar" class="progress-bar"></div>
+
+		<div class="gripper" onmousedown="findWidgetInstance.onFindWidgetGripperMouseDown(event)">
+			<i class="fas fa-grip-vertical"></i>
+		</div>
+
+		<div class="search-input-wrapper">
+			<input id="find-widget-input" placeholder="Find..." class="input" title="Enter to start search" />
+
+			<div id="find-widget-error-message" class="error-message">
+			</div>
+		</div>
+
+		<div class="info">
+			<span id="find-widget-start-search" class="clickable" style="margin-right: 7px;"
+				onclick="findWidgetInstance.refreshCurrentSearch()" title="Start search (Enter)">
+				<i class="fas fa-search"></i>
+			</span>
+			<span id="find-widget-info">0/0</span>
+			<span id="find-widget-cancel-search" title="Cancel search (Escape)" class="clickable"
+				onclick="findWidgetInstance.onCancelSearch()" style="display: none;">
+				<i class="fas fa-hand-paper"></i>
+			</span>
+			<span id="find-widget-outdated-search" class="outdated-search clickable" style="display: none;"
+				onclick="findWidgetInstance.refreshCurrentSearch()"
+				title="The table has changed, thus the search is outdated. Click to refresh the search.">
+				<i class="fas fa-exclamation-triangle"></i>
+			</span>
+		</div>
+
+		<div class="divider"></div>
+
+		<!-- search options -->
+		<div class="flexed">
+			<div id="find-window-option-match-case" class="btn option"
+				onclick="findWidgetInstance.toggleFindWindowOptionMatchCase()" title="Match Case">
+				<span>Aa</span>
+			</div>
+
+			<div id="find-window-option-whole-cell" class="btn option"
+				onclick="findWidgetInstance.toggleFindWindowOptionWholeCell()" title="Match Whole Cell Value">
+				<span style="text-decoration: underline overline;">Abl</span>
+			</div>
+
+			<div id="find-window-option-whole-cell-trimmed" class="btn option"
+				onclick="findWidgetInstance.toggleFindWindowOptionMatchTrimmedCell()"
+				title="Trims the cell value before comparing">
+				<span style="text-decoration: underline;">_A_</span>
+			</div>
+
+			<div id="find-window-option-regex" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionRegex()"
+				title="Use Regular Expression">
+				<span>
+					<i class="fas fa-square-full" style="font-size: 5px;"></i>
+					<i class="fas fa-asterisk" style="vertical-align: top; font-size: 8px; margin-top: 3px;"></i>
+				</span>
+			</div>
+		</div>
+
+		<div class="divider"></div>
+
+		<!-- search navigation buttons-->
+		<div class="flexed" style="margin-right: 5px;">
+			<div id="find-widget-previous" class="btn" onclick="findWidgetInstance.gotoPreviousFindMatch()"
+				title="Previous match (⇧F3)">
+				<i class="fas fa-chevron-up"></i>
+			</div>
+
+			<div id="find-widget-next" class=" btn" onclick="findWidgetInstance.gotoNextFindMatch()" title="Next match (F3)">
+				<i class="fas fa-chevron-down"></i>
+			</div>
+
+			<div class="btn" onclick="findWidgetInstance.showOrHideWidget(false)" title="Close (Escape)">
+				<i class="fas fa-times"></i>
+			</div>
+		</div>
+
+	</div>
+
+	<div id="site-header-bar">
+
+		<div>
+			<!-- <i class="fas fa-pen" style="margin-right: 0.5rem;"></i> -->
+			<!-- LOGO -->
+			<span>Edit csv</span>
+		</div>
+
+		<div class="right-area ">
+
+			<div class="clickable" style="margin-right: 1rem;" onclick="toggleTheme()">
+				<i class="fas fa-adjust"></i>
+				<span>Toggle Theme</span>
+				<!-- <i class="far fa-moon"></i>
+				<i class="far fa-sun"></i> -->
+			</div>
+
+			<div style="margin-right: 1rem;" class="clickable" onclick="toggleChangelogModal(true)">
+				v1.0.0
+			</div>
+
+			<div style="margin-right: 1rem;">
+				<a href="./legalNotice.html" target="_blank">
+					Legal Notice
+				</a>
+			</div>
+
+			<div style="margin-right: 1rem;">
+				<a href="./privacy.html" target="_blank">
+					Privacy Policy
+				</a>
+			</div>
+
+			<div>
+				<a href="https://github.com/janisdd/vscode-edit-csv" target="_blank">
+					<span>Sources</span>
+					<img src="imgs/GitHub-Mark-32px.png" alt="Github logo" style="height: 21px; vertical-align: middle;">
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="page full-h">
+
+		<div class="all-options">
+
+			<table>
+				<thead>
+					<tr>
+						<th>
+							<div class="options-title clickable" onclick="toggleOptionsBar()">
+								<span>
+									<i id="options-bar-icon" class="fas fa-chevron-right"></i> Read options
+								</span>
+							</div>
+						</th>
+						<th>
+							<div class="options-title clickable" onclick="toggleOptionsBar()">
+								Write options
+							</div>
+						</th>
+						<th style="width: 100%;">
+							<div class="options-title">
+								<span class="clickable" onclick="toggleOptionsBar()">Preview</span>
+
+								<span class="mar-left-half clickable" onclick="generateCsvPreview()" title="Refresh the preview">
+									<i class="fas fa-redo-alt"></i>
+								</span>
+
+								<!-- no css tooltip because we want a delay-->
+								<span class="mar-left-half clickable" onclick="copyPreviewToClipboard()"
+									title="Creates the preview and copies it to the clipboard">
+									<i id="preview-copy-icon" class="fas fa-paste"></i>
+								</span>
+
+								<span class="mar-left-half clickable" onclick="reRenderTable()" style="margin-left: 2em;"
+									title="Redraws the table. This can fix some measuring issues (e.g. after the font size changed)">
+									<i id="re-render-table-icon" class="fas fa-ruler-combined"></i>
+								</span>
+
+								<span id="reload-file" class="clickable" onclick="preReloadFileFromDisk()" style="margin-left: 2em;"
+									title="Reload the csv file content (from disk)">
+									<i class="fas fa-sync-alt"></i>
+								</span>
+
+								<!-- fixed rows top -->
+								<div class="flexed changeable-indicator" style="margin-left: 2em;">
+									<div>
+										<span id="fixed-rows-icon" class="clickable" title="Set fixed rows top"
+											onclick="_toggleFixedRowsText()">
+											<i class="rotated-90deg fas fa-align-left"></i>
+										</span>
+										<span id="fixed-rows-text" style="margin-left: 0.5rem;" class="dis-hidden">fixed rows:</span>
+									</div>
+									<div id="fixed-rows-top-info" class="text" style="margin-left: 0.5rem;">0</div>
+									<div class="changeable" style="margin-left: 0.5rem;">
+										<span class="clickable" onclick="incFixedRowsTop()"><i class="fas fa-chevron-up"></i></span>
+										<span class="clickable" onclick="decFixedRowsTop()"><i class="fas fa-chevron-down"></i></span>
+									</div>
+								</div>
+								<!-- fixed columns left -->
+								<div class="flexed changeable-indicator" style="margin-left: 1em;">
+									<div>
+										<span id="fixed-columns-icon" class="clickable" title="Set fixed columns left"
+											onclick="_toggleFixedColumnsText()">
+											<i class="fas fa-align-left"></i>
+										</span>
+										<span id="fixed-columns-text" style="margin-left: 0.5rem;" class="dis-hidden">fixed columns:</span>
+									</div>
+									<div id="fixed-columns-top-info" class="text" style="margin-left: 0.5rem;">0</div>
+									<div class="changeable" style="margin-left: 0.5rem;">
+										<span class="clickable" onclick="incFixedColsLeft()"><i class="fas fa-chevron-up"></i></span>
+										<span class="clickable" onclick="decFixedColsLeft()"><i class="fas fa-chevron-down"></i></span>
+									</div>
+								</div>
+
+								<span class="clickable" style="margin-left: 1em;">
+									<input id="csv-file-input" type="file" name="file" class="file-input" />
+									<label for="csv-file-input"><i class="fas fa-upload"></i> Open a file or drop...</label>
+								</span>
+
+
+								<span id="source-file-unwatched-indicator"
+									class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline"
+									style="float: right;margin-right: 5px;"
+									data-tooltip="The csv source file cannot be automaically reloaded (because it's not in the current workpsace) if the file on disk changes. You will get notified if the file gets changed but then you need to open/display the file in vs code and manually refresh the table (refresh button). Alternatively just close this table and reopen it.">
+									<i class="fas fa-eye"></i>
+								</span>
+								<span id="unsaved-changes-indicator"
+									class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left"
+									style="float: right;margin-right: 5px;" data-tooltip="You might have unsaved changes">
+									<i class="fas fa-save"></i>
+								</span>
+							</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<div id="read-options-content" class="options-content">
+								<div>
+									<div class="field same-line">
+										<label>Encoding</label>
+										<div class="select">
+											<select id="read-option-encoding">
+												<option id="read-option-encoding-auto" value="auto">Auto detect</option>
+												<!-- options will be auto inserted here -->
+											</select>
+										</div>
+									</div>
+
+									<div class="field">
+										<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked"
+											onchange="applyHasHeader(true, false)">
+										<label for="has-header">
+											<span>Has header</span>
+										</label>
+										<span class="tooltip is-tooltip-right is-tooltip-multiline"
+											data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack!">
+											<i class="fas fa-question-circle"></i>
+										</span>
+									</div>
+
+									<!-- this makes the row data invalid if we have more than 1 col-->
+									<!-- <div class="field">
+													<input id="skip-empty-lines" type="checkbox" name="skip-empty-lines" class="switch is-rounded" checked="checked" onchange="setSkipEmptyLines()" disabled>
+													<label for="skip-empty-lines">
+														<span>Skip empty lines</span>
+														<span class="tooltip is-tooltip-multiline" data-tooltip="If enabled empty lines will be used as row. Disabled because empty rows are invalid if we have more than 1 column.">
+																<i class="fas fa-question-circle"></i>
+														</span>
+													</label>
+											</div> -->
+
+									<!-- delimiter and comment -->
+									<div class="flexed">
+										<div class="field">
+											<label>
+												<span>Delimiter</span>
+												<span class="clickable tooltip" data-tooltip="Set to tab character"
+													onclick="setReadDelimiter('\t')">⇥</span>
+												<span id="read-delimiter-tooltip" class="tooltip" data-tooltip="Empty to auto detect">
+													<i class="fas fa-question-circle"></i>
+												</span>
+											</label>
+											<input id="delimiter-string" class="input" type="text" placeholder="auto"
+												oninput="setDelimiterString()">
+										</div>
+
+										<div class="field mar-left">
+											<label>
+												<span>Comment</span>
+												<span class="tooltip is-tooltip-multiline"
+													data-tooltip="Comments before and after csv data are preserved. Comments between data rows are ignored. Empty to treat every line as data (no comments).">
+													<i class="fas fa-question-circle"></i>
+												</span>
+											</label>
+											<input id="comment-string" class="input" type="text" placeholder="Empty for no comments"
+												oninput="setCommentString()">
+										</div>
+									</div>
+
+									<!-- quote and escape -->
+									<div class="flexed">
+										<div class="field">
+											<label>
+												<span>QuoteChar</span>
+											</label>
+											<input id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()">
+										</div>
+
+										<div class="field mar-left">
+											<label>
+												<span>EscapeChar</span>
+											</label>
+											<input id="escape-char-string" class="input" type="text" oninput="setEscapeCharString()">
+										</div>
+									</div>
+
+
+									<button class="button is-light" onclick="toggleAskReadAgainModal(true)">
+										<span>Reset data and apply read options</span>
+										<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
+											data-tooltip="The input file content was stored locally and is used as data.">
+											<i class="fas fa-question-circle"></i>
+										</span>
+									</button>
+
+								</div>
+							</div>
+						</td>
+						<td>
+							<div id="write-options-content" class="options-content">
+
+								<div class="field same-line">
+									<label>Encoding</label>
+									<div class="select">
+										<select id="write-option-encoding">
+											<option value="auto">Same as read</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="field">
+									<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded"
+										checked="checked" onchange="setHasHeaderWrite()">
+									<label for="has-header-write">
+										<span>Write header</span>
+									</label>
+									<span class="tooltip is-tooltip-bottom" data-tooltip="Checked: writes the header row, unchecked: not">
+										<i class="fas fa-question-circle"></i>
+									</span>
+								</div>
+
+								<!-- delimiter and comment -->
+								<div class="flexed">
+									<div class="field">
+										<label for="delimiter-string-write">
+											<label>
+												<span>Delimiter</span>
+												<span class="clickable tooltip" data-tooltip="Set to tab character"
+													onclick="setWriteDelimiter('\t')">⇥</span>
+												<span class="tooltip" data-tooltip="Empty to use delimiter from read">
+													<i class="fas fa-question-circle"></i>
+												</span>
+											</label>
+										</label>
+										<input id="delimiter-string-write" class="input" type="text" placeholder="auto"
+											oninput="setDelimiterStringWrite()">
+									</div>
+
+									<div class="field mar-left">
+										<label for="comment-string-write">
+											<label>
+												<span>Comment</span>
+												<span class="tooltip is-tooltip-multiline"
+													data-tooltip="Empty for no comments. Comments before and after csv data are written if char is present. Empty to exclude comments.">
+													<i class="fas fa-question-circle"></i>
+												</span>
+											</label>
+										</label>
+										<input id="comment-string-write" class="input" type="text" placeholder="Empty for no comments"
+											oninput="setCommentStringWrite()">
+									</div>
+								</div>
+
+								<!-- quote and escape -->
+								<div class="flexed">
+									<div class="field">
+										<label>
+											<span>QuoteChar</span>
+										</label>
+										<input id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()">
+									</div>
+
+									<div class="field mar-left">
+										<label>
+											<span>EscapeChar</span>
+										</label>
+										<input id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()">
+									</div>
+								</div>
+
+								<div class="flexed">
+
+									<div class="field" style="margin-bottom: .75rem;">
+										<input id="quote-all-fields-write" type="checkbox" name="quote-all-fields-write"
+											class="switch is-rounded" checked="checked" onchange="setQuoteAllFieldsWrite()">
+										<label for="quote-all-fields-write">
+											<span>Quote all fields</span>
+										</label>
+									</div>
+
+								</div>
+
+								<!-- see help modal why -->
+								<div class="field same-line">
+									<label for="comment-string-write" title="End of line terminator">EOL</label>
+									<div class="select">
+										<select id="newline-select-write" onchange="setNewLineWrite()">
+											<option id="newline-same-as-input-option" value="">Same as input</option>
+											<option value="lf">Linux/Mac (LF)</option>
+											<option value="crlf">Windows (CRLF)</option>
+										</select>
+									</div>
+								</div>
+
+							</div>
+						</td>
+						<td>
+							<div id="preview-content" class="options-content">
+								<textarea id="csv-preview" class="textarea preview-csv-textarea" rows="11"></textarea>
+							</div>
+						</td>
+					</tr>
+
+				</tbody>
+			</table>
+
+		</div>
+
+		<div class="table-action-buttons">
+
+			<div class="separated-btns">
+				<button class="button is-outlined" onclick="addRow()">
+					<span class="icon is-small">
+						<i class="fas fa-plus"></i>
+					</span>
+					<span>Add row</span>
+				</button>
+
+				<button class="button is-outlined" onclick="addColumn()">
+					<span class="icon is-small">
+						<i class="fas fa-plus"></i>
+					</span>
+					<span>Add column</span>
+				</button>
+
+				<button id="btn-apply-changes-to-file-and-save" class="button is-outlined mar-left" onclick="downloadAsFile()">
+					<span class="icon is-small">
+						<i class="fas fa-save"></i>
+					</span>
+					<span>Download file</span>
+					<span class="tooltip is-tooltip-multiline mar-left-half"
+						data-tooltip="Downloads the current state of the table as csv file [ctrl+s/cmd+s]">
+						<i class="fas fa-question-circle"></i>
+					</span>
+				</button>
+
+				<div id="status-info-wrapper">
+					<div>
+						<span id="status-info"></span>
+					</div>
+				</div>
+
+				<div class="flexed">
+
+					<div>
+						<button id="show-comments-btn" style="margin-right: 1em" class="button is-outlined"
+							onclick="showOrHideAllComments(true)">
+							<span class="icon is-small">
+								<i class="far fa-comments"></i>
+							</span>
+							<span>Show comments</span>
+						</button>
+						<button id="hide-comments-btn" style="margin-right: 1em" class="button is-outlined"
+							onclick="showOrHideAllComments(false)">
+							<span class="icon is-small">
+								<i class="fas fa-comments"></i>
+							</span>
+							<span>Hide comments</span>
+							<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
+								data-tooltip="Hides rows starting with a comment. The row headers will display an indicator if a row above or below is hidden. Hidden rows are also exported!">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</button>
+					</div>
+
+					<button style="margin-right: 1em" class="button is-outlined" onclick="trimAllCells()">
+						<span class="icon is-small">
+							<i class="fas fa-hand-scissors"></i>
+						</span>
+						<span>Trim</span>
+						<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
+							data-tooltip="Trims every cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo stack!">
+							<i class="fas fa-question-circle"></i>
+						</span>
+					</button>
+
+					<button class="button is-outlined" onclick="toggleHelpModal(true)">
+						<span class="icon is-small">
+							<i class="fas fa-question"></i>
+						</span>
+						<span>Help</span>
+					</button>
+				</div>
+
+			</div>
+			<div id="received-csv-prog-bar-wrapper">
+				<progress id="received-csv-prog-bar" class="progress is-info" value="50" max="100"></progress>
+			</div>
+		</div>
+
+
+
+		<!-- main editor/grid area -->
+		<div class="side-paneled">
+			<div class="side-panel">
+
+				<div class="stat">
+					<div>Selected rows
+						<span class="tooltip is-tooltip-right" data-tooltip="The selected rows count">
+							<i class="far fa-question-circle"></i>
+						</span>
+					</div>
+
+					<div id="stat-selected-rows">000</div>
+				</div>
+
+				<div class="stat">
+					<div>Selected cols
+						<span class="tooltip is-tooltip-right" data-tooltip="The selected columns count">
+							<i class="far fa-question-circle"></i>
+						</span>
+					</div>
+					<div id="stat-selected-cols">000</div>
+				</div>
+
+				<div class="stat">
+					<div>Selected cells
+						<span class="tooltip is-tooltip-right" data-tooltip="The number of selected cells">
+							<i class="far fa-question-circle"></i>
+						</span>
+					</div>
+					<div id="stat-selected-cells-count">000</div>
+				</div>
+
+				<div class="sub-stat">
+					<div>Not empty
+						<span class="tooltip is-tooltip-right" data-tooltip="The selected cells count where the value is not empty">
+							<i class="far fa-question-circle"></i>
+						</span>
+					</div>
+					<div id="stat-selected-not-empty-cells">000</div>
+				</div>
+
+				<div class="stat">
+					<div>Numbers sum
+						<span class="tooltip is-tooltip-right is-tooltip-multiline"
+							data-tooltip="The sum of numbers in the selected cells. Only the first number of a cell is used (first that matches /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/). Arbitrary-precision is powered by big.js">
+							<i class="far fa-question-circle"></i>
+						</span>
+					</div>
+					<div id="stat-sum-of-numbers">000</div>
+				</div>
+
+				<div class="stat divider"></div>
+
+				<div class="stat">
+					<div>Rows count</div>
+					<div id="stat-rows-count">000</div>
+				</div>
+
+				<div class="stat">
+					<div>Cols count</div>
+					<div id="stat-cols-count">000</div>
+				</div>
+
+				<div class="stat divider"></div>
+
+				<div>
+					<div style="border: 1px solid black; height: 300px;">
+						AD HERE
+					</div>
+				</div>
+
+			</div>
+
+			<div id="csv-editor-wrapper" class="csv-editor-wrapper">
+				<div id="csv-editor">No data present. Please <b>enable JavaScript</b> for this site</div>
+			</div>
+
+		</div>
+
+
+	</div>
+
+	<div id="help-modal" class="modal">
+		<div class="modal-background" onclick="toggleHelpModal(false)"></div>
+		<div class="modal-content">
+			<div class="box">
+
+				<h3 class="title is-3">Important Notes</h3>
+				<div class="content">
+					<ul>
+						<li>Note that the default write encoding is <b>UTF-8!</b></li>
+						<li>Empty lines are skipped!</li>
+						<li>On initial load all rows are expanded so that all rows have equal length (number of cells (if
+							necessary)) [might trigger change detection]</li>
+						<li>The files are not uploaded to any server. They are only processed in the browser (thus the bad
+							performance for large files)</li>
+						<li><b>I found a bug, what should I do?</b> Please click on "Sources" which will get you to the github
+							repository. There you can create an issue</li>
+					</ul>
+				</div>
+
+				<h3 class="title is-3">Features/Shortcuts</h3>
+				<div class="content">
+					<ul>
+						<li>Undo/Redo</li>
+						<li>Click on column header text to sort</li>
+						<li>Click left next to the row/column header text to select then drag to rearrange</li>
+						<li>Resize row/column</li>
+						<li>
+							<div class="keys">Home</div> to move to the first cell in a row
+						</li>
+						<li>
+							<div class="keys">End</div> to move to the last cell in a row
+						</li>
+
+						<li>
+							<div class="keys">Ctrl</div>+<div class="keys">Home</div> to move to the first cell in a column
+						</li>
+						<li>
+							<div class="keys">Ctrl</div>+<div class="keys">End</div> to move to the last cell in a column
+						</li>
+						<li>
+							<div class="keys">Esc</div> to cancel editing and close cell editor
+						</li>
+						<li>
+							<div class="keys">Ctrl</div>+<div class="keys">Enter</div> to add a line break in a cell
+						</li>
+
+						<li>To delete a row/column hover over it and click the trash-icon</li>
+
+						<li>Double click on a column resize handle to fit content, double click on an auto sized column to set width
+							to
+							200px (good for very wide columns)</li>
+
+					</ul>
+
+					For a full list of shortcuts see <a target="_blank"
+						href="https://handsontable.com/docs/6.2.2/tutorial-keyboard-navigation.html">https://handsontable.com/docs/6.2.2/tutorial-keyboard-navigation.html</a>
+				</div>
+
+				<h3 class="title is-3">Hints</h3>
+				<div class="content">
+					<ul>
+						<li>The unsaved changes indicator is display on any change (never cleared until you apply the changes, even
+							if you revert manually)</li>
+						<li>When you see the unsaved changes indicator right after the table was loaded then some rows were expanded
+							(to ensure all rows have the same length)</li>
+						<li>You can right-click on the table to get a context menu</li>
+						<li>Hidden rows are also exported</li>
+						<li>Comment rows will export only the first cell/column. If you use a cell other than the first for comments
+							the cell color will indicate this. </li>
+						<li>Sorting state is exported</li>
+						<li>All cell values are strings thus sorting might behave differently than expected</li>
+						<li>Copy & Past use tab (<div class="keys">⇥</div>) as separator (same as excel)</li>
+						<li>If a row has more cell than the others empty cells are added to match the row with the highest cell
+							count</li>
+						<li>You can delete multiple rows/cols by selecting them via shift and right click then remove</li>
+					</ul>
+				</div>
+
+
+			</div>
+		</div>
+		<button class="modal-close is-large" aria-label="close" onclick="toggleHelpModal(false)"></button>
+	</div>
+
+	<div id="ask-read-again-modal" class="modal modal-centered">
+		<div class="modal-background"></div>
+		<div class="modal-content">
+			<div class="box">
+				<h3 class="title is-3">Reset data and apply read options</h3>
+
+				<p>
+					Are you sure you want to overwrite the table with the initial content of the file? <br />
+					This will use the initial data (when you opened the csv file) and discard all changes applied to the table!
+					<br />
+					The read options will be applied.
+				</p>
+
+				<div style="margin-top: 1em">
+					<!-- changed handler -->
+					<button class="button is-warning" onclick="resetDataFromResetDialogWithEncoding()">
+						<span>Reset</span>
+					</button>
+
+					<button style="margin-left: 0.5em" class="button is-outlined" onclick="toggleAskReadAgainModal(false)">
+						<span>Cancel</span>
+					</button>
+				</div>
+
+			</div>
+		</div>
+		<button class="modal-close is-large" aria-label="close" onclick="toggleAskReadAgainModal(false)"></button>
+	</div>
+
+	<div id="ask-reload-file-modal" class="modal modal-centered">
+		<div class="modal-background"></div>
+		<div class="modal-content">
+			<div class="box">
+				<h3 class="title is-3">Reload file content and discard changes</h3>
+
+				<p>
+					Are you sure you want to read the source file again? <br />
+					All changes to the table will be discarded! <br />
+					<br />
+					<i>This will also update the snapshot of the file that is used for the reset data feature.</i>
+				</p>
+
+				<div style="margin-top: 1em">
+					<button class="button is-warning" onclick="reloadFileFromDisk()">
+						<span>Reload</span>
+					</button>
+
+					<button style="margin-left: 0.5em" class="button is-outlined" onclick="toggleAskReloadFileModalDiv(false)">
+						<span>Cancel</span>
+					</button>
+				</div>
+
+			</div>
+		</div>
+		<button class="modal-close is-large" aria-label="close" onclick="toggleAskReloadFileModalDiv(false)"></button>
+	</div>
+
+	<div id="source-file-changed-modal" class="modal modal-centered">
+		<div class="modal-background"></div>
+		<div class="modal-content">
+			<div class="box">
+				<h3 class="title is-3">Source file changed</h3>
+
+				<p>
+					The source file changed, thus the tabel is not up-to-date. <br />
+					You can reload the file content which will discard all changes to the table! <br /><br />
+					Or you can ignore the changes. <br />
+					<br />
+					<i>This will also update the snapshot of the file that is used for the reset data feature.</i>
+				</p>
+
+				<div style="margin-top: 1em">
+					<button class="button is-warning" onclick="reloadFileFromDisk()">
+						<span>Reload</span>
+					</button>
+
+					<button style="margin-left: 0.5em" class="button is-outlined"
+						onclick="toggleSourceFileChangedModalDiv(false)">
+						<span>Ignore</span>
+					</button>
+				</div>
+
+			</div>
+		</div>
+		<button class="modal-close is-large" aria-label="close" onclick="toggleSourceFileChangedModalDiv(false)"></button>
+	</div>
+
+	<div id="changelog-modal" class="modal modal-centered">
+		<div class="modal-background" onclick="toggleChangelogModal(false)"></div>
+		<div class="modal-card">
+			<header class="modal-card-head">
+				<p class="modal-card-title">Changelog</p>
+				<button class="delete" aria-label="close" onclick="toggleChangelogModal(false)"></button>
+			</header>
+			<section class="modal-card-body">
+				<ul>
+					<li class="new-version">v1.0.0</li>
+					<li>Initial release</li>
+				</ul>
+			</section>
+			<footer class="modal-card-foot">
+				<button class="button is-outlined" onclick="toggleChangelogModal(false)">Close</button>
+			</footer>
+		</div>
+	</div>
+
+	<div id="drop-file-overlay" class="op-hidden">
+		<div id="drop-zone" class="">
+			<div>
+				<p><i class="fas fa-upload" style="margin-right: 1rem;"></i> Drop file to open</p>
+			</div>
+		</div>
+	</div>
+
+
+	<script src="../out/browser/afterDomLoaded.js"></script>
+	<script src="../../thirdParty/handsontable/handsontable.min.js"></script>
+	<script src="../../thirdParty/papaparse/papaparse.min.js"></script>
+	<script src="../../thirdParty/mousetrap/mousetrap.min.js"></script>
+	<script src="../../thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js"></script>
+
+
+	<script src="./third-party/parcel-iconv-chardet.js"></script>
+	<!-- copy from node_modules -->
+	<script src="./third-party/sweetalert2//sweetalert2.min.js"></script>
+	<script src="./third-party/bulma-toast/bulma-toast.min.js"></script>
+	<script src="./third-party/big.js/big.min.js"></script>
+	<!-- end copy from node_modules -->
+	<script src="../out/progressbar.js"></script>
+	<script src="../out/findWidget.js"></script>
+	<script src="../out/io.js"></script>
+	<script src="../out/ui.js"></script>
+	<script src="../out/util.js"></script>
+	<script src="../out/main.js"></script>
+	<script src="../out/browser/browser.js"></script>
+
+
+</body>
+
+</html>

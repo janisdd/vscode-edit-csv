@@ -2,11 +2,17 @@
 
 ## [Unreleased]
 
+## 0.4.2
+
+- fixed issue where the background color was not in sync with the editor color theme
+- added online version of the plugin
+- fixed issue on windows where the cells had a red outline instead of a blue one
+
 ## 0.4.1
 
 - file watchers now work for all files (not only inside the current workspace)
 	- but the automatic file reload only for files inside the current workspace!!
-- added config option to disable source file watching `shouldWatchCsvSourceFile`
+- added config option to disable source file watching
 - help modal can finally be closed by clicking on the background
 
 ## 0.4.0

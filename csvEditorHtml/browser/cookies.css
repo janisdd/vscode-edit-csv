@@ -1,0 +1,68 @@
+html {
+	--cookie-box-display: inline-table;
+}
+/* see https://stackoverflow.com/questions/1776915/how-can-i-center-an-absolutely-positioned-element-in-a-div */
+.cookie-box-wrapper {
+	position: absolute;
+	top: 0;
+	left: 50%;
+	transform: translate(-50%, 0);
+	z-index: 2000;
+	display: var(--cookie-box-display);
+	color: #d0d0d0;
+	max-width: 820px;
+}
+
+.cookie-box {
+	position: relative;
+	top: 0;
+	/* left: -50%; */
+	background-color: rgb(61, 61, 61);
+	display: inline-flex;
+	flex-direction: column;
+	/* border: 1px solid black; */
+	box-shadow: 4px 3px 7px -1px rgb(29 29 29 / 83%);
+	padding: 5px 10px;
+}
+
+
+.cookie-box .banner-content {
+	display: inline-flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.cookie-box ul {
+	list-style: revert;
+	padding: revert;
+}
+
+.cookie-box .multi-buttons {
+	display: inline-flex;
+	margin: -5px -10px -5px 0;
+}
+
+.cookie-box .multi-buttons .as-button:nth-child(1) {
+	border-right: 1px solid #b5b5b5;
+}
+
+.cookie-box .as-button {
+	padding: 0 10px;
+	background-color: rgb(2, 120, 255);
+	cursor: pointer;
+	/* border: 1px solid #929292; */
+	display: flex;
+	align-items: center;
+	user-select: none;
+}
+
+.cookie-box .as-button:hover {
+	background-color: rgb(2, 94, 199);
+	cursor: pointer;
+}
+
+.cookie-box .details {
+	display: none;
+	margin-top: 1rem;
+	padding: 0 1rem 1rem 1rem;
+}

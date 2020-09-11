@@ -13,6 +13,7 @@ vsc-extension-quickstart.md
 TODO.md
 node_modules/@types
 backup
+images/**
 scripts.md
 thirdParty/info.md
 thirdParty/bulma/bulma.css
@@ -26,3 +27,7 @@ thirdParty/mousetrap/plugins/global-bind/README.md
 thirdParty/papaparse/papaparse.js
 promtUploadbuild.js
 cypress
+csvEditorHtml/browser/**
+csvEditorHtml/out/browser/**
+# not used anymore but we might need to copy certain rules...
+thirdParty/bulma-extensions/**

@@ -1,0 +1,200 @@
+html {
+	--extension-font-size    : 16px;
+	--vscode-editor-font-size: 16px;
+	--theme-bg-color: #003b49;
+
+	overflow-y: auto;
+}
+
+body.vscode-dark {
+	background-color: var(--theme-bg-color);
+}
+
+body.vscode-light {
+	background-color: var(--theme-bg-color);
+}
+
+.page.full-h {
+	height: calc(100% - 30px);
+}
+
+#site-header-bar {
+	height: 30px;
+	max-height: 30px;
+	padding: 3px 10px;
+
+	display: flex;
+	justify-content: space-between;
+}
+
+.vscode-dark #site-header-bar {
+	background-color: #2d3536;
+	border-bottom: 1px solid #8e8e8e;
+}
+
+.vscode-light #site-header-bar {
+	background-color: #f7f7f7;
+	border-bottom: 1px solid #8e8e8e;
+}
+
+
+#site-header-bar .right-area {
+	display: flex;
+}
+
+
+#read-options-content,
+#write-options-content,
+#preview-content {
+	display: none;
+}
+
+#source-file-unwatched-indicator,
+#reload-file,
+#btn-apply-changes-to-file,
+#received-csv-prog-bar-wrapper {
+	display: none;
+}
+
+
+
+/* see http://tympanus.net/codrops/2015/09/15/styling-customizing-file-inputs-smart-way/ */
+.options-title .changeable-indicator .changeable span {
+	font-size: calc(var(--vscode-editor-font-size) - 6px);
+}
+
+.file-input {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
+
+.file-input + label {
+	display: inline-block;
+	cursor: pointer;
+}
+
+.file-input:focus + label,
+.file-input + label:hover {
+}
+
+/* file drop style */
+#csv-file-drop-area {
+	border: 2px dashed #ccc;
+  border-radius: 20px;
+  width: 480px;
+  font-family: sans-serif;
+  margin: 100px auto;
+  padding: 20px;
+}
+
+#drop-file-overlay {
+	z-index: 1000;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	opacity: 0.8;
+	background-color: black;
+	padding: 1rem;
+	pointer-events: none;
+}
+
+#drop-zone {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 10px;
+	border: 5px dashed #ccc;
+	color: white;
+	font-size: 2em;
+	pointer-events: none;
+}
+
+#drop-zone.active {
+	border: 5px dashed rgb(67 202 67);
+	color: rgb(67 202 67);
+}
+
+.side-paneled {
+	display: flex;
+	flex: 1;
+	overflow: hidden;
+}
+
+.side-paneled .side-panel {
+	padding: 5px 5px 5px 0; /* body padding -> use 0 */
+	/* border-left: 1px solid #8e8e8e; */
+	border-right: 1px solid #8e8e8e;
+	
+	width: 155px;
+}
+
+.side-panel .stat {
+	padding-bottom: 3px;
+}
+
+.side-panel .stat div:nth-child(2) {
+	padding-left: 1rem;
+	word-break: break-all;
+}
+
+.side-panel .sub-stat {
+	padding-bottom: 3px;
+	padding-left: 1rem;
+}
+
+.side-panel .sub-stat div:nth-child(2) {
+	padding-left: 1rem;
+}
+
+
+.side-panel .stat.divider {
+	border-bottom: 1px solid #8e8e8e52;
+	margin-bottom: 3px;
+}
+
+.browser .csv-editor-wrapper {
+	
+}
+
+
+
+.vscode-light .notification {
+	box-shadow: 4px 3px 7px 0px rgb(191 191 191 / 75%);
+}
+.vscode-dark .notification {
+	background-color: #404040;
+	color: #d0d0d0;
+	box-shadow: 4px 3px 7px 0px rgb(0 0 0 / 75%)
+}
+
+
+/* scrolling modal */
+.vscode-dark .modal .modal-card .modal-card-head,
+.vscode-dark .modal .modal-card .modal-card-foot {
+	background-color: #353535;
+	color: #d0d0d0;
+}
+
+.vscode-dark .modal .modal-card .modal-card-head .modal-card-title{ 
+	color: #fdfdfd;
+}
+
+.vscode-dark .modal .modal-card .modal-card-body {
+	background-color: #404040;
+	color: #d0d0d0;
+}
+
+li.new-version {
+	border-bottom: 1px solid #8e8e8e;
+	font-size: 1.5rem;
+	margin-bottom: 0.5rem;
+	padding-top: 1rem;
+}

@@ -2,18 +2,12 @@
 <html>
 
 <head>
-	<title>Csv editor</title>
+	<title>Edit csv</title>
 	<link rel="stylesheet" href="../thirdParty/handsontable/handsontable.css">
-	<script src="../thirdParty/handsontable/handsontable.js"></script>
-	<script src="../thirdParty/papaparse/papaparse.min.js"></script>
-
-	<script src="../thirdParty/mousetrap/mousetrap.min.js"></script>
-	<script src="../thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js"></script>
 
 	<link rel="stylesheet" href="../thirdParty/fortawesome/fontawesome-free/css/all.min.css">
 
 	<link rel="stylesheet" href="../thirdParty/bulma/bulma.min.css">
-	<link rel="stylesheet" href="../thirdParty/bulma-extensions/bulma-extensions.min.css">
 	<link rel="stylesheet" href="./main.css">
 	<link rel="stylesheet" href="./dark.css">
 	<link rel="stylesheet" href="./light.css">
@@ -260,7 +254,7 @@
 											<button class="button is-light" onclick="toggleAskReadAgainModal(true)">
 												<span>Reset data and apply read options</span>
 												<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
-													data-tooltip="The input file content was stored locally and used as data. Thus this view is independent of the source file">
+													data-tooltip="The input file content was stored locally and is used as data. Thus this view is independent of the source file">
 													<i class="fas fa-question-circle"></i>
 												</span>
 											</button>
@@ -347,7 +341,7 @@
 											<label for="comment-string-write">NewLine</label>
 											<div class="select">
 												<select id="newline-select-write" onchange="setNewLineWrite()">
-													<option value="">Same as input</option>
+													<option id="newline-same-as-input-option" value="">Same as input</option>
 													<option value="crlf">Windows (CRLF)</option>
 													<option value="lf">Linux/Mac (LF)</option>
 												</select>
@@ -385,7 +379,7 @@
 					<span>Add column</span>
 				</button>
 
-				<button class="button is-outlined mar-left" onclick="postApplyContent(true)">
+				<button id="btn-apply-changes-to-file-and-save" class="button is-outlined mar-left" onclick="postApplyContent(true)">
 					<span class="icon is-small">
 						<i class="fas fa-save"></i>
 					</span>
@@ -396,7 +390,7 @@
 					</span>
 				</button>
 
-				<button class="button is-outlined" onclick="postApplyContent(false)">
+				<button id="btn-apply-changes-to-file" class="button is-outlined" onclick="postApplyContent(false)">
 					<span class="icon is-small">
 						<i class="fas fa-reply"></i>
 					</span>
@@ -530,6 +524,7 @@
 						<li>If a row has more cell than the others empty cells are added to match the row with the highest cell
 							count</li>
 						<li>Extension configuration is only applied for new editors</li>
+						<li>You can delete multiple rows/cols by selecting them via shift and right click then remove</li>
 					</ul>
 				</div>
 
@@ -623,6 +618,10 @@
 		<button class="modal-close is-large" aria-label="close" onclick="toggleSourceFileChangedModalDiv(false)"></button>
 	</div>
 
+	<script src="../thirdParty/handsontable/handsontable.js"></script>
+	<script src="../thirdParty/papaparse/papaparse.min.js"></script>
+	<script src="../thirdParty/mousetrap/mousetrap.min.js"></script>
+	<script src="../thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js"></script>
 
 	<script src="out/progressbar.js"></script>
 	<script src="out/findWidget.js"></script>

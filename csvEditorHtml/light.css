@@ -17,7 +17,7 @@ body.vscode-light {
 }
 
 .vscode-light .button.is-outlined:hover {
-	background-color: #404040;
+	background-color: #404040; /* maybe #676767 ??*/
 	color: #d0d0d0;
 }
 .vscode-light .button.is-outlined:focus {
@@ -120,4 +120,8 @@ body.vscode-light {
 	border: 1px solid #8e8e8e;
 	border-collapse: initial;
 	border-radius: 10px;
+}
+
+.vscode-light a {
+	color: #0866ff;
 }

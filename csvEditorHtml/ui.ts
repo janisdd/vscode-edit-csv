@@ -280,7 +280,7 @@ function setNewLineWrite() {
 	else if (el.value === 'lf') {
 		defaultCsvWriteOptions.newline = '\n'
 	}
-	else if (el.value === 'lf') {
+	else if (el.value === 'crlf') {
 		defaultCsvWriteOptions.newline = '\r\n'
 	}
 }
@@ -989,6 +989,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	//@ts-ignore
 	Handsontable.dom.addEvent(window as any, 'resize', throttle(onResizeGrid, 200))
 
+	if (typeof afterHandsontableCreated !== 'undefined') afterHandsontableCreated(hot)
 
 	const settingsApplied = checkIfHasHeaderReadOptionIsAvailable(true)
 
@@ -1408,7 +1409,7 @@ function _setIsWatchingSourceFileUiIndicator(isWatching: boolean) {
  */
 function changeFontSizeInPx(fontSizeInPx: number) {
 
-	document.documentElement.style.setProperty('--extension-font-size', fontSizeInPx.toString())
+	document.documentElement.style.setProperty('--extension-font-size', `${fontSizeInPx.toString()}px`)
 
 	if (fontSizeInPx <= 0) {
 		//remove custom font size and use editor font size

@@ -87,6 +87,7 @@ let defaultCsvWriteOptions: CsvWriteOptions = {
 	quoteAllFields: false,
 	retainQuoteInformation: true,
 }
+//will be set when we read the csv content
 let newLineFromInput = '\n'
 
 //we need to store this because for collapsed columns we need to change the selection
@@ -145,6 +146,8 @@ const askReadAgainModalDiv = _getById('ask-read-again-modal')
 const askReloadFileModalDiv = _getById('ask-reload-file-modal')
 const sourceFileChangedDiv = _getById('source-file-changed-modal')
 
+const btnApplyChangesToFileAndSave =_getById(`btn-apply-changes-to-file-and-save`)
+
 const readDelimiterTooltip = _getById('read-delimiter-tooltip')
 const readDelimiterTooltipText = "Empty to auto detect"
 
@@ -162,6 +165,10 @@ const fixedColumnsTopText = _getById('fixed-columns-text') as HTMLSpanElement
 
 const showCommentsBtn = _getById('show-comments-btn') as HTMLButtonElement
 const hideCommentsBtn = _getById('hide-comments-btn') as HTMLButtonElement
+
+const newlineSameSsInputOption = _getById('newline-same-as-input-option') as HTMLOptionElement
+const newlineSameSsInputOptionText = `Same as input`
+updateNewLineSelect()
 
 //add this to the first wrong column
 const warningTooltipTextWhenCommentRowNotFirstCellIsUsed = `Please use only the first cell in comment row (others are not exported)`
@@ -222,9 +229,15 @@ let _data = parseCsv(initialContent, defaultCsvReadOptions)
 if (_data && !vscode) {
 
 	let _exampleData: string[][] = []
+	let initialRows = 5
+	let initialCols = 5
+
+	_exampleData = [...Array(initialRows).keys()].map(p => 
+		[...Array(initialCols).keys()].map(k => '')
+		)
 
 	//@ts-ignore
-	_exampleData = Handsontable.helper.createSpreadsheetData(100, 20)
+	// _exampleData = Handsontable.helper.createSpreadsheetData(100, 20)
 	// _exampleData = Handsontable.helper.createSpreadsheetData(1000, 20)
 	// _exampleData = Handsontable.helper.createSpreadsheetData(10000, 21)
 	// _exampleData = Handsontable.helper.createSpreadsheetData(100000, 20)
