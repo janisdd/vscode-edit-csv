@@ -24,6 +24,8 @@ const distPath = path.join(basePath, `dist`)
 const assetsPrefixDir = `assets`
 const assetsDistPath = path.join(distPath, assetsPrefixDir)
 
+const sourceMapLineRegex = /^\/\/# sourceMappingURL=(.*)$/gm
+
 //this is relative to csvEditorHtml/browser/
 const htmlFilePathsToBuild: string[] = [
 	`indexBrowser.html`,
@@ -42,9 +44,6 @@ const justCopyPaths = [
 const buildHash = uuidv4()
 
 function main() {
-
-
-	//clear??
 
 	const ensureDistDirAndAssetsExists = () => {
 		try {
@@ -218,9 +217,7 @@ function main() {
 				console.log(`[INFO] ... copyied css file ${cssLinkPath} to ${outputPath}`)
 			} catch (error) {
 				console.log(`[ERROR] ... error copying css file ${cssLinkPath} to ${outputPath}`)
-				console.log(`[ERROR] error`, error)
-				exit(1)
-				return
+				throw error
 			}
 
 			//now we need to replace the path in the html file...
@@ -272,16 +269,12 @@ function main() {
 
 			//copy is step 1
 			try {
-				fs.copyFileSync(scriptSrcPath, outputPath)
+				copyFileSyncAndChangeContent(scriptSrcPath, outputPath, replaceJsSourceMapLine)
 				console.log(`[INFO] ... copyied script file ${scriptSrcPath} to ${outputPath}`)
 			} catch (error) {
 				console.log(`[ERROR] ... error copying script file ${scriptSrcPath} to ${outputPath}`)
-				console.log(`[ERROR] error`, error)
-				exit(1)
-				continue
+				throw error
 			}
-
-			
 
 			//now we need to replace the path in the html file...
 			scriptTag.src = path.join(assetsPrefixDir, newFileName)
@@ -307,9 +300,7 @@ function main() {
 				console.log(`[INFO] ... copyied img file ${imgSrcPath} to ${outputPath}`)
 			} catch (error) {
 				console.log(`[ERROR] ... error copying img file ${imgSrcPath} to ${outputPath}`)
-				console.log(`[ERROR] error`, error)
-				exit(1)
-				continue
+				throw error
 			}
 
 			
@@ -446,6 +437,24 @@ function getAllCommentElements(document: Document, dom: jsdom.JSDOM): Comment[] 
 			elements.push(commentNode)
 		}
 	return elements
+}
+
+function copyFileSyncAndChangeContent(filePath: string, outputPath: string, replaceFunc: (content: string) => string) {
+	
+
+	try {
+		const content = fs.readFileSync(filePath, 'utf8')
+		const newContent = replaceFunc(content)
+		fs.writeFileSync(outputPath, newContent, 'utf8')	
+	} catch (error) {
+		throw error
+	}
+
+}
+
+function replaceJsSourceMapLine(jsFileContent: string): string {
+	const cleanJs = jsFileContent.replace(sourceMapLineRegex, '\n')
+	return cleanJs
 }
 
 /**
