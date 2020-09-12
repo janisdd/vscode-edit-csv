@@ -169,7 +169,11 @@ function main() {
 			continue
 		}
 
+		console.log(``)
+		console.log(``)
 		console.log(`[INFO] read file ${absoluteHtmlFilePath}`)
+		console.log(``)
+		console.log(``)
 
 		const dom = new JSDOM(content)
 		const { document } = dom.window
@@ -178,13 +182,22 @@ function main() {
 		const scripts = getAllScriptElements(document)
 		const imgs = getAllImgElements(document)
 		const allAnchors = getAllAnchorElements(document)
+		const comments = getAllCommentElements(document, dom)
 
 		//--- now copy files to dist dir
+
+		console.log()
+		console.log(`[INFO] --- removing comments (${comments.length}) ---`)
+		for (let j = 0; j < comments.length; j++) {
+			const commentNode = comments[j]
+			commentNode.remove()
+			console.log(`[INFO] removed comment: ${commentNode.textContent}`)
+		}
 
 		// const afterCopiedHandlers: Array<() => void> = []
 
 		console.log()
-		console.log(`[INFO] --- css files ---`)
+		console.log(`[INFO] --- css files (${links.length}) ---`)
 		for (let j = 0; j < links.length; j++) {
 			const cssLink = links[j]
 
@@ -243,7 +256,7 @@ function main() {
 		}
 
 		console.log()
-		console.log(`[INFO] --- script files ---`)
+		console.log(`[INFO] --- script files (${scripts.length}) ---`)
 		for (let j = 0; j < scripts.length; j++) {
 			const scriptTag = scripts[j]
 			const scriptSrcPath = path.join(basePath, scriptTag.src)
@@ -275,7 +288,7 @@ function main() {
 		}
 
 		console.log()
-		console.log(`[INFO] --- img files ---`)
+		console.log(`[INFO] --- img files (${imgs.length}) ---`)
 		for (let j = 0; j < imgs.length; j++) {
 			const imgTag = imgs[j]
 			const imgSrcPath = path.join(basePath, imgTag.src)
@@ -415,6 +428,25 @@ function getAllAnchorElements(document: Document): HTMLAnchorElement[] {
 	return elements
 }
 
+/**
+ * returns all comment nodes
+ * @param document 
+ */
+function getAllCommentElements(document: Document, dom: jsdom.JSDOM): Comment[] {
+
+	const elements: Comment[] = []
+
+	const commentIterator = document.createNodeIterator(document,
+		dom.window.NodeFilter.SHOW_COMMENT, {
+			acceptNode: (node) => dom.window.NodeFilter.FILTER_ACCEPT
+		})
+
+		while (commentIterator.nextNode()) {
+			const commentNode = commentIterator.referenceNode as Comment
+			elements.push(commentNode)
+		}
+	return elements
+}
 
 /**
  * used for cache busting, see https://css-tricks.com/strategies-for-cache-busting-css/
