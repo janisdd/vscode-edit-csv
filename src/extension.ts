@@ -9,12 +9,13 @@ import * as chokidar from "chokidar";
 
 // const debounceDocumentChangeInMs = 1000
 
+//for a full list of context keys see https://code.visualstudio.com/docs/getstarted/keybindings#_when-clause-contexts
+
 /**
  * for editor uris this is the scheme to use
  * so we can find editors
  */
 export const editorUriScheme = 'csv-edit'
-
 
 
 // this method is called when your extension is activated
