@@ -34,3 +34,7 @@ Then run yarn test / npm run test
 	- parse: rowInsertCommentLines_commentsString !== null, left trimmed strings starting with it are treated as comments and are parsed into a row with 1 cell
 	- unparse: rowInsertCommentLines_commentsString !== null, left trimmed strings first cells will be trimmed left and only the first cell will be exported
 
+
+## Minified version
+
+minified with https://javascript-minifier.com/

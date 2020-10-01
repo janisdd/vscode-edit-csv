@@ -7,7 +7,14 @@ commit: 49170b76b382317356c2f707e2e4191430b8d495
 comment: we need this to support custom comment handling...
 */
 /*
-changelog:
+changelog: (latest first)
+
+- fixes issue where all fields quoted and missing closing quote on last field will hang the function guessDelimiter
+	- this is because the field in the row will not terminated by the new line because the closing quote is missing (\n is also valid inside multi line fields)
+	- in combination with an unknown delimiter (the wrong one) will cause that no quote is accepted as closing quote and we never find a single valid row (after 10 we normally stop guessing)
+		- this is because a valid closing quote is followed by the delimiter `"..." DEL` or new line `"..."\n
+	- to resolve this we added the config option `isGuessingDelimiter` to the parser and allow a field `maxGuessLength` (default to ~5000) to stop searching for the closing quote
+	- also the new line char is not properly recognized if a closing quote is missing because all new line chars are inside quotes (guessLineEndings removes everything in between quotes) -> we never stop at `"..."\n` because we actually could have `"..."\r\n` so after the quote the `\r` follows, not the new line character
 
 - added option to parsing to retain quote information for columns
 	- the returned type is now: oldResult & {columnIsQuoted: boolean[] or null if option is not set}
@@ -110,8 +117,8 @@ changelog:
 			this.each(function(idx)
 			{
 				var supported = $(this).prop('tagName').toUpperCase() === 'INPUT'
-								&& $(this).attr('type').toLowerCase() === 'file'
-								&& global.FileReader;
+					&& $(this).attr('type').toLowerCase() === 'file'
+					&& global.FileReader;
 
 				if (!supported || !this.files || this.files.length === 0)
 					return true;	// continue to next input element
@@ -305,10 +312,11 @@ changelog:
 		/** !== null: we want to include comments but they should be processed, lines trimmed starting with a comments are comment lines
 		 * only the first row data is exported
 		 */
-		var _rowInsertCommentLines_commentsString = null
+		// eslint-disable-next-line camelcase
+		var _rowInsertCommentLines_commentsString = null;
 
 		/** @type {boolean[] | null} */
-		var _columnIsQuoted = null
+		var _columnIsQuoted = null;
 
 		unpackConfig();
 
@@ -356,7 +364,7 @@ changelog:
 				return;
 
 			if (typeof _config.delimiter === 'string'
-                && !Papa.BAD_DELIMITERS.filter(function(value) { return _config.delimiter.indexOf(value) !== -1; }).length)
+				&& !Papa.BAD_DELIMITERS.filter(function(value) { return _config.delimiter.indexOf(value) !== -1; }).length)
 			{
 				_delimiter = _config.delimiter;
 			}
@@ -390,11 +398,12 @@ changelog:
 			}
 
 			if (_config.rowInsertCommentLines_commentsString !== null) {
-				_rowInsertCommentLines_commentsString = _config.rowInsertCommentLines_commentsString
+				// eslint-disable-next-line camelcase
+				_rowInsertCommentLines_commentsString = _config.rowInsertCommentLines_commentsString;
 			}
 
 			if (typeof _config.columnIsQuoted !== 'undefined') {
-				_columnIsQuoted = _config.columnIsQuoted
+				_columnIsQuoted = _config.columnIsQuoted;
 			}
 		}
 
@@ -417,11 +426,11 @@ changelog:
 
 			if (_quotes) {
 				//we quote all fields so no need for this
-				_columnIsQuoted = false
+				_columnIsQuoted = false;
 			}
 
 			if (_columnIsQuoted) {
-				_quotes = _columnIsQuoted
+				_quotes = _columnIsQuoted;
 			}
 
 			if (typeof fields === 'string')
@@ -466,13 +475,14 @@ changelog:
 				}
 				if (!emptyLine)
 				{
-					
+
+					// eslint-disable-next-line camelcase
 					if (data[row].length > 0 && _rowInsertCommentLines_commentsString) {
 						if (typeof data[row][0] === 'string' && data[row][0].startsWith(_rowInsertCommentLines_commentsString)) {
-							csv += data[row][0] + _newline
-							continue
+							csv += data[row][0] + _newline;
+							continue;
 						}
-				}
+					}
 
 					for (var col = 0; col < maxCol; col++)
 					{
@@ -495,7 +505,7 @@ changelog:
 		{
 			if (typeof str === 'undefined' || str === null) {
 				if (_quotes) {
-					return _quoteChar + '' + _quoteChar
+					return _quoteChar + '' + _quoteChar;
 				}
 				return '';
 			}
@@ -506,11 +516,11 @@ changelog:
 			str = str.toString().replace(quoteCharRegex, _escapedQuote);
 
 			var needsQuotes = (typeof _quotes === 'boolean' && _quotes)
-							|| (Array.isArray(_quotes) && _quotes[col])
-							|| hasAny(str, Papa.BAD_DELIMITERS)
-							|| str.indexOf(_delimiter) > -1
-							|| str.charAt(0) === ' '
-							|| str.charAt(str.length - 1) === ' ';
+				|| (Array.isArray(_quotes) && _quotes[col])
+				|| hasAny(str, Papa.BAD_DELIMITERS)
+				|| str.indexOf(_delimiter) > -1
+				|| str.charAt(0) === ' '
+				|| str.charAt(str.length - 1) === ' ';
 
 			return needsQuotes ? _quoteChar + str + _quoteChar : str;
 		}
@@ -1455,7 +1465,8 @@ changelog:
 			escapeChar = config.escapeChar;
 		}
 
-		var rowInsertCommentLines_commentsString = config.rowInsertCommentLines_commentsString
+		// eslint-disable-next-line camelcase
+		var rowInsertCommentLines_commentsString = config.rowInsertCommentLines_commentsString;
 
 		/**
 		 * normally when parsing quotes are discarded as they don't change the retrieved data
@@ -1463,18 +1474,18 @@ changelog:
 		 * 	 true: column was quoted
 		 * 	 false: column was not quoted
 		 * false: quote information is returned as null or undefined (falsy)
-		 * 
+		 *
 		 * to determine if a column is quoted we use the first cell only (if a column has no cells then it's not quoted)
 		 * so if the first line has only 3 columns and all other more than 3 (e.g. 4) then all columns starting from 4 are treated as not quoted!!
 		 * not that there is no difference if we have column headers (first row is used)
 		 * comment rows are ignored for this
 		 */
-		var retainQuoteInformation = config.retainQuoteInformation
+		var retainQuoteInformation = config.retainQuoteInformation;
 		/** @type {boolean[]} */
-		var columnIsQuoted = null
+		var columnIsQuoted = null;
 		//when we set this to true we got the right quote information
 		//(when need to skip empty & comment rows and during this we might reset columnIsQuoted multiple times)
-		var firstQuoteInformationRowFound = false
+		var firstQuoteInformationRowFound = false;
 
 		// Delimiter must be valid
 		if (typeof delim !== 'string'
@@ -1512,17 +1523,20 @@ changelog:
 				commentsLen = comments.length;
 			var stepIsFunction = isFunction(step);
 
-			var rowInsertCommentLines_commentsStringLen = 0
-			var treatCommentsSpecially = typeof rowInsertCommentLines_commentsString === 'string'
+			// eslint-disable-next-line camelcase
+			var rowInsertCommentLines_commentsStringLen = 0;
+			// eslint-disable-next-line camelcase
+			var treatCommentsSpecially = typeof rowInsertCommentLines_commentsString === 'string';
 
 			if (treatCommentsSpecially) {
-				rowInsertCommentLines_commentsStringLen = rowInsertCommentLines_commentsString.length
+				// eslint-disable-next-line camelcase
+				rowInsertCommentLines_commentsStringLen = rowInsertCommentLines_commentsString.length;
 			}
 
 			// Establish starting state
 			cursor = 0;
 			var data = [], errors = [], row = [], lastCursor = 0;
-			
+
 
 			if (!input)
 				return returnable();
@@ -1535,8 +1549,8 @@ changelog:
 					row = rows[i];
 
 					//we could trim left here but this would not be compatible with not fast mode...
-					var isCommentRow = treatCommentsSpecially && row.startsWith(rowInsertCommentLines_commentsString)
-					var _row = null
+					var isCommentRow = treatCommentsSpecially && row.startsWith(rowInsertCommentLines_commentsString);
+					var _row = null;
 
 					//although we know that there are no quotes (--> columnIsQuoted must be all false entries...)
 					//but we want/need to set the right length for the quote array (first real row)
@@ -1552,11 +1566,11 @@ changelog:
 					{
 						data = [];
 
-						_row = !isCommentRow ? row.split(delim) : [row]
+						_row = !isCommentRow ? row.split(delim) : [row];
 
 						if (retainQuoteInformation && firstQuoteInformationRowFound === false) {
 							//in fast mode there are no quote characters...
-							columnIsQuoted = Array(_row.length).fill(false)
+							columnIsQuoted = Array(_row.length).fill(false);
 						}
 
 						pushRow(_row);
@@ -1565,16 +1579,16 @@ changelog:
 							return returnable();
 					}
 					else {
-						_row = !isCommentRow ? row.split(delim) : [row]
+						_row = !isCommentRow ? row.split(delim) : [row];
 
 						if (retainQuoteInformation && firstQuoteInformationRowFound === false) {
 							//in fast mode there are no quote characters...
-							columnIsQuoted = Array(_row.length).fill(false)
+							columnIsQuoted = Array(_row.length).fill(false);
 						}
 
 						pushRow(_row);
 					}
-						
+
 					if (preview && i >= preview)
 					{
 						data = data.slice(0, preview);
@@ -1589,7 +1603,7 @@ changelog:
 			var quoteCharRegex = new RegExp(escapeRegExp(escapeChar) + escapeRegExp(quoteChar), 'g');
 			var quoteSearch = input.indexOf(quoteChar, cursor);
 			//we don't use fast mode so we assume some field is quoted...
-			columnIsQuoted = []
+			columnIsQuoted = [];
 
 			//if the text does not contain the delimiter (not even in quoted fields) we can return early
 			if (isGuessingDelimiter && nextDelim === -1 && cursor === 0) {
@@ -1606,7 +1620,7 @@ changelog:
 					quoteSearch = cursor;
 
 					if (retainQuoteInformation && firstQuoteInformationRowFound === false) {
-						columnIsQuoted.push(true)
+						columnIsQuoted.push(true);
 					}
 
 					// Skip the opening quote
@@ -1721,7 +1735,7 @@ changelog:
 				}
 
 				if (retainQuoteInformation && firstQuoteInformationRowFound === false) {
-					columnIsQuoted.push(false)
+					columnIsQuoted.push(false);
 				}
 
 				// Comment found at start of new line
@@ -1735,6 +1749,7 @@ changelog:
 					continue;
 				}
 
+				// eslint-disable-next-line camelcase
 				if (row.length === 0 && treatCommentsSpecially && input.substr(cursor, rowInsertCommentLines_commentsStringLen) === rowInsertCommentLines_commentsString) {
 
 					if (nextNewline === -1) {
@@ -1747,7 +1762,7 @@ changelog:
 					row.push(input.substring(cursor, nextNewline));
 					saveRow(nextNewline + newlineLen);
 					nextDelim = input.indexOf(delim, cursor);
-					continue
+					continue;
 				}
 
 				// Next delimiter comes before next newline, so we've reached end of field
@@ -1782,15 +1797,15 @@ changelog:
 					row.push(input.substring(cursor, nextNewline));
 					saveRow(nextNewline + newlineLen);
 
-					//TODO remove this? why? this only disables the next if??
+					//remove this? why? this only disables the next if??
 					if (firstQuoteInformationRowFound)
 
-					if (stepIsFunction)
-					{
-						doStep();
-						if (aborted)
-							return returnable();
-					}
+						if (stepIsFunction)
+						{
+							doStep();
+							if (aborted)
+								return returnable();
+						}
 
 					if (preview && data.length >= preview)
 						return returnable(true);
@@ -1815,21 +1830,21 @@ changelog:
 
 				if (firstQuoteInformationRowFound === false) {
 
-					if (row.length === 1 && 
+					if (row.length === 1 &&
 						(row[0] === '' //empty row is skipped in ui --> no quote information
-						|| treatCommentsSpecially && row[0].startsWith(rowInsertCommentLines_commentsString))) { //comment row should not give 
-						firstQuoteInformationRowFound = false
-						columnIsQuoted = [] //reset for next row
+							|| treatCommentsSpecially && row[0].startsWith(rowInsertCommentLines_commentsString))) { //comment row should not give
+						firstQuoteInformationRowFound = false;
+						columnIsQuoted = []; //reset for next row
 					} else {
-						firstQuoteInformationRowFound = true
+						firstQuoteInformationRowFound = true;
 					}
 				}
 			}
 
 			/**
-             * checks if there are extra spaces after closing quote and given index without any text
-             * if Yes, returns the number of spaces
-             */
+			 * checks if there are extra spaces after closing quote and given index without any text
+			 * if Yes, returns the number of spaces
+			 */
 			function extraSpaces(index) {
 				var spaceLength = 0;
 				if (index !== -1) {
