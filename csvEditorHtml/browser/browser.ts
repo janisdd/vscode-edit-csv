@@ -486,3 +486,8 @@ Mousetrap.bindGlobal(['meta+s', 'ctrl+s'], (e) => {
 })
 
 
+//--- setup vscode hooks for browser
+
+postVsError = (error: string) => {
+	Swal.fire(`Error`, `${error}`, `error`)
+}

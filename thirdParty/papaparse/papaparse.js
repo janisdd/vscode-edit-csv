@@ -1332,7 +1332,8 @@ changelog:
 					comments: comments,
 					delimiter: delim,
 					newline: newline,
-					preview: 10
+					preview: 10,
+					isGuessingDelimiter: true,
 				}).parse(input);
 
 				for (var j = 0; j < preview.data.length; j++) {
@@ -1372,6 +1373,8 @@ changelog:
 			};
 		}
 
+		//this does not play nice with unmatched quotes on the last field (because all new lines are removed by the regex)
+		//the regex works but maybe it should be ([^*]*?)?
 		function guessLineEndings(input, quoteChar)
 		{
 			input = input.substr(0, 1024 * 1024);	// max length 1 MB
@@ -1427,6 +1430,20 @@ changelog:
 		var preview = config.preview;
 		var fastMode = config.fastMode;
 		var quoteChar;
+		var isGuessingDelimiter = false;
+		var maxGuessLength = null; //if we are guessing the delimiter only use that many characters
+
+		if (typeof config.isGuessingDelimiter === 'boolean') {
+			isGuessingDelimiter = config.isGuessingDelimiter;
+
+			if (typeof config.maxGuessLength === 'number') {
+				maxGuessLength = config.maxGuessLength;
+			} else {
+				//default
+				maxGuessLength = 5000;
+			}
+		}
+
 		/** Allows for no quoteChar by setting quoteChar to undefined in config */
 		if (config.quoteChar === undefined) {
 			quoteChar = '"';
@@ -1574,6 +1591,11 @@ changelog:
 			//we don't use fast mode so we assume some field is quoted...
 			columnIsQuoted = []
 
+			//if the text does not contain the delimiter (not even in quoted fields) we can return early
+			if (isGuessingDelimiter && nextDelim === -1 && cursor === 0) {
+				return finish('');
+			}
+
 			// Parser loop
 			for (;;)
 			{
@@ -1594,6 +1616,11 @@ changelog:
 					{
 						// Find closing quote
 						quoteSearch = input.indexOf(quoteChar, quoteSearch + 1);
+
+						// we exceeded the max search length for the delimiter, give up
+						if (isGuessingDelimiter && maxGuessLength && quoteSearch > maxGuessLength) {
+							return finish('');
+						}
 
 						//No other quotes are found - no other delimiters
 						if (quoteSearch === -1)
@@ -1755,6 +1782,7 @@ changelog:
 					row.push(input.substring(cursor, nextNewline));
 					saveRow(nextNewline + newlineLen);
 
+					//TODO remove this? why? this only disables the next if??
 					if (firstQuoteInformationRowFound)
 
 					if (stepIsFunction)
@@ -1859,7 +1887,7 @@ changelog:
 						truncated: !!stopped,
 						cursor: lastCursor + (baseIndex || 0)
 					},
-					columnIsQuoted
+					columnIsQuoted: columnIsQuoted
 				};
 			}
 

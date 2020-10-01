@@ -54,8 +54,8 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 					continue;
 				}
 
-				if (error.row) {
-					_error(`${error.message} on line ${error.row}`)
+				if (typeof error.row === 'number') {
+					_error(`${error.message} on line ${error.row+1}`) //row is 0 based
 					continue
 				}
 
@@ -294,7 +294,7 @@ function postVsWarning(text: string) {
  * called to display the given text in vs code 
  * @param text 
  */
-function postVsError(text: string) {
+var postVsError = (text: string) => {
 
 	if (!vscode) {
 		console.log(`postVsError (but in browser)`)
