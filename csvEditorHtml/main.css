@@ -1,4 +1,8 @@
 
+html {
+	--extension-options-bar-display: block;
+}
+
 html, body {
 	height: 100%;
 	/* dark  for browser*/
@@ -444,6 +448,12 @@ div.field.same-line label {
 .options-content {
 	padding: 0.5em 0.5em 0.5em 0.5em;
 	height: 100%;
+}
+
+#read-options-content,
+#write-options-content,
+#preview-content {
+	display: var(--extension-options-bar-display);
 }
 
 /* END options bar*/

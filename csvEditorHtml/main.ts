@@ -146,6 +146,11 @@ const askReadAgainModalDiv = _getById('ask-read-again-modal')
 const askReloadFileModalDiv = _getById('ask-reload-file-modal')
 const sourceFileChangedDiv = _getById('source-file-changed-modal')
 
+//we also have some css that rely on these ids
+const readContent = _getById('read-options-content')
+const writeContent = _getById('write-options-content')
+const previewContent = _getById('preview-content')
+
 const btnApplyChangesToFileAndSave =_getById(`btn-apply-changes-to-file-and-save`)
 
 const readDelimiterTooltip = _getById('read-delimiter-tooltip')

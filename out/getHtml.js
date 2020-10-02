@@ -17,6 +17,8 @@ function getResourcePath(webview, context, filePath) {
 exports.getResourcePath = getResourcePath;
 /**
  * creates the html for the csv editor
+ *
+ * this is copied from csvEditorHtml/index.html
  * @param context
  */
 function createEditorHtml(webview, context, initialVars) {
@@ -45,6 +47,7 @@ function createEditorHtml(webview, context, initialVars) {
     const uiJs = _getResourcePath('csvEditorHtml/out/ui.js');
     const utilJs = _getResourcePath('csvEditorHtml/out/util.js');
     const mainJs = _getResourcePath('csvEditorHtml/out/main.js');
+    const beforeDomLoadedJs = _getResourcePath('csvEditorHtml/out/beforeDomLoaded.js');
     const config = configurationHelper_1.getExtensionConfiguration();
     //use blocks so vs code adds folding
     let findWidgetHtml = ``;
@@ -698,6 +701,11 @@ function createEditorHtml(webview, context, initialVars) {
 		<link rel="stylesheet" href="${settingsOverwriteCss}">
 	</head>
 	<body class="vs-code vs-code-settings-font-size">
+	<script>
+		var initialConfig = ${JSON.stringify(config)};
+		var initialVars = ${JSON.stringify(initialVars)};
+		</script>
+		<script src="${beforeDomLoadedJs}"></script>
 	
 	${findWidgetHtml}
 
@@ -711,10 +719,6 @@ function createEditorHtml(webview, context, initialVars) {
 
 	${sourceFileChangedModalHtml}
 
-	<script>
-	var initialConfig = ${JSON.stringify(config)};
-	var initialVars = ${JSON.stringify(initialVars)};
-	</script>
 
 	<script src="${handsontableJs}"></script>
 	<script src="${papaparseJs}"></script>

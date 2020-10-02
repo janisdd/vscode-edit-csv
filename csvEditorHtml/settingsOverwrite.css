@@ -4,7 +4,7 @@ this file is used to apply extension settings via css variables
 */
 
 html {
-	--extension-font-size: 16px
+	--extension-font-size: 16px;
 }
 
 /* use font size from editor */

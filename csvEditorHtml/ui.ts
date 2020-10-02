@@ -13,9 +13,6 @@ type GridSettings = import("../thirdParty/handsontable/handsontable").GridSettin
  */
 function toggleOptionsBar(shouldCollapse?: boolean) {
 	const el = _getById('options-bar-icon')
-	const readContent = _getById('read-options-content')
-	const writeContent = _getById('write-options-content')
-	const previewContent = _getById('preview-content')
 
 	if (shouldCollapse === undefined) {
 		if (el.classList.contains('fa-chevron-down')) {
@@ -25,6 +22,9 @@ function toggleOptionsBar(shouldCollapse?: boolean) {
 			shouldCollapse = false
 		}
 	}
+
+	document.documentElement.style
+		.setProperty('--extension-options-bar-display', shouldCollapse ? `none` : `block`)
 
 	if (vscode) {
 		const lastState = _getVsState()
@@ -38,9 +38,6 @@ function toggleOptionsBar(shouldCollapse?: boolean) {
 		el.classList.remove('fa-chevron-down')
 		el.classList.add('fa-chevron-right')
 
-		readContent.style.display = 'none'
-		writeContent.style.display = 'none'
-		previewContent.style.display = 'none'
 
 		onResizeGrid()
 
@@ -51,9 +48,6 @@ function toggleOptionsBar(shouldCollapse?: boolean) {
 	el.classList.add('fa-chevron-down')
 	el.classList.remove('fa-chevron-right')
 
-	readContent.style.display = 'block'
-	writeContent.style.display = 'block'
-	previewContent.style.display = 'block'
 
 	onResizeGrid()
 

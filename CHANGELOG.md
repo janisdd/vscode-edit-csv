@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+- options bar is not longer flashing (when hiding it at startup)
+	- done via css variable
+- fixed issue where papaparse would take very long to load a csv file
+	- this was because guessDelimiter and all fields quoted cases the whole file to be "searched" for the right delimiter multiple times (for each known delimiter)
+		- this was the case when there was some quoting issues
+
 ## 0.4.2
 
 - fixed issue where the background color was not in sync with the editor color theme
