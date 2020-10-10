@@ -55,11 +55,17 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 				}
 
 				if (typeof error.row === 'number') {
-					_error(`${error.message} on line ${error.row+1}`) //row is 0 based
+					statusInfo.innerText = `Error`
+					const errorMsg = `${error.message} on line ${error.row+1}`
+					csvEditorDiv.innerText = errorMsg
+					_error(errorMsg) //row is 0 based
 					continue
 				}
 
-				_error(`${error.message}`)
+				statusInfo.innerText = `Error`
+				const errorMsg = `${error.message}`
+				csvEditorDiv.innerText = errorMsg
+				_error(errorMsg)
 			}
 
 			return null
