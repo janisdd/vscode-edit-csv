@@ -43,11 +43,11 @@ body.vscode-light {
 }
 
 
-#read-options-content,
+/* #read-options-content,
 #write-options-content,
 #preview-content {
 	display: none;
-}
+} */
 
 #source-file-unwatched-indicator,
 #reload-file,
@@ -120,44 +120,6 @@ body.vscode-light {
 #drop-zone.active {
 	border: 5px dashed rgb(67 202 67);
 	color: rgb(67 202 67);
-}
-
-.side-paneled {
-	display: flex;
-	flex: 1;
-	overflow: hidden;
-}
-
-.side-paneled .side-panel {
-	padding: 5px 5px 5px 0; /* body padding -> use 0 */
-	/* border-left: 1px solid #8e8e8e; */
-	border-right: 1px solid #8e8e8e;
-	
-	width: 155px;
-}
-
-.side-panel .stat {
-	padding-bottom: 3px;
-}
-
-.side-panel .stat div:nth-child(2) {
-	padding-left: 1rem;
-	word-break: break-all;
-}
-
-.side-panel .sub-stat {
-	padding-bottom: 3px;
-	padding-left: 1rem;
-}
-
-.side-panel .sub-stat div:nth-child(2) {
-	padding-left: 1rem;
-}
-
-
-.side-panel .stat.divider {
-	border-bottom: 1px solid #8e8e8e52;
-	margin-bottom: 3px;
 }
 
 .browser .csv-editor-wrapper {

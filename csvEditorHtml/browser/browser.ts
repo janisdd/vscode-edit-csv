@@ -33,15 +33,6 @@ const readOptionEncodingSelect = _getById(`read-option-encoding`) as HTMLSelectE
 const writeOptionEncodingSelect = _getById(`write-option-encoding`) as HTMLSelectElement
 const readOptionAutoEncodingOption = _getById(`read-option-encoding-auto`) as HTMLOptionElement
 
-//--- side stats
-const statSelectedRows = _getById(`stat-selected-rows`) as HTMLDivElement
-const statSelectedCols = _getById(`stat-selected-cols`) as HTMLDivElement
-const statRowsCount = _getById(`stat-rows-count`) as HTMLDivElement
-const statColsCount = _getById(`stat-cols-count`) as HTMLDivElement
-const statSelectedCellsCount = _getById(`stat-selected-cells-count`) as HTMLDivElement
-const statSelectedNotEmptyCells = _getById(`stat-selected-not-empty-cells`) as HTMLDivElement
-const statSumOfNumbers = _getById(`stat-sum-of-numbers`) as HTMLDivElement
-
 
 //--- modals
 const changelogModalDiv = _getById(`changelog-modal`) as HTMLDivElement
@@ -392,91 +383,6 @@ function toggleChangelogModal(isVisible: boolean) {
 
 	changelogModalDiv.classList.remove('is-active')
 }
-
-//taken from https://github.com/MikeMcl/big.js/blob/master/big.js
-const numberRegex = /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/
-function afterHandsontableCreated(hot: Handsontable) {
-
-	/**
-	 * @param row Selection start visual row index.
-	 * @param column Selection start visual column index.
-	 * @param row2 Selection end visual row index.
-	 * @param column2 Selection end visual column index.
-	 */
-	const afterSelectionHandler = (row: number, column: number, row2: number, column2: number) => {
-		let rowsCount = Math.abs(row2 - row) + 1
-		let colsCount = Math.abs(column2 - column) + 1
-		statSelectedRows.innerText = `${rowsCount}`
-		// statSelectedNotEmptyRows
-		statSelectedCols.innerText = `${colsCount}`
-		// statSelectedNotEmptyCols
-		statSelectedCellsCount.innerText = `${rowsCount * colsCount}`
-
-		//could be improved when we iterate over cols when we have less cols than rows??
-		let notEmptyCount = 0
-		let numbersSum = Big(0)
-		let containsInvalidNumbers = false
-		let minR = Math.min(row, row2)
-		let maxR = Math.max(row, row2)
-		for (let index = minR; index <= maxR; index++) {
-			const data = hot.getDataAtRow(index)
-
-			let minC = Math.min(column, column2)
-			let maxC = Math.max(column, column2)
-
-			for (let i = minC; i <= maxC; i++) {
-				const el = data[i]
-
-				if (el !== '' && el !== null) {
-					notEmptyCount++
-
-					if (!containsInvalidNumbers) {
-						let numberRegexRes = numberRegex.exec(el)
-
-						if (!numberRegexRes || numberRegexRes.length === 0) continue
-
-						try {
-							let _num = Big(numberRegexRes[0])
-							numbersSum = numbersSum.plus(_num)
-						} catch (error) {
-							console.log(`could not create or add number to statSumOfNumbers at row: ${index}, col: ${i}`, error)
-							containsInvalidNumbers = true
-						}
-					}
-				}
-			}
-		}
-
-		statSelectedNotEmptyCells.innerText = `${notEmptyCount}`
-		statSumOfNumbers.innerText = containsInvalidNumbers
-			? `Some invalid num`
-			: `${numbersSum}`
-	}
-
-	hot.addHook('afterSelection', afterSelectionHandler as any)
-
-	const afterRowOrColsCountChangeHandler = () => {
-		statRowsCount.innerText = `${hot.countRows()}`
-		statColsCount.innerText = `${hot.countCols()}`
-	}
-
-	hot.addHook('afterRemoveRow', afterRowOrColsCountChangeHandler)
-	hot.addHook('afterCreateRow', afterRowOrColsCountChangeHandler)
-	hot.addHook('afterCreateCol', afterRowOrColsCountChangeHandler)
-	hot.addHook('afterRemoveCol', afterRowOrColsCountChangeHandler)
-
-	statSelectedRows.innerText = `${0}`
-	statSelectedCols.innerText = `${0}`
-	statSelectedNotEmptyCells.innerText = `${0}`
-	statSumOfNumbers.innerText = `${0}`
-	statSelectedCellsCount.innerText = `${0}`
-	statRowsCount.innerText = `${hot.countRows()}`
-	statColsCount.innerText = `${hot.countCols()}`
-}
-
-//because main.ts is loaded before this the first init must be manually...
-
-afterHandsontableCreated(hot!)
 
 //--------- setup keybindings
 

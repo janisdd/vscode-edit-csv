@@ -998,6 +998,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	//make sure we see something (right size)...
 	onResizeGrid()
 
+	//because main.ts is loaded before this the first init must be manually...
+	afterHandsontableCreated(hot!)
+
 	if (hot) {
 		//select first cell by default so we have always a context
 		hot.selectCell(0, 0)
@@ -1496,3 +1499,38 @@ function _toggleFixedColumnsText() {
 		fixedColumnsTopText.classList.add('dis-hidden')
 	}
 }
+
+const minSidebarWidthInPx = 150
+/**
+ * setsup the sidedbar resize handle events
+ */
+function setupSideBarResizeHandle() {
+
+	let downX: number | null = null
+	let _style = window.getComputedStyle(sidePanel)
+	let downWidth: number = minSidebarWidthInPx
+
+	sideBarResizeHandle.addEventListener(`mousedown`, (e) => {
+		downX = e.clientX
+		 _style = window.getComputedStyle(sidePanel)
+		 downWidth = parseInt(_style.width.substring(0,_style.width.length-2))
+		 if (isNaN(downWidth)) downWidth = minSidebarWidthInPx
+	})
+
+
+	document.addEventListener(`mousemove`, throttle((e: MouseEvent) => {
+		if (downX === null) return
+
+		let delta = e.clientX - downX
+
+		sidePanel.style.width = `${Math.max(downWidth + delta, minSidebarWidthInPx)}px`
+		console.log(`delta`, delta)
+		onResizeGrid()
+	}, 200))
+
+	document.addEventListener(`mouseup`, (e) => {
+		downX = null
+	})
+
+}
+

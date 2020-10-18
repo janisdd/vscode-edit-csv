@@ -186,9 +186,22 @@ const sourceFileUnwatchedIndicator = _getById('source-file-unwatched-indicator')
 
 const hasHeaderReadOptionInput = _getById('has-header') as HTMLInputElement
 
+const sideBarResizeHandle = _getById(`side-bar-resize-handle`) as HTMLDivElement
+//--- side stats
+const sidePanel = _getById(`side-panel`) as HTMLDivElement
+const statSelectedRows = _getById(`stat-selected-rows`) as HTMLDivElement
+const statSelectedCols = _getById(`stat-selected-cols`) as HTMLDivElement
+const statRowsCount = _getById(`stat-rows-count`) as HTMLDivElement
+const statColsCount = _getById(`stat-cols-count`) as HTMLDivElement
+const statSelectedCellsCount = _getById(`stat-selected-cells-count`) as HTMLDivElement
+const statSelectedNotEmptyCells = _getById(`stat-selected-not-empty-cells`) as HTMLDivElement
+const statSumOfNumbers = _getById(`stat-sum-of-numbers`) as HTMLDivElement
+
 //--- find widget controls
 
 const findWidgetInstance = new FindWidget()
+
+setupSideBarResizeHandle()
 
 
 /* main */

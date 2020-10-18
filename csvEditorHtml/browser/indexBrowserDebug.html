@@ -613,29 +613,18 @@
 			</div>
 		</div>
 
-
-
 		<!-- main editor/grid area -->
 		<div class="side-paneled">
-			<div class="side-panel">
+			<div id="side-panel" class="side-panel">
 
 				<div class="stat">
-					<div>Selected rows
-						<span class="tooltip is-tooltip-right" data-tooltip="The selected rows count">
+					<div>Numbers sum
+						<span class="tooltip is-tooltip-right is-tooltip-multiline"
+							data-tooltip="The sum of numbers in the selected cells. Only the first number of a cell is used (first that matches /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/). Arbitrary-precision is powered by big.js">
 							<i class="far fa-question-circle"></i>
 						</span>
 					</div>
-
-					<div id="stat-selected-rows">000</div>
-				</div>
-
-				<div class="stat">
-					<div>Selected cols
-						<span class="tooltip is-tooltip-right" data-tooltip="The selected columns count">
-							<i class="far fa-question-circle"></i>
-						</span>
-					</div>
-					<div id="stat-selected-cols">000</div>
+					<div id="stat-sum-of-numbers">000</div>
 				</div>
 
 				<div class="stat">
@@ -657,13 +646,22 @@
 				</div>
 
 				<div class="stat">
-					<div>Numbers sum
-						<span class="tooltip is-tooltip-right is-tooltip-multiline"
-							data-tooltip="The sum of numbers in the selected cells. Only the first number of a cell is used (first that matches /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/). Arbitrary-precision is powered by big.js">
+					<div>Selected rows
+						<span class="tooltip is-tooltip-right" data-tooltip="The selected rows count">
 							<i class="far fa-question-circle"></i>
 						</span>
 					</div>
-					<div id="stat-sum-of-numbers">000</div>
+
+					<div id="stat-selected-rows">000</div>
+				</div>
+
+				<div class="stat">
+					<div>Selected cols
+						<span class="tooltip is-tooltip-right" data-tooltip="The selected columns count">
+							<i class="far fa-question-circle"></i>
+						</span>
+					</div>
+					<div id="stat-selected-cols">000</div>
 				</div>
 
 				<div class="stat divider"></div>
@@ -689,12 +687,13 @@
 
 			</div>
 
+			<div id="side-bar-resize-handle"></div>
+
 			<div id="csv-editor-wrapper" class="csv-editor-wrapper">
 				<div id="csv-editor">No data present. Please <b>enable JavaScript</b> for this site</div>
 			</div>
 
 		</div>
-
 
 	</div>
 
@@ -908,7 +907,7 @@
 	<!-- copy from node_modules -->
 	<script src="./third-party/sweetalert2//sweetalert2.min.js"></script>
 	<script src="./third-party/bulma-toast/bulma-toast.min.js"></script>
-	<script src="./third-party/big.js/big.min.js"></script>
+	<script src="../../thirdParty/big.js/big.min.js"></script>
 	<!-- end copy from node_modules -->
 	<script src="../out/progressbar.js"></script>
 	<script src="../out/findWidget.js"></script>

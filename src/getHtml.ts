@@ -33,6 +33,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	const mousetrapJs = _getResourcePath('thirdParty/mousetrap/mousetrap.min.js')
 	const mousetrapBindGlobalJs = _getResourcePath('thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js')
 
+	const bigJs = _getResourcePath('thirdParty/big.js/big.min.js')
+
 	let fontAwesomeCss = _getResourcePath('thirdParty/fortawesome/fontawesome-free/css/all.min.css')
 	//we need to load the font manually because the url() seems to not work properly with vscode-resource
 	const iconFont = _getResourcePath('thirdParty/fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2')
@@ -131,6 +133,83 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 					<i class="fas fa-times"></i>
 			</div>
 		</div>
+
+	</div>
+		`
+	}
+
+	let sidePanel = ``
+	{
+		sidePanel = `
+		<div id="side-panel" class="side-panel">
+
+		<div class="stat">
+			<div>Numbers sum
+				<span class="tooltip is-tooltip-right is-tooltip-multiline"
+					data-tooltip="The sum of numbers in the selected cells. Only the first number of a cell is used (first that matches /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/). Arbitrary-precision is powered by big.js">
+					<i class="far fa-question-circle"></i>
+				</span>
+			</div>
+			<div id="stat-sum-of-numbers">000</div>
+		</div>
+
+		<div class="stat">
+			<div>Selected cells
+				<span class="tooltip is-tooltip-right" data-tooltip="The number of selected cells">
+					<i class="far fa-question-circle"></i>
+				</span>
+			</div>
+			<div id="stat-selected-cells-count">000</div>
+		</div>
+
+		<div class="sub-stat">
+			<div>Not empty
+				<span class="tooltip is-tooltip-right" data-tooltip="The selected cells count where the value is not empty">
+					<i class="far fa-question-circle"></i>
+				</span>
+			</div>
+			<div id="stat-selected-not-empty-cells">000</div>
+		</div>
+
+		<div class="stat">
+			<div>Selected rows
+				<span class="tooltip is-tooltip-right" data-tooltip="The selected rows count">
+					<i class="far fa-question-circle"></i>
+				</span>
+			</div>
+
+			<div id="stat-selected-rows">000</div>
+		</div>
+
+		<div class="stat">
+			<div>Selected cols
+				<span class="tooltip is-tooltip-right" data-tooltip="The selected columns count">
+					<i class="far fa-question-circle"></i>
+				</span>
+			</div>
+			<div id="stat-selected-cols">000</div>
+		</div>
+
+		<div class="stat divider"></div>
+
+		<div class="stat">
+			<div>Rows count</div>
+			<div id="stat-rows-count">000</div>
+		</div>
+
+		<div class="stat">
+			<div>Cols count</div>
+			<div id="stat-cols-count">000</div>
+		</div>
+
+		<div class="stat divider"></div>
+
+		<!-- some day an ad can be placed here -->
+		<!-- <div>
+			<div style="border: 1px solid black; height: 300px;">
+				AD HERE
+			</div>
+		</div> -->
 
 	</div>
 		`
@@ -504,8 +583,16 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 
 			<!-- main editor/grid area -->
-			<div id="csv-editor-wrapper" class="csv-editor-wrapper">
-				<div id="csv-editor">No data received</div>
+			<div class="side-paneled">
+				${sidePanel}
+
+				<div id="side-bar-resize-handle"></div>
+
+				<!-- main editor/grid area -->
+				<div id="csv-editor-wrapper" class="csv-editor-wrapper">
+					<div id="csv-editor">No data received</div>
+				</div>
+
 			</div>
 
 		</div>
@@ -739,14 +826,15 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	<script src="${papaparseJs}"></script>
 	<script src="${mousetrapJs}"></script>
 	<script src="${mousetrapBindGlobalJs}"></script>
+	<script src="${bigJs}"></script>
 
-	 <script src="${progressJs}"></script>
-	 <script src="${findWidgetJs}"></script>
-	 <script src="${ioJs}"></script>
-	 <script src="${utilJs}"></script>
-	 <script src="${uiJs}"></script>
-		<script src="${mainJs}"></script>
-		
+	<script src="${progressJs}"></script>
+	<script src="${findWidgetJs}"></script>
+	<script src="${ioJs}"></script>
+	<script src="${utilJs}"></script>
+	<script src="${uiJs}"></script>
+	<script src="${mainJs}"></script>
+
 	</body>
 </html>`
 }
