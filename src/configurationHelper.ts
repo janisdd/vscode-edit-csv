@@ -33,6 +33,7 @@ const defaultConfig: CsvEditSettings = {
 	fontSizeInPx: 16,
 	showColumnHeaderNamesWithLettersLikeExcel: false,
 	shouldWatchCsvSourceFile: true,
+	sidePanelAppearance: 'collapsed',
 }
 
 /**

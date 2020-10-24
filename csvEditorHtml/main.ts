@@ -186,7 +186,11 @@ const sourceFileUnwatchedIndicator = _getById('source-file-unwatched-indicator')
 
 const hasHeaderReadOptionInput = _getById('has-header') as HTMLInputElement
 
-const sideBarResizeHandle = _getById(`side-bar-resize-handle`) as HTMLDivElement
+const leftSidePanelToggle = document.getElementById('left-panel-toggle')
+if (vscode && !leftSidePanelToggle) throw new Error(`element with id 'left-panel-toggle' not found`) //null is ok for browser
+const leftPanelToggleIconExpand = document.getElementById(`left-panel-toggle-icon-expand`) as HTMLElement //<i>
+if (vscode && !leftPanelToggleIconExpand) throw new Error(`element with id 'left-panel-toggle-icon-expand' not found`) //null is ok for browser
+const sideBarResizeHandle = _getById(`side-panel-resize-handle`) as HTMLDivElement
 //--- side stats
 const sidePanel = _getById(`side-panel`) as HTMLDivElement
 const statSelectedRows = _getById(`stat-selected-rows`) as HTMLDivElement

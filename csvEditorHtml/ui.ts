@@ -1501,6 +1501,7 @@ function _toggleFixedColumnsText() {
 }
 
 const minSidebarWidthInPx = 150
+const collapseSidePanelThreshold = 60 //if we drag the handle e.g. between left: [0, 80] we collapse the side panel, so this is the left space to the left window border
 /**
  * setsup the sidedbar resize handle events
  */
@@ -1521,10 +1522,24 @@ function setupSideBarResizeHandle() {
 	document.addEventListener(`mousemove`, throttle((e: MouseEvent) => {
 		if (downX === null) return
 
-		let delta = e.clientX - downX
+		const delta = e.clientX - downX
 
 		sidePanel.style.width = `${Math.max(downWidth + delta, minSidebarWidthInPx)}px`
-		console.log(`delta`, delta)
+
+		if (vscode) {
+
+			const isSidePanelCollapsed = getIsSidePanelCollapsed()
+
+			if (e.clientX <= collapseSidePanelThreshold) {
+				//we want to collapse the side panel
+				if (!isSidePanelCollapsed) toggleSidePanel(true)
+			} else {
+				//this is not really possible because we cannot drag the collapsed panel...
+				//ensude the side panel is not collapsed (expanded)
+				if (isSidePanelCollapsed) toggleSidePanel(false)
+			}
+		}
+
 		onResizeGrid()
 	}, 200))
 
@@ -1534,3 +1549,31 @@ function setupSideBarResizeHandle() {
 
 }
 
+function getIsSidePanelCollapsed(): boolean {
+	return window.getComputedStyle(leftPanelToggleIconExpand).display === 'block'
+}
+
+function toggleSidePanel(shouldCollapse?: boolean) {
+
+	//only in extension (not in browser)
+	if (vscode && shouldCollapse === undefined) {
+		const isSidePanelCollapsed = getIsSidePanelCollapsed()
+		if (isSidePanelCollapsed) {
+			shouldCollapse = false
+		} else {
+			shouldCollapse = true
+		}
+	}
+
+	document.documentElement.style
+		.setProperty('--extension-side-panel-display', shouldCollapse ? `none` : `flex`)
+
+	document.documentElement.style
+		.setProperty('--extension-side-panel-expand-icon-display', shouldCollapse ? `block` : `none`)
+
+	document.documentElement.style
+		.setProperty('--extension-side-panel-collapse-icon-display', shouldCollapse ? `none` : `block`)
+
+	onResizeGrid()
+
+}

@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.4.2",
+	"version": "0.5.0",
 	"license": "MIT",
 	"publisher": "janisdd",
 	"engines": {
@@ -352,6 +352,19 @@
 					"type": "boolean",
 					"default": true,
 					"description": "true: the source csv file is watched for changes. If changes happen the user is notified (maybe the table is automatically reloaded when the table has no changes). false: not watched the source csv file"
+				},
+				"csv-edit.sidePanelAppearance": {
+					"type": "string",
+					"default": "collapsed",
+					"description": "the appearance of the side panel",
+					"enum": [
+						"expanded",
+						"collapsed"
+					],
+					"enumDescriptions": [
+						"side panel will always start expanded",
+						"side panel will always start collapsed"
+					]
 				}
 			}
 		}

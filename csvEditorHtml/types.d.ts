@@ -177,6 +177,13 @@ type CsvEditSettings = {
 	 * true: the source csv file is watched for changes. If changes happen the user is notified (maybe the table is automatically reloaded when the table has no changes). false: not watched the source csv file
 	 */
 	shouldWatchCsvSourceFile: boolean
+
+	/**
+	 * the appearance of the side panel
+	 * expanded: side panel will always start expanded
+	 * collapsed: side panel will always start collapsed
+	 */
+	sidePanelAppearance: 'expanded' | 'collapsed'
 }
 
 /* --- frontend settings --- */

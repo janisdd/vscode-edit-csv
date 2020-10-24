@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## 0.5.0
+
+- added browser version
+- added side panel with some stats
 - options bar is not longer flashing (when hiding it at startup)
 	- done via css variable
 - fixed issue where papaparse would take very long to load a csv file

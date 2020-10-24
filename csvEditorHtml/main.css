@@ -1,6 +1,9 @@
 
 html {
 	--extension-options-bar-display: block;
+	--extension-side-panel-display: none;
+	--extension-side-panel-expand-icon-display: block;
+	--extension-side-panel-collapse-icon-display: none;
 }
 
 html, body {
@@ -196,11 +199,35 @@ body .modal {
 	/* border-left: 1px solid #8e8e8e; */
 	/* width: 155px; */
 	min-width: 150px; /* see {@link minSidebarWidthInPx}*/
+	display: var(--extension-side-panel-display);
 }
 
-#side-bar-resize-handle {
+#left-panel-toggle {
+	width: 18px;
+	height: 18px;
+}
+
+#side-panel-inner {
+	flex: 1;
+}
+
+.left-panel-toggle-icon-collapse {
+	display: var(--extension-side-panel-collapse-icon-display);
+}
+
+.left-panel-toggle-icon-expand {
+	display: var(--extension-side-panel-expand-icon-display);
+}
+
+.side-panel-toggle-wrapper {
+	padding: 5px;
+	display: flex;
+	align-items: center;
+}
+
+#side-panel-resize-handle {
 	width: 3px;
-	border-right: 1px solid #8e8e8e;
+	border-right: 1px solid #8e8e8e52;
 	cursor: ew-resize;
 }
 

@@ -42,6 +42,7 @@ var initialConfig: CsvEditSettings | undefined = {
 	fontSizeInPx: 16,
 	showColumnHeaderNamesWithLettersLikeExcel: false,
 	shouldWatchCsvSourceFile: true,
+	sidePanelAppearance: 'expanded',
 }
 
 function __getById(id: string): HTMLElement {

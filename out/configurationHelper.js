@@ -33,6 +33,7 @@ const defaultConfig = {
     fontSizeInPx: 16,
     showColumnHeaderNamesWithLettersLikeExcel: false,
     shouldWatchCsvSourceFile: true,
+    sidePanelAppearance: 'collapsed',
 };
 /**
  * returns the configuration for this extension
