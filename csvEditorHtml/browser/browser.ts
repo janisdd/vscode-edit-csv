@@ -3,8 +3,17 @@ const chardet = window.chardet
 //@ts-ignore
 const iconv = window.iconv
 
+//uncomment to get typing, but cannot be deployed so uncomment after you finished
 // import Swal from "sweetalert2"
 declare var Swal: any
+
+interface Toaster {
+	new(content: string, type: "info" | "message" | "warning" | "error" | "done", timeoutInMs: number): Toaster
+	new(content: HTMLElement, type: "info" | "message" | "warning" | "error" | "done", timeoutInMs: number): Toaster
+	delete(): void
+}
+
+declare var Toast: Toaster
 
 // import type * as bulmaToast2 from "bulma-toast";
 declare var bulmaToast: any
@@ -312,6 +321,18 @@ function downloadAsFile(): void {
 	document.body.removeChild(aDownload)
 
 	window.URL.revokeObjectURL(url)
+
+	const downloadToastDiv = document.createElement(`div`)
+	const toastIcon = document.createElement(`i`)
+	toastIcon.classList.add('fas', 'fa-save')
+	toastIcon.style.marginRight = `5px`
+	const toastTextSpan = document.createElement(`span`)
+	toastTextSpan.textContent = `used output encoding: '${encoding}'`
+	downloadToastDiv.appendChild(toastIcon)
+	downloadToastDiv.appendChild(toastTextSpan)
+	
+	const toast = new Toast(downloadToastDiv, 'message', 5000)
+	downloadToastDiv.addEventListener(`click`, () => toast.delete())
 
 	//used to clear focus... else styles are not properly applied (clears btn border)
 	//@ts-ignore

@@ -166,7 +166,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 				<div class="sub-stat">
 					<div>Not empty
-						<span class="tooltip is-tooltip-right" data-tooltip="The selected cells count where the value is not empty">
+						<span class="tooltip is-tooltip-right" data-tooltip="The selected cells count where the value is not empty (whitespace is counted as value)">
 							<i class="far fa-question-circle"></i>
 						</span>
 					</div>

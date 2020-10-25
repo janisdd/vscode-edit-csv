@@ -1549,10 +1549,16 @@ function setupSideBarResizeHandle() {
 
 }
 
+/**
+ * gets if the side panel is collapsed (true) or not (false)
+ */
 function getIsSidePanelCollapsed(): boolean {
 	return window.getComputedStyle(leftPanelToggleIconExpand).display === 'block'
 }
 
+/**
+ * toggles the side panel
+ */
 function toggleSidePanel(shouldCollapse?: boolean) {
 
 	//only in extension (not in browser)

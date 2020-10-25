@@ -28,10 +28,13 @@
 	<!-- copy from node_modules -->
 	<link rel="preload" href="./third-party/sweetalert2/sweetalert2.min.css" as="style"
 		onload="this.onload=null;this.rel='stylesheet'">
-	<noscript>
-		<link rel="stylesheet" href="./third-party/sweetalert2/sweetalert2.min.css"></noscript>
+	<noscript><link rel="stylesheet" href="./third-party/sweetalert2/sweetalert2.min.css"></noscript>
 
 	<link id="sweetalert2-dark-theme-link" rel="stylesheet" href="./third-party/sweetalert2-themes/dark.min.css">
+
+	<link rel="preload" href="../../node_modules/toaster-js/default.css" as="style"
+		onload="this.onload=null;this.rel='stylesheet'">
+	<noscript><link rel="stylesheet" href="../../node_modules/toaster-js/default.css"></noscript>
 	<!-- end copy from node_modules -->
 
 	<link rel="stylesheet" href="../../thirdParty/bulma/bulma.min.css">
@@ -650,7 +653,7 @@
 
 					<div class="sub-stat">
 						<div>Not empty
-							<span class="tooltip is-tooltip-right" data-tooltip="The selected cells count where the value is not empty">
+							<span class="tooltip is-tooltip-right" data-tooltip="The selected cells count where the value is not empty (whitespace is counted as value)">
 								<i class="far fa-question-circle"></i>
 							</span>
 						</div>
@@ -918,6 +921,7 @@
 
 	<script src="./third-party/parcel-iconv-chardet.js"></script>
 	<!-- copy from node_modules -->
+	<script src="../../node_modules/toaster-js/umd.js"></script>
 	<script src="./third-party/sweetalert2//sweetalert2.min.js"></script>
 	<script src="./third-party/bulma-toast/bulma-toast.min.js"></script>
 	<script src="../../thirdParty/big.js/big.min.js"></script>

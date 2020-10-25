@@ -26,6 +26,16 @@ const assetsDistPath = path.join(distPath, assetsPrefixDir)
 
 const sourceMapLineRegex = /^\/\/# sourceMappingURL=(.*)$/gm
 
+type PathNameTuple = {
+	outputName: string
+	originalFullPath: string
+}
+//because we collapse the paths to only start with assets/[NAME]
+//we could get name collisions... we use these vars to indicate duplicate names and throw an error (must be fixed manually somehow)
+const jsScriptPathNames = new Map<string, PathNameTuple>()
+const cssLinkPathNames = new Map<string, PathNameTuple>()
+const imgPathNames = new Map<string, PathNameTuple>()
+
 //this is relative to csvEditorHtml/browser/
 const htmlFilePathsToBuild: string[] = [
 	`indexBrowser.html`,
@@ -34,7 +44,6 @@ const htmlFilePathsToBuild: string[] = [
 ]
 
 //this is relative to csvEditorHtml/browser/
-//NOTE THAT THIS IGNORED assets path!!
 //directories ends with /
 const justCopyPaths = [
 	[`../../thirdParty/fortawesome/fontawesome-free/webfonts/`, `webfonts/`]
@@ -59,7 +68,7 @@ function main() {
 			exit(1)
 			return
 		}
-	
+
 		try {
 			if (fs.existsSync(assetsDistPath)) {
 				console.log(`[INFO] dist path assets exists ${assetsDistPath}`)
@@ -206,17 +215,19 @@ function main() {
 
 			const newFileName = `${fileParts.namePart}.${buildHash}.${fileParts.extensionPart}`
 
-			const cssLinkPath = path.join(basePath, cssLink.href)
+			const cssLinkSourcePath = path.join(basePath, cssLink.href)
 			const outputPath = path.join(assetsDistPath, fileName)
 
-			console.log(`[INFO] found candidate css file (${j + 1}) relative path: ${cssLink.href}, absolute path: ${cssLinkPath} ...`)
+			console.log(`[INFO] found candidate css file (${j + 1}) relative path: ${cssLink.href}, absolute path: ${cssLinkSourcePath} ...`)
+
+			checkAndAddCssFilePath(fileName, cssLinkSourcePath)
 
 			//copy is step 1
 			try {
-				fs.copyFileSync(cssLinkPath, outputPath)
-				console.log(`[INFO] ... copyied css file ${cssLinkPath} to ${outputPath}`)
+				fs.copyFileSync(cssLinkSourcePath, outputPath)
+				console.log(`[INFO] ... copyied css file ${cssLinkSourcePath} to ${outputPath}`)
 			} catch (error) {
-				console.log(`[ERROR] ... error copying css file ${cssLinkPath} to ${outputPath}`)
+				console.log(`[ERROR] ... error copying css file ${cssLinkSourcePath} to ${outputPath}`)
 				throw error
 			}
 
@@ -236,7 +247,6 @@ function main() {
 				}
 				cssLink.removeAttribute('data-path-keep-depth')
 
-				
 				let dirPaths: string[] = []
 
 				for (let k = 0; k < pathKeepDepth; k++) {
@@ -246,7 +256,7 @@ function main() {
 				}
 
 				//now we need to replace the path in the html file...
-				
+
 				cssLink.href = path.join(...dirPaths, newFileName)
 			}
 
@@ -256,23 +266,25 @@ function main() {
 		console.log(`[INFO] --- script files (${scripts.length}) ---`)
 		for (let j = 0; j < scripts.length; j++) {
 			const scriptTag = scripts[j]
-			const scriptSrcPath = path.join(basePath, scriptTag.src)
+			const scriptSourceSrcPath = path.join(basePath, scriptTag.src)
 
 
-			let fileName = path.basename(scriptSrcPath)
+			let fileName = path.basename(scriptSourceSrcPath)
 			let fileParts = getFilePars(fileName)
 			const newFileName = `${fileParts.namePart}.${buildHash}.${fileParts.extensionPart}`
 
 			const outputPath = path.join(assetsDistPath, fileName)
 
-			console.log(`[INFO] found candidate script file (${j + 1}) relative path: ${scriptTag.src}, absolute path: ${scriptSrcPath}`)
+			console.log(`[INFO] found candidate script file (${j + 1}) relative path: ${scriptTag.src}, absolute path: ${scriptSourceSrcPath}`)
+
+			checkAndAddJsFilePath(fileName, scriptSourceSrcPath)
 
 			//copy is step 1
 			try {
-				copyFileSyncAndChangeContent(scriptSrcPath, outputPath, replaceJsSourceMapLine)
-				console.log(`[INFO] ... copyied script file ${scriptSrcPath} to ${outputPath}`)
+				copyFileSyncAndChangeContent(scriptSourceSrcPath, outputPath, replaceJsSourceMapLine)
+				console.log(`[INFO] ... copyied script file ${scriptSourceSrcPath} to ${outputPath}`)
 			} catch (error) {
-				console.log(`[ERROR] ... error copying script file ${scriptSrcPath} to ${outputPath}`)
+				console.log(`[ERROR] ... error copying script file ${scriptSourceSrcPath} to ${outputPath}`)
 				throw error
 			}
 
@@ -284,7 +296,7 @@ function main() {
 		console.log(`[INFO] --- img files (${imgs.length}) ---`)
 		for (let j = 0; j < imgs.length; j++) {
 			const imgTag = imgs[j]
-			const imgSrcPath = path.join(basePath, imgTag.src)
+			const imgSourceSrcPath = path.join(basePath, imgTag.src)
 
 			let fileName = path.basename(imgTag.src)
 			let fileParts = getFilePars(fileName)
@@ -292,21 +304,20 @@ function main() {
 
 			const outputPath = path.join(assetsDistPath, fileName)
 
-			console.log(`[INFO] found candidate img file (${j + 1}) relative path: ${imgTag.src}, absolute path: ${imgSrcPath} ...`)
+			console.log(`[INFO] found candidate img file (${j + 1}) relative path: ${imgTag.src}, absolute path: ${imgSourceSrcPath} ...`)
+
+			checkAndAddImgFilePath(fileName, imgSourceSrcPath)
 
 			//copy is step 1
 			try {
-				fs.copyFileSync(imgSrcPath, outputPath)
-				console.log(`[INFO] ... copyied img file ${imgSrcPath} to ${outputPath}`)
+				fs.copyFileSync(imgSourceSrcPath, outputPath)
+				console.log(`[INFO] ... copyied img file ${imgSourceSrcPath} to ${outputPath}`)
 			} catch (error) {
-				console.log(`[ERROR] ... error copying img file ${imgSrcPath} to ${outputPath}`)
+				console.log(`[ERROR] ... error copying img file ${imgSourceSrcPath} to ${outputPath}`)
 				throw error
 			}
 
-			
-
 			//now we need to replace the path in the html file...
-			
 			imgTag.src = path.join(assetsPrefixDir, newFileName)
 		}
 
@@ -429,23 +440,23 @@ function getAllCommentElements(document: Document, dom: jsdom.JSDOM): Comment[] 
 
 	const commentIterator = document.createNodeIterator(document,
 		dom.window.NodeFilter.SHOW_COMMENT, {
-			acceptNode: (node) => dom.window.NodeFilter.FILTER_ACCEPT
-		})
+		acceptNode: (node) => dom.window.NodeFilter.FILTER_ACCEPT
+	})
 
-		while (commentIterator.nextNode()) {
-			const commentNode = commentIterator.referenceNode as Comment
-			elements.push(commentNode)
-		}
+	while (commentIterator.nextNode()) {
+		const commentNode = commentIterator.referenceNode as Comment
+		elements.push(commentNode)
+	}
 	return elements
 }
 
 function copyFileSyncAndChangeContent(filePath: string, outputPath: string, replaceFunc: (content: string) => string) {
-	
+
 
 	try {
 		const content = fs.readFileSync(filePath, 'utf8')
 		const newContent = replaceFunc(content)
-		fs.writeFileSync(outputPath, newContent, 'utf8')	
+		fs.writeFileSync(outputPath, newContent, 'utf8')
 	} catch (error) {
 		throw error
 	}
@@ -463,10 +474,10 @@ function replaceJsSourceMapLine(jsFileContent: string): string {
  * see https://stackoverflow.com/questions/105034/how-to-create-guid-uuid
  */
 function uuidv4(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8)
-    return v.toString(16);
-  })
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+		var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8)
+		return v.toString(16);
+	})
 }
 type FileParts = {
 	namePart: string
@@ -485,4 +496,51 @@ function getFilePars(fileName: string): FileParts {
 		namePart: parts[0],
 		extensionPart: parts.slice(1).join('.')
 	}
+}
+
+function checkAndAddCssFilePath(cssFileName: string, fullCssLinkSourcePath: string) {
+	if (cssLinkPathNames.has(cssFileName)) {
+
+		const otherFile = cssLinkPathNames.get(cssFileName)
+
+		//this can actually happen if we use the exact same css file twice e.g. with preloading
+
+		if (otherFile?.originalFullPath !== fullCssLinkSourcePath) {
+			//we already got this file name... throw
+			throw new Error(`[ERROR] other CSS file has the same output name '${cssFileName}'! The other file full path is '${otherFile?.originalFullPath}', the current file full path is '${fullCssLinkSourcePath}'`)
+		}
+	}
+
+	cssLinkPathNames.set(cssFileName, {
+		outputName: cssFileName,
+		originalFullPath: fullCssLinkSourcePath
+	})
+}
+
+function checkAndAddJsFilePath(jsFileName: string, fullJsLinkSourcePath: string) {
+	if (cssLinkPathNames.has(jsFileName)) {
+
+		const otherFile = jsScriptPathNames.get(jsFileName)
+		//we already got this file name... throw
+		throw new Error(`[ERROR] other JS file has the same output name '${jsFileName}'! The other file full path is '${otherFile?.originalFullPath}', the current file full path is '${fullJsLinkSourcePath}'`)
+	}
+
+	jsScriptPathNames.set(jsFileName, {
+		outputName: jsFileName,
+		originalFullPath: fullJsLinkSourcePath
+	})
+}
+
+function checkAndAddImgFilePath(imgFileName: string, fullImgLinkSourcePath: string) {
+	if (cssLinkPathNames.has(imgFileName)) {
+
+		const otherFile = imgPathNames.get(imgFileName)
+		//we already got this file name... throw
+		throw new Error(`[ERROR] other IMG file has the same output name '${imgFileName}'! The other file full path is '${otherFile?.originalFullPath}', the current file full path is '${fullImgLinkSourcePath}'`)
+	}
+
+	imgPathNames.set(imgFileName, {
+		outputName: imgFileName,
+		originalFullPath: fullImgLinkSourcePath
+	})
 }

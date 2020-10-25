@@ -790,7 +790,7 @@ function afterHandsontableCreated(hot: Handsontable) {
 							let _num = Big(numberRegexRes[0])
 							numbersSum = numbersSum.plus(_num)
 						} catch (error) {
-							console.log(`could not create or add number to statSumOfNumbers at row: ${index}, col: ${i}`, error)
+							console.warn(`could not create or add number to statSumOfNumbers at row: ${index}, col: ${i}`, error)
 							containsInvalidNumbers = true
 						}
 					}

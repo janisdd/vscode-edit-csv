@@ -137,7 +137,9 @@ There are two things missing...
 - for ui: [bulma](https://github.com/jgthms/bulma), [bulma-extension](https://github.com/Wikiki/bulma-extensions), [fontawesome](https://github.com/FortAwesome/Font-Awesome)
 - for shortcuts: [mousetrap](https://github.com/ccampbell/mousetrap)
 
-*see `thirdParty` folder*
+*see `thirdParty` folders*
+
+There are some more in `package.json`. Even if they are not referenced directly, they are used e.g. for the browser build. We copy them from `node_modules` into the `thirdParty` folders.
 
 ## How to build locally
 
