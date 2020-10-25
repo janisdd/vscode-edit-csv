@@ -4,7 +4,9 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
-
+## 1.0.1
+- toast now displays the exported file encoding
+- side panel can now be resized
 
 ## 1.0.0
 - initial release
