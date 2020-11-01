@@ -8,6 +8,7 @@
 - added side panel with some stats
 - options bar is not longer flashing (when hiding it at startup)
 	- done via css variable
+- added multi column sorting (custom handsontable version bump)
 - fixed issue where papaparse would take very long to load a csv file
 	- this was because guessDelimiter and all fields quoted cases the whole file to be "searched" for the right delimiter multiple times (for each known delimiter)
 		- this was the case when there was some quoting issues

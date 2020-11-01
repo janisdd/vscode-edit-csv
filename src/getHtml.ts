@@ -668,7 +668,9 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 						<li>If you edit an unnamed (csv) file and close it then the editor will be closed too (unsaved changes will
 							be lost)!</li>
 						<li>Sorting state is exported</li>
-						<li>All cell values are strings thus sorting might behave differently than expected</li>
+						<li>Sorting is not automatically updated after data has changed</li>
+						<li>You can use ctrl/cmd click on a column header to sort by multiple columns</li>
+						<li>All cell values are strings thus sorting might behave differently than expected!!</li>
 						<li>Copy & Past use tab (<div class="keys">⇥</div>) as separator (same as excel)</li>
 						<li>You cannot change the new line character (because vs code automatically converts it to the file setting
 							i think)

@@ -23,8 +23,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Version: 6.3.0
- * Release date: 19/12/2018 (built at 25/10/2019 14:47:37)
+ * Version: 6.4.0
+ * Release date: 19/12/2018 (built at 01/11/2020 12:38:24)
  */
 /**
  * Fix for bootstrap styles
@@ -1079,6 +1079,102 @@ thead .htCollapseButton:after {
   animation-fill-mode: forwards;
   -webkit-animation-fill-mode: forwards;
 }
+/* we place a small indicator and a number indicating the order of sorting */
+
+/* Column's number position */
+.handsontable span.colHeader.columnSorting::after {
+  /* Centering start */
+  top: 50%;
+  margin-top: -2px; /* Two extra pixels (-2 instead of -4) for purpose of proper positioning of numeric indicators, when `font-size` set to default */
+  /* Centering end */
+
+  position: absolute;
+  right: -15px;
+  padding-left: 5px; ; /* For purpose of continuous mouse over experience, when moving between the `::before` and the `::after` elements */
+
+  font-size: 8px;
+  height: 8px;
+  line-height: 1.1;
+}
+
+/*.handsontable span.colHeader.columnSorting[class^="sort-"]::after,*/
+/*.handsontable span.colHeader.columnSorting[class*=" sort-"]::after {*/
+/*  content: "+"*/
+/*}*/
+
+.handsontable span.colHeader.columnSorting.sort-1::after {
+  content: '1';
+}
+
+.handsontable span.colHeader.columnSorting.sort-2::after {
+  content: '2';
+}
+
+.handsontable span.colHeader.columnSorting.sort-3::after {
+  content: '3';
+}
+
+.handsontable span.colHeader.columnSorting.sort-4::after {
+  content: '4';
+}
+
+.handsontable span.colHeader.columnSorting.sort-5::after {
+  content: '5';
+}
+
+.handsontable span.colHeader.columnSorting.sort-6::after {
+  content: '6';
+}
+
+.handsontable span.colHeader.columnSorting.sort-7::after {
+  content: '7';
+}
+
+.handsontable span.colHeader.columnSorting.sort-8::after {
+  content: '8';
+}
+.handsontable span.colHeader.columnSorting.sort-9::after {
+  content: '9';
+}
+.handsontable span.colHeader.columnSorting.sort-10::after {
+  content: '10';
+}
+.handsontable span.colHeader.columnSorting.sort-11::after {
+  content: '11';
+}
+.handsontable span.colHeader.columnSorting.sort-12::after {
+  content: '12';
+}
+.handsontable span.colHeader.columnSorting.sort-13::after {
+  content: '13';
+}
+.handsontable span.colHeader.columnSorting.sort-14::after {
+  content: '14';
+}
+.handsontable span.colHeader.columnSorting.sort-15::after {
+  content: '15';
+}
+.handsontable span.colHeader.columnSorting.sort-16::after {
+  content: '16';
+}
+.handsontable span.colHeader.columnSorting.sort-17::after {
+  content: '17';
+}
+.handsontable span.colHeader.columnSorting.sort-18::after {
+  content: '18';
+}
+.handsontable span.colHeader.columnSorting.sort-19::after {
+  content: '19';
+}
+.handsontable span.colHeader.columnSorting.sort-20::after {
+  content: '20';
+}
+
+/* TODO remove ??? */
+/* Drop-down menu widens header by 5 pixels, sort sequence numbers won't overlap the icon; mainly for the IE9+ */
+/*.htGhostTable th div button.changeType + span.colHeader.columnSorting:not(.indicatorDisabled) {*/
+/*  padding-right: 5px;*/
+/*}*/
 .htCommentCell {
     position: relative;
 }
