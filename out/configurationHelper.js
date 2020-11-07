@@ -34,6 +34,7 @@ const defaultConfig = {
     showColumnHeaderNamesWithLettersLikeExcel: false,
     shouldWatchCsvSourceFile: true,
     sidePanelAppearance: 'collapsed',
+    initialNumbersStyle: 'en',
 };
 /**
  * returns the configuration for this extension

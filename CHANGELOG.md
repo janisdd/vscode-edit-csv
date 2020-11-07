@@ -6,6 +6,7 @@
 
 - added browser version
 - added side panel with some stats
+	- supports different number styles (NOT FOR SORTING)
 - options bar is not longer flashing (when hiding it at startup)
 	- done via css variable
 - added multi column sorting (custom handsontable version bump)

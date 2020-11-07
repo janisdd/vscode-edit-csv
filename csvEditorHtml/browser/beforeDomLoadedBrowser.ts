@@ -43,6 +43,7 @@ var initialConfig: CsvEditSettings | undefined = {
 	showColumnHeaderNamesWithLettersLikeExcel: false,
 	shouldWatchCsvSourceFile: true,
 	sidePanelAppearance: 'expanded',
+	initialNumbersStyle: 'en',
 }
 
 function __getById(id: string): HTMLElement {

@@ -365,6 +365,19 @@
 						"side panel will always start expanded",
 						"side panel will always start collapsed"
 					]
+				},
+				"csv-edit.initialNumbersStyle": {
+					"type": "string",
+					"default": "en",
+					"description": "the initial numbers style for the side panel stats",
+					"enum": [
+						"en",
+						"non-en"
+					],
+					"enumDescriptions": [
+						"decimal separator is '.' e.g. 3.14 Optional thousand separator: ',' e.g. 1,003.14",
+						"decimal separator is ',' e.g. 3,14 Optional thousand separator: '.' e.g. 1.003,14"
+					]
 				}
 			}
 		}

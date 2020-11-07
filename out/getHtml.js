@@ -32,6 +32,7 @@ function createEditorHtml(webview, context, initialVars) {
     const mousetrapJs = _getResourcePath('thirdParty/mousetrap/mousetrap.min.js');
     const mousetrapBindGlobalJs = _getResourcePath('thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js');
     const bigJs = _getResourcePath('thirdParty/big.js/big.min.js');
+    const bigJsToFormat = _getResourcePath('thirdParty/toFormat/toFormat.min.js');
     let fontAwesomeCss = _getResourcePath('thirdParty/fortawesome/fontawesome-free/css/all.min.css');
     //we need to load the font manually because the url() seems to not work properly with vscode-resource
     const iconFont = _getResourcePath('thirdParty/fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2');
@@ -192,6 +193,33 @@ function createEditorHtml(webview, context, initialVars) {
 				<div class="stat">
 					<div>Cols count</div>
 					<div id="stat-cols-count">000</div>
+				</div>
+
+				<div class="stat divider"></div>
+
+				<div class="stat">
+					<div>Numbers style
+						<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="The number style only applies for the stats, does not affect sorting!!">
+							<i class="far fa-question-circle"></i>
+						</span>
+					</div>
+					<div class="control" style="padding-left: 0;">
+						<label class="radio">
+							<input id="numbers-style-en" type="radio" name="numbers-style">
+							en: 3.14 
+							<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="Decimal separator: '.' Thousand separator: a single whitespace or ','">
+								<i class="far fa-question-circle"></i>
+							</span>
+						</label>
+						<br />
+						<label class="radio">
+							<input id="numbers-style-non-en" type="radio" name="numbers-style">
+							non-en: 3,14
+							<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="Decimal separator: ',' Thousand separator: a single whitespace or '.'">
+								<i class="far fa-question-circle"></i>
+							</span>
+						</label>
+					</div>
 				</div>
 
 				<div class="stat divider"></div>
@@ -823,6 +851,7 @@ function createEditorHtml(webview, context, initialVars) {
 	<script src="${mousetrapJs}"></script>
 	<script src="${mousetrapBindGlobalJs}"></script>
 	<script src="${bigJs}"></script>
+	<script src="${bigJsToFormat}"></script>
 
 	<script src="${progressJs}"></script>
 	<script src="${findWidgetJs}"></script>

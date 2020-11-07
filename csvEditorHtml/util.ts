@@ -163,9 +163,9 @@ function spreadsheetColumnLetterLabel(index: number) {
 	26 --> AA
 	27 --> AB
 	...
-  2*26-1=51 --> AZ
-  52 --> BA
-  3*26-1=77 --> BZ
+	2*26-1=51 --> AZ
+	52 --> BA
+	3*26-1=77 --> BZ
 	*/
 	let num = index
 	let columnLabel = ''
@@ -635,6 +635,8 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 	//--- other options
 	fixedRowsTopInfoSpan.innerText = fixedRowsTop + ''
 	fixedColumnsTopInfoSpan.innerText = fixedColumnsLeft + ''
+
+	setNumbersStyleUi(initialConfig.initialNumbersStyle)
 }
 
 
@@ -745,7 +747,7 @@ function customSearchMethod(query: string | undefined | null, value: string | un
 }
 
 //taken from https://github.com/MikeMcl/big.js/blob/master/big.js
-const numberRegex = /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/
+// const numberRegex = /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/
 function afterHandsontableCreated(hot: Handsontable) {
 
 	/**
@@ -755,6 +757,7 @@ function afterHandsontableCreated(hot: Handsontable) {
 	 * @param column2 Selection end visual column index.
 	 */
 	const afterSelectionHandler = (row: number, column: number, row2: number, column2: number) => {
+		let numbersStyleToUse = getNumbersStyleFromUi()
 		let rowsCount = Math.abs(row2 - row) + 1
 		let colsCount = Math.abs(column2 - column) + 1
 		statSelectedRows.innerText = `${rowsCount}`
@@ -782,12 +785,13 @@ function afterHandsontableCreated(hot: Handsontable) {
 					notEmptyCount++
 
 					if (!containsInvalidNumbers) {
-						let numberRegexRes = numberRegex.exec(el)
 
-						if (!numberRegexRes || numberRegexRes.length === 0) continue
+						const firstCanonicalNumberStringInCell = getFirstCanonicalNumberStringInCell(el, numbersStyleToUse)
+
+						if (firstCanonicalNumberStringInCell === null) continue
 
 						try {
-							let _num = Big(numberRegexRes[0])
+							let _num = Big(firstCanonicalNumberStringInCell)
 							numbersSum = numbersSum.plus(_num)
 						} catch (error) {
 							console.warn(`could not create or add number to statSumOfNumbers at row: ${index}, col: ${i}`, error)
@@ -801,7 +805,7 @@ function afterHandsontableCreated(hot: Handsontable) {
 		statSelectedNotEmptyCells.innerText = `${notEmptyCount}`
 		statSumOfNumbers.innerText = containsInvalidNumbers
 			? `Some invalid num`
-			: `${numbersSum}`
+			: `${formatBigJsNumber(numbersSum, numbersStyleToUse)}`
 	}
 
 	hot.addHook('afterSelection', afterSelectionHandler as any)
@@ -823,4 +827,131 @@ function afterHandsontableCreated(hot: Handsontable) {
 	statSelectedCellsCount.innerText = `${0}`
 	statRowsCount.innerText = `${hot.countRows()}`
 	statColsCount.innerText = `${hot.countCols()}`
+}
+
+
+/**
+ * returns the first number string in the cell value
+ */
+function getFirstCanonicalNumberStringInCell(cellValue: string, numbersStyle: NumbersStyle): string | null {
+
+	// let thousandSeparatorsMatches = numbersStyle.thousandSeparatorReplaceRegex.exec(cellValue)
+
+	let cellContent = cellValue
+
+	let thousandSeparatorsMatches
+	while (thousandSeparatorsMatches = numbersStyle.thousandSeparatorReplaceRegex.exec(cellValue)) {
+
+		let replaceContent = thousandSeparatorsMatches[0].replace(numbersStyle.thousandSeparator, '')
+		cellContent = cellContent.replace(thousandSeparatorsMatches[0], replaceContent)
+	}
+
+	let numberRegexRes = numbersStyle.regex.exec(cellContent)
+
+	if (!numberRegexRes || numberRegexRes.length === 0) return null
+
+	//this not longer has thousand separators...
+	//big js only accepts numbers in en format (3.14)
+	return numberRegexRes[0].replace(/\,/gm, '.')
+}
+
+const knownNumberStylesMap: KnownNumberStylesMap = {
+	"en": {
+		key: 'en',
+		/**
+		 * this allows:
+		 * 0(000)
+		 * 0(000).0(000)
+		 * .0(000)
+		 * all repeated with - in front (negative numbers)
+		 * all repeated with e0(000) | e+0(000) | e-0(000)
+		 */
+		regex: /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/,
+		thousandSeparator: /(\,| )/gm,
+		thousandSeparatorReplaceRegex: /((\,| )\d{3})+/gm
+	},
+	"non-en": {
+		key: 'non-en',
+		/**
+		 * this allows:
+		 * 0(000)
+		 * 0(000),0(000)
+		 * ,0(000)
+		 * all repeated with - in front (negative numbers)
+		 * all repeated with e0(000) | e+0(000) | e-0(000)
+		 */
+		regex: /-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?/,
+		thousandSeparator: /(\.| )/gm,
+		thousandSeparatorReplaceRegex: /((\.| )\d{3})+/gm
+	}
+}
+
+/**
+ * sets the number style ui from the given nubmer style
+ */
+function setNumbersStyleUi(numbersStyleToUse: CsvEditSettings["initialNumbersStyle"]) {
+
+	numbersStyleEnRadio.checked = false
+	numbersStyleNonEnRadio.checked = false
+
+	switch (numbersStyleToUse) {
+		case 'en': {
+			numbersStyleEnRadio.checked = true
+			break
+		}
+
+		case 'non-en': {
+			numbersStyleNonEnRadio.checked = true
+			break
+		}
+
+		default:
+			notExhaustiveSwitch(numbersStyleToUse)
+	}
+}
+
+/**
+ * returns the number style from the ui
+ */
+function getNumbersStyleFromUi(): NumbersStyle {
+
+
+	if (numbersStyleEnRadio.checked) return knownNumberStylesMap['en']
+
+	if (numbersStyleNonEnRadio.checked) return knownNumberStylesMap['non-en']
+
+	postVsWarning(`Got unknown numbers style from ui, defaulting to 'en'`)
+
+	return knownNumberStylesMap['en']
+}
+
+//don't know how to type this properly without typeof ...
+const b = new Big(1)
+function formatBigJsNumber(bigJsNumber: typeof b, numbersStyleToUse: NumbersStyle): string {
+
+	switch (numbersStyleToUse.key) {
+		case 'en': {
+
+			//@ts-ignore
+			bigJsNumber.format = {
+				decimalSeparator: '.',
+				groupSeparator: '', //TODO or maybe whitespace?
+			}
+			break
+		}
+		case 'non-en': {
+			//@ts-ignore
+			bigJsNumber.format = {
+				decimalSeparator: ',',
+				groupSeparator: '', //TODO or maybe whitespace?
+			}
+			break
+		}
+
+		default:
+			notExhaustiveSwitch(numbersStyleToUse.key)
+	}
+
+	//@ts-ignore
+	return bigJsNumber.toFormat()
 }

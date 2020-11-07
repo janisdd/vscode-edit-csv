@@ -32,6 +32,10 @@ body.vscode-dark {
 	color: #d0d0d0;
 }
 
+.vscode-dark .radio:hover {
+	color: #d0d0d0;
+}
+
 .vscode-dark .select select {
 	border-color: #8e8e8e;
 	background-color: #404040;

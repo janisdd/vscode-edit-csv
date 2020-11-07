@@ -29,6 +29,10 @@ body.vscode-high-contrast {
 	color: white;
 }
 
+.vscode-dark .radio:hover {
+	color: white;
+}
+
 .vscode-high-contrast .box {
 	background-color: black;
 	color: white;

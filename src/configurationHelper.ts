@@ -34,6 +34,7 @@ const defaultConfig: CsvEditSettings = {
 	showColumnHeaderNamesWithLettersLikeExcel: false,
 	shouldWatchCsvSourceFile: true,
 	sidePanelAppearance: 'collapsed',
+	initialNumbersStyle: 'en',
 }
 
 /**

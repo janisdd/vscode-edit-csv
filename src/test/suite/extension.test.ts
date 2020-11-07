@@ -80,7 +80,7 @@ suite('some frontend func tests', function () {
         const COLUMN_LABEL_BASE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         const COLUMN_LABEL_BASE_LENGTH = COLUMN_LABEL_BASE.length
 
-        function spreadsheetColumnLetterLabel(index: number) {
+        function spreadsheetColumnLetterLabel(index: number): string {
             let num = index
             let columnLabel = ''
             //see https://stackoverflow.com/questions/34813980/getting-an-array-of-column-names-at-sheetjs

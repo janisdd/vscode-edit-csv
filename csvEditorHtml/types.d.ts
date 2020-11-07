@@ -184,6 +184,13 @@ type CsvEditSettings = {
 	 * collapsed: side panel will always start collapsed
 	 */
 	sidePanelAppearance: 'expanded' | 'collapsed'
+
+	/**
+	 * the initial numbers style for the side panel (can be changed later through the ui)
+	 * en: decimal separator is '.' e.g. 3.14
+	 * non-en: decimal separator is ',' e.g. 3,14
+	 */
+	initialNumbersStyle: 'en' | 'non-en'
 }
 
 /* --- frontend settings --- */
@@ -452,4 +459,29 @@ type Point = {
 type ExtendedCsvParseResult = {
 	data: string[][]
 	columnIsQuoted: boolean[]
+}
+
+type NumbersStyle = {
+	key: 'en' | 'non-en'
+	regex: RegExp
+	thousandSeparator: RegExp
+	/**
+	 * the idea is to replace the thousand separators with the empty string (we normally also allow a single whitespace as separator)... else:
+	 * e.g. we have en (1.23) and a cell values is 1,2,3
+	 * when we just replace the thousand separator (,) with the empty string we get 123
+	 * but actually we only use the first number so we expect 1
+	 * 
+	 * when replacing only this regex e.g. /((\.)\d{3})+/
+	 * 1.000,123 -> 1000,123
+	 * 1.000 --> 1000
+	 * 1.000.000 -> 1000000
+	 * 1,2,3 -> 1,2,3
+	 * 1,200,3 -> 1200,3 (hm... maybe this should be 2003? for now it's easier the match from left to right and replace)
+	 */
+	thousandSeparatorReplaceRegex: RegExp
+}
+
+type KnownNumberStylesMap = {
+	['en']: NumbersStyle
+	['non-en']: NumbersStyle
 }

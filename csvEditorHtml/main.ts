@@ -30,6 +30,10 @@ const csv: typeof import('papaparse') = (window as any).Papa
 //handsontable instance
 let hot: import('../thirdParty/handsontable/handsontable') | null
 
+//add toFormat to big numbers
+//@ts-ignore
+toFormat(Big)
+
 /**
  * the default csv content to used if we get empty content
  * handson table will throw if we pass in a 1D array because it expects an object?
@@ -200,6 +204,9 @@ const statColsCount = _getById(`stat-cols-count`) as HTMLDivElement
 const statSelectedCellsCount = _getById(`stat-selected-cells-count`) as HTMLDivElement
 const statSelectedNotEmptyCells = _getById(`stat-selected-not-empty-cells`) as HTMLDivElement
 const statSumOfNumbers = _getById(`stat-sum-of-numbers`) as HTMLDivElement
+
+const numbersStyleEnRadio = _getById(`numbers-style-en`) as HTMLInputElement //radio
+const numbersStyleNonEnRadio = _getById(`numbers-style-non-en`) as HTMLInputElement //radio
 
 //--- find widget controls
 

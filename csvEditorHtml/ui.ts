@@ -1525,6 +1525,7 @@ function setupSideBarResizeHandle() {
 		const delta = e.clientX - downX
 
 		sidePanel.style.width = `${Math.max(downWidth + delta, minSidebarWidthInPx)}px`
+		sidePanel.style.maxWidth = `${Math.max(downWidth + delta, minSidebarWidthInPx)}px`
 
 		if (vscode) {
 

@@ -25,6 +25,9 @@ body.vscode-light {
 	color: #404040;
 }
 
+.vscode-light .radio:hover {
+	color: #657b83;
+}
 
 /* handson table styles */
 

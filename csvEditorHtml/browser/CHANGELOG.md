@@ -6,6 +6,7 @@ note that the changelog is also present on the website when you click on the ver
 
 ## 1.1.0
 - added multi column sorting (custom handsontable version bump)
+- left side panel (stats) now supports two different number styles
 
 ## 1.0.1
 - toast now displays the exported file encoding

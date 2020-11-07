@@ -191,7 +191,7 @@ body .modal {
 .side-paneled {
 	display: flex;
 	flex: 1;
-	overflow: hidden;
+	/* overflow: hidden; */
 }
 
 .side-paneled .side-panel {
@@ -199,6 +199,7 @@ body .modal {
 	/* border-left: 1px solid #8e8e8e; */
 	/* width: 155px; */
 	min-width: 150px; /* see {@link minSidebarWidthInPx}*/
+	max-width: 150px;
 	display: var(--extension-side-panel-display);
 }
 
@@ -254,6 +255,16 @@ body .modal {
 	border-bottom: 1px solid #8e8e8e52;
 	margin-bottom: 3px;
 }
+
+.radio-list .radio {
+	display: block;
+}
+
+.radio-list .radio + .radio {
+	margin-left: 0;
+	margin-top: .5em;
+}
+
 
 /* from https://gist.github.com/jeromyanglim/3952143 */
 /*usage:  <div className="keys">A</div> */

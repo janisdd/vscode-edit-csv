@@ -266,7 +266,7 @@ function postReloadFile() {
  * called to display the given text in vs code 
  * @param text 
  */
-function postVsInformation(text: string) {
+var postVsInformation = (text: string) => {
 
 	if (!vscode) {
 		console.log(`postVsInformation (but in browser)`)
@@ -283,7 +283,7 @@ function postVsInformation(text: string) {
  * called to display the given text in vs code 
  * @param text 
  */
-function postVsWarning(text: string) {
+var postVsWarning = (text: string) => {
 
 	if (!vscode) {
 		console.log(`postVsWarning (but in browser)`)
