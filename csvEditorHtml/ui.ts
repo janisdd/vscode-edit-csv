@@ -63,9 +63,12 @@ function toggleOptionsBar(shouldCollapse?: boolean) {
  * 
  * @param fromUndo true: only update col headers, do not change the table data (will be done by undo/redo), false: normal
  */
-function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
+function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 
 	const el = hasHeaderReadOptionInput //or defaultCsvReadOptions._hasHeader
+
+	const autoApplyHasHeader = shouldApplyHasHeaderAfterRowsAdded
+	setShouldAutpApplyHasHeader(false)
 
 	const elWrite = _getById('has-header-write') as HTMLInputElement //or defaultCsvWriteOptions.header
 
@@ -73,7 +76,7 @@ function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 
 		if (!hot) throw new Error('table was null')
 
-		if (el.checked) {
+		if (el.checked || autoApplyHasHeader) {
 
 			//this checked state is set from csvReadOptions._hasHeader
 			const dataWithIndex = getFirstRowWithIndex()
@@ -89,6 +92,7 @@ function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			if (fromUndo) return
 	
 			headerRowWithIndex = dataWithIndex
+			el.checked = true //sync ui in case we get here via autoApplyHasHeader
 	
 			hot.updateSettings({
 				fixedRowsTop: 0,
@@ -188,6 +192,63 @@ function applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 	func()
 
 }
+
+/**
+ * sets or removes if the has header should be applies automatically (not applies, only sets flag and ui)
+ */
+function setShouldAutpApplyHasHeader(shouldSet: boolean) {
+
+	if(shouldSet) {
+		shouldApplyHasHeaderAfterRowsAdded = true
+		hasHeaderReadOptionInput.classList.add(`toggle-auto-future`)
+	} else {
+		hasHeaderReadOptionInput.classList.remove(`toggle-auto-future`)
+		shouldApplyHasHeaderAfterRowsAdded = false
+	}
+}
+
+/**
+ * checks if {@link shouldApplyHasHeaderAfterRowsAdded} is set and if so, tries to apply it
+ */
+function checkAutoApplyHasHeader() {
+
+	if (!shouldApplyHasHeaderAfterRowsAdded) return
+
+	tryApplyHasHeader()
+}
+
+/**
+ * tries to set the has header read option
+ * can fail if we have only 1 row
+ *   in this case we set {@link shouldApplyHasHeaderAfterRowsAdded} so we know we need to watch if rows are added and then apply it afterwards
+ */
+function tryApplyHasHeader() {
+
+	if (!hot) return
+
+	const uiShouldApply = hasHeaderReadOptionInput.checked
+	//this might also change the (ui) option
+	const canApply = checkIfHasHeaderReadOptionIsAvailable(false)
+
+	if (uiShouldApply) {
+		if (!canApply) {
+
+			if (shouldApplyHasHeaderAfterRowsAdded) {
+				//toggle to false (not auto apply)
+				setShouldAutpApplyHasHeader(false)
+				return
+			}
+	
+			setShouldAutpApplyHasHeader(true)
+			return
+		}
+	}
+
+	//else just apply
+	_applyHasHeader(true, false)
+}
+
+
 function setDelimiterString() {
 	const el = _getById('delimiter-string') as HTMLInputElement
 	defaultCsvReadOptions.delimiter = el.value
@@ -852,6 +913,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			}
 			onAnyChange()
 			updateFixedRowsCols()
+			checkAutoApplyHasHeader()
 		},
 		afterRemoveRow: function (visualRowIndex, amount) {
 			//we need to modify some or all hiddenPhysicalRowIndices...
@@ -985,14 +1047,23 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 	if (typeof afterHandsontableCreated !== 'undefined') afterHandsontableCreated(hot)
 
+	const oldShouldApplyHeaderReadOption = defaultCsvReadOptions._hasHeader
 	const settingsApplied = checkIfHasHeaderReadOptionIsAvailable(true)
 
 	//if we have only 1 row and header is enabled by default...this would be an error (we cannot display something)
 
-	if (settingsApplied === true && defaultCsvReadOptions._hasHeader === true) { //this must be applied else we get duplicate first row
-		applyHasHeader(true, false)
+	if (oldShouldApplyHeaderReadOption === true) {
 
-		updateFixedRowsCols()
+		if (settingsApplied === true) { //this must be applied else we get duplicate first row
+
+			_applyHasHeader(true, false)
+
+			updateFixedRowsCols()
+		} else {
+			//head cannot be applied (because only 1 or 0 rows) ... but settings say user want to has header...
+			//set auto enable if we have enough rows
+			setShouldAutpApplyHasHeader(true)
+		}
 	}
 
 	//make sure we see something (right size)...

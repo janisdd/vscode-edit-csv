@@ -345,12 +345,12 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 						
 												<div class="field">
 													<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked"
-														onchange="applyHasHeader(true, false)">
+														onchange="tryApplyHasHeader(true, false)">
 													<label for="has-header">
 														<span>Has header</span>
 													</label>
 													<span class="tooltip is-tooltip-right is-tooltip-multiline"
-														data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack!">
+														data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applies immediately, it will be applied if the table has more than 1 row.">
 														<i class="fas fa-question-circle"></i>
 													</span>
 												</div>

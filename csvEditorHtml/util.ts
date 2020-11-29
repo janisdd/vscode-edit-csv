@@ -237,7 +237,7 @@ function addRow(selectNewRow = true) {
 		hot.selectCell(numRows, 0)
 	}
 
-	checkIfHasHeaderReadOptionIsAvailable(false)
+	checkAutoApplyHasHeader()
 }
 
 /**
@@ -432,7 +432,7 @@ function checkIfHasHeaderReadOptionIsAvailable(isInitialRender: boolean): boolea
 
 	const data = getData() //this also includes header rows
 
-	const el = _getById('has-header') as HTMLInputElement
+	const el = hasHeaderReadOptionInput
 
 	let canSetOption = false
 
@@ -456,10 +456,10 @@ function checkIfHasHeaderReadOptionIsAvailable(isInitialRender: boolean): boolea
 	}
 
 	if (canSetOption) {
-		el.removeAttribute('disabled')
+		// el.removeAttribute('disabled')
 
 	} else {
-		el.setAttribute('disabled', '')
+		// el.setAttribute('disabled', '')
 
 		defaultCsvReadOptions._hasHeader = false
 		el.checked = false

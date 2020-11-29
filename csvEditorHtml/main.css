@@ -547,6 +547,9 @@ textarea.handsontableInput {
 	outline: #5292f7;
 }
 
+.switch[type=checkbox].toggle-auto-future+label:before {
+	background: #dcd164;
+}
 /* --- copied from bulma-extension --- */
 .switch[type=checkbox] {
 	outline: 0;

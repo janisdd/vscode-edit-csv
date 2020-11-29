@@ -1,5 +1,6 @@
 .vscode/**
 .vscode-test/**
+.github/**
 out/test/**
 src/**
 csvEditorHtml/index.html

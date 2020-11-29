@@ -143,6 +143,15 @@ let isFirstHasHeaderChangedEvent = true
  */
 let initialColumnWidth: number = 0
 
+/**
+ * this is only needed if we want to display header rows but we have only 1 row...
+ * handsontable always needs at least one row so we cannot remove the first row and use it as header
+ * so we store here that we want to set the first row as header row immediately after we have at least 2 rows
+ * true: use the first row as header row immediately after we have at least 2 rows
+ * false: do not use the first row as header (also false we have toggle has header option and have >= 2 rows)
+ */
+let shouldApplyHasHeaderAfterRowsAdded = false
+
 const csvEditorWrapper = _getById('csv-editor-wrapper')
 const csvEditorDiv = _getById('csv-editor')
 const helModalDiv = _getById('help-modal')
