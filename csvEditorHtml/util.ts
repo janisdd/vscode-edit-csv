@@ -757,55 +757,12 @@ function afterHandsontableCreated(hot: Handsontable) {
 	 * @param column2 Selection end visual column index.
 	 */
 	const afterSelectionHandler = (row: number, column: number, row2: number, column2: number) => {
-		let numbersStyleToUse = getNumbersStyleFromUi()
-		let rowsCount = Math.abs(row2 - row) + 1
-		let colsCount = Math.abs(column2 - column) + 1
-		statSelectedRows.innerText = `${rowsCount}`
-		// statSelectedNotEmptyRows
-		statSelectedCols.innerText = `${colsCount}`
-		// statSelectedNotEmptyCols
-		statSelectedCellsCount.innerText = `${rowsCount * colsCount}`
 
-		//could be improved when we iterate over cols when we have less cols than rows??
-		let notEmptyCount = 0
-		let numbersSum = Big(0)
-		let containsInvalidNumbers = false
-		let minR = Math.min(row, row2)
-		let maxR = Math.max(row, row2)
-		for (let index = minR; index <= maxR; index++) {
-			const data = hot.getDataAtRow(index)
-
-			let minC = Math.min(column, column2)
-			let maxC = Math.max(column, column2)
-
-			for (let i = minC; i <= maxC; i++) {
-				const el = data[i]
-
-				if (el !== '' && el !== null) {
-					notEmptyCount++
-
-					if (!containsInvalidNumbers) {
-
-						const firstCanonicalNumberStringInCell = getFirstCanonicalNumberStringInCell(el, numbersStyleToUse)
-
-						if (firstCanonicalNumberStringInCell === null) continue
-
-						try {
-							let _num = Big(firstCanonicalNumberStringInCell)
-							numbersSum = numbersSum.plus(_num)
-						} catch (error) {
-							console.warn(`could not create or add number to statSumOfNumbers at row: ${index}, col: ${i}`, error)
-							containsInvalidNumbers = true
-						}
-					}
-				}
-			}
+		if (getIsSidePanelCollapsed()) {
+			//not update stats (might be costly and we don't display stats anyway)
+		} else {
+			calculateStats(row, column, row2, column2)
 		}
-
-		statSelectedNotEmptyCells.innerText = `${notEmptyCount}`
-		statSumOfNumbers.innerText = containsInvalidNumbers
-			? `Some invalid num`
-			: `${formatBigJsNumber(numbersSum, numbersStyleToUse)}`
 	}
 
 	hot.addHook('afterSelection', afterSelectionHandler as any)
@@ -828,6 +785,82 @@ function afterHandsontableCreated(hot: Handsontable) {
 	statRowsCount.innerText = `${hot.countRows()}`
 	statColsCount.innerText = `${hot.countCols()}`
 }
+
+/**
+ * recalculates the stats (even if they are not visible)
+ */
+function recalculateStats() {
+	const selectedRanges = hot!.getSelected()
+
+	if (!selectedRanges) return
+
+	const firstRange = selectedRanges[0]
+
+	calculateStats(...firstRange)
+}
+
+/**
+ * the stats calculation func
+ * @param row 
+ * @param column 
+ * @param row2 
+ * @param column2 
+ */
+function _calculateStats(row: number, column: number, row2: number, column2: number) {
+	
+	let numbersStyleToUse = getNumbersStyleFromUi()
+	let rowsCount = Math.abs(row2 - row) + 1
+	let colsCount = Math.abs(column2 - column) + 1
+	statSelectedRows.innerText = `${rowsCount}`
+	// statSelectedNotEmptyRows
+	statSelectedCols.innerText = `${colsCount}`
+	// statSelectedNotEmptyCols
+	statSelectedCellsCount.innerText = `${rowsCount * colsCount}`
+
+	//could be improved when we iterate over cols when we have less cols than rows??
+	let notEmptyCount = 0
+	let numbersSum = Big(0)
+	let containsInvalidNumbers = false
+	let minR = Math.min(row, row2)
+	let maxR = Math.max(row, row2)
+	for (let index = minR; index <= maxR; index++) {
+		const data = hot!.getDataAtRow(index)
+
+		let minC = Math.min(column, column2)
+		let maxC = Math.max(column, column2)
+
+		for (let i = minC; i <= maxC; i++) {
+			const el = data[i]
+
+			if (el !== '' && el !== null) {
+				notEmptyCount++
+
+				if (!containsInvalidNumbers) {
+
+					const firstCanonicalNumberStringInCell = getFirstCanonicalNumberStringInCell(el, numbersStyleToUse)
+
+					if (firstCanonicalNumberStringInCell === null) continue
+
+					try {
+						let _num = Big(firstCanonicalNumberStringInCell)
+						numbersSum = numbersSum.plus(_num)
+					} catch (error) {
+						console.warn(`could not create or add number to statSumOfNumbers at row: ${index}, col: ${i}`, error)
+						containsInvalidNumbers = true
+					}
+				}
+			}
+		}
+	}
+
+	statSelectedNotEmptyCells.innerText = `${notEmptyCount}`
+	statSumOfNumbers.innerText = containsInvalidNumbers
+		? `Some invalid num`
+		: `${formatBigJsNumber(numbersSum, numbersStyleToUse)}`
+
+}
+
+const calculateStats = throttle(_calculateStats, 300) as typeof _calculateStats
 
 
 /**

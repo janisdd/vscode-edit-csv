@@ -1654,4 +1654,11 @@ function toggleSidePanel(shouldCollapse?: boolean) {
 
 	onResizeGrid()
 
+	if (shouldCollapse) {
+		//will be hidden
+	} else {
+		//we now display the stats ... calculate it
+		recalculateStats()
+	}
+
 }

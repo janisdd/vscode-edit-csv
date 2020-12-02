@@ -139,7 +139,7 @@ function createEditorHtml(webview, context, initialVars) {
 				<div class="stat">
 					<div>Numbers sum
 						<span class="tooltip is-tooltip-right is-tooltip-multiline"
-							data-tooltip="The sum of numbers in the selected cells. Only the first number of a cell is used (first that matches /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/). Arbitrary-precision is powered by big.js">
+							data-tooltip="The sum of numbers in the selected cells (only connected cells). Only the first number of a cell is used. Arbitrary-precision is powered by big.js">
 							<i class="far fa-question-circle"></i>
 						</span>
 					</div>
@@ -157,7 +157,7 @@ function createEditorHtml(webview, context, initialVars) {
 
 				<div class="sub-stat">
 					<div>Not empty
-						<span class="tooltip is-tooltip-right" data-tooltip="The selected cells count where the value is not empty (whitespace is counted as value)">
+						<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="The selected cells count where the value is not empty (whitespace is counted as value)">
 							<i class="far fa-question-circle"></i>
 						</span>
 					</div>
@@ -223,7 +223,7 @@ function createEditorHtml(webview, context, initialVars) {
 				</div>
 
 				<div class="stat divider"></div>
-
+				
 				<!-- some day an ad can be placed here -->
 				<!-- <div>
 					<div style="border: 1px solid black; height: 300px;">
