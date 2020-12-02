@@ -201,9 +201,11 @@ function setShouldAutpApplyHasHeader(shouldSet: boolean) {
 	if(shouldSet) {
 		shouldApplyHasHeaderAfterRowsAdded = true
 		hasHeaderReadOptionInput.classList.add(`toggle-auto-future`)
+		hasHeaderLabel.title = `Activated automatically, if table has >= 2 rows`
 	} else {
 		hasHeaderReadOptionInput.classList.remove(`toggle-auto-future`)
 		shouldApplyHasHeaderAfterRowsAdded = false
+		hasHeaderLabel.title = ``
 	}
 }
 

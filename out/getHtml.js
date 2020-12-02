@@ -335,7 +335,7 @@ function createEditorHtml(webview, context, initialVars) {
 												<div class="field">
 													<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked"
 														onchange="tryApplyHasHeader(true, false)">
-													<label for="has-header">
+													<label id="has-header-label" for="has-header">
 														<span>Has header</span>
 													</label>
 													<span class="tooltip is-tooltip-right is-tooltip-multiline"

@@ -198,6 +198,7 @@ const sourceFileUnwatchedIndicator = _getById('source-file-unwatched-indicator')
 
 
 const hasHeaderReadOptionInput = _getById('has-header') as HTMLInputElement
+const hasHeaderLabel = _getById(`has-header-label`) as HTMLLabelElement
 
 const leftSidePanelToggle = document.getElementById('left-panel-toggle')
 if (vscode && !leftSidePanelToggle) throw new Error(`element with id 'left-panel-toggle' not found`) //null is ok for browser
