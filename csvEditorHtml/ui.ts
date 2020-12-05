@@ -1627,7 +1627,14 @@ function setupSideBarResizeHandle() {
  * gets if the side panel is collapsed (true) or not (false)
  */
 function getIsSidePanelCollapsed(): boolean {
-	return window.getComputedStyle(leftPanelToggleIconExpand).display === 'block'
+
+	//only in vs code
+	if (vscode) {
+		return window.getComputedStyle(leftPanelToggleIconExpand).display === 'block'
+	}
+
+	//panel cannot be collapsed in browser
+	return false
 }
 
 /**

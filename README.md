@@ -95,6 +95,13 @@ As you can see this **does not** scale very well with **large csv files** (needs
 
 There are some settings for this plugin. Open the VS Code Settings and search for `csv-edit`
 
+### File extension xyz is not recognized by the vs code extension
+
+See https://code.visualstudio.com/docs/languages/overview#_adding-a-file-extension-to-a-language
+
+If the link is down: Search for `files.associations` in the vs code settings. Then add an entry for `*.xyz` to `csv`.  
+Now the file is treated as a csv file and is recognized by the extension
+
 ## Known Issues
 
 - if the source file content changes while the editor is open, the editor will not be updated (e.g. take new content)
