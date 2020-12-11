@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- added hint what option `EscapeChar` does (escapes the `QuoteChar` inside field values)
+
 ## 0.5.2
 
 - added hint to readme how to set csv for different file types in vs code

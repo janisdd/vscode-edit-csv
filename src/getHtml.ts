@@ -406,6 +406,10 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 													<div class="field mar-left">
 														<label>
 															<span>EscapeChar</span>
+															<span class="tooltip is-tooltip-multiline"
+																data-tooltip="The character used to escape the QuoteChar inside field values">
+																<i class="fas fa-question-circle"></i>
+															</span>
 														</label>
 														<input id="escape-char-string" class="input" type="text" oninput="setEscapeCharString()">
 													</div>
@@ -480,6 +484,10 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 												<div class="field mar-left">
 													<label>
 														<span>EscapeChar</span>
+														<span class="tooltip is-tooltip-multiline"
+															data-tooltip="The character used to escape the QuoteChar inside field values">
+															<i class="fas fa-question-circle"></i>
+														</span>
 													</label>
 													<input id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()">
 												</div>
@@ -533,7 +541,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 							<i class="fas fa-chevron-down left-panel-toggle-icon-collapse"></i>
 						</div>
 					</div>
-
+					
 					<button class="button is-outlined" onclick="addRow()">
 						<span class="icon is-small">
 							<i class="fas fa-plus"></i>
@@ -620,7 +628,6 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 					<progress id="received-csv-prog-bar" class="progress is-info" value="50" max="100"></progress>
 				</div>
 			</div>
-
 
 
 			<!-- main editor/grid area -->

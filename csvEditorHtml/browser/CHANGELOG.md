@@ -4,6 +4,8 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+- added hint what option `EscapeChar` does (escapes the `QuoteChar` inside field values)
+
 ## 1.1.1
 
 - (same as vs code extension v0.5.2)
