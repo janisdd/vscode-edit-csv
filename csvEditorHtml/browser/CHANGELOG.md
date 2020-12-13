@@ -4,6 +4,13 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.1.2
+
+- (same as vs code extension v0.5.3)
+- fixed issue where the table height is not properly resized when the windows is resized
+- resetting data now keeps column widths
+	- when removing a column left from a column the (right) column keeps it size
+	- the width is also shifted
 - added hint what option `EscapeChar` does (escapes the `QuoteChar` inside field values)
 
 ## 1.1.1

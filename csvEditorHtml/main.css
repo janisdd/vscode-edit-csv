@@ -191,7 +191,8 @@ body .modal {
 .side-paneled {
 	display: flex;
 	flex: 1;
-	/* overflow: hidden; */
+	/* needs to be hidden else the content (the table height will resize this larger than it should), see onResizeGrid */
+	overflow: hidden;
 }
 
 .side-paneled .side-panel {
