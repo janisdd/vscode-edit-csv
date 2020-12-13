@@ -152,6 +152,19 @@ let initialColumnWidth: number = 0
  */
 let shouldApplyHasHeaderAfterRowsAdded = false
 
+/**
+ * stores the widths of the handsontable columns
+ * THIS is always synced with the ui
+ * it allows us to modify the widths better e.g. restore widths...
+ * 
+ * uses visual column indices!
+ * 
+ * inspired by https://github.com/YaroslavOvdii/fliplet-widget-data-source/blob/master/js/spreadsheet.js (also see https://github.com/Fliplet/fliplet-widget-data-source/pull/81/files)
+ */
+let allColWidths: number[] = []
+//afterRender is called directly after we render the table but we might want to apply old col widths here
+let isInitialHotRender = true
+
 const csvEditorWrapper = _getById('csv-editor-wrapper')
 const csvEditorDiv = _getById('csv-editor')
 const helModalDiv = _getById('help-modal')

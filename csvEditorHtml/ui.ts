@@ -447,6 +447,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 		let defaultColHeaderFuncBound = defaultColHeaderFunc.bind(this, showColumnHeaderNamesWithLettersLikeExcel)
 
+	isInitialHotRender = true
+
 	hot = new Handsontable(container, {
 		data: csvParseResult.data,
 		trimWhitespace: false,
@@ -597,14 +599,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 		// },
 
-		//TODO see https://github.com/handsontable/handsontable/issues/3328
-		//only working because first argument is actually the old size, which is a bug
+		//see https://github.com/handsontable/handsontable/issues/3328
+		//ONLY working because first argument is actually the old size, which is a bug
 		beforeColumnResize: function (oldSize, newSize, isDoubleClick) { //after change but before render
-
-			//allColSizes is not always up to date... only set on window resize... when the bug is fixed we need to change this...
-
-			// if (allColSizes.length > 0 && isDoubleClick) {
-			// const oldSize = allColSizes[currentColumn]
 
 			if (oldSize === newSize) {
 				//e.g. we have a large column and the auto size is too large...
@@ -614,7 +611,13 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					console.log(`initialConfig is falsy`)
 				}
 			}
-			// }
+		},
+		afterColumnResize: function() {
+			// syncColWidths() //covered by afterRender
+		},
+		afterPaste: function () {
+			//could create new columns
+			// syncColWidths() //covered by afterRender
 		},
 		enterMoves: function (event: KeyboardEvent) {
 
@@ -716,6 +719,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			// 	applyHasHeader(true, true)
 			// }
 
+			//could remove columns
+			// syncColWidths() //covered by afterRender
 		},
 		beforeRedo: function (action: any) {
 
@@ -733,7 +738,17 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			// 	applyHasHeader(true, true)
 			// }
 		},
-
+		/**
+		 * isForced: Is true if rendering was triggered by a change of settings or data; or 
+		 * false if rendering was triggered by scrolling or moving selection.
+		 */
+		afterRender: function(isForced: boolean) {
+			if (!isForced || isInitialHotRender) return
+			//e.g. when we edit a cell and the cell must adjust the width because of the content
+			//there is no other hook?
+			//this is also fired on various other event (e.g. col resize...) but better sync more than miss an event
+			syncColWidths()
+		},
 		/**
 		 * this is an array if we e.g. move consecutive columns (2,3)
 		 *   but maybe there is a way... this func should handle this anyway
@@ -816,6 +831,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				columnIsQuoted = quoteCopy
 			}
 
+			// syncColWidths() //covered by afterRender
 			onAnyChange()
 		} as any),
 		afterRowMove: function(startRow: number, endRow: number) {
@@ -862,6 +878,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				columnIsQuoted.splice(physicalIndex, 0, ...Array(amount).fill(newColumnQuoteInformationIsQuoted))
 			}
 
+			// syncColWidths() //covered by afterRender
 			onAnyChange()
 			updateFixedRowsCols()
 		},
@@ -894,6 +911,10 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				columnIsQuoted.splice(physicalIndex, amount)
 			}
 
+			allColWidths.splice(visualColIndex, 1)
+			applyColWidths()
+
+			// syncColWidths() //covered by afterRender
 			onAnyChange()
 			updateFixedRowsCols()
 		},
@@ -1068,6 +1089,12 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		}
 	}
 
+	isInitialHotRender = false
+	if (allColWidths && allColWidths.length > 0) {
+		//apply old width
+		applyColWidths()
+	}
+
 	//make sure we see something (right size)...
 	onResizeGrid()
 
@@ -1111,10 +1138,6 @@ function onAnyChange(changes?: CellChanges[] | null, reason?: string) {
 	postSetEditorHasChanges(true)
 }
 
-//not needed really now because of bug in handson table, see https://github.com/handsontable/handsontable/issues/3328
-//just used to check if we have columns
-var allColSizes = []
-
 /**
  * updates the handson table to fill available space (will trigger scrollbars)
  */
@@ -1146,11 +1169,41 @@ function onResizeGrid() {
 	}, false)
 
 	//get all col sizes
-	allColSizes = []
-	for (let i = 0; i < hot.countCols(); i++) {
-		allColSizes.push(hot.getColWidth(i))
-	}
+	syncColWidths()
+}
 
+/**
+ * applies the stored col widths to the ui
+ */
+function applyColWidths() {
+	if (!hot) return
+
+	//this is a bit messy but it works...??
+	// console.log(`col widths applies`, allColWidths)
+	//snatched from https://github.com/YaroslavOvdii/fliplet-widget-data-source/blob/master/js/spreadsheet.js
+	hot.getSettings().manualColumnResize = false
+	//note that setting colWidths will disable the auto size column plugin (see Plugin AutoColumnSize.isEnabled)
+	//it is enabled if (!colWidths)
+	hot.updateSettings({ colWidths: allColWidths }, false)
+	hot.getSettings().manualColumnResize = true
+	hot.updateSettings({}, false)
+	hot.getPlugin('autoColumnSize').enablePlugin()
+}
+/**
+ * syncs the {@link allColWidths} with the ui/handsonable state
+ */
+function syncColWidths() {
+	allColWidths = _getColWidths()
+	// console.log('col widths synced', allColWidths);
+	
+}
+
+function _getColWidths() {
+	if (!hot) return
+	//@ts-ignore
+	return hot.getColHeader().map(function(header, index) {
+		return hot!.getColWidth(index)
+	})
 }
 
 /**
