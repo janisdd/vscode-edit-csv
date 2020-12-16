@@ -15,6 +15,7 @@ assignees: ''
 ### Version?
 - vs code plugin
 - browser
+- both
 
 
 ### Description
