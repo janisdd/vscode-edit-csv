@@ -4,6 +4,7 @@
 
 ## 0.5.3
 
+- added additional buttons to insert rows/columns
 - fixed issue where the table height is not properly resized when the windows is resized
 - resetting data now keeps column widths
 	- when removing a column left from a column the (right) column keeps it size

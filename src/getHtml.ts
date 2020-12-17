@@ -542,19 +542,35 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 						</div>
 					</div>
 					
-					<button class="button is-outlined" onclick="addRow()">
+					<button id="add-row-btn"  class="button is-outlined" onclick="addRow()">
 						<span class="icon is-small">
 							<i class="fas fa-plus"></i>
 						</span>
 						<span>Add row</span>
 					</button>
+					<div class="row-col-insert-btns">
+						<button class="button is-outlined" onclick="insertRowAbove()" title="Insert row above current row [ctrl+shift+ins]">
+							<i class="fas fas fa-caret-up "></i>
+						</button>
+						<button class="button is-outlined " onclick="insertRowBelow() " title="Insert row below current row [ctrl+ins]">
+							<i class="fas fa-caret-down ad"></i>
+						</button>
+					</div>
 
-					<button class="button is-outlined" onclick="addColumn()">
+					<button id="add-col-btn" class="button is-outlined" onclick="addColumn()">
 						<span class="icon is-small">
 							<i class="fas fa-plus"></i>
 						</span>
 						<span>Add column</span>
 					</button>
+					<div class="row-col-insert-btns">
+						<button class="button is-outlined" onclick="insertColLeft()" title="Insert column left to current column">
+							<i class="fas fas fa-caret-left"></i>
+						</button>
+						<button class="button is-outlined" onclick="insertColRight()" title="Insert column right to current column">
+							<i class="fas fa-caret-right"></i>
+						</button>
+					</div>
 
 					<button id="btn-apply-changes-to-file-and-save" class="button is-outlined mar-left" onclick="postApplyContent(true)">
 						<span class="icon is-small">

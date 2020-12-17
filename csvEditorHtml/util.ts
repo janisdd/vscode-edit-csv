@@ -241,6 +241,109 @@ function addRow(selectNewRow = true) {
 }
 
 /**
+ * returns the visual start row index of the first selection range
+ * the index is the visual one seen in the ui (e.g. changed when we reorder rows)
+ */
+function _getSelectedVisualRowIndex(): number | null {
+
+	if (!hot) throw new Error('table was null')
+
+	const selections = hot.getSelected()
+	if (!selections?.length) return null
+
+	const firstSelection = selections[0]
+	const rowIndex = firstSelection[0] //start row
+	return rowIndex
+}
+
+/**
+ * returns the visual start col index of the first selection range
+ * the index is the visual one seen in the ui (e.g. changed when we reorder rows)
+ */
+function _getSelectedVisualColIndex(): number | null {
+
+	if (!hot) throw new Error('table was null')
+
+	const selections = hot.getSelected()
+	if (!selections?.length) return null
+
+	const firstSelection = selections[0]
+	const rowIndex = firstSelection[1] //start row
+	return rowIndex
+}
+
+/**
+ * adds a new row above the current row
+ */
+function insertRowAbove(selectNewRow = true, preserveSelectedCol = false) {
+	_insertRowInternal(false, selectNewRow, preserveSelectedCol)
+}
+/**
+ * adds a new row below the current row
+ */
+function insertRowBelow(selectNewRow = true, preserveSelectedCol = false) {
+	_insertRowInternal(true, selectNewRow, preserveSelectedCol)
+}
+
+/**
+ * 
+ * @param belowCurrRow 
+ * @param selectNewRow 
+ * @param preserveSelectedCol true: if we select the new row do we also want to preserve the selected col? (if not the first col is selected)
+ */
+function _insertRowInternal(belowCurrRow: boolean, selectNewRow: boolean, preserveSelectedCol: boolean) {
+	if (!hot) throw new Error('table was null')
+
+	const currRowIndex = _getSelectedVisualRowIndex()
+	const currColIndex = _getSelectedVisualColIndex()
+	if (currRowIndex === null || currColIndex === null) return
+
+	const targetRowIndex = currRowIndex + (belowCurrRow ? 1 : 0)
+	// const test = hot.toPhysicalRow(targetRowIndex) //also not working when rows are reordered...
+	hot.alter('insert_row', targetRowIndex)
+
+	if (selectNewRow) {
+		hot.selectCell(targetRowIndex, preserveSelectedCol ? currColIndex : 0)
+	}
+
+	checkAutoApplyHasHeader()
+}
+
+/**
+ * adds a new row above the current row
+ */
+function insertColLeft(selectNewCol = true, preserveSelectedRow = true) {
+	_insertColInternal(false, selectNewCol, preserveSelectedRow)
+}
+/**
+ * adds a new col below the current row
+ */
+function insertColRight(selectNewCol = true, preserveSelectedRow = true) {
+	_insertColInternal(true, selectNewCol, preserveSelectedRow)
+}
+
+/**
+ * 
+ * @param belowCurrRow 
+ * @param selectNewRow 
+ * @param preserveSelectedCol true: if we select the new row do we also want to preserve the selected col? (if not the first col is selected)
+ */
+function _insertColInternal(afterCurrCol: boolean, selectNewCol: boolean, preserveSelectedRow: boolean) {
+	if (!hot) throw new Error('table was null')
+
+	const currColIndex = _getSelectedVisualColIndex()
+	const currRowIndex = _getSelectedVisualRowIndex()
+	if (currRowIndex === null || currColIndex === null) return
+
+	const targetColIndex = currColIndex + (afterCurrCol ? 1 : 0)
+	// const test = hot.toPhysicalColumn(targetColIndex) //also not working when columns are reordered...
+	hot.alter('insert_col', targetColIndex)
+
+	if (selectNewCol) {
+		hot.selectCell(preserveSelectedRow ? currRowIndex : 0, targetColIndex)
+	}
+}
+/**
  * removes a row by index
  * @param {number} index 0 based
  */
@@ -807,7 +910,7 @@ function recalculateStats() {
  * @param column2 
  */
 function _calculateStats(row: number, column: number, row2: number, column2: number) {
-	
+
 	let numbersStyleToUse = getNumbersStyleFromUi()
 	let rowsCount = Math.abs(row2 - row) + 1
 	let colsCount = Math.abs(column2 - column) + 1

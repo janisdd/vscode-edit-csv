@@ -6,7 +6,9 @@ note that the changelog is also present on the website when you click on the ver
 
 ## 1.1.2
 
+
 - (same as vs code extension v0.5.3)
+- added additional buttons to insert rows/columns
 - fixed issue where the table height is not properly resized when the windows is resized
 - resetting data now keeps column widths
 	- when removing a column left from a column the (right) column keeps it size

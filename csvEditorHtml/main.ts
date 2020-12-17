@@ -177,7 +177,7 @@ const readContent = _getById('read-options-content')
 const writeContent = _getById('write-options-content')
 const previewContent = _getById('preview-content')
 
-const btnApplyChangesToFileAndSave =_getById(`btn-apply-changes-to-file-and-save`)
+const btnApplyChangesToFileAndSave = _getById(`btn-apply-changes-to-file-and-save`)
 
 const readDelimiterTooltip = _getById('read-delimiter-tooltip')
 const readDelimiterTooltipText = "Empty to auto detect"
@@ -274,6 +274,8 @@ if (!vscode) {
 //set values from extension config
 setupAndApplyInitialConfigPart1(initialConfig, initialVars)
 
+setupGlobalShortcutsInVs()
+
 //see readDataAgain
 let _data = parseCsv(initialContent, defaultCsvReadOptions)
 
@@ -284,9 +286,9 @@ if (_data && !vscode) {
 	let initialRows = 5
 	let initialCols = 5
 
-	_exampleData = [...Array(initialRows).keys()].map(p => 
+	_exampleData = [...Array(initialRows).keys()].map(p =>
 		[...Array(initialCols).keys()].map(k => '')
-		)
+	)
 
 	//@ts-ignore
 	// _exampleData = Handsontable.helper.createSpreadsheetData(100, 20)
@@ -317,11 +319,20 @@ if (vscode) {
 //-------------------------------------------------- global shortcuts 
 //only in vs code not in browser
 
-if (vscode) {
-	Mousetrap.bindGlobal(['meta+s', 'ctrl+s'], (e) => {
-		e.preventDefault()
-		postApplyContent(true)
-	})
-	
-}
+//register this before handsontable so we can first apply our actions
+function setupGlobalShortcutsInVs() {
+	if (vscode) {
+		Mousetrap.bindGlobal(['meta+s', 'ctrl+s'], (e) => {
+			e.preventDefault()
+			postApplyContent(true)
+		})
+	}
 
+	Mousetrap.bindGlobal(['ctrl+ins'], (e) => {
+		insertRowBelow()
+	})
+	Mousetrap.bindGlobal(['ctrl+shift+ins'], (e) => {
+		insertRowAbove()
+	})
+
+}

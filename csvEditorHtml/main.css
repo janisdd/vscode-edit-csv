@@ -130,7 +130,7 @@ input.input {
 	display: flex;
 }
 
-.table-action-buttons .separated-btns button:not(:last-child) {
+.table-action-buttons .separated-btns > button:not(:last-child) {
 	margin-right: 5px;
 }
 
@@ -184,6 +184,26 @@ body .modal {
 
 .centered .modal-content {
 	text-align: center;
+}
+
+.row-col-insert-btns {
+	display: flex;
+	flex-direction: column;
+	margin-right: 10px;
+}
+.row-col-insert-btns button {
+	padding: 1px;
+	height: auto;
+	margin: 0;
+	padding: 0 4px;
+	width: 20px;
+	height: 18px;
+}
+
+
+#add-row-btn,
+#add-col-btn {
+	margin-right: -1px;
 }
 
 /* --- side bar --- */

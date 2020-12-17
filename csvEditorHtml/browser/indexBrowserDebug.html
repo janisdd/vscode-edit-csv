@@ -211,7 +211,7 @@
 			</div>
 
 			<div style="margin-right: 1rem;" class="clickable" onclick="toggleChangelogModal(true)">
-				v1.1.2
+				v1.2.0
 			</div>
 
 			<div style="margin-right: 1rem;">
@@ -555,19 +555,35 @@
 					</div>
 				</div> -->
 
-				<button class="button is-outlined" onclick="addRow()">
+				<button id="add-row-btn" class="button is-outlined" onclick="addRow()">
 					<span class="icon is-small">
 						<i class="fas fa-plus"></i>
 					</span>
 					<span>Add row</span>
 				</button>
+				<div class="row-col-insert-btns">
+					<button class="button is-outlined" onclick="insertRowAbove()" title="Insert row above current row [ctrl+shift+ins]">
+						<i class="fas fas fa-caret-up "></i>
+					</button>
+					<button class="button is-outlined " onclick="insertRowBelow() " title="Insert row below current row [ctrl+ins]">
+						<i class="fas fa-caret-down ad"></i>
+					</button>
+				</div>
 
-				<button class="button is-outlined" onclick="addColumn()">
+				<button id="add-col-btn" class="button is-outlined mar-left" onclick="addColumn()">
 					<span class="icon is-small">
 						<i class="fas fa-plus"></i>
 					</span>
 					<span>Add column</span>
 				</button>
+				<div class="row-col-insert-btns">
+					<button class="button is-outlined" onclick="insertColLeft()" title="Insert column left to current column">
+						<i class="fas fas fa-caret-left"></i>
+					</button>
+					<button class="button is-outlined" onclick="insertColRight()" title="Insert column right to current column">
+						<i class="fas fa-caret-right"></i>
+					</button>
+				</div>
 
 				<button id="btn-apply-changes-to-file-and-save" class="button is-outlined mar-left" onclick="downloadAsFile()">
 					<span class="icon is-small">
@@ -930,6 +946,8 @@
 			</header>
 			<section class="modal-card-body">
 				<ul>
+					<li class="new-version">v1.1.3</li>
+					<li>added buttons to insert rows/columns</li>
 					<li class="new-version">v1.1.2</li>
 					<li>resetting data now keeps column widths</li>
 					<li class="new-version">v1.1.1</li>
