@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.5.3",
+	"version": "0.5.4",
 	"license": "MIT",
 	"publisher": "janisdd",
 	"engines": {
@@ -102,6 +102,56 @@
 					"when": "resourceLangId == 'CSV (semicolon)'",
 					"command": "edit-csv.edit",
 					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (semicolon)'",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (pipe)'",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (whitespace)'",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (tilde)'",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (caret)'",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (colon)'",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (double quote)'",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (equals)'",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (dot)'",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (hyphen)'",
+					"command": "edit-csv.edit",
+					"group": "navigation"
 				}
 			],
 			"editor/title": [
@@ -131,8 +181,53 @@
 					"group": "navigation"
 				},
 				{
-					"when": "resourceScheme == csv-edit",
-					"command": "edit-csv.goto-source",
+					"when": "editorLangId == 'csv (semicolon)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (pipe)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (whitespace)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (tilde)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (caret)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (colon)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (double quote)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (equals)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (dot)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (hyphen)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
 					"group": "navigation"
 				}
 			],
@@ -159,6 +254,56 @@
 				},
 				{
 					"when": "resourceLangId == 'CSV (semicolon)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (semicolon)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (pipe)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (whitespace)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (tilde)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (caret)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (colon)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (double quote)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (equals)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (dot)' && resourceScheme != csv-edit",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'csv (hyphen)' && resourceScheme != csv-edit",
 					"command": "edit-csv.edit",
 					"group": "navigation"
 				}
