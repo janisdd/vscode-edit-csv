@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## 0.5.4
+## 0.5.5
 
 - fixed papaparse issue where `null` values (e.g. when a new row/col was added via handsontable) did't respect the `retainQuoteInformation`
 
