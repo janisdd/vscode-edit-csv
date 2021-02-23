@@ -7,8 +7,13 @@ commit: 49170b76b382317356c2f707e2e4191430b8d495
 comment: we need this to support custom comment handling...
 */
 /*
+
+NOTE that the minified version is not in sync!!
+you need to manually compress it, e.g. with https://javascript-minifier.com/
+
 changelog: (latest first)
 
+- fixes issue where passing an array of bools to unparse config option `quotes` is not used for null and undefined values
 - fixes issue where all fields quoted and missing closing quote on last field will hang the function guessDelimiter
 	- this is because the field in the row will not terminated by the new line because the closing quote is missing (\n is also valid inside multi line fields)
 	- in combination with an unknown delimiter (the wrong one) will cause that no quote is accepted as closing quote and we never find a single valid row (after 10 we normally stop guessing)
@@ -504,7 +509,7 @@ changelog: (latest first)
 		function safe(str, col)
 		{
 			if (typeof str === 'undefined' || str === null) {
-				if (_quotes) {
+				if ((typeof _quotes === 'boolean' && _quotes) || Array.isArray(_quotes) && _quotes[col]) {
 					return _quoteChar + '' + _quoteChar;
 				}
 				return '';

@@ -4,8 +4,12 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
-## 1.1.2
+## 1.1.3
 
+- (same as vs code extension v0.5.5)
+- fixed papaparse issue where `null` values (e.g. when a new row/col was added via handsontable) did't respect the `retainQuoteInformation`
+
+## 1.1.2
 
 - (same as vs code extension v0.5.3)
 - added additional buttons to insert rows/columns

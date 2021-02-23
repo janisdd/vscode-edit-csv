@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## 0.5.4
+
+- fixed papaparse issue where `null` values (e.g. when a new row/col was added via handsontable) did't respect the `retainQuoteInformation`
+
+## 0.5.4
+
+- added support for more vs code csv language ids
+
 ## 0.5.3
 
 - added additional buttons to insert rows/columns
