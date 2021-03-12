@@ -703,7 +703,8 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 		escapeChar: initialConfig.writeOption_escapeChar,
 		quoteChar: initialConfig.writeOption_quoteChar,
 		quoteAllFields: initialConfig.quoteAllFields,
-		retainQuoteInformation: initialConfig.retainQuoteInformation
+		retainQuoteInformation: initialConfig.retainQuoteInformation,
+		quoteEmptyOrNullFields: initialConfig.quoteEmptyOrNullFields === 'true' ? true : false,
 	})
 
 	switch (initialConfig.optionsBarAppearance) {

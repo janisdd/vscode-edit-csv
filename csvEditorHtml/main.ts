@@ -89,6 +89,7 @@ let defaultCsvWriteOptions: CsvWriteOptions = {
 	quoteChar: '"',
 	escapeChar: '"',
 	quoteAllFields: false,
+	quoteEmptyOrNullFields: false,
 	retainQuoteInformation: true,
 }
 //will be set when we read the csv content

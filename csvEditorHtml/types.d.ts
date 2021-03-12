@@ -124,6 +124,13 @@ type CsvEditSettings = {
 	quoteAllFields: boolean
 
 	/**
+	 * whether null, undefined and empty values should be quoted (takes precedence over quoteAllFields)
+	 * true: quote null, undefined and empty string values (takes precedence over quoteAllFields), false: not
+	 * we use an enum in case we later want to add some values (e.g. take retain quote information into account)
+	 */
+	quoteEmptyOrNullFields: 'true' | 'false',
+
+	/**
 	 * true: initially hides rows with comments found in the table, false: not hide rows with comments
 	 */
 	initiallyHideComments: boolean
@@ -269,8 +276,16 @@ type CsvWriteOptions = {
 
 	/**
 	 * true: to always quote fields, false: not (only if necessary)
+	 * this does not apply for null, undefined and empty strings,
+	 * {@link quoteEmptyOrNullFields}
 	 */
 	quoteAllFields: boolean
+
+	/**
+	 * true: quote null, undefined and empty strings
+	 * this setting takes precedence over {@link quoteAllFields}
+	 */
+	quoteEmptyOrNullFields: boolean
 
 	/**
 	 * true: information about quoted fields are retained during parsing and written to output(for more details see readme), false: information about quoted field is discarded

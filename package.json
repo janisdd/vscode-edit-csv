@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.5.5",
+	"version": "0.5.6",
 	"license": "MIT",
 	"publisher": "janisdd",
 	"engines": {
@@ -442,6 +442,19 @@
 					"type": "boolean",
 					"default": false,
 					"description": "true: to always quote fields, false: not (only if necessary, and respect retainQuoteInformation)"
+				},
+				"csv-edit.quoteEmptyOrNullFields": {
+					"type": "string",
+					"default": "false",
+					"description": "whether null, undefined and empty values should be quoted (takes precedence over quoteAllFields)",
+					"enum": [
+						"true",
+						"false"
+					],
+					"enumDescriptions": [
+						"quote null, undefined and empty values",
+						"do not quote null, undefined and empty values"
+					]
 				},
 				"csv-edit.initiallyHideComments": {
 					"type": "boolean",

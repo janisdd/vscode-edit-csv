@@ -13,7 +13,7 @@ you need to manually compress it, e.g. with https://javascript-minifier.com/
 
 changelog: (latest first)
 
-- fixes issue where passing an array of bools to unparse config option `quotes` is not used for null and undefined values
+- added option `quoteEmptyOrNullFields` (defaults to false) to unparse which defines how null, undefined and empty strings are quoted
 - fixes issue where all fields quoted and missing closing quote on last field will hang the function guessDelimiter
 	- this is because the field in the row will not terminated by the new line because the closing quote is missing (\n is also valid inside multi line fields)
 	- in combination with an unknown delimiter (the wrong one) will cause that no quote is accepted as closing quote and we never find a single valid row (after 10 we normally stop guessing)
@@ -323,6 +323,10 @@ changelog: (latest first)
 		/** @type {boolean[] | null} */
 		var _columnIsQuoted = null;
 
+		//true: quote null, undefined and empty string values
+		/** @type {boolean} */
+		var _quoteEmptyOrNullFields = false;
+
 		unpackConfig();
 
 		var quoteCharRegex = new RegExp(escapeRegExp(_quoteChar), 'g');
@@ -409,6 +413,10 @@ changelog: (latest first)
 
 			if (typeof _config.columnIsQuoted !== 'undefined') {
 				_columnIsQuoted = _config.columnIsQuoted;
+			}
+
+			if (typeof _config.quoteEmptyOrNullFields === 'boolean') {
+				_quoteEmptyOrNullFields = _config.quoteEmptyOrNullFields;
 			}
 		}
 
@@ -508,8 +516,8 @@ changelog: (latest first)
 		/** Encloses a value around quotes if needed (makes a value safe for CSV insertion) */
 		function safe(str, col)
 		{
-			if (typeof str === 'undefined' || str === null) {
-				if ((typeof _quotes === 'boolean' && _quotes) || Array.isArray(_quotes) && _quotes[col]) {
+			if (typeof str === 'undefined' || str === null || str === '') {
+				if (_quoteEmptyOrNullFields) {
 					return _quoteChar + '' + _quoteChar;
 				}
 				return '';

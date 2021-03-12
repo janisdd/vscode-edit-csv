@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+
+## 0.5.6
+
+- added option to handle empty values (null, undefined and empty (string) values) `quoteEmptyOrNullFields`
+	- takes always precedence over retainQuoteInformation
+	- updated custom papaparse to support this option
+
 ## 0.5.5
 
 - fixed papaparse issue where `null` values (e.g. when a new row/col was added via handsontable) did't respect the `retainQuoteInformation`

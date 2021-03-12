@@ -4,6 +4,12 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.1.4
+
+- (same as vs code extension v0.5.6)
+- added option to handle empty values (null, undefined and empty (string) values) `quoteEmptyOrNullFields`
+	- takes always precedence over retainQuoteInformation
+
 ## 1.1.3
 
 - (same as vs code extension v0.5.5)

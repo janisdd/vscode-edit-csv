@@ -22,6 +22,7 @@ const defaultConfig = {
     openSourceFileAfterApply: false,
     selectTextAfterBeginEditCell: false,
     quoteAllFields: false,
+    quoteEmptyOrNullFields: 'false',
     initiallyHideComments: false,
     enableWrapping: true,
     initialColumnWidth: 0,

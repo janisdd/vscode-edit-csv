@@ -183,6 +183,9 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 	const _conf: import('papaparse').UnparseConfig = {
 		...csvWriteOptions,
 		quotes: csvWriteOptions.quoteAllFields,
+		//custom created option to handle null, undefined and empty string values
+		//@ts-ignore
+		quoteEmptyOrNullFields: csvWriteOptions.quoteEmptyOrNullFields,
 	}
 
 	if (csvWriteOptions.header) {
