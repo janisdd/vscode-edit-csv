@@ -45,6 +45,8 @@ var initialConfig: CsvEditSettings | undefined = {
 	shouldWatchCsvSourceFile: true,
 	sidePanelAppearance: 'expanded',
 	initialNumbersStyle: 'en',
+	insertRowBehavior: 'focusFirstCellNewRow',
+	insertColBehavior: 'keepRowKeepColumn',
 }
 
 function __getById(id: string): HTMLElement {

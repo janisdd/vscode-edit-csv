@@ -3,6 +3,13 @@
 ## [Unreleased]
 
 
+## 0.5.7
+
+- added shortcuts to insert row above (ctrl+shift+alt+up) / below (ctrl+shift+alt+down) and insert column left (ctrl+shift+alt+left) / right (ctrl+shift+alt+right)
+- added option to configure what cell should be selected after a row/col is inserted
+	- `insertRowBehavior`, `insertColBehavior`
+	- cell context menu to insert row/col now also uses the configured action
+
 ## 0.5.6
 
 - added option to handle empty values (null, undefined and empty (string) values) `quoteEmptyOrNullFields`

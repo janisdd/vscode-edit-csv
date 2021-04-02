@@ -500,13 +500,29 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			callback: function (key: string, ...others) {
 			},
 			items: {
-				'row_above': {},
-				'row_below': {},
+				'row_above': {
+					callback: function() { //key, selection, clickEvent
+						insertRowAbove()
+					}
+				},
+				'row_below': {
+					callback: function() { //key, selection, clickEvent
+						insertRowBelow()
+					}
+				},
 				'---------': {
 					name: '---------'
 				},
-				'col_left': {},
-				'col_right': {},
+				'col_left': {
+					callback: function() { //key, selection, clickEvent
+						insertColLeft()
+					}
+				},
+				'col_right': {
+					callback: function() { //key, selection, clickEvent
+						insertColRight()
+					}
+				},
 				'---------2': {
 					name: '---------'
 				},
@@ -1061,6 +1077,25 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			}
 
 			return defaultHeight
+		} as any,
+
+		beforeKeyDown: function (event: KeyboardEvent) {
+			
+			//NOTE that this can prevent all vs code shortcuts... e.g. cmd+p (on mac)!!!
+			if (event.ctrlKey && event.shiftKey && event.altKey && event.key === 'ArrowDown') {
+				event.stopImmediatePropagation()
+				insertRowBelow()
+			} else if (event.ctrlKey && event.shiftKey && event.altKey && event.key === 'ArrowUp') {
+				event.stopImmediatePropagation()
+				insertRowAbove()
+			} else if (event.ctrlKey && event.shiftKey && event.altKey && event.key === 'ArrowLeft') {
+				event.stopImmediatePropagation()
+				insertColLeft()
+			} else if (event.ctrlKey && event.shiftKey && event.altKey && event.key === 'ArrowRight') {
+				event.stopImmediatePropagation()
+				insertColRight()
+			}
+
 		} as any,
 
 	})

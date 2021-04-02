@@ -4,6 +4,10 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.1.5
+
+- added shortcuts to insert row above (ctrl+shift+alt+up) / below (ctrl+shift+alt+down) and insert column left (ctrl+shift+alt+left) / right (ctrl+shift+alt+right)
+
 ## 1.1.4
 
 - (same as vs code extension v0.5.6)

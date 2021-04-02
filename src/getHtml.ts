@@ -542,17 +542,17 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 						</div>
 					</div>
 					
-					<button id="add-row-btn"  class="button is-outlined" onclick="addRow()">
+					<button id="add-row-btn" class="button is-outlined" onclick="addRow()">
 						<span class="icon is-small">
 							<i class="fas fa-plus"></i>
 						</span>
 						<span>Add row</span>
 					</button>
 					<div class="row-col-insert-btns">
-						<button class="button is-outlined" onclick="insertRowAbove()" title="Insert row above current row [ctrl+shift+ins]">
+						<button class="button is-outlined" onclick="insertRowAbove()" title="Insert row above current row [ctrl+shift+alt+up, ctrl+shift+ins]">
 							<i class="fas fas fa-caret-up "></i>
 						</button>
-						<button class="button is-outlined " onclick="insertRowBelow() " title="Insert row below current row [ctrl+ins]">
+						<button class="button is-outlined " onclick="insertRowBelow() " title="Insert row below current row [ctrl+shift+alt+down, ctrl+ins]">
 							<i class="fas fa-caret-down ad"></i>
 						</button>
 					</div>
@@ -564,10 +564,10 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 						<span>Add column</span>
 					</button>
 					<div class="row-col-insert-btns">
-						<button class="button is-outlined" onclick="insertColLeft()" title="Insert column left to current column">
+						<button class="button is-outlined" onclick="insertColLeft()" title="Insert column left to current column [ctrl+shift+alt+left]">
 							<i class="fas fas fa-caret-left"></i>
 						</button>
-						<button class="button is-outlined" onclick="insertColRight()" title="Insert column right to current column">
+						<button class="button is-outlined" onclick="insertColRight()" title="Insert column right to current column [ctrl+shift+alt+right]">
 							<i class="fas fa-caret-right"></i>
 						</button>
 					</div>

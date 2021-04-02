@@ -36,6 +36,8 @@ const defaultConfig = {
     shouldWatchCsvSourceFile: true,
     sidePanelAppearance: 'collapsed',
     initialNumbersStyle: 'en',
+    insertRowBehavior: 'focusFirstCellNewRow',
+    insertColBehavior: 'keepRowKeepColumn',
 };
 /**
  * returns the configuration for this extension

@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.5.6",
+	"version": "0.5.7",
 	"license": "MIT",
 	"publisher": "janisdd",
 	"engines": {
@@ -535,6 +535,32 @@
 					"enumDescriptions": [
 						"decimal separator is '.' e.g. 3.14 Optional thousand separator: ',' e.g. 1,003.14",
 						"decimal separator is ',' e.g. 3,14 Optional thousand separator: '.' e.g. 1.003,14"
+					]
+				},
+				"csv-edit.insertRowBehavior": {
+					"type": "string",
+					"default": "focusFirstCellNewRow",
+					"description": "which cell should be focused or selected when a new row is inserted (above or below)",
+					"enum": [
+						"focusFirstCellNewRow",
+						"keepRowKeepColumn"
+					],
+					"enumDescriptions": [
+						"focus the first cell in the new row",
+						"keep the currently selected cell"
+					]
+				},
+				"csv-edit.insertColBehavior": {
+					"type": "string",
+					"default": "keepRowKeepColumn",
+					"description": "which cell should be focused or selected when a new column is inserted (left or right)",
+					"enum": [
+						"keepRowFocusNewColumn",
+						"keepRowKeepColumn"
+					],
+					"enumDescriptions": [
+						"we stay in the same row but the cell in the new column is selected",
+						"keep the currently selected cell"
 					]
 				}
 			}

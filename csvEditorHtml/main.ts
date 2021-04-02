@@ -336,4 +336,8 @@ function setupGlobalShortcutsInVs() {
 		insertRowAbove()
 	})
 
+	//---- some shortcuts are also in ui.ts where the handsontable instance is created...
+	//needed for core handsontable shortcuts e.g. that involve arrow keys
+
+
 }

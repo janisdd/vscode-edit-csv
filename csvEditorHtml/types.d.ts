@@ -198,6 +198,21 @@ type CsvEditSettings = {
 	 * non-en: decimal separator is ',' e.g. 3,14
 	 */
 	initialNumbersStyle: 'en' | 'non-en'
+
+	/**
+	 * which cell should be focused or selected when a new row is inserted (above or below)
+	 * focusFirstCellNewRow: focus the first cell in the new row: 
+	 * keepRowKeepColumn: keep the currently selected cell
+	 */
+	insertRowBehavior: 'focusFirstCellNewRow' | 'keepRowKeepColumn'
+
+	/**
+	 * which cell should be focused or selected when a new column is inserted (left or right)
+	 * keepRowFocusNewColumn: we stay in the same row but the cell in the new column is selected
+	 * keepRowKeepColumn: keep the currently selected cell
+	 */
+	insertColBehavior: 'keepRowFocusNewColumn' | 'keepRowKeepColumn'
+
 }
 
 /* --- frontend settings --- */

@@ -275,23 +275,17 @@ function _getSelectedVisualColIndex(): number | null {
 /**
  * adds a new row above the current row
  */
-function insertRowAbove(selectNewRow = true, preserveSelectedCol = false) {
-	_insertRowInternal(false, selectNewRow, preserveSelectedCol)
+function insertRowAbove() {
+	_insertRowInternal(false)
 }
 /**
  * adds a new row below the current row
  */
-function insertRowBelow(selectNewRow = true, preserveSelectedCol = false) {
-	_insertRowInternal(true, selectNewRow, preserveSelectedCol)
+function insertRowBelow() {
+	_insertRowInternal(true)
 }
 
-/**
- * 
- * @param belowCurrRow 
- * @param selectNewRow 
- * @param preserveSelectedCol true: if we select the new row do we also want to preserve the selected col? (if not the first col is selected)
- */
-function _insertRowInternal(belowCurrRow: boolean, selectNewRow: boolean, preserveSelectedCol: boolean) {
+function _insertRowInternal(belowCurrRow: boolean) {
 	if (!hot) throw new Error('table was null')
 
 	const currRowIndex = _getSelectedVisualRowIndex()
@@ -302,8 +296,21 @@ function _insertRowInternal(belowCurrRow: boolean, selectNewRow: boolean, preser
 	// const test = hot.toPhysicalRow(targetRowIndex) //also not working when rows are reordered...
 	hot.alter('insert_row', targetRowIndex)
 
-	if (selectNewRow) {
-		hot.selectCell(targetRowIndex, preserveSelectedCol ? currColIndex : 0)
+	//undefined should not happen but just in case
+	const focusBehavior = initialConfig?.insertRowBehavior ?? 'focusFirstCellNewRow'
+
+	switch (focusBehavior) {
+		case 'focusFirstCellNewRow': {
+			//new row, first cell
+			hot.selectCell(targetRowIndex, 0)
+			break;
+		}
+		case 'keepRowKeepColumn': {
+			//before insert row, same column
+			hot.selectCell(targetRowIndex + (belowCurrRow ? -1 : 1), currColIndex)
+			break;
+		}
+		default: notExhaustiveSwitch(focusBehavior)
 	}
 
 	checkAutoApplyHasHeader()
@@ -313,22 +320,16 @@ function _insertRowInternal(belowCurrRow: boolean, selectNewRow: boolean, preser
  * adds a new row above the current row
  */
 function insertColLeft(selectNewCol = true, preserveSelectedRow = true) {
-	_insertColInternal(false, selectNewCol, preserveSelectedRow)
+	_insertColInternal(false)
 }
 /**
  * adds a new col below the current row
  */
 function insertColRight(selectNewCol = true, preserveSelectedRow = true) {
-	_insertColInternal(true, selectNewCol, preserveSelectedRow)
+	_insertColInternal(true)
 }
 
-/**
- * 
- * @param belowCurrRow 
- * @param selectNewRow 
- * @param preserveSelectedCol true: if we select the new row do we also want to preserve the selected col? (if not the first col is selected)
- */
-function _insertColInternal(afterCurrCol: boolean, selectNewCol: boolean, preserveSelectedRow: boolean) {
+function _insertColInternal(afterCurrCol: boolean) {
 	if (!hot) throw new Error('table was null')
 
 	const currColIndex = _getSelectedVisualColIndex()
@@ -339,8 +340,21 @@ function _insertColInternal(afterCurrCol: boolean, selectNewCol: boolean, preser
 	// const test = hot.toPhysicalColumn(targetColIndex) //also not working when columns are reordered...
 	hot.alter('insert_col', targetColIndex)
 
-	if (selectNewCol) {
-		hot.selectCell(preserveSelectedRow ? currRowIndex : 0, targetColIndex)
+	//undefined should not happen but just in case
+	const focusBehavior = initialConfig?.insertColBehavior ?? 'keepRowKeepColumn'
+
+	switch (focusBehavior) {
+		case 'keepRowFocusNewColumn': {
+			//new row, first cell
+			hot.selectCell(currRowIndex, targetColIndex)
+			break;
+		}
+		case 'keepRowKeepColumn': {
+			//before insert row, same column
+			hot.selectCell(currRowIndex, targetColIndex + (afterCurrCol ? -1 : 1))
+			break;
+		}
+		default: notExhaustiveSwitch(focusBehavior)
 	}
 }
 /**

@@ -36,6 +36,8 @@ const defaultConfig: CsvEditSettings = {
 	shouldWatchCsvSourceFile: true,
 	sidePanelAppearance: 'collapsed',
 	initialNumbersStyle: 'en',
+	insertRowBehavior: 'focusFirstCellNewRow',
+	insertColBehavior: 'keepRowKeepColumn',
 }
 
 /**
