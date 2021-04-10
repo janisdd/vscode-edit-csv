@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { editorUriScheme } from './extension';
+import { limitSingleCharacterString } from "./util";
 
 
 
@@ -61,6 +62,12 @@ export function getExtensionConfiguration(): CsvEditSettings {
 		//@ts-ignore
 		copy[key] = optionValue
 	}
+
+	//ensure single character requirements
+	copy.readOption_quoteChar = limitSingleCharacterString(copy.readOption_quoteChar)
+	copy.readOption_escapeChar = limitSingleCharacterString(copy.readOption_escapeChar)
+	copy.writeOption_quoteChar = limitSingleCharacterString(copy.writeOption_quoteChar)
+	copy.writeOption_escapeChar = limitSingleCharacterString(copy.writeOption_escapeChar)
 
 	return copy
 }

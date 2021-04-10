@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.5.7",
+	"version": "0.5.8",
 	"license": "MIT",
 	"publisher": "janisdd",
 	"engines": {
@@ -383,12 +383,14 @@
 				"csv-edit.readOption_quoteChar": {
 					"type": "string",
 					"default": "\"",
-					"description": "the string used to quote fields"
+					"description": "the string used to quote fields",
+					"maxLength": 1
 				},
 				"csv-edit.readOption_escapeChar": {
 					"type": "string",
 					"default": "\"",
-					"description": "the string used to escape the quote character within a field"
+					"description": "the string used to escape the quote character within a field",
+					"maxLength": 1
 				},
 				"csv-edit.writeOption_hasHeader": {
 					"type": "string",
@@ -416,12 +418,14 @@
 				"csv-edit.writeOption_quoteChar": {
 					"type": "string",
 					"default": "\"",
-					"description": "the string used to quote fields"
+					"description": "the string used to quote fields",
+					"maxLength": 1
 				},
 				"csv-edit.writeOption_escapeChar": {
 					"type": "string",
 					"default": "\"",
-					"description": "the string used to escape the quote character within a field"
+					"description": "the string used to escape the quote character within a field",
+					"maxLength": 1
 				},
 				"csv-edit.doubleClickColumnHandleForcedWith": {
 					"type": "number",

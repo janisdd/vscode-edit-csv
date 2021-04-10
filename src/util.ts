@@ -13,7 +13,15 @@ export function getCurrentViewColumn(): vscode.ViewColumn {
 		: vscode.ViewColumn.One
 }
 
+export function limitSingleCharacterString(value: string): string {
+	
+	if (value.length > 1) {
+		//using last char is more user friendly as we can click and press a key to use the new char
+		value = value.substring(value.length-1)
+	}
 
+	return value
+}
 
 //from https://davidwalsh.name/javascript-debounce-function
 export function debounce(func: Function, wait: number, immediate = false) {

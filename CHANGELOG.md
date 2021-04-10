@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## 0.5.8
+
+- fixed issue in papaparse where multi-character delimiters won't work
+- updated the ui to only accept the proper lengths for csv read options
+	- config will throw an error if the csv read options are too long
 
 ## 0.5.7
 

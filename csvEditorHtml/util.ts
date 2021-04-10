@@ -15,6 +15,17 @@ function _getById(id: string): HTMLElement {
 	return el
 }
 
+function ensuredSingleCharacterString(el: HTMLInputElement): boolean {
+	
+	if (el.value.length > 1) {
+		//using last char is more user friendly as we can click and press a key to use the new char
+		el.value = el.value.substring(el.value.length-1)
+		return false
+	}
+
+	return true
+}
+
 /**
  * checks if a given cell value is a comment with the given configuration
  * @param value

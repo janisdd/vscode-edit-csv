@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.partitionString = exports.isCsvFile = exports.debounce = exports.getCurrentViewColumn = exports.debugLog = void 0;
+exports.partitionString = exports.isCsvFile = exports.debounce = exports.limitSingleCharacterString = exports.getCurrentViewColumn = exports.debugLog = void 0;
 const vscode = require("vscode");
 function debugLog(msg) {
     // console.log(msg)
@@ -15,6 +15,14 @@ function getCurrentViewColumn() {
         : vscode.ViewColumn.One;
 }
 exports.getCurrentViewColumn = getCurrentViewColumn;
+function limitSingleCharacterString(value) {
+    if (value.length > 1) {
+        //using last char is more user friendly as we can click and press a key to use the new char
+        value = value.substring(value.length - 1);
+    }
+    return value;
+}
+exports.limitSingleCharacterString = limitSingleCharacterString;
 //from https://davidwalsh.name/javascript-debounce-function
 function debounce(func, wait, immediate = false) {
     var timeout;

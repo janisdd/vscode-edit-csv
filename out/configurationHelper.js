@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getExtensionConfiguration = void 0;
 const vscode = require("vscode");
 const extension_1 = require("./extension");
+const util_1 = require("./util");
 const defaultConfig = {
     highlightCsvComments: true,
     lastRowEnterBehavior: 'default',
@@ -54,6 +55,11 @@ function getExtensionConfiguration() {
         //@ts-ignore
         copy[key] = optionValue;
     }
+    //ensure single character requirements
+    copy.readOption_quoteChar = util_1.limitSingleCharacterString(copy.readOption_quoteChar);
+    copy.readOption_escapeChar = util_1.limitSingleCharacterString(copy.readOption_escapeChar);
+    copy.writeOption_quoteChar = util_1.limitSingleCharacterString(copy.writeOption_quoteChar);
+    copy.writeOption_escapeChar = util_1.limitSingleCharacterString(copy.writeOption_escapeChar);
     return copy;
 }
 exports.getExtensionConfiguration = getExtensionConfiguration;
