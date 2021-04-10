@@ -264,7 +264,7 @@ function setCommentString() {
 function setQuoteCharString() {
 	const el = _getById('quote-char-string') as HTMLInputElement
 
-	if (!ensuredSingleCharacterString(el)) return
+	ensuredSingleCharacterString(el)
 
 	defaultCsvReadOptions.quoteChar = el.value
 }
@@ -272,7 +272,7 @@ function setQuoteCharString() {
 function setEscapeCharString() {
 	const el = _getById('escape-char-string') as HTMLInputElement
 
-	if (!ensuredSingleCharacterString(el)) return
+	ensuredSingleCharacterString(el)
 
 	defaultCsvReadOptions.escapeChar = el.value
 }
@@ -319,7 +319,7 @@ function setCommentStringWrite() {
 function setQuoteCharStringWrite() {
 	const el = _getById('quote-char-string-write') as HTMLInputElement
 
-	if (!ensuredSingleCharacterString(el)) return
+	ensuredSingleCharacterString(el)
 
 	defaultCsvWriteOptions.quoteChar = el.value
 }
@@ -327,7 +327,7 @@ function setQuoteCharStringWrite() {
 function setEscapeCharStringWrite() {
 	const el = _getById('escape-char-string-write') as HTMLInputElement
 
-	if (!ensuredSingleCharacterString(el)) return
+	ensuredSingleCharacterString(el)
 	
 	defaultCsvWriteOptions.escapeChar = el.value
 }

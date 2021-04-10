@@ -27,8 +27,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	// let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
 	let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js')
 	// let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js')
-	// let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js')
-	let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
+	let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js')
+	// let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
 
 	const mousetrapJs = _getResourcePath('thirdParty/mousetrap/mousetrap.min.js')
 	const mousetrapBindGlobalJs = _getResourcePath('thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js')
