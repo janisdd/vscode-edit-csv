@@ -543,7 +543,7 @@
 				},
 				"csv-edit.insertRowBehavior": {
 					"type": "string",
-					"default": "focusFirstCellNewRow",
+					"default": "keepRowKeepColumn",
 					"description": "which cell should be focused or selected when a new row is inserted (above or below)",
 					"enum": [
 						"focusFirstCellNewRow",

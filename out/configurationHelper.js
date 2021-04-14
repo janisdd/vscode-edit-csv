@@ -37,7 +37,7 @@ const defaultConfig = {
     shouldWatchCsvSourceFile: true,
     sidePanelAppearance: 'collapsed',
     initialNumbersStyle: 'en',
-    insertRowBehavior: 'focusFirstCellNewRow',
+    insertRowBehavior: 'keepRowKeepColumn',
     insertColBehavior: 'keepRowKeepColumn',
 };
 /**

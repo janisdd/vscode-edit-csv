@@ -104,8 +104,7 @@ Now the file is treated as a csv file and is recognized by the extension
 
 ## Known Issues
 
-- if the source file content changes while the editor is open, the editor will not be updated (e.g. take new content)
-	- if you then apply the editor the source file content/changes are **overwritten!**
+- after reordering columns or rows (e.g. sorting or manually dragged) inserting rows/col won't work (ui gets out of sync with data)
 
 - `apply and save` an unnamed file will close the editor
 	- this is because the new uri for the new file is not known and for some reason if an extension saves an unnamed file the new file is not displayed automatically
@@ -115,6 +114,8 @@ Now the file is treated as a csv file and is recognized by the extension
 	- thus changes can no longer be saved/applied
 	- maybe this can be resolved when https://github.com/Microsoft/vscode/issues/43768 is closed
 
+- if the source file content changes and the file is not in the current workspace (open folder) auto file content reload is not working
+	- however, you are notified if the file content changes (e.g. outside of vs code)
 
 ## Alternatives
 
