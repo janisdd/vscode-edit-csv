@@ -14,6 +14,7 @@
     "spellright.documentTypes": [
         "markdown",
         "latex",
+        "html",
         "plaintext"
     ],
     "typescript.tsdk": "node_modules/typescript/lib"
