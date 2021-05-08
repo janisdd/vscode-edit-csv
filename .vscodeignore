@@ -15,6 +15,7 @@ TODO.md
 node_modules/@types
 backup
 images/**
+!images/logo.png
 scripts.md
 thirdParty/info.md
 thirdParty/bulma/bulma.css

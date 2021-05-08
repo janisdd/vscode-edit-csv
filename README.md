@@ -1,4 +1,4 @@
-# vscode-edit-csv README
+# vscode-edit-csv
 
 This extensions allows you to edit csv files with an excel like table ui
 
@@ -121,9 +121,8 @@ Now the file is treated as a csv file and is recognized by the extension
 
 ## How long will it stay in preview?
 
-There are two things missing...
+There is one things missing...
 
-- a pretty icon ;)
 - tests
 	- especially for interaction between vs code and the webview
 	- I added some listeners to handsontable hooks which manipulate rendering, selection...
@@ -163,3 +162,10 @@ then press `F5` to run the extension
 When you edit `csvEditorHtml/index.html` you need to manually copy the changes (everything in the body but without the scripts) into `src/getHtml.ts` (past into body)
 
 You can also open `csvEditorHtml/index.html` in your favorite browser and play around *(the vs code settings are not applied in the browser)*
+
+## License
+
+Code: MIT
+
+Logo: CC BY NC 3.0 by Janis Dähne
+
