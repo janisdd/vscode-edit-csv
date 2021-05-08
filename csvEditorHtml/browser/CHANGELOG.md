@@ -4,6 +4,13 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+
+## 1.2.0
+
+- (same as vs code extension v6.0.0)
+- fixed issue where reordering/sorting breaks inserting
+- new logo
+
 ## 1.1.6
 
 - fixed issue in papaparse where multi-character delimiters won't work

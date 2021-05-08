@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## 6.0.0
+
+- fixed issue where reordering/sorting breaks inserting
+- new logo
+
 ## 0.5.8
 
 - fixed issue in papaparse where multi-character delimiters won't work
