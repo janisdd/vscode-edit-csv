@@ -74,7 +74,7 @@ When you click on `edit csv file`
 - the current config is stringified and injected into the editor (webview) html
 - a manager stores a reference to the webview, source file uri, editor uri
 
-- in the webview the pieces are put together and the text is parsed as csv and displayed in the (handson) table element
+- in the webview the pieces are put together and the text is parsed as csv and displayed in the (handsontable) table element
 
 When you click on `apply`
 
@@ -103,8 +103,6 @@ If the link is down: Search for `files.associations` in the vs code settings. Th
 Now the file is treated as a csv file and is recognized by the extension
 
 ## Known Issues
-
-- after reordering columns or rows (e.g. sorting or manually dragged) inserting rows/col won't work (ui gets out of sync with data)
 
 - `apply and save` an unnamed file will close the editor
 	- this is because the new uri for the new file is not known and for some reason if an extension saves an unnamed file the new file is not displayed automatically

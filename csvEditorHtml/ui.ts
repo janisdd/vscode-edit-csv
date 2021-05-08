@@ -786,7 +786,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 			if (!hot) throw new Error('table was null')
 
-			//TODO NOT WORKING??
+			//DO not update settings while we are in some hooks!
+			//else the index mapping might get corrupted
 			// hot.updateSettings({
 			// 	colHeaders: defaultColHeaderFunc as any
 			// }, false)
@@ -908,43 +909,14 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 			// syncColWidths() //covered by afterRender
 			onAnyChange()
-			updateFixedRowsCols()
+			//dont' call this as it corrupts hot index mappings (because all other hooks need to finish first before we update hot settings)
+			//also it's not needed as handsontable already handles this internally
+			// updateFixedRowsCols()
 		},
 		afterRemoveCol: function (visualColIndex, amount) {
-
-			if (!hot) return
-
-			if (headerRowWithIndex) {
-				const physicalIndex = hot.toPhysicalColumn(visualColIndex)
-				headerRowWithIndex.row.splice(physicalIndex, amount)
-				//hot automatically re-renders after this
-			}
-
-			const sortConfigs = hot.getPlugin('columnSorting').getSortConfig()
-
-			const sortedColumnIds = sortConfigs.map(p => hot!.toPhysicalColumn(p.column))
-
-			let removedColIds: number[] = []
-			for (let i = 0; i < amount; i++) {
-				removedColIds.push(hot.toPhysicalColumn(visualColIndex + i))
-			}
-
-			//if we removed some col that was sorted then clear sorting...
-			if (sortedColumnIds.some(p => removedColIds.includes(p))) {
-				hot.getPlugin('columnSorting').clearSort()
-			}
-
-			if (columnIsQuoted) {
-				const physicalIndex = hot.toPhysicalColumn(visualColIndex)
-				columnIsQuoted.splice(physicalIndex, amount)
-			}
-
-			allColWidths.splice(visualColIndex, 1)
-			applyColWidths()
-
-			// syncColWidths() //covered by afterRender
-			onAnyChange()
-			updateFixedRowsCols()
+			//added below
+			//critical because we could update hot settings here
+			pre_afterRemoveCol(visualColIndex, amount)
 		},
 		//inspired by https://github.com/handsontable/handsontable/blob/master/src/plugins/hiddenRows/hiddenRows.js
 		//i absolutely don't understand how handsontable implementation is working... 
@@ -953,18 +925,13 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		//and then they increment the physical row via the amount
 		//however, it works somehow...
 		afterCreateRow: function (visualRowIndex, amount) {
-			//we need to modify some or all hiddenPhysicalRowIndices...
+			//added below
+			//critical because we could update hot settings here
+			pre_afterCreateRow(visualRowIndex, amount)
 
-			for (let i = 0; i < hiddenPhysicalRowIndices.length; i++) {
-				const hiddenPhysicalRowIndex = hiddenPhysicalRowIndices[i];
-
-				if (hiddenPhysicalRowIndex >= visualRowIndex) {
-					hiddenPhysicalRowIndices[i] += amount
-				}
-			}
-			onAnyChange()
-			updateFixedRowsCols()
-			checkAutoApplyHasHeader()
+			//don't do this as we are inside a hook and the next listerners will change the indices and when we call
+			//hot.updateSettings (inside this func) the plugin internal states are changed and the indices/mappings are corrupted
+			// updateFixedRowsCols()
 		},
 		afterRemoveRow: function (visualRowIndex, amount) {
 			//we need to modify some or all hiddenPhysicalRowIndices...
@@ -989,7 +956,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			}
 
 			onAnyChange()
-			updateFixedRowsCols()
+			//dont' call this as it corrupts hot index mappings (because all other hooks need to finish first before we update hot settings)
+			//also it's not needed as handsontable already handles this internally
+			// updateFixedRowsCols()
 		},
 		//called when we select a row via row header
 		beforeSetRangeStartOnly: function (coords) {
@@ -1116,6 +1085,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	Handsontable.dom.addEvent(window as any, 'resize', throttle(onResizeGrid, 200))
 
 	if (typeof afterHandsontableCreated !== 'undefined') afterHandsontableCreated(hot)
+
+	hot.addHook('afterRender', afterRenderForced as any)
 
 	const oldShouldApplyHeaderReadOption = defaultCsvReadOptions._hasHeader
 	const settingsApplied = checkIfHasHeaderReadOptionIsAvailable(true)
@@ -1595,6 +1566,9 @@ function changeFontSizeInPx(fontSizeInPx: number) {
 
 /**
  * applies the fixed rows and cols settings (normally called after a row/col added/removed)
+ * ONLY call this if all other hot hooks have run else the data gets out of sync
+ *   this is because the manualRowMove (and other) plugins update index mappings and when we call
+ *   updateSettings during that the plugins get disabled and enabled and the data gets out of sync (the mapping)
  * ONLY if the {@link defaultCsvReadOptions._hasHeader} is false
  */
 function updateFixedRowsCols() {
@@ -1770,4 +1744,129 @@ function toggleSidePanel(shouldCollapse?: boolean) {
 		recalculateStats()
 	}
 
+}
+
+// ------------------------------------------------------
+
+/*maybe this is not needed but it can be dangerous to call hot.updateSettings while indices/mappings are updated
+ e.g. when we call {@link updateFixedRowsCols} during afterCreateRow and
+   move row 5 below row 1 then try to add a row below row 1 it is added 2 rows below and row 5 is at is't ols position...
+
+so we only store the events we get and call them after a rerender (which is hopefully are called last)
+*/
+
+type RecordedHookAction = 'afterRemoveCol' | 'afterCreateRow'
+
+let recordedHookActions: RecordedHookAction[]
+
+type HookItem = {
+	actionName: RecordedHookAction
+	action: Function
+}
+
+let hook_list: HookItem[] = []
+
+function afterRenderForced(isForced: boolean) {
+	if (!isForced) {
+		hook_list = []
+		recordedHookActions = []
+		return
+	}
+
+	//hot.alter forced a rerender
+	//and we can only run our hooks after hot has updated internal mappings and indices
+	//so we kepp track if our hooks were fired and execute them after the rerender
+
+	for (let i = 0; i < hook_list.length; i++) {
+		const hookItem = hook_list[i];
+
+		if (!recordedHookActions.includes(hookItem.actionName)) continue
+
+		hookItem.action()
+	}
+	hook_list = []
+	recordedHookActions = []
+}
+
+function pre_afterRemoveCol(this: any,visualColIndex: number, amount: number) {
+	recordedHookActions.push("afterRemoveCol")
+
+	hook_list.push({
+		actionName: 'afterCreateRow',
+		action: afterRemoveCol.bind(this, visualColIndex, amount)
+	})
+}
+
+function afterRemoveCol(visualColIndex: number, amount: number) {
+	if (!hot) return
+
+	if (headerRowWithIndex) {
+		const physicalIndex = hot.toPhysicalColumn(visualColIndex)
+		headerRowWithIndex.row.splice(physicalIndex, amount)
+		//hot automatically re-renders after this
+	}
+
+	const sortConfigs = hot.getPlugin('columnSorting').getSortConfig()
+
+	const sortedColumnIds = sortConfigs.map(p => hot!.toPhysicalColumn(p.column))
+
+	let removedColIds: number[] = []
+	for (let i = 0; i < amount; i++) {
+		removedColIds.push(hot.toPhysicalColumn(visualColIndex + i))
+	}
+
+	//if we removed some col that was sorted then clear sorting...
+	if (sortedColumnIds.some(p => removedColIds.includes(p))) {
+		hot.getPlugin('columnSorting').clearSort()
+	}
+
+	if (columnIsQuoted) {
+		const physicalIndex = hot.toPhysicalColumn(visualColIndex)
+		columnIsQuoted.splice(physicalIndex, amount)
+	}
+
+	allColWidths.splice(visualColIndex, 1)
+	//critical might update settings
+	applyColWidths()
+
+	// syncColWidths() //covered by afterRender
+	onAnyChange()
+	//dont' call this as it corrupts hot index mappings (because all other hooks need to finish first before we update hot settings)
+	//also it's not needed as handsontable already handles this internally
+	// updateFixedRowsCols()
+}
+
+function pre_afterCreateRow(this: any, visualRowIndex: number, amount: number) {
+	recordedHookActions.push("afterCreateRow")
+
+	hook_list.push({
+		actionName: 'afterCreateRow',
+		action: afterCreateRow.bind(this, visualRowIndex, amount)
+	})
+}
+
+//inspired by https://github.com/handsontable/handsontable/blob/master/src/plugins/hiddenRows/hiddenRows.js
+//i absolutely don't understand how handsontable implementation is working... 
+//their this.hiddenRows should be physical indices (see https://github.com/handsontable/handsontable/blob/master/src/plugins/hiddenRows/hiddenRows.js#L254)
+//but in onAfterCreateRow & onAfterRemoveRow they check against `visualRow` which is actually the physical row (see above)
+//and then they increment the physical row via the amount
+//however, it works somehow...
+function afterCreateRow(visualRowIndex: number, amount: number) {
+	//added below
+	//critical because we could update hot settings here
+	//we need to modify some or all hiddenPhysicalRowIndices...
+
+	for (let i = 0; i < hiddenPhysicalRowIndices.length; i++) {
+		const hiddenPhysicalRowIndex = hiddenPhysicalRowIndices[i];
+
+		if (hiddenPhysicalRowIndex >= visualRowIndex) {
+			hiddenPhysicalRowIndices[i] += amount
+		}
+	}
+	onAnyChange()
+	//dont' call this as it corrupts hot index mappings (because all other hooks need to finish first before we update hot settings)
+	//also it's not needed as handsontable already handles this internally
+	// updateFixedRowsCols()
+
+	checkAutoApplyHasHeader()
 }
