@@ -339,6 +339,7 @@ function setQuoteAllFieldsWrite() {
 
 /**
  * NOT USED CURRENTLY (ui is hidden)
+ * only in browser version
  */
 function setNewLineWrite() {
 	const el = _getById('newline-select-write') as HTMLInputElement

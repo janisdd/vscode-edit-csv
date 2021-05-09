@@ -14,7 +14,7 @@ var initialVars: InitialVars = {
 
 var initialConfig: CsvEditSettings | undefined = {
 	highlightCsvComments: true,
-	lastRowEnterBehavior: 'createRow',
+	lastRowEnterBehavior: 'default',
 	lastColumnTabBehavior: 'createColumn',
 	optionsBarAppearance: "collapsed",
 	readOption_comment: "#",
