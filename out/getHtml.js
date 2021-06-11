@@ -279,6 +279,11 @@ function createEditorHtml(webview, context, initialVars) {
 											<i id="re-render-table-icon" class="fas fa-ruler-combined"></i>
 										</span>
 
+										<span class="mar-left-half clickable" onclick="forceResizeColumns()" style="margin-left: 0.5em;"
+											title="Resizes all columns to match their content">
+											<i id="force-column-resize-icon" class="fas fa-arrows-alt-h"></i>
+										</span>
+
 										<span id="reload-file" class="clickable" onclick="preReloadFileFromDisk()" style="margin-left: 2em;"
 											title="Reload the csv file content (from disk)">
 											<i class="fas fa-sync-alt"></i>
@@ -699,6 +704,10 @@ function createEditorHtml(webview, context, initialVars) {
 				<h3 class="title is-3">Hints</h3>
 				<div class="content">
 					<ul>
+					<!-- turns out handsontable checks if the values are isNaN and if both are numbers they are parsed as floats and compared as floats ... so comparing numbers or text should be fine here -->
+						<li>Sorting is not automatically updated after data has changed</li>
+						<li>Sorting state is exported</li>
+						<li>You can use ctrl/cmd click on a column header to sort by multiple columns</li>
 						<li>The unsaved changes indicator is display on any change (never cleared until you apply the changes, even if you revert manually)</li>
 						<li>When you see the unsaved changes indicator right after the table was loaded then some rows were expanded (to ensure all rows have the same length)</li>
 						<li>You can right-click on the table to get a context menu</li>
@@ -706,10 +715,6 @@ function createEditorHtml(webview, context, initialVars) {
 						<li>Comment rows will export only the first cell/column. If you use a cell other than the first for comments the cell color will indicate this. </li>
 						<li>If you edit an unnamed (csv) file and close it then the editor will be closed too (unsaved changes will
 							be lost)!</li>
-						<li>Sorting state is exported</li>
-						<li>Sorting is not automatically updated after data has changed</li>
-						<li>You can use ctrl/cmd click on a column header to sort by multiple columns</li>
-						<li>All cell values are strings thus sorting might behave differently than expected!!</li>
 						<li>Copy & Past use tab (<div class="keys">⇥</div>) as separator (same as excel)</li>
 						<li>You cannot change the new line character (because vs code automatically converts it to the file setting
 							i think)

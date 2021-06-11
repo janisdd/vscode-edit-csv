@@ -394,7 +394,7 @@ function copyPreviewToClipboard() {
 /**
  * renders the hot table again
  */
-function reRenderTable() {
+function reRenderTable(callback?: () => void) {
 
 	if (!hot) return
 
@@ -403,8 +403,51 @@ function reRenderTable() {
 		hot!.render()
 		setTimeout(() => {
 			statusInfo.innerText = ``
+			
+			if (callback) {
+				//use another timeout so we clear the status text first
+				setTimeout(() => {
+					callback()
+				})
+			}
+
 		}, 0)
 	})
+}
+
+/**
+ * after resetting data the autoColumnSize plugin is disabled (don't know why)
+ * but this is ok as we want our saved column width on reset {@link allColWidths}
+ * 
+ * but after clicking force resize columns we want to enable it again...
+ */
+function forceResizeColumns() {
+	if (!hot) return
+
+		//note that setting colWidths will disable the auto size column plugin (see Plugin AutoColumnSize.isEnabled)
+	//it is enabled if (!colWidths)
+	let plugin = hot.getPlugin('autoColumnSize')
+
+	let setColSizeFunc = () => {
+		if (!hot) return
+		hot.getSettings().manualColumnResize = false //this prevents setting manual col size?
+		hot.updateSettings({ colWidths: plugin.widths }, false)
+		hot.getSettings().manualColumnResize = true
+		hot.updateSettings({}, false) //change to manualColumnResize is only applied after updating setting?
+		plugin.enablePlugin()
+	}
+
+	if (plugin.widths.length === 0) {
+		plugin.enablePlugin()
+
+		reRenderTable(setColSizeFunc)
+		// hot.render() //this is needed else calculate will not get widths
+		//apparently render sets the column widths in the plugin if it's enabled?
+		// plugin.calculateAllColumnsWidth()
+		return
+	}
+
+	setColSizeFunc()
 }
 
 

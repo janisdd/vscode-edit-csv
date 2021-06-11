@@ -222,7 +222,7 @@
 			</div>
 
 			<div id="version-n-changelog" style="margin-right: 1rem;" class="clickable" onclick="toggleChangelogModal(true)">
-				v1.2.0
+				v1.2.1
 			</div>
 
 			<div style="margin-right: 1rem;">
@@ -282,6 +282,11 @@
 								<span class="mar-left-half clickable" onclick="reRenderTable()" style="margin-left: 2em;"
 									title="Redraws the table. This can fix some measuring issues (e.g. after the font size changed)">
 									<i id="re-render-table-icon" class="fas fa-ruler-combined"></i>
+								</span>
+
+								<span class="mar-left-half clickable" onclick="forceResizeColumns()" style="margin-left: 0.5em;"
+									title="Resizes all columns to match their content">
+									<i id="force-column-resize-icon" class="fas fa-arrows-alt-h"></i>
 								</span>
 
 								<span id="reload-file" class="clickable" onclick="preReloadFileFromDisk()" style="margin-left: 2em;"
@@ -957,6 +962,8 @@
 			</header>
 			<section class="modal-card-body">
 				<ul>
+					<li class="new-version">v1.2.1</li>
+					<li>added button to resize column to match their content</li>
 					<li class="new-version">v1.2.0</li>
 					<li>fixed issue where reordering/sorting breaks inserting</li>
 					<li class="new-version">v1.1.6</li>

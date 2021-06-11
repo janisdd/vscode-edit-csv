@@ -4,6 +4,10 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.2.1
+
+- (same as vs code extension v6.0.1)
+- added button to resize column to match their content
 
 ## 1.2.0
 

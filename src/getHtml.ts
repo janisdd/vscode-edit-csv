@@ -290,6 +290,11 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 											<i id="re-render-table-icon" class="fas fa-ruler-combined"></i>
 										</span>
 
+										<span class="mar-left-half clickable" onclick="forceResizeColumns()" style="margin-left: 0.5em;"
+											title="Resizes all columns to match their content">
+											<i id="force-column-resize-icon" class="fas fa-arrows-alt-h"></i>
+										</span>
+
 										<span id="reload-file" class="clickable" onclick="preReloadFileFromDisk()" style="margin-left: 2em;"
 											title="Reload the csv file content (from disk)">
 											<i class="fas fa-sync-alt"></i>

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## 6.0.1
+
+- added button to resize column to match their content
+
 ## 6.0.0
 
 - fixed issue where reordering/sorting breaks inserting
