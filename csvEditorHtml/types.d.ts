@@ -515,3 +515,7 @@ type KnownNumberStylesMap = {
 	['en']: NumbersStyle
 	['non-en']: NumbersStyle
 }
+type EditHeaderCellAction = {
+	actionType: 'changeHeaderCell'
+	change: [0, colIndex: number, beforeValue: string, afterValue: string]
+}

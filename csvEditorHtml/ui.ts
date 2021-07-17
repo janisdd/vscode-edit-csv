@@ -80,7 +80,7 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 
 			//this checked state is set from csvReadOptions._hasHeader
 			const dataWithIndex = getFirstRowWithIndex()
-	
+
 			if (dataWithIndex === null) {
 				//disable input...
 				const el3 = _getById('has-header') as HTMLInputElement
@@ -88,12 +88,12 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 				headerRowWithIndex = null
 				return
 			}
-	
+
 			if (fromUndo) return
-	
+
 			headerRowWithIndex = dataWithIndex
 			el.checked = true //sync ui in case we get here via autoApplyHasHeader
-	
+
 			hot.updateSettings({
 				fixedRowsTop: 0,
 				fixedColumnsLeft: 0,
@@ -101,8 +101,8 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 
 			let hasAnyChangesBefore = getHasAnyChangesUi()
 
-			hot.alter('remove_row', headerRowWithIndex.physicalIndex);
-	
+			hot.alter('remove_row', headerRowWithIndex.physicalIndex)
+
 			elWrite.checked = true
 			defaultCsvWriteOptions.header = true
 			defaultCsvReadOptions._hasHeader = true
@@ -112,7 +112,7 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 				if (hasAnyChangesBefore === false) {
 					_setHasUnsavedChangesUiIndicator(false)
 				}
-				
+
 				isFirstHasHeaderChangedEvent = false
 			}
 
@@ -126,13 +126,13 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			hot.render()
 			return
 		}
-	
+
 		if (fromUndo) return
-	
+
 		if (headerRowWithIndex === null) {
 			throw new Error('could not insert header row')
 		}
-	
+
 		let hasAnyChangesBefore = getHasAnyChangesUi()
 
 		hot.alter('insert_row', headerRowWithIndex.physicalIndex)
@@ -140,9 +140,9 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 		const visualCol = hot.toVisualColumn(0)
 		//see https://handsontable.com/docs/6.2.2/Core.html#populateFromArray
 		hot.populateFromArray(visualRow, visualCol, [[...headerRowWithIndex.row]])
-	
+
 		headerRowWithIndex = null
-	
+
 		elWrite.checked = false
 		defaultCsvWriteOptions.header = false
 		defaultCsvReadOptions._hasHeader = false
@@ -157,7 +157,7 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			if (hasAnyChangesBefore === false) {
 				_setHasUnsavedChangesUiIndicator(false)
 			}
-			
+
 			isFirstHasHeaderChangedEvent = false
 		}
 
@@ -166,11 +166,11 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 		//@ts-ignore
 		let undoPlugin = hot.undoRedo
 		undoPlugin.clear()
-	
+
 		//we changed headerRowWithIndex / header row so force a re-render so that hot calls defaultColHeaderFunc again
 		hot.render()
 
-	
+
 	}
 
 	if (displayRenderInformation) {
@@ -198,7 +198,7 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
  */
 function setShouldAutpApplyHasHeader(shouldSet: boolean) {
 
-	if(shouldSet) {
+	if (shouldSet) {
 		shouldApplyHasHeaderAfterRowsAdded = true
 		hasHeaderReadOptionInput.classList.add(`toggle-auto-future`)
 		hasHeaderLabel.title = `Activated automatically, if table has >= 2 rows`
@@ -240,7 +240,7 @@ function tryApplyHasHeader() {
 				setShouldAutpApplyHasHeader(false)
 				return
 			}
-	
+
 			setShouldAutpApplyHasHeader(true)
 			return
 		}
@@ -328,7 +328,7 @@ function setEscapeCharStringWrite() {
 	const el = _getById('escape-char-string-write') as HTMLInputElement
 
 	ensuredSingleCharacterString(el)
-	
+
 	defaultCsvWriteOptions.escapeChar = el.value
 }
 
@@ -403,7 +403,7 @@ function reRenderTable(callback?: () => void) {
 		hot!.render()
 		setTimeout(() => {
 			statusInfo.innerText = ``
-			
+
 			if (callback) {
 				//use another timeout so we clear the status text first
 				setTimeout(() => {
@@ -424,7 +424,7 @@ function reRenderTable(callback?: () => void) {
 function forceResizeColumns() {
 	if (!hot) return
 
-		//note that setting colWidths will disable the auto size column plugin (see Plugin AutoColumnSize.isEnabled)
+	//note that setting colWidths will disable the auto size column plugin (see Plugin AutoColumnSize.isEnabled)
 	//it is enabled if (!colWidths)
 	let plugin = hot.getPlugin('autoColumnSize')
 
@@ -477,7 +477,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 	//reset header row
 	headerRowWithIndex = null
-	
+
 	// if (data.length > 0) {
 	// 	headerRowWithIndex = getFirstRowWithIndexByData(data)
 	// }
@@ -494,14 +494,14 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	if (initiallyHideComments && typeof csvReadConfig.comments === 'string') {
 		hiddenPhysicalRowIndices = _getCommentIndices(csvParseResult.data, csvReadConfig)
 	}
-	
-		//enable all find connected stuff
-		//we need to setup this first so we get the events before handsontable... e.g. document keydown
-		findWidgetInstance.setupFind()
 
-		const showColumnHeaderNamesWithLettersLikeExcel = initialConfig?.showColumnHeaderNamesWithLettersLikeExcel ?? false
+	//enable all find connected stuff
+	//we need to setup this first so we get the events before handsontable... e.g. document keydown
+	findWidgetInstance.setupFind()
 
-		let defaultColHeaderFuncBound = defaultColHeaderFunc.bind(this, showColumnHeaderNamesWithLettersLikeExcel)
+	const showColumnHeaderNamesWithLettersLikeExcel = initialConfig?.showColumnHeaderNamesWithLettersLikeExcel ?? false
+
+	let defaultColHeaderFuncBound = defaultColHeaderFunc.bind(this, showColumnHeaderNamesWithLettersLikeExcel)
 
 	isInitialHotRender = true
 
@@ -553,16 +553,14 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		fixedColumnsLeft: fixedColumnsLeft,
 		//see https://handsontable.com/docs/7.1.0/demo-context-menu.html
 		contextMenu: {
-			callback: function (key: string, ...others) {
-			},
 			items: {
 				'row_above': {
-					callback: function() { //key, selection, clickEvent
+					callback: function () { //key, selection, clickEvent
 						insertRowAbove()
 					}
 				},
 				'row_below': {
-					callback: function() { //key, selection, clickEvent
+					callback: function () { //key, selection, clickEvent
 						insertRowBelow()
 					}
 				},
@@ -570,12 +568,12 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					name: '---------'
 				},
 				'col_left': {
-					callback: function() { //key, selection, clickEvent
+					callback: function () { //key, selection, clickEvent
 						insertColLeft()
 					}
 				},
 				'col_right': {
-					callback: function() { //key, selection, clickEvent
+					callback: function () { //key, selection, clickEvent
 						insertColRight()
 					}
 				},
@@ -612,9 +610,55 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					name: '---------'
 				},
 				'alignment': {},
+				'edit_header_cell': {
+					name: 'Edit header cell',
+					hidden: function () {
+						//there is no selection for header cells...
+						let selectedRanges = hot!.getSelected()
+
+						//only one range is selected
+						if (selectedRanges?.length !== 1) return true
+
+						//only one column is selected
+						if (selectedRanges[0][1] !== selectedRanges[0][3]) return true
+
+						//the whole col must be selected then we clicked the header cell
+						let maxRowIndex = hot!.countRows() - 1
+						if (selectedRanges[0][0] !== 0 || selectedRanges[0][2] !== maxRowIndex) return true
+
+						//must have custom header cells
+						if (!defaultCsvReadOptions._hasHeader) return true
+
+						if (!headerRowWithIndex) return true
+
+						return false
+					},
+					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
+						if (!headerRowWithIndex) return
+						if (selection.length > 1) return
+
+						let targetCol = selection[0].start.col
+
+						showColHeaderEditor(targetCol)
+					}
+				}
 			}
 		} as ContextMenuSettings,
+		afterOnCellMouseUp: function () {
 
+			//we need this because after we click on header edit this event is called and focuses some editor on the hot instance
+			if (editHeaderCellTextInputEl) {
+				setTimeout(() => {
+					editHeaderCellTextInputEl!.focus()
+				}, 0)
+			}
+
+		},
+		afterOnCellMouseDown: function (event, coords, th) {
+			if (coords.row !== -1) return
+
+			lastClickedHeaderCellTh = th
+		},
 		outsideClickDeselects: false, //keep selection
 
 		cells: highlightCsvComments
@@ -684,7 +728,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				}
 			}
 		},
-		afterColumnResize: function() {
+		afterColumnResize: function () {
 			// syncColWidths() //covered by afterRender
 		},
 		afterPaste: function () {
@@ -772,6 +816,27 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//we could change data to 1 element array containing the finished data? log to console then step until we get to SheetClip.stringify
 			// console.log('data');
 		},
+		beforeUndo: function (_action: EditHeaderCellAction | any) {
+
+			let action = _action as EditHeaderCellAction
+
+			//when we change has header this is not a prolbem because the undo stack is cleared when we toggle has header
+			if (action.actionType === 'changeHeaderCell' && headerRowWithIndex) {
+				let physicalColIndex: number = action.change[1]
+				let beforeValue = action.change[2]
+
+				let undoPlugin = (hot as any).undoRedo
+				let undoneStack = undoPlugin.undoneActions as any[]
+				undoneStack.push(action)
+
+				headerRowWithIndex.row[physicalColIndex] = beforeValue
+				setTimeout(() => {
+					hot!.render()
+				}, 0)
+				return false
+			}
+
+		},
 		afterUndo: function (action: any) {
 
 			// console.log(`afterUndo`, action)
@@ -794,9 +859,25 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//could remove columns
 			// syncColWidths() //covered by afterRender
 		},
-		beforeRedo: function (action: any) {
+		beforeRedo: function (_action: any) {
 
-			// console.log(`beforeRedo`, action)
+			let action = _action as EditHeaderCellAction
+
+			//when we change has header this is not a prolbem because the undo stack is cleared when we toggle has header
+			if (action.actionType === 'changeHeaderCell' && headerRowWithIndex) {
+				let physicalColIndex: number = action.change[1]
+				let afterValue = action.change[3]
+
+				let undoPlugin = (hot as any).undoRedo
+				let doneStack = undoPlugin.doneActions as any[]
+				doneStack.push(action)
+
+				headerRowWithIndex.row[physicalColIndex] = afterValue
+				setTimeout(() => {
+					hot!.render()
+				}, 0)
+				return false
+			}
 
 			// if (headerRowWithIndex && action.actionType === 'remove_row' && action.index === headerRowWithIndex.physicalIndex) { //first row cannot be removed normally so it must be the header row option
 			// 	//we re insert header row
@@ -814,7 +895,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		 * isForced: Is true if rendering was triggered by a change of settings or data; or 
 		 * false if rendering was triggered by scrolling or moving selection.
 		 */
-		afterRender: function(isForced: boolean) {
+		afterRender: function (isForced: boolean) {
 			if (!isForced || isInitialHotRender) return
 			//e.g. when we edit a cell and the cell must adjust the width because of the content
 			//there is no other hook?
@@ -841,29 +922,29 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				//same as in columnIsQuoted... see below for docs
 				let temp = headerRowWithIndex
 
-					const headerRowTexts: (string | null)[] = startColVisualIndices.map(p => temp.row[p]) //for some reason we need tmp here else can be null??
+				const headerRowTexts: (string | null)[] = startColVisualIndices.map(p => temp.row[p]) //for some reason we need tmp here else can be null??
 
-					let headerRowCopy: Array<string | null> = []
+				let headerRowCopy: Array<string | null> = []
 
-					for (let i = 0; i <= headerRowWithIndex.row.length; i++) {
-						const colText = i < headerRowWithIndex.row.length ? headerRowWithIndex.row[i] : null;
-	
-						let startIndex = startColVisualIndices.indexOf(i)
-	
-						if (startIndex !== -1) {
-							continue
-						}
-	
-						if (i === endColVisualIndex) {
-							headerRowCopy.push(...headerRowTexts)
-						}
-	
-						if (i >= headerRowWithIndex.row.length) continue
-	
-						headerRowCopy.push(colText)
+				for (let i = 0; i <= headerRowWithIndex.row.length; i++) {
+					const colText = i < headerRowWithIndex.row.length ? headerRowWithIndex.row[i] : null;
+
+					let startIndex = startColVisualIndices.indexOf(i)
+
+					if (startIndex !== -1) {
+						continue
 					}
-	
-					headerRowWithIndex.row = headerRowCopy
+
+					if (i === endColVisualIndex) {
+						headerRowCopy.push(...headerRowTexts)
+					}
+
+					if (i >= headerRowWithIndex.row.length) continue
+
+					headerRowCopy.push(colText)
+				}
+
+				headerRowWithIndex.row = headerRowCopy
 			}
 
 			if (columnIsQuoted) {
@@ -907,7 +988,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			// syncColWidths() //covered by afterRender
 			onAnyChange()
 		} as any),
-		afterRowMove: function(startRow: number, endRow: number) {
+		afterRowMove: function (startRow: number, endRow: number) {
 			if (!hot) throw new Error('table was null')
 			onAnyChange()
 		},
@@ -1105,7 +1186,13 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		} as any,
 
 		beforeKeyDown: function (event: KeyboardEvent) {
-			
+
+			//we need this because when editing header cell the hot instance thinks some editor is active and would pass the inputs to the next cell...
+			if (editHeaderCellTextInputEl) {
+				event.stopImmediatePropagation()
+				return
+			}
+
 			//NOTE that this can prevent all vs code shortcuts... e.g. cmd+p (on mac)!!!
 			if (event.ctrlKey && event.shiftKey && event.altKey && event.key === 'ArrowDown') {
 				event.stopImmediatePropagation()
@@ -1189,7 +1276,7 @@ function onAnyChange(changes?: CellChanges[] | null, reason?: string) {
 		if (!hasChanges) return
 	}
 
-	
+
 	//we need to check the value cache because the user could have cleared the input and then closed the widget
 	//but if we have an old search we re-open the old search which is now invalid...
 	if (findWidgetInstance.findWidgetInputValueCache !== '') {
@@ -1257,13 +1344,13 @@ function applyColWidths() {
 function syncColWidths() {
 	allColWidths = _getColWidths()
 	// console.log('col widths synced', allColWidths);
-	
+
 }
 
 function _getColWidths() {
 	if (!hot) return
 	//@ts-ignore
-	return hot.getColHeader().map(function(header, index) {
+	return hot.getColHeader().map(function (header, index) {
 		return hot!.getColWidth(index)
 	})
 }
@@ -1406,7 +1493,7 @@ function resetDataFromResetDialog() {
  * if all changes are written to the file we can proceed without displaying a dialog
  */
 function preReloadFileFromDisk() {
-	
+
 
 	const hasAnyChanges = getHasAnyChangesUi()
 
@@ -1629,13 +1716,13 @@ function updateFixedRowsCols() {
  * increments the {@link fixedRowsTop} by 1
  */
 function incFixedRowsTop() {
-	_changeFixedRowsTop(fixedRowsTop+1)
+	_changeFixedRowsTop(fixedRowsTop + 1)
 }
 /**
  * decrements the {@link fixedRowsTop} by 1
  */
 function decFixedRowsTop() {
-	_changeFixedRowsTop(fixedRowsTop-1)
+	_changeFixedRowsTop(fixedRowsTop - 1)
 }
 /**
  * no use this directly in the ui as {@link fixedRowsTop} name could change
@@ -1662,13 +1749,13 @@ function _toggleFixedRowsText() {
  * increments the {@link fixedColumnsLeft} by 1
  */
 function incFixedColsLeft() {
-	_changeFixedColsLeft(fixedColumnsLeft+1)
+	_changeFixedColsLeft(fixedColumnsLeft + 1)
 }
 /**
  * decrements the {@link fixedColumnsLeft} by 1
  */
 function decFixedColsLeft() {
-	_changeFixedColsLeft(fixedColumnsLeft-1)
+	_changeFixedColsLeft(fixedColumnsLeft - 1)
 }
 /**
  * no use this directly in the ui as {@link fixedColumnsLeft} name could change
@@ -1704,9 +1791,9 @@ function setupSideBarResizeHandle() {
 
 	sideBarResizeHandle.addEventListener(`mousedown`, (e) => {
 		downX = e.clientX
-		 _style = window.getComputedStyle(sidePanel)
-		 downWidth = parseInt(_style.width.substring(0,_style.width.length-2))
-		 if (isNaN(downWidth)) downWidth = minSidebarWidthInPx
+		_style = window.getComputedStyle(sidePanel)
+		downWidth = parseInt(_style.width.substring(0, _style.width.length - 2))
+		if (isNaN(downWidth)) downWidth = minSidebarWidthInPx
 	})
 
 
@@ -1794,7 +1881,7 @@ function toggleSidePanel(shouldCollapse?: boolean) {
 
 /*maybe this is not needed but it can be dangerous to call hot.updateSettings while indices/mappings are updated
  e.g. when we call {@link updateFixedRowsCols} during afterCreateRow and
-   move row 5 below row 1 then try to add a row below row 1 it is added 2 rows below and row 5 is at is't ols position...
+	 move row 5 below row 1 then try to add a row below row 1 it is added 2 rows below and row 5 is at is't ols position...
 
 so we only store the events we get and call them after a rerender (which is hopefully are called last)
 */
@@ -1832,7 +1919,7 @@ function afterRenderForced(isForced: boolean) {
 	recordedHookActions = []
 }
 
-function pre_afterRemoveCol(this: any,visualColIndex: number, amount: number) {
+function pre_afterRemoveCol(this: any, visualColIndex: number, amount: number) {
 	recordedHookActions.push("afterRemoveCol")
 
 	hook_list.push({
@@ -1914,3 +2001,99 @@ function afterCreateRow(visualRowIndex: number, amount: number) {
 
 	checkAutoApplyHasHeader()
 }
+
+function showColHeaderEditor(physicalColIndex: number) {
+
+	if (!headerRowWithIndex) return
+	if (!lastClickedHeaderCellTh) return
+
+	//see https://stackoverflow.com/questions/18348437/how-do-i-edit-the-header-text-of-a-handsontable
+	//update hot
+	//TODO does this work with virtual rendering? is really physical index?
+	//TODO scrolling (horizontal/vertical)
+	//TODO col resizing?
+	//TODO show indicator for long contents during render? (also for undo/redo?)
+
+	let rect = lastClickedHeaderCellTh.getBoundingClientRect()
+
+	let input = document.createElement(`input`)
+	input.setAttribute(`type`, `text`)
+	input.style.position = `absolute`
+	input.style.left = `${rect.left}px`
+	input.style.top = `${rect.top}px`
+	input.style.width = `${rect.width}px`
+	input.style.height = `${rect.height}px`
+	input.style.zIndex = `1000`
+
+	input.value = headerRowWithIndex.row[physicalColIndex] ?? ''
+	editHeaderCellTextInputEl = input
+
+
+	let inputWasRemoved = false
+	const removeInput = () => {
+		editHeaderCellTextInputEl = null
+		//this also calls blur
+		if (inputWasRemoved) return
+		inputWasRemoved = true
+		input.remove()
+	}
+
+	//blur -> commit
+	//esc -> revert
+
+	const beforeValue = input.value
+	//set to false initially e.g. when we focus some other window we don't want to apply changes
+	let shouldApplyChanges = true
+
+	let applyChange = () => {
+		shouldApplyChanges = false
+		if (headerRowWithIndex && beforeValue !== input.value) {
+			headerRowWithIndex.row[physicalColIndex] = input.value
+
+			let undoPlugin = (hot as any).undoRedo
+			let doneStack = undoPlugin.doneActions as any[]
+			let editHeaderRow: EditHeaderCellAction = {
+				actionType: 'changeHeaderCell',
+				change: [0, physicalColIndex, beforeValue, input.value]
+			}
+			doneStack.push(editHeaderRow)
+
+			//TODO show indicator?
+			hot!.render()
+		}
+	}
+
+	let addListeners = () => {
+
+		input.addEventListener(`blur`, () => {
+			if (shouldApplyChanges) {
+				applyChange()
+			}
+			removeInput()
+		})
+
+		input.addEventListener(`keyup`, (e) => {
+
+			if (e.key.toLocaleLowerCase() === `escape`) {
+				shouldApplyChanges = false
+				removeInput()
+			}
+
+			if (e.key.toLocaleLowerCase() === `enter`) {
+				shouldApplyChanges = true
+				applyChange()
+				removeInput()
+			}
+		})
+	}
+
+
+	document.body.appendChild(input)
+
+	setTimeout(() => {
+		addListeners()
+		// input.select()
+	})
+
+}
+

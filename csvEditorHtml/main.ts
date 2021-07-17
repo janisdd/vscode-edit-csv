@@ -49,6 +49,8 @@ const defaultCsvContentIfEmpty = `,\n,`
  * {string[] | null}
  */
 let headerRowWithIndex: HeaderRowWithIndex | null = null
+let lastClickedHeaderCellTh: Element | null = null
+let editHeaderCellTextInputEl: HTMLInputElement | null = null
 
 let hiddenPhysicalRowIndices: number[] = []
 
