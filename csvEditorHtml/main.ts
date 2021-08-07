@@ -51,6 +51,9 @@ const defaultCsvContentIfEmpty = `,\n,`
 let headerRowWithIndex: HeaderRowWithIndex | null = null
 let lastClickedHeaderCellTh: Element | null = null
 let editHeaderCellTextInputEl: HTMLInputElement | null = null
+let editHeaderCellTextInputLeftOffsetInPx: number = 0
+let handsontableOverlayScrollLeft: number = 0
+let _onTableScrollThrottled: ((this: HTMLDivElement, e: Event) => void) | null = null
 
 let hiddenPhysicalRowIndices: number[] = []
 

@@ -1250,6 +1250,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	//because main.ts is loaded before this the first init must be manually...
 	afterHandsontableCreated(hot!)
 
+	setupScrollListeners(hot)
+
 	if (hot) {
 		//select first cell by default so we have always a context
 		hot.selectCell(0, 0)
@@ -1828,6 +1830,34 @@ function setupSideBarResizeHandle() {
 
 }
 
+function getHandsontableOverlayScrollLeft(): HTMLDivElement | null {
+	const overlayWrapper = document.querySelector(`#csv-editor-wrapper .ht_master .wtHolder`)
+
+	if (!overlayWrapper) {
+		console.warn(`could not find handsontable overlay wrapper`)
+		return null
+	}
+	return overlayWrapper as HTMLDivElement
+}
+
+function setupScrollListeners() {
+
+	let overlayWrapper = getHandsontableOverlayScrollLeft()!
+	
+	if (_onTableScrollThrottled) {
+		overlayWrapper.removeEventListener(`scroll`, _onTableScrollThrottled)
+	}
+	_onTableScrollThrottled = throttle(_onTableScroll, 100)
+	overlayWrapper.addEventListener(`scroll`, _onTableScrollThrottled)
+}
+
+function _onTableScroll(e: Event) {
+
+	if (!editHeaderCellTextInputEl) return
+	let scrollLeft = (e.target as HTMLElement).scrollLeft
+	editHeaderCellTextInputEl.style.left = `${editHeaderCellTextInputLeftOffsetInPx - (scrollLeft - handsontableOverlayScrollLeft)}px`
+}
+
 /**
  * gets if the side panel is collapsed (true) or not (false)
  */
@@ -2010,9 +2040,9 @@ function showColHeaderEditor(physicalColIndex: number) {
 	//see https://stackoverflow.com/questions/18348437/how-do-i-edit-the-header-text-of-a-handsontable
 	//update hot
 	//TODO does this work with virtual rendering? is really physical index?
-	//TODO scrolling (horizontal/vertical)
 	//TODO col resizing?
 	//TODO show indicator for long contents during render? (also for undo/redo?)
+	
 
 	let rect = lastClickedHeaderCellTh.getBoundingClientRect()
 
@@ -2020,6 +2050,7 @@ function showColHeaderEditor(physicalColIndex: number) {
 	input.setAttribute(`type`, `text`)
 	input.style.position = `absolute`
 	input.style.left = `${rect.left}px`
+	editHeaderCellTextInputLeftOffsetInPx = rect.left
 	input.style.top = `${rect.top}px`
 	input.style.width = `${rect.width}px`
 	input.style.height = `${rect.height}px`
@@ -2028,6 +2059,8 @@ function showColHeaderEditor(physicalColIndex: number) {
 	input.value = headerRowWithIndex.row[physicalColIndex] ?? ''
 	editHeaderCellTextInputEl = input
 
+	let overlayWrapper = getHandsontableOverlayScrollLeft()!
+	handsontableOverlayScrollLeft = overlayWrapper.scrollLeft
 
 	let inputWasRemoved = false
 	const removeInput = () => {
