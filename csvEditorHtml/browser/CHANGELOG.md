@@ -4,6 +4,12 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.2.2
+
+- (same as vs code extension v6.0.2)
+- fixed issue 63: column header cells can now be edited
+- fixed issue 66: added readonly mode
+
 ## 1.2.1
 
 - (same as vs code extension v6.0.1)

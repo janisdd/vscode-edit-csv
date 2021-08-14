@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## 6.0.2
+
+- fixed issue 63: column header cells can now be edited
+- fixed issue 66: added readonly mode
+
 ## 6.0.1
 
 - added button to resize column to match their content

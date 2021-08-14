@@ -507,6 +507,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 	hot = new Handsontable(container, {
 		data: csvParseResult.data,
+		readOnly: isReadonlyMode,
 		trimWhitespace: false,
 		rowHeaderWidth: getRowHeaderWidth(csvParseResult.data.length),
 		//false to enable virtual rendering
@@ -514,7 +515,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		rowHeaders: function (row: number) { //the visual row index
 			let text = (row + 1).toString()
 
-			if (csvParseResult.data.length === 1) {
+			if (csvParseResult.data.length === 1 || isReadonlyMode) {
 				return `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
 			}
 
@@ -557,11 +558,17 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				'row_above': {
 					callback: function () { //key, selection, clickEvent
 						insertRowAbove()
+					},
+					disabled: function() {
+						return isReadonlyMode
 					}
 				},
 				'row_below': {
 					callback: function () { //key, selection, clickEvent
 						insertRowBelow()
+					},
+					disabled: function() {
+						return isReadonlyMode
 					}
 				},
 				'---------': {
@@ -570,11 +577,17 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				'col_left': {
 					callback: function () { //key, selection, clickEvent
 						insertColLeft()
+					},
+					disabled: function() {
+						return isReadonlyMode
 					}
 				},
 				'col_right': {
 					callback: function () { //key, selection, clickEvent
 						insertColRight()
+					},
+					disabled: function() {
+						return isReadonlyMode
 					}
 				},
 				'---------2': {
@@ -582,6 +595,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				},
 				'remove_row': {
 					disabled: function () {
+
+						if (isReadonlyMode) return true
 
 						const selection = hot!.getSelected()
 						let allRowsAreSelected = false
@@ -591,10 +606,12 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						}
 
 						return hot!.countRows() === 1 || allRowsAreSelected
-					}
+					},
 				},
 				'remove_col': {
 					disabled: function () {
+
+						if (isReadonlyMode) return true
 
 						const selection = hot!.getSelected()
 						let allColsAreSelected = false
@@ -639,7 +656,10 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 						let targetCol = selection[0].start.col
 
-						showColHeaderEditor(targetCol)
+						showColHeaderNameEditor(targetCol)
+					},
+					disabled: function() {
+						return isReadonlyMode
 					}
 				}
 			}
@@ -1250,7 +1270,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	//because main.ts is loaded before this the first init must be manually...
 	afterHandsontableCreated(hot!)
 
-	setupScrollListeners(hot)
+	setupScrollListeners()
 
 	if (hot) {
 		//select first cell by default so we have always a context
@@ -1392,19 +1412,17 @@ function defaultColHeaderFunc(useLettersAsColumnNames: boolean, colIndex: number
 
 	let visualIndex = colIndex
 
-	if (hot) {
-		visualIndex = hot.toVisualColumn(colIndex)
-
-		if (hot.countCols() === 1) {
-			return `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
-		}
-
-		return `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})"><i class="fas fa-trash"></i></span>`
+	if (!hot) {
+		return `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
 	}
 
-	return visualIndex !== 0
-		? `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})"><i class="fas fa-trash"></i></span>`
-		: `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
+	visualIndex = hot.toVisualColumn(colIndex)
+
+	if (hot.countCols() === 1 || isReadonlyMode) {
+		return `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
+	}
+
+	return `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})"><i class="fas fa-trash"></i></span>`
 }
 
 /**
@@ -1537,6 +1555,9 @@ function stopReceiveCsvProgBar() {
  * @param saveSourceFile 
  */
 function postApplyContent(saveSourceFile: boolean) {
+
+	if (isReadonlyMode) return
+
 	const csvContent = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
 
 	//used to clear focus... else styles are not properly applied
@@ -2032,17 +2053,16 @@ function afterCreateRow(visualRowIndex: number, amount: number) {
 	checkAutoApplyHasHeader()
 }
 
-function showColHeaderEditor(physicalColIndex: number) {
+function showColHeaderNameEditor(physicalColIndex: number) {
 
 	if (!headerRowWithIndex) return
 	if (!lastClickedHeaderCellTh) return
 
 	//see https://stackoverflow.com/questions/18348437/how-do-i-edit-the-header-text-of-a-handsontable
 	//update hot
-	//TODO does this work with virtual rendering? is really physical index?
-	//TODO col resizing?
-	//TODO show indicator for long contents during render? (also for undo/redo?)
-	
+	//col resizing? ok because input loses focus
+	//long render indicators are not really necessary at this point because 100k row files only takes 1-2s
+	//does work with virtual indices (e.g. when we reordered the columns)
 
 	let rect = lastClickedHeaderCellTh.getBoundingClientRect()
 
@@ -2130,3 +2150,52 @@ function showColHeaderEditor(physicalColIndex: number) {
 
 }
 
+
+function _updateToggleReadonlyModeUi() {
+
+	console.log(`asdasdasdas`)
+	//new state is isReadonlyMode
+	if (isReadonlyMode) {
+		isReadonlyModeToggleSpan.classList.add(`active`)
+		isReadonlyModeToggleSpan.title = `Sets the table to edit mode`
+
+		//disable edit ui
+		const btnEditableUi = document.querySelectorAll(`.on-readonly-disable-btn`)
+		for (let i = 0; i < btnEditableUi.length; i++) {
+			btnEditableUi.item(i).setAttribute('disabled','true')
+		}
+
+		const divEditableUi = document.querySelectorAll(`.on-readonly-disable-div`)
+		for (let i = 0; i < divEditableUi.length; i++) {
+			divEditableUi.item(i).classList.add('div-readonly-disabled')
+		}
+
+	} else {
+		isReadonlyModeToggleSpan.classList.remove(`active`)
+		isReadonlyModeToggleSpan.title = `Sets the table to readonly mode`
+
+			//enable edit ui
+			const btnEditableUi = document.querySelectorAll(`.on-readonly-disable-btn`)
+			for (let i = 0; i < btnEditableUi.length; i++) {
+				btnEditableUi.item(i).removeAttribute('disabled')
+			}
+
+			const divEditableUi = document.querySelectorAll(`.on-readonly-disable-div`)
+			for (let i = 0; i < divEditableUi.length; i++) {
+				divEditableUi.item(i).classList.remove('div-readonly-disabled')
+			}
+	}
+}
+
+function toggleReadonlyMode() {
+
+	if (!hot) return
+
+	isReadonlyMode = !isReadonlyMode
+
+	hot.updateSettings({
+		readOnly: isReadonlyMode
+	}, false)
+	
+	_updateToggleReadonlyModeUi()
+}

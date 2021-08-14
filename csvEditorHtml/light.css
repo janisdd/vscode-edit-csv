@@ -128,3 +128,8 @@ body.vscode-light {
 .vscode-light a {
 	color: #0866ff;
 }
+
+.vscode-light .handsontable .htDimmed {
+	/*color: #8c8c8c*/ /*harder to read*/
+	color: inherit;
+}

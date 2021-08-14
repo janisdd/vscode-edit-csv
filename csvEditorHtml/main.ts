@@ -159,6 +159,12 @@ let initialColumnWidth: number = 0
 let shouldApplyHasHeaderAfterRowsAdded = false
 
 /**
+ * table is editable or not, also disables some related ui, e.g. buttons
+ * set via {@link CsvEditSettings.initiallyIsInReadonlyMode}
+ */
+let isReadonlyMode = false
+
+/**
  * stores the widths of the handsontable columns
  * THIS is always synced with the ui
  * it allows us to modify the widths better e.g. restore widths...
@@ -236,6 +242,8 @@ const statSumOfNumbers = _getById(`stat-sum-of-numbers`) as HTMLDivElement
 
 const numbersStyleEnRadio = _getById(`numbers-style-en`) as HTMLInputElement //radio
 const numbersStyleNonEnRadio = _getById(`numbers-style-non-en`) as HTMLInputElement //radio
+
+const isReadonlyModeToggleSpan = _getById(`is-readonly-mode-toggle`) as HTMLSpanElement
 
 //--- find widget controls
 

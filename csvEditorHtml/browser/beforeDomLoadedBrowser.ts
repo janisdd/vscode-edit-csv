@@ -47,6 +47,7 @@ var initialConfig: CsvEditSettings | undefined = {
 	initialNumbersStyle: 'en',
 	insertRowBehavior: 'keepRowKeepColumn',
 	insertColBehavior: 'keepRowKeepColumn',
+	initiallyIsInReadonlyMode: false,
 }
 
 function __getById(id: string): HTMLElement {

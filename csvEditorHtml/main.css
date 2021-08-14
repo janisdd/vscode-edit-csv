@@ -4,6 +4,8 @@ html {
 	--extension-side-panel-display: none;
 	--extension-side-panel-expand-icon-display: block;
 	--extension-side-panel-collapse-icon-display: none;
+
+	--warning-color-all-themes: rgb(193 166 63);
 }
 
 html, body {
@@ -56,7 +58,7 @@ html, body {
 }
 
 .unsaved-changes-indicator {
-	color: rgb(193 166 63);
+	color: var(--warning-color-all-themes);
 	transition: opacity 0.5s ease-in-out;
 }
 
@@ -468,6 +470,11 @@ tr.hidden-row-previous-row > th:after {
 	pointer-events: none;
 }
 
+.div-readonly-disabled {
+	opacity: 0.7!important;
+	pointer-events: none;
+}
+
 div.field.same-line {
 	display: flex;
 	align-items: center;
@@ -530,6 +537,33 @@ div.field.same-line label {
 	margin-top: -3px;
 }
 
+.options-title .toggle-btn {
+	position: relative;
+	display: inline-flex;
+	vertical-align: middle;
+}
+
+#is-readonly-mode-toggle .fas.fa-slash:nth-child(2) {
+	position: absolute;
+	left: 0;
+	top: 7px;
+}
+
+#is-readonly-mode-toggle .fas.fa-slash:nth-child(3) {
+	position: absolute;
+	left: -1px;
+	top: 9px;
+	color: var(--vscode-editor-background);
+}
+
+#is-readonly-mode-toggle.active {
+	color: var(--warning-color-all-themes);
+}
+
+.options-title .toggle-btn .active {
+	color: white;
+
+}
 
 
 .rotated-90deg {

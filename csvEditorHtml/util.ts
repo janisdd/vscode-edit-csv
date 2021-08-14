@@ -285,12 +285,18 @@ function _getSelectedVisualColIndex(): number | null {
  * adds a new row above the current row
  */
 function insertRowAbove() {
+
+	if (isReadonlyMode) return
+
 	_insertRowInternal(false)
 }
 /**
  * adds a new row below the current row
  */
 function insertRowBelow() {
+
+	if (isReadonlyMode) return
+
 	_insertRowInternal(true)
 }
 
@@ -329,12 +335,18 @@ function _insertRowInternal(belowCurrRow: boolean) {
  * adds a new row above the current row
  */
 function insertColLeft(selectNewCol = true, preserveSelectedRow = true) {
+
+	if (isReadonlyMode) return
+
 	_insertColInternal(false)
 }
 /**
  * adds a new col below the current row
  */
 function insertColRight(selectNewCol = true, preserveSelectedRow = true) {
+
+	if (isReadonlyMode) return
+
 	_insertColInternal(true)
 }
 
@@ -372,6 +384,8 @@ function _insertColInternal(afterCurrCol: boolean) {
  */
 function removeRow(index: number) {
 
+	if (isReadonlyMode) return
+
 	if (!hot) throw new Error('table was null')
 
 	hot.alter('remove_row', index)
@@ -383,6 +397,8 @@ function removeRow(index: number) {
  * @param {number} index the visual column index
  */
 function removeColumn(index: number) {
+
+	if (isReadonlyMode) return
 
 	if (!hot) throw new Error('table was null')
 
@@ -762,6 +778,9 @@ function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefi
 	//--- other options
 	fixedRowsTopInfoSpan.innerText = fixedRowsTop + ''
 	fixedColumnsTopInfoSpan.innerText = fixedColumnsLeft + ''
+
+	isReadonlyMode = initialConfig.initiallyIsInReadonlyMode
+	_updateToggleReadonlyModeUi()
 
 	setNumbersStyleUi(initialConfig.initialNumbersStyle)
 }

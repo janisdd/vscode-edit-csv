@@ -75,6 +75,10 @@ body .toast {
 	font-size: calc(var(--vscode-editor-font-size) - 6px);
 }
 
+#is-readonly-mode-toggle .fas.fa-slash:nth-child(3) {
+	color: var(--theme-bg-color);
+}
+
 .file-input {
 	width: 0.1px;
 	height: 0.1px;

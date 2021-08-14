@@ -428,7 +428,7 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 
 			const hasAnyChanges = getHasAnyChangesUi()
 
-			if (!hasAnyChanges) {
+			if (!hasAnyChanges && !isReadonlyMode) {
 				//just relaod the file because we have no changes anyway...
 				reloadFileFromDisk()
 				return

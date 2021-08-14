@@ -39,6 +39,7 @@ const defaultConfig: CsvEditSettings = {
 	initialNumbersStyle: 'en',
 	insertRowBehavior: 'keepRowKeepColumn',
 	insertColBehavior: 'keepRowKeepColumn',
+	initiallyIsInReadonlyMode: false,
 }
 
 /**

@@ -213,6 +213,13 @@ type CsvEditSettings = {
 	 */
 	insertColBehavior: 'keepRowFocusNewColumn' | 'keepRowKeepColumn'
 
+	/**
+	 * table should start in readonly mode?
+	 * true: table is view only,
+	 * false: edit mode (normal)
+	 * NOTE that initial fixes (e.g. all rows should have the same length) are applied because readonly is only applied after/during the table is created
+	 */
+	initiallyIsInReadonlyMode: boolean
 }
 
 /* --- frontend settings --- */

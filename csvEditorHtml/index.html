@@ -168,6 +168,15 @@
 											<span class="clickable" onclick="decFixedColsLeft()"><i class="fas fa-chevron-down"></i></span>
 										</div>
 									</div>
+									<!-- toggle readonly mode -->
+									<div class="flexed toggle-btn clickable" style="margin-left: 1em;">
+										<span id="is-readonly-mode-toggle" onclick="toggleReadonlyMode()" 
+										title="Toggls the readonly table mode (SET IN CODE AT STARTUP)">
+											<i class="fas fa-pen"></i>
+											<i class="fas fa-slash"></i>
+											<i class="fas fa-slash"></i>
+										</span>
+									</div>
 
 
 									<span id="source-file-unwatched-indicator" class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline" style="float: right;margin-right: 5px;"
@@ -185,7 +194,7 @@
 				<tbody>
 					<tr>
 						<td>
-								<div id="read-options-content" class="options-content">
+								<div id="read-options-content" class="options-content on-readonly-disable-div">
 										<div>
 					
 											<div class="field">
@@ -273,7 +282,7 @@
 								</div>
 						</td>
 						<td>
-								<div id="write-options-content" class="options-content">
+								<div id="write-options-content" class="options-content on-readonly-disable-div">
 										<div class="field">
 											<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded"
 												checked="checked" onchange="setHasHeaderWrite()">
@@ -387,37 +396,37 @@
 					</div>
 				</div>
 				
-				<button id="add-row-btn" class="button is-outlined" onclick="addRow()">
+				<button id="add-row-btn" class="button is-outlined on-readonly-disable-btn" onclick="addRow()">
 					<span class="icon is-small">
 						<i class="fas fa-plus"></i>
 					</span>
 					<span>Add row</span>
 				</button>
 				<div class="row-col-insert-btns">
-					<button class="button is-outlined" onclick="insertRowAbove()" title="Insert row above current row [ctrl+shift+alt+up, ctrl+shift+ins]">
+					<button class="button is-outlined on-readonly-disable-btn" onclick="insertRowAbove()" title="Insert row above current row [ctrl+shift+alt+up, ctrl+shift+ins]">
 						<i class="fas fas fa-caret-up "></i>
 					</button>
-					<button class="button is-outlined " onclick="insertRowBelow() " title="Insert row below current row [ctrl+shift+alt+down, ctrl+ins]">
+					<button class="button is-outlined on-readonly-disable-btn" onclick="insertRowBelow() " title="Insert row below current row [ctrl+shift+alt+down, ctrl+ins]">
 						<i class="fas fa-caret-down ad"></i>
 					</button>
 				</div>
 
-				<button id="add-col-btn" class="button is-outlined" onclick="addColumn()">
+				<button id="add-col-btn" class="button is-outlined on-readonly-disable-btn" onclick="addColumn()">
 					<span class="icon is-small">
 						<i class="fas fa-plus"></i>
 					</span>
 					<span>Add column</span>
 				</button>
 				<div class="row-col-insert-btns">
-					<button class="button is-outlined" onclick="insertColLeft()" title="Insert column left to current column [ctrl+shift+alt+left]">
+					<button class="button is-outlined on-readonly-disable-btn" onclick="insertColLeft()" title="Insert column left to current column [ctrl+shift+alt+left]">
 						<i class="fas fas fa-caret-left"></i>
 					</button>
-					<button class="button is-outlined" onclick="insertColRight()" title="Insert column right to current column [ctrl+shift+alt+right]">
+					<button class="button is-outlined on-readonly-disable-btn" onclick="insertColRight()" title="Insert column right to current column [ctrl+shift+alt+right]">
 						<i class="fas fa-caret-right"></i>
 					</button>
 				</div>
 
-				<button id="btn-apply-changes-to-file-and-save" class="button is-outlined mar-left" onclick="postApplyContent(true)">
+				<button id="btn-apply-changes-to-file-and-save" class="button is-outlined mar-left on-readonly-disable-btn" onclick="postApplyContent(true)">
 					<span class="icon is-small">
 						<i class="fas fa-save"></i>
 					</span>
@@ -428,7 +437,7 @@
 					</span>
 				</button>
 
-				<button id="btn-apply-changes-to-file" class="button is-outlined" onclick="postApplyContent(false)">
+				<button id="btn-apply-changes-to-file" class="button is-outlined on-readonly-disable-btn" onclick="postApplyContent(false)">
 					<span class="icon is-small">
 						<i class="fas fa-reply"></i>
 					</span>
@@ -465,7 +474,7 @@
 						</button>
 					</div>
 
-					<button style="margin-right: 1em" class="button is-outlined" onclick="trimAllCells()">
+					<button style="margin-right: 1em" class="button is-outlined on-readonly-disable-btn" onclick="trimAllCells()">
 						<span class="icon is-small">
 							<i class="fas fa-hand-scissors"></i>
 						</span>

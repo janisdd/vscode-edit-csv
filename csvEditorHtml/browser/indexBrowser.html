@@ -223,8 +223,10 @@
 				<i class="far fa-sun"></i> -->
 			</div>
 
-			<div id="version-n-changelog" style="margin-right: 1rem;" class="clickable" onclick="toggleChangelogModal(true)">
-				v1.2.1
+			<div id="version-n-changelog" style="margin-right: 1rem;">
+				<a href="https://github.com/janisdd/vscode-edit-csv/blob/master/csvEditorHtml/browser/CHANGELOG.md" target="_blank">
+					v1.2.1
+				</a>
 			</div>
 
 			<div style="margin-right: 1rem;">
@@ -326,8 +328,17 @@
 										<span class="clickable" onclick="decFixedColsLeft()"><i class="fas fa-chevron-down"></i></span>
 									</div>
 								</div>
+								<!-- toggle readonly mode -->
+								<div class="flexed toggle-btn clickable" style="margin-left: 1em;">
+									<span id="is-readonly-mode-toggle" onclick="toggleReadonlyMode()" 
+									title="Toggls the readonly table mode (SET IN CODE AT STARTUP)">
+										<i class="fas fa-pen"></i>
+										<i class="fas fa-slash"></i>
+										<i class="fas fa-slash"></i>
+									</span>
+								</div>
 
-								<span class="clickable" style="margin-left: 1em;">
+								<span class="clickable" style="margin-left: 2em;">
 									<input id="csv-file-input" type="file" name="file" class="file-input" />
 									<label for="csv-file-input"><i class="fas fa-upload"></i> Open a file or drop...</label>
 								</span>
@@ -351,7 +362,7 @@
 				<tbody>
 					<tr>
 						<td>
-							<div id="read-options-content" class="options-content">
+							<div id="read-options-content" class="options-content on-readonly-disable-div">
 								<div>
 									<div class="field same-line">
 										<label>Encoding</label>
@@ -448,7 +459,7 @@
 							</div>
 						</td>
 						<td>
-							<div id="write-options-content" class="options-content">
+							<div id="write-options-content" class="options-content on-readonly-disable-div">
 
 								<div class="field same-line">
 									<label>Encoding</label>
@@ -573,32 +584,32 @@
 					</div>
 				</div> -->
 
-				<button id="add-row-btn" class="button is-outlined" onclick="addRow()">
+				<button id="add-row-btn" class="button is-outlined on-readonly-disable-btn" onclick="addRow()">
 					<span class="icon is-small">
 						<i class="fas fa-plus"></i>
 					</span>
 					<span>Add row</span>
 				</button>
 				<div class="row-col-insert-btns">
-					<button class="button is-outlined" onclick="insertRowAbove()" title="Insert row above current row [ctrl+shift+alt+up, ctrl+shift+ins]">
+					<button class="button is-outlined on-readonly-disable-btn" onclick="insertRowAbove()" title="Insert row above current row [ctrl+shift+alt+up, ctrl+shift+ins]">
 						<i class="fas fas fa-caret-up "></i>
 					</button>
-					<button class="button is-outlined " onclick="insertRowBelow() " title="Insert row below current row [ctrl+shift+alt+down, ctrl+ins]">
+					<button class="button is-outlined on-readonly-disable-btn" onclick="insertRowBelow() " title="Insert row below current row [ctrl+shift+alt+down, ctrl+ins]">
 						<i class="fas fa-caret-down ad"></i>
 					</button>
 				</div>
 
-				<button id="add-col-btn" class="button is-outlined" onclick="addColumn()">
+				<button id="add-col-btn" class="button is-outlined on-readonly-disable-btn" onclick="addColumn()">
 					<span class="icon is-small">
 						<i class="fas fa-plus"></i>
 					</span>
 					<span>Add column</span>
 				</button>
 				<div class="row-col-insert-btns">
-					<button class="button is-outlined" onclick="insertColLeft()" title="Insert column left to current column [ctrl+shift+alt+left]">
+					<button class="button is-outlined on-readonly-disable-btn" onclick="insertColLeft()" title="Insert column left to current column [ctrl+shift+alt+left]">
 						<i class="fas fas fa-caret-left"></i>
 					</button>
-					<button class="button is-outlined" onclick="insertColRight()" title="Insert column right to current column [ctrl+shift+alt+right]">
+					<button class="button is-outlined on-readonly-disable-btn" onclick="insertColRight()" title="Insert column right to current column [ctrl+shift+alt+right]">
 						<i class="fas fa-caret-right"></i>
 					</button>
 				</div>
@@ -643,7 +654,7 @@
 						</button>
 					</div>
 
-					<button style="margin-right: 1em" class="button is-outlined" onclick="trimAllCells()">
+					<button style="margin-right: 1em" class="button is-outlined on-readonly-disable-btn" onclick="trimAllCells()">
 						<span class="icon is-small">
 							<i class="fas fa-hand-scissors"></i>
 						</span>
@@ -959,47 +970,6 @@
 		<button class="modal-close is-large" aria-label="close" onclick="toggleSourceFileChangedModalDiv(false)"></button>
 	</div>
 
-	<div id="changelog-modal" class="modal modal-centered">
-		<div class="modal-background" onclick="toggleChangelogModal(false)"></div>
-		<div class="modal-card">
-			<header class="modal-card-head">
-				<p class="modal-card-title">Changelog</p>
-				<button class="delete" aria-label="close" onclick="toggleChangelogModal(false)"></button>
-			</header>
-			<section class="modal-card-body">
-				<ul>
-					<li class="new-version">v1.2.1</li>
-					<li>added button to resize column to match their content</li>
-					<li class="new-version">v1.2.0</li>
-					<li>fixed issue where reordering/sorting breaks inserting</li>
-					<li class="new-version">v1.1.6</li>
-					<li>fixed issue in papaparse where multi-character delimiters won't work</li>
-					<li class="new-version">v1.1.5</li>
-					<li>added new keybord shortcuts for inserting rows/cols</li>
-					<li class="new-version">v1.1.4 / v1.1.3</li>
-					<li>empty values are not longer quoted</li>
-					<li class="new-version">v1.1.2</li>
-					<li>added buttons to insert rows/columns</li>
-					<li>resetting data now keeps column widths</li>
-					<li class="new-version">v1.1.1</li>
-					<li>added hint to readme how to set csv for different file types in vs code</li>
-					<li>read option `has header` can now be toggled even if the table has only 1 row</li>
-					<li>- side bar stats are only updated if the side bar is visible</li>
-					<li class="new-version">v1.1.0</li>
-					<li>added multi column sorting (ctrl/cmd + click)</li>
-					<li>left side panel (stats) now supports two different number styles</li>
-					<li class="new-version">v1.0.1</li>
-					<li>a toast now displays the used file encoding for export/download</li>
-					<li>side panel can now be resized</li>
-					<li class="new-version">v1.0.0</li>
-					<li>Initial release</li>
-				</ul>
-			</section>
-			<footer class="modal-card-foot">
-				<button class="button is-outlined" onclick="toggleChangelogModal(false)">Close</button>
-			</footer>
-		</div>
-	</div>
 
 	<div id="drop-file-overlay" class="op-hidden">
 		<div id="drop-zone" class="">

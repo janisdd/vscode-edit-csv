@@ -25,8 +25,8 @@ function createEditorHtml(webview, context, initialVars) {
     const _getResourcePath = getResourcePath.bind(undefined, webview, context);
     let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.min.css');
     // let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
-    let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js');
-    // let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js')
+    // let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js')
+    let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js');
     let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js');
     // let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
     const mousetrapJs = _getResourcePath('thirdParty/mousetrap/mousetrap.min.js');
@@ -317,10 +317,19 @@ function createEditorHtml(webview, context, initialVars) {
 												<span class="clickable" onclick="decFixedColsLeft()"><i class="fas fa-chevron-down"></i></span>
 											</div>
 										</div>
+										<!-- toggle readonly mode -->
+										<div class="flexed toggle-btn clickable" style="margin-left: 1em;">
+											<span id="is-readonly-mode-toggle" onclick="toggleReadonlyMode()" 
+											title="Toggls the readonly table mode (SET IN CODE AT STARTUP)">
+												<i class="fas fa-pen"></i>
+												<i class="fas fa-slash"></i>
+												<i class="fas fa-slash"></i>
+											</span>
+										</div>
 
 
 										<span id="source-file-unwatched-indicator" class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline" style="float: right;margin-right: 5px;"
-											data-tooltip="The csv source file cannot be automaically reloaded (because it's not in the current workpsace) if the file on disk changes. You will get notified if the file gets changed but then you need to open/display the file in vs code and manually refresh the table (refresh button). Alternatively just close this table and reopen it.">
+											data-tooltip="The csv source file cannot be automatically reloaded if the file on disk is changed (because it's not in the current workspace). You will get notified if the file is changed but then you need to open/display the source csv file in vs code and manually refresh the table (refresh button). Alternatively just close this table and reopen it.">
 											<i class="fas fa-eye"></i>
 										</span>
 										<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"
@@ -334,7 +343,7 @@ function createEditorHtml(webview, context, initialVars) {
 					<tbody>
 						<tr>
 							<td>
-									<div id="read-options-content" class="options-content">
+									<div id="read-options-content" class="options-content on-readonly-disable-div">
 											<div>
 						
 												<div class="field">
@@ -422,7 +431,7 @@ function createEditorHtml(webview, context, initialVars) {
 									</div>
 							</td>
 							<td>
-									<div id="write-options-content" class="options-content">
+									<div id="write-options-content" class="options-content on-readonly-disable-div">
 											<div class="field">
 												<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded"
 													checked="checked" onchange="setHasHeaderWrite()">
@@ -536,37 +545,37 @@ function createEditorHtml(webview, context, initialVars) {
 						</div>
 					</div>
 					
-					<button id="add-row-btn" class="button is-outlined" onclick="addRow()">
+					<button id="add-row-btn" class="button is-outlined on-readonly-disable-btn" onclick="addRow()">
 						<span class="icon is-small">
 							<i class="fas fa-plus"></i>
 						</span>
 						<span>Add row</span>
 					</button>
 					<div class="row-col-insert-btns">
-						<button class="button is-outlined" onclick="insertRowAbove()" title="Insert row above current row [ctrl+shift+alt+up, ctrl+shift+ins]">
+						<button class="button is-outlined on-readonly-disable-btn" onclick="insertRowAbove()" title="Insert row above current row [ctrl+shift+alt+up, ctrl+shift+ins]">
 							<i class="fas fas fa-caret-up "></i>
 						</button>
-						<button class="button is-outlined " onclick="insertRowBelow() " title="Insert row below current row [ctrl+shift+alt+down, ctrl+ins]">
+						<button class="button is-outlined on-readonly-disable-btn" onclick="insertRowBelow() " title="Insert row below current row [ctrl+shift+alt+down, ctrl+ins]">
 							<i class="fas fa-caret-down ad"></i>
 						</button>
 					</div>
 
-					<button id="add-col-btn" class="button is-outlined" onclick="addColumn()">
+					<button id="add-col-btn" class="button is-outlined on-readonly-disable-btn" onclick="addColumn()">
 						<span class="icon is-small">
 							<i class="fas fa-plus"></i>
 						</span>
 						<span>Add column</span>
 					</button>
 					<div class="row-col-insert-btns">
-						<button class="button is-outlined" onclick="insertColLeft()" title="Insert column left to current column [ctrl+shift+alt+left]">
+						<button class="button is-outlined on-readonly-disable-btn" onclick="insertColLeft()" title="Insert column left to current column [ctrl+shift+alt+left]">
 							<i class="fas fas fa-caret-left"></i>
 						</button>
-						<button class="button is-outlined" onclick="insertColRight()" title="Insert column right to current column [ctrl+shift+alt+right]">
+						<button class="button is-outlined on-readonly-disable-btn" onclick="insertColRight()" title="Insert column right to current column [ctrl+shift+alt+right]">
 							<i class="fas fa-caret-right"></i>
 						</button>
 					</div>
 
-					<button id="btn-apply-changes-to-file-and-save" class="button is-outlined mar-left" onclick="postApplyContent(true)">
+					<button id="btn-apply-changes-to-file-and-save" class="button is-outlined mar-left on-readonly-disable-btn" onclick="postApplyContent(true)">
 						<span class="icon is-small">
 							<i class="fas fa-save"></i>
 						</span>
@@ -577,7 +586,7 @@ function createEditorHtml(webview, context, initialVars) {
 						</span>
 					</button>
 
-					<button id="btn-apply-changes-to-file" class="button is-outlined" onclick="postApplyContent(false)">
+					<button id="btn-apply-changes-to-file" class="button is-outlined on-readonly-disable-btn" onclick="postApplyContent(false)">
 						<span class="icon is-small">
 							<i class="fas fa-reply"></i>
 						</span>
@@ -614,7 +623,7 @@ function createEditorHtml(webview, context, initialVars) {
 							</button>
 						</div>
 
-						<button style="margin-right: 1em" class="button is-outlined" onclick="trimAllCells()">
+						<button style="margin-right: 1em" class="button is-outlined on-readonly-disable-btn" onclick="trimAllCells()">
 							<span class="icon is-small">
 								<i class="fas fa-hand-scissors"></i>
 							</span>
@@ -642,7 +651,109 @@ function createEditorHtml(webview, context, initialVars) {
 
 			<!-- main editor/grid area -->
 			<div class="side-paneled">
-				${sidePanel}
+				<div id="side-panel" class="side-panel">
+
+					<div id="side-panel-inner">
+
+						<div class="stat">
+							<div>Numbers sum
+								<span class="tooltip is-tooltip-right is-tooltip-multiline"
+									data-tooltip="The sum of numbers in the selected cells (only connected cells). Only the first number of a cell is used. Arbitrary-precision is powered by big.js">
+									<i class="far fa-question-circle"></i>
+								</span>
+							</div>
+							<div id="stat-sum-of-numbers">000</div>
+						</div>
+
+						<div class="stat">
+							<div>Selected cells
+								<span class="tooltip is-tooltip-right" data-tooltip="The number of selected cells">
+									<i class="far fa-question-circle"></i>
+								</span>
+							</div>
+							<div id="stat-selected-cells-count">000</div>
+						</div>
+
+						<div class="sub-stat">
+							<div>Not empty
+								<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="The selected cells count where the value is not empty (whitespace is counted as value)">
+									<i class="far fa-question-circle"></i>
+								</span>
+							</div>
+							<div id="stat-selected-not-empty-cells">000</div>
+						</div>
+
+						<div class="stat">
+							<div>Selected rows
+								<span class="tooltip is-tooltip-right" data-tooltip="The selected rows count">
+									<i class="far fa-question-circle"></i>
+								</span>
+							</div>
+
+							<div id="stat-selected-rows">000</div>
+						</div>
+
+						<div class="stat">
+							<div>Selected cols
+								<span class="tooltip is-tooltip-right" data-tooltip="The selected columns count">
+									<i class="far fa-question-circle"></i>
+								</span>
+							</div>
+							<div id="stat-selected-cols">000</div>
+						</div>
+
+						<div class="stat divider"></div>
+
+						<div class="stat">
+							<div>Rows count</div>
+							<div id="stat-rows-count">000</div>
+						</div>
+
+						<div class="stat">
+							<div>Cols count</div>
+							<div id="stat-cols-count">000</div>
+						</div>
+
+						<div class="stat divider"></div>
+
+						<div class="stat">
+							<div>Numbers style
+								<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="The number style only applies for the stats, does not affect sorting!!">
+									<i class="far fa-question-circle"></i>
+								</span>
+							</div>
+							<div class="control" style="padding-left: 0;">
+								<label class="radio">
+									<input id="numbers-style-en" type="radio" name="numbers-style">
+									en: 3.14 
+									<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="Decimal separator: '.' Thousand separator: a single whitespace or ','">
+										<i class="far fa-question-circle"></i>
+									</span>
+								</label>
+								<br />
+								<label class="radio">
+									<input id="numbers-style-non-en" type="radio" name="numbers-style">
+									non-en: 3,14
+									<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="Decimal separator: ',' Thousand separator: a single whitespace or '.'">
+										<i class="far fa-question-circle"></i>
+									</span>
+								</label>
+							</div>
+						</div>
+
+						<div class="stat divider"></div>
+						
+						<!-- some day an ad can be placed here -->
+						<!-- <div>
+							<div style="border: 1px solid black; height: 300px;">
+								AD HERE
+							</div>
+						</div> -->
+					</div>
+
+					<!-- place this inside to collapse this with the sidebar -->
+					<div id="side-panel-resize-handle"></div>
+				</div>
 
 				<!-- main editor/grid area -->
 				<div id="csv-editor-wrapper" class="csv-editor-wrapper">

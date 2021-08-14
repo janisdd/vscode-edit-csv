@@ -203,3 +203,9 @@ body.vscode-high-contrast {
 	border-collapse: initial;
 	border-radius: 10px;
 }
+
+.vscode-high-contrast .handsontable .htDimmed {
+	/*color: #cacaca;*/ /*harder to read*/
+	cursor: pointer; /*as color does not really work maybe this helps?*/
+	color: inherit;
+}

@@ -39,6 +39,7 @@ const defaultConfig = {
     initialNumbersStyle: 'en',
     insertRowBehavior: 'keepRowKeepColumn',
     insertColBehavior: 'keepRowKeepColumn',
+    initiallyIsInReadonlyMode: false,
 };
 /**
  * returns the configuration for this extension

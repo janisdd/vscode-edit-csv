@@ -240,3 +240,8 @@ body.vscode-dark {
 .vscode-dark a {
 	color: #5c9bff;
 }
+
+.vscode-dark .handsontable .htDimmed {
+	/*color: #b7b7b7*/ /*harder to read*/
+	color: inherit;
+}
