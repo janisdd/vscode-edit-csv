@@ -21,5 +21,10 @@ assignees: ''
 ### Description
 A clear and concise description of what the bug is.
 
+### Expected behavior
+
+What you'd expect to happen.
+
+
 ### Steps to reproduce
 A step by step guide how to reproduce this issue/bug.
