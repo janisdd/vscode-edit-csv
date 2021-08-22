@@ -664,6 +664,13 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				}
 			}
 		} as ContextMenuSettings,
+		beforeColumnSort: function(currentSortConfig, destinationSortConfigs) {
+
+			//we cannot use the setting columnSorting because this would remove the hidden indicators, this would change the coulmn width...
+			if (isReadonlyMode) return false
+
+			return
+		},
 		afterOnCellMouseUp: function () {
 
 			//we need this because after we click on header edit this event is called and focuses some editor on the hot instance
@@ -1412,9 +1419,10 @@ function defaultColHeaderFunc(useLettersAsColumnNames: boolean, colIndex: number
 
 	let visualIndex = colIndex
 
-	if (!hot) {
-		return `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
-	}
+	if (!hot) return ``
+	// if (!hot) {
+	// 	return `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
+	// }
 
 	visualIndex = hot.toVisualColumn(colIndex)
 
@@ -2194,7 +2202,10 @@ function toggleReadonlyMode() {
 	isReadonlyMode = !isReadonlyMode
 
 	hot.updateSettings({
-		readOnly: isReadonlyMode
+		readOnly: isReadonlyMode,
+		manualRowMove: !isReadonlyMode,
+		manualColumnMove: !isReadonlyMode,
+		undo: !isReadonlyMode
 	}, false)
 	
 	_updateToggleReadonlyModeUi()
