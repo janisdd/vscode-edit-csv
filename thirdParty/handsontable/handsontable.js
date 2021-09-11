@@ -23,8 +23,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Version: 6.4.1
- * Release date: 19/12/2018 (built at 13/12/2020 14:35:33)
+ * Version: 6.4.3
+ * Release date: 19/12/2018 (built at 11/09/2021 12:20:44)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29737,9 +29737,9 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "13/12/2020 14:35:33";
+Handsontable.buildDate = "11/09/2021 12:20:44";
 Handsontable.packageName = "handsontable";
-Handsontable.version = "6.4.1";
+Handsontable.version = "6.4.3";
 var baseVersion = "";
 
 if (baseVersion) {
@@ -39707,6 +39707,7 @@ function EditorManager(instance, priv, selection) {
   var destroyed = false;
   var lock = false;
   var activeEditor;
+  var isCurrentlyComposing = false;
 
   function moveSelectionAfterEnter(shiftKey) {
     var enterMoves = typeof priv.settings.enterMoves === 'function' ? priv.settings.enterMoves(event) : priv.settings.enterMoves;
@@ -39758,10 +39759,16 @@ function EditorManager(instance, priv, selection) {
       return;
     }
 
-    instance.runHooks('beforeKeyDown', event); // keyCode 229 aka 'uninitialized' doesn't take into account with editors. This key code is produced when unfinished
+    instance.runHooks('beforeKeyDown', event);
+
+    if (event.keyCode === 27 || event.keyCode === 13) {
+      // esc | enter
+      isCurrentlyComposing = false;
+    } // keyCode 229 aka 'uninitialized' doesn't take into account with editors. This key code is produced when unfinished
     // character is entering (using IME editor). It is fired mainly on linux (ubuntu) with installed ibus-pinyin package.
 
-    if (destroyed || event.keyCode === 229) {
+
+    if (destroyed || event.keyCode === 229 && isCurrentlyComposing === false) {
       return;
     }
 
@@ -39780,7 +39787,22 @@ function EditorManager(instance, priv, selection) {
 
     if (activeEditor && !activeEditor.isWaiting()) {
       if (!(0, _unicode.isMetaKey)(event.keyCode) && !(0, _unicode.isCtrlMetaKey)(event.keyCode) && !ctrlDown && !_this.isEditorOpened()) {
-        _this.openEditor('', event);
+        if (event.keyCode >= 173 && event.keyCode <= 183 || event.keyCode === 19 // pause/break
+        || event.keyCode === 144 // num lock
+        || event.keyCode === 145 // scroll lock
+        ) {// see https://www.freecodecamp.org/news/javascript-keycode-list-keypress-event-key-codes/
+            // AudioVolumeMute, AudioVolumeDown, AudioVolumeUp, LaunchMediaPlayer, LaunchApplication1, LaunchApplication2
+            // these are not printable so we don't want to clear the cell value
+          } else {
+          // eslint-disable-next-line no-lonely-if
+          if (isCurrentlyComposing) {
+            _this.openEditor(event.key, event);
+
+            isCurrentlyComposing = false;
+          } else {
+            _this.openEditor('', event);
+          }
+        }
 
         return;
       }
@@ -39955,15 +39977,29 @@ function EditorManager(instance, priv, selection) {
   function init() {
     instance.addHook('afterDocumentKeyDown', onKeyDown);
     eventManager.addEventListener(document.documentElement, 'keydown', function (event) {
+      // console.log(isCurrentlyComposing);
       if (!destroyed) {
         instance.runHooks('afterDocumentKeyDown', event);
       }
     }); // Open editor when text composition is started (IME editor)
+    // eslint-disable-next-line no-unused-vars
 
     eventManager.addEventListener(document.documentElement, 'compositionstart', function (event) {
-      if (!destroyed && activeEditor && !activeEditor.isOpened() && instance.isListening()) {
-        _this.openEditor('', event);
-      }
+      isCurrentlyComposing = true; // console.log('compositionstart', event);
+      // if (!destroyed && activeEditor && !activeEditor.isOpened() && instance.isListening()) {
+      //   _this.openEditor('', event);
+      // }
+    }); // eslint-disable-next-line no-unused-vars
+
+    eventManager.addEventListener(document.documentElement, 'compositionupdate', function (event) {// console.log('compositionupdate', event);
+    }); // this is fired after key down so we cannot really use this... and sometimes it's now fired e.g. on esc to cancel
+    // eslint-disable-next-line no-unused-vars
+
+    eventManager.addEventListener(document.documentElement, 'compositionend', function (event) {
+      // console.log('compositionend', event);
+      isCurrentlyComposing = false; // if (!destroyed && activeEditor && !activeEditor.isOpened() && instance.isListening()) {
+      //   _this.openEditor(event.data, event);
+      // }
     });
 
     function onDblClick(event, coords, elem) {
@@ -39980,11 +40016,11 @@ function EditorManager(instance, priv, selection) {
     instance.view.wt.update('onCellDblClick', onDblClick);
   }
   /**
-  * Lock the editor from being prepared and closed. Locking the editor prevents its closing and
-  * reinitialized after selecting the new cell. This feature is necessary for a mobile editor.
-  *
-  * @function lockEditor
-  * @memberof! Handsontable.EditorManager#
+   * Lock the editor from being prepared and closed. Locking the editor prevents its closing and
+   * reinitialized after selecting the new cell. This feature is necessary for a mobile editor.
+   *
+   * @function lockEditor
+   * @memberof! Handsontable.EditorManager#
    */
 
 
@@ -39992,11 +40028,11 @@ function EditorManager(instance, priv, selection) {
     lock = true;
   };
   /**
-  * Unlock the editor from being prepared and closed. This method restores the original behavior of
-  * the editors where for every new selection its instances are closed.
-  *
-  * @function unlockEditor
-  * @memberof! Handsontable.EditorManager#
+   * Unlock the editor from being prepared and closed. This method restores the original behavior of
+   * the editors where for every new selection its instances are closed.
+   *
+   * @function unlockEditor
+   * @memberof! Handsontable.EditorManager#
    */
 
 
