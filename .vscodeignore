@@ -34,3 +34,4 @@ csvEditorHtml/browser/**
 csvEditorHtml/out/browser/**
 # not used anymore but we might need to copy certain rules...
 thirdParty/bulma-extensions/**
+.vscode-test-web/**

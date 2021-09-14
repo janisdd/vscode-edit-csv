@@ -11,4 +11,4 @@ cypress
 csvEditorHtml/browser/dist
 csvEditorHtml/browser/imgs/private
 images/logo_backup/*
-
+.vscode-test-web/*

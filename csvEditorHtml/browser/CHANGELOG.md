@@ -9,6 +9,8 @@ note that the changelog is also present on the website when you click on the ver
 - (same as vs code extension v6.0.2)
 - fixed issue 63: column header cells can now be edited
 - fixed issue 66: added readonly mode
+- fixed issue 64: some non-text keys (e.g. volume controls) not longer clear cell values
+	- also compound characters also not clear cell values
 
 ## 1.2.1
 
