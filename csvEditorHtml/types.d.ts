@@ -467,6 +467,7 @@ type HeaderRowWithIndex = {
 	 * entries can be null e.g. for new columns
 	 * for null we display the column name 'column X' where X is the number of the column
 	 * however, after opening the cell editor null becomes the empty string (after committing the value)...
+	 * these are visual indices as we use this for rendering...
 	 */
 	row: Array<string | null>
 /**
@@ -525,4 +526,16 @@ type KnownNumberStylesMap = {
 type EditHeaderCellAction = {
 	actionType: 'changeHeaderCell'
 	change: [0, colIndex: number, beforeValue: string, afterValue: string]
+}
+type RemoveColumnAction = {
+	actionType: 'remove_col'
+	amount: number
+	index: number
+	indexes: number[]
+	//a table with the removed data
+	data: string[][]
+}
+
+type InsertColumnAction = {
+	actionType: 'insert_col'
 }

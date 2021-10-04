@@ -57,6 +57,15 @@ let _onTableScrollThrottled: ((this: HTMLDivElement, e: Event) => void) | null =
 
 let hiddenPhysicalRowIndices: number[] = []
 
+
+type HeaderRowWithIndexUndoStackItem = {
+	action: 'added' | 'removed'
+	visualIndex: number
+	headerData: Array<string | null>
+}
+let headerRowWithIndexUndoStack: Array<HeaderRowWithIndexUndoStackItem> = []
+let headerRowWithIndexRedoStack: Array<HeaderRowWithIndexUndoStackItem> = []
+
 /**
  * this is part of the output from papaparse
  * for each column 

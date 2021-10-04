@@ -2,18 +2,23 @@
 
 ## [Unreleased]
 
-## 6.0.2
+## 0.0.3
+
+- fixed issue 70: Removing columns doesn't remove header
+	- undo/redo does not work with column headers
+
+## 0.6.2
 
 - fixed issue 63: column header cells can now be edited
 - fixed issue 66: added readonly mode
 - fixed issue 64: some non-text keys (e.g. volume controls) not longer clear cell values
 	- also compound characters also not clear cell values
 
-## 6.0.1
+## 0.6.1
 
 - added button to resize column to match their content
 
-## 6.0.0
+## 0.6.0
 
 - fixed issue where reordering/sorting breaks inserting
 - new logo

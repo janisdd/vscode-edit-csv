@@ -843,24 +843,57 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//we could change data to 1 element array containing the finished data? log to console then step until we get to SheetClip.stringify
 			// console.log('data');
 		},
-		beforeUndo: function (_action: EditHeaderCellAction | any) {
+		beforeUndo: function (_action: EditHeaderCellAction | RemoveColumnAction | InsertColumnAction | any) {
 
-			let action = _action as EditHeaderCellAction
+			let __action = _action as EditHeaderCellAction | RemoveColumnAction | InsertColumnAction
 
 			//when we change has header this is not a prolbem because the undo stack is cleared when we toggle has header
-			if (action.actionType === 'changeHeaderCell' && headerRowWithIndex) {
-				let physicalColIndex: number = action.change[1]
+			if (__action.actionType === 'changeHeaderCell' && headerRowWithIndex) {
+				let action = __action as EditHeaderCellAction
+				let visualColIndex: number = action.change[1]
 				let beforeValue = action.change[2]
 
 				let undoPlugin = (hot as any).undoRedo
 				let undoneStack = undoPlugin.undoneActions as any[]
 				undoneStack.push(action)
 
-				headerRowWithIndex.row[physicalColIndex] = beforeValue
+				headerRowWithIndex.row[visualColIndex] = beforeValue
 				setTimeout(() => {
 					hot!.render()
 				}, 0)
 				return false
+
+			} else if (__action.actionType === 'remove_col' && headerRowWithIndex) {
+				// let action = __action as RemoveColumnAction
+				
+				let lastAction = headerRowWithIndexUndoStack.pop()
+				if (lastAction && lastAction.action === "removed") {
+	
+					headerRowWithIndex.row.splice(lastAction.visualIndex,0, ...lastAction.headerData)
+
+					headerRowWithIndexRedoStack.push({
+						action: 'removed',
+						visualIndex: lastAction.visualIndex,
+						headerData: lastAction.headerData
+					})
+
+				}
+
+			} else if (__action.actionType === 'insert_col' && headerRowWithIndex) {
+				// let action = __action as InsertColumnAction
+				
+				let lastAction = headerRowWithIndexUndoStack.pop()
+				if (lastAction && lastAction.action === "added") {
+	
+					headerRowWithIndex.row.splice(lastAction.visualIndex,lastAction.headerData.length)
+
+					headerRowWithIndexRedoStack.push({
+						action: 'added',
+						visualIndex: lastAction.visualIndex,
+						headerData: lastAction.headerData
+					})
+
+				}
 			}
 
 		},
@@ -886,25 +919,56 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//could remove columns
 			// syncColWidths() //covered by afterRender
 		},
-		beforeRedo: function (_action: any) {
+		beforeRedo: function (_action: EditHeaderCellAction | RemoveColumnAction | InsertColumnAction | any) {
 
-			let action = _action as EditHeaderCellAction
+			let __action = _action as EditHeaderCellAction | RemoveColumnAction | InsertColumnAction
 
 			//when we change has header this is not a prolbem because the undo stack is cleared when we toggle has header
-			if (action.actionType === 'changeHeaderCell' && headerRowWithIndex) {
-				let physicalColIndex: number = action.change[1]
+			if (__action.actionType === 'changeHeaderCell' && headerRowWithIndex) {
+
+				let action = __action as EditHeaderCellAction
+				let visualColIndex: number = action.change[1]
 				let afterValue = action.change[3]
 
 				let undoPlugin = (hot as any).undoRedo
 				let doneStack = undoPlugin.doneActions as any[]
 				doneStack.push(action)
 
-				headerRowWithIndex.row[physicalColIndex] = afterValue
+				headerRowWithIndex.row[visualColIndex] = afterValue
 				setTimeout(() => {
 					hot!.render()
 				}, 0)
 				return false
+
+			} else if (__action.actionType === 'remove_col' && headerRowWithIndex) {
+			// let action = __action as RemoveColumnAction
+			
+			let lastAction = headerRowWithIndexRedoStack.pop()
+			if (lastAction && lastAction.action === "removed") {
+
+				headerRowWithIndex.row.splice(lastAction.visualIndex, lastAction.headerData.length)
+
+				headerRowWithIndexUndoStack.push({
+					action: 'removed',
+					visualIndex: lastAction.visualIndex,
+					headerData: lastAction.headerData
+				})
 			}
+		} else if (__action.actionType === 'insert_col' && headerRowWithIndex) {
+
+			let lastAction = headerRowWithIndexRedoStack.pop()
+			if (lastAction && lastAction.action === "added") {
+
+				headerRowWithIndex.row.splice(lastAction.visualIndex, 0, ...lastAction.headerData)
+
+				headerRowWithIndexUndoStack.push({
+					action: 'added',
+					visualIndex: lastAction.visualIndex,
+					headerData: lastAction.headerData
+				})
+			}
+
+		}
 
 			// if (headerRowWithIndex && action.actionType === 'remove_row' && action.index === headerRowWithIndex.physicalIndex) { //first row cannot be removed normally so it must be the header row option
 			// 	//we re insert header row
@@ -921,14 +985,16 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		/**
 		 * isForced: Is true if rendering was triggered by a change of settings or data; or 
 		 * false if rendering was triggered by scrolling or moving selection.
+		 * 
+		 * WE now do this in an additional hook
 		 */
-		afterRender: function (isForced: boolean) {
-			if (!isForced || isInitialHotRender) return
-			//e.g. when we edit a cell and the cell must adjust the width because of the content
-			//there is no other hook?
-			//this is also fired on various other event (e.g. col resize...) but better sync more than miss an event
-			syncColWidths()
-		},
+		// afterRender: function (isForced: boolean) {
+		// 	if (!isForced || isInitialHotRender) return
+		// 	//e.g. when we edit a cell and the cell must adjust the width because of the content
+		// 	//there is no other hook?
+		// 	//this is also fired on various other event (e.g. col resize...) but better sync more than miss an event
+		// 	syncColWidths()
+		// },
 		/**
 		 * this is an array if we e.g. move consecutive columns (2,3)
 		 *   but maybe there is a way... this func should handle this anyway
@@ -943,6 +1009,12 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			// hot.updateSettings({
 			// 	colHeaders: defaultColHeaderFunc as any
 			// }, false)
+
+			//clear all undo redo because handsontable do not undo the col moves but the edits... which leads to wrong data!
+			headerRowWithIndexUndoStack.splice(0)
+			headerRowWithIndexRedoStack.splice(0)
+			let undoPlugin = (hot as any).undoRedo
+			undoPlugin.clear()
 
 			//dirty copy of below!!!
 			if (headerRowWithIndex !== null) {
@@ -1043,20 +1115,27 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				}
 			}
 		},
-		afterCreateCol: function (visualColIndex, amount) {
+		afterCreateCol: function (visualColIndex, amount, source?: string) {
 
 			if (!hot) return
 
 			if (headerRowWithIndex) {
-				const physicalIndex = hot.toPhysicalColumn(visualColIndex)
+				// const physicalIndex = hot.toPhysicalColumn(visualColIndex)
 
-				headerRowWithIndex.row.splice(physicalIndex, 0, ...Array(amount).fill(null))
-				//hot automatically re-renders after this
+				if (source !== `UndoRedo.undo` && source !== `UndoRedo.redo`) { //undo redo is already handled
+					headerRowWithIndexUndoStack.push({
+						action: 'added',
+						visualIndex: visualColIndex,
+						headerData: [...Array(amount).fill(null)],
+					})
+
+					headerRowWithIndex.row.splice(visualColIndex, 0, ...Array(amount).fill(null))
+				} 
 			}
 
 			if (columnIsQuoted) {
-				const physicalIndex = hot.toPhysicalColumn(visualColIndex)
-				columnIsQuoted.splice(physicalIndex, 0, ...Array(amount).fill(newColumnQuoteInformationIsQuoted))
+				// const physicalIndex = hot.toPhysicalColumn(visualColIndex)
+				columnIsQuoted.splice(visualColIndex, 0, ...Array(amount).fill(newColumnQuoteInformationIsQuoted))
 			}
 
 			// syncColWidths() //covered by afterRender
@@ -1065,10 +1144,20 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//also it's not needed as handsontable already handles this internally
 			// updateFixedRowsCols()
 		},
-		afterRemoveCol: function (visualColIndex, amount) {
+		afterRemoveCol: function (visualColIndex, amount, someting?: any, source?: string) {
+
+			let isFromUndoRedo = (source === `UndoRedo.undo` || source === `UndoRedo.redo`)
+			if (headerRowWithIndex && !isFromUndoRedo) { //undo redo is already handled
+				headerRowWithIndexUndoStack.push({
+					action: 'removed',
+					visualIndex: visualColIndex,
+					headerData: [headerRowWithIndex.row[visualColIndex]]
+				})
+			}
+
 			//added below
 			//critical because we could update hot settings here
-			pre_afterRemoveCol(visualColIndex, amount)
+			pre_afterRemoveCol(visualColIndex, amount, isFromUndoRedo)
 		},
 		//inspired by https://github.com/handsontable/handsontable/blob/master/src/plugins/hiddenRows/hiddenRows.js
 		//i absolutely don't understand how handsontable implementation is working... 
@@ -1360,6 +1449,16 @@ function applyColWidths() {
 	// console.log(`col widths applies`, allColWidths)
 	//snatched from https://github.com/YaroslavOvdii/fliplet-widget-data-source/blob/master/js/spreadsheet.js
 	hot.getSettings().manualColumnResize = false
+	let autoSizedWidths = _getColWidths()
+
+	//maybe the user removed columns so we don't have all widths... e.g. remove cols then reset data...
+	//we keep the col widths we have and add the auto size ones for the columns where we don't have old sizes...
+	//NOTE we don't store the column names so we probably apply the wrong size to the wrong columns, e.g. 2 cols, reset 5 columns -> first 2 columns will get the old size of the old 2 columns
+	for (let i = allColWidths.length; i < autoSizedWidths.length; i++) {
+		const colWidth = autoSizedWidths[i]
+		allColWidths.push(colWidth)
+	}
+
 	//note that setting colWidths will disable the auto size column plugin (see Plugin AutoColumnSize.isEnabled)
 	//it is enabled if (!colWidths)
 	hot.updateSettings({ colWidths: allColWidths }, false)
@@ -1376,8 +1475,8 @@ function syncColWidths() {
 
 }
 
-function _getColWidths() {
-	if (!hot) return
+function _getColWidths(): number[] {
+	if (!hot) return []
 	//@ts-ignore
 	return hot.getColHeader().map(function (header, index) {
 		return hot!.getColWidth(index)
@@ -1972,27 +2071,34 @@ function afterRenderForced(isForced: boolean) {
 
 		if (!recordedHookActions.includes(hookItem.actionName)) continue
 
+		//prevent infinite loop if we render in action
+		hook_list.splice(i, 1)
 		hookItem.action()
 	}
 	hook_list = []
 	recordedHookActions = []
+
+	if (!isForced || isInitialHotRender) return
+	//e.g. when we edit a cell and the cell must adjust the width because of the content
+	//there is no other hook?
+	//this is also fired on various other event (e.g. col resize...) but better sync more than miss an event
+	syncColWidths()
 }
 
-function pre_afterRemoveCol(this: any, visualColIndex: number, amount: number) {
+function pre_afterRemoveCol(this: any, visualColIndex: number, amount: number, isFromUndoRedo: boolean) {
 	recordedHookActions.push("afterRemoveCol")
 
 	hook_list.push({
-		actionName: 'afterCreateRow',
-		action: afterRemoveCol.bind(this, visualColIndex, amount)
+		actionName: 'afterRemoveCol',
+		action: afterRemoveCol.bind(this, visualColIndex, amount, isFromUndoRedo)
 	})
 }
 
-function afterRemoveCol(visualColIndex: number, amount: number) {
+function afterRemoveCol(visualColIndex: number, amount: number, isFromUndoRedo: boolean) {
 	if (!hot) return
 
-	if (headerRowWithIndex) {
-		const physicalIndex = hot.toPhysicalColumn(visualColIndex)
-		headerRowWithIndex.row.splice(physicalIndex, amount)
+	if (headerRowWithIndex && !isFromUndoRedo) {
+		headerRowWithIndex.row.splice(visualColIndex, amount)
 		//hot automatically re-renders after this
 	}
 
@@ -2011,8 +2117,8 @@ function afterRemoveCol(visualColIndex: number, amount: number) {
 	}
 
 	if (columnIsQuoted) {
-		const physicalIndex = hot.toPhysicalColumn(visualColIndex)
-		columnIsQuoted.splice(physicalIndex, amount)
+		// const physicalIndex = hot.toPhysicalColumn(visualColIndex)
+		columnIsQuoted.splice(visualColIndex, amount)
 	}
 
 	allColWidths.splice(visualColIndex, 1)
@@ -2061,7 +2167,7 @@ function afterCreateRow(visualRowIndex: number, amount: number) {
 	checkAutoApplyHasHeader()
 }
 
-function showColHeaderNameEditor(physicalColIndex: number) {
+function showColHeaderNameEditor(visualColIndex: number) {
 
 	if (!headerRowWithIndex) return
 	if (!lastClickedHeaderCellTh) return
@@ -2084,7 +2190,7 @@ function showColHeaderNameEditor(physicalColIndex: number) {
 	input.style.height = `${rect.height}px`
 	input.style.zIndex = `1000`
 
-	input.value = headerRowWithIndex.row[physicalColIndex] ?? ''
+	input.value = headerRowWithIndex.row[visualColIndex] ?? ''
 	editHeaderCellTextInputEl = input
 
 	let overlayWrapper = getHandsontableOverlayScrollLeft()!
@@ -2109,13 +2215,13 @@ function showColHeaderNameEditor(physicalColIndex: number) {
 	let applyChange = () => {
 		shouldApplyChanges = false
 		if (headerRowWithIndex && beforeValue !== input.value) {
-			headerRowWithIndex.row[physicalColIndex] = input.value
+			headerRowWithIndex.row[visualColIndex] = input.value
 
 			let undoPlugin = (hot as any).undoRedo
 			let doneStack = undoPlugin.doneActions as any[]
 			let editHeaderRow: EditHeaderCellAction = {
 				actionType: 'changeHeaderCell',
-				change: [0, physicalColIndex, beforeValue, input.value]
+				change: [0, visualColIndex, beforeValue, input.value]
 			}
 			doneStack.push(editHeaderRow)
 
