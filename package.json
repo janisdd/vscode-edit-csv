@@ -609,7 +609,7 @@
 		"glob": "^7.1.6",
 		"iconv-lite": "^0.6.2",
 		"jsdom": "16.4.0",
-		"mocha": "^8.1.1",
+		"mocha": "^9.1.2",
 		"readline-sync": "^1.4.10",
 		"sweetalert2": "^9.17.2",
 		"toaster-js": "^2.2.3",

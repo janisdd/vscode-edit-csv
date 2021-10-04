@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## 0.0.3
+## 0.6.3
 
 - fixed issue 70: Removing columns doesn't remove header
 	- undo/redo does not work with column headers
