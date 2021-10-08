@@ -57,6 +57,9 @@ let _onTableScrollThrottled: ((this: HTMLDivElement, e: Event) => void) | null =
 
 let hiddenPhysicalRowIndices: number[] = []
 
+let copyPasteRowLimit = 10000000
+let copyPasteColLimit = 10000000
+
 
 type HeaderRowWithIndexUndoStackItem = {
 	action: 'added' | 'removed'

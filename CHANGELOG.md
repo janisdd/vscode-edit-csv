@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## 0.6.4
+
+- fixed issue 72: copy limited to 1000 cells
+	- changed the limit to 10000000
+
 ## 0.6.3
 
 - fixed issue 70: Removing columns doesn't remove header
