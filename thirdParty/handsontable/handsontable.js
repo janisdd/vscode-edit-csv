@@ -23,8 +23,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Version: 6.4.3
- * Release date: 19/12/2018 (built at 11/09/2021 12:20:44)
+ * Version: 6.4.4
+ * Release date: 19/12/2018 (built at 06/02/2022 13:06:54)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29737,9 +29737,9 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "11/09/2021 12:20:44";
+Handsontable.buildDate = "06/02/2022 13:06:54";
 Handsontable.packageName = "handsontable";
-Handsontable.version = "6.4.3";
+Handsontable.version = "6.4.4";
 var baseVersion = "";
 
 if (baseVersion) {
@@ -52847,6 +52847,14 @@ exports.tableToArray = tableToArray;
 
 var _mixed = __webpack_require__(14);
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 /**
  * Converts javascript array into HTMLTable.
  *
@@ -52900,40 +52908,190 @@ function isHTMLTable(element) {
  */
 
 
+var ESCAPED_HTML_CHARS = {
+  '&nbsp;': '\x20',
+  '&amp;': '&',
+  '&lt;': '<',
+  '&gt;': '>'
+};
+var regEscapedChars = new RegExp(Object.keys(ESCAPED_HTML_CHARS).map(function (key) {
+  return "(".concat(key, ")");
+}).join('|'), 'gi');
+
 function tableToArray(element) {
-  var result = [];
+  var rootDocument = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document;
+  var settingsObj = {};
+  var fragment = rootDocument.createDocumentFragment();
+  var tempElem = rootDocument.createElement('div');
+  fragment.appendChild(tempElem);
   var checkElement = element;
 
   if (typeof checkElement === 'string') {
-    var tempElem = document.createElement('div');
-    tempElem.innerHTML = checkElement.replace(/\n/g, '');
+    var escapedAdjacentHTML = checkElement.replace(/<td\b[^>]*?>([\s\S]*?)<\/\s*td>/g, function (cellFragment) {
+      var openingTag = cellFragment.match(/<td\b[^>]*?>/g)[0];
+      var cellValue = cellFragment.substring(openingTag.length, cellFragment.lastIndexOf('<')).replace(/(<(?!br)([^>]+)>)/gi, '');
+      var closingTag = '</td>';
+      return "".concat(openingTag).concat(cellValue).concat(closingTag);
+    });
+    tempElem.insertAdjacentHTML('afterbegin', "".concat(escapedAdjacentHTML));
     checkElement = tempElem.querySelector('table');
   }
 
-  if (checkElement && isHTMLTable(checkElement)) {
-    var rows = checkElement.rows;
-    var rowsLen = rows && rows.length;
-    var tempArray = [];
-
-    for (var row = 0; row < rowsLen; row += 1) {
-      var cells = rows[row].cells;
-      var cellsLen = cells.length;
-      var newRow = [];
-
-      for (var column = 0; column < cellsLen; column += 1) {
-        var cell = cells[column];
-        cell.innerHTML = cell.innerHTML.trim().replace(/<br(.|)>(\n?)/, '\n');
-        var cellText = cell.innerText;
-        newRow.push(cellText);
-      }
-
-      tempArray.push(newRow);
-    }
-
-    result.push.apply(result, tempArray);
+  if (!checkElement || !isHTMLTable(checkElement)) {
+    return;
   }
 
-  return result;
+  var generator = tempElem.querySelector('meta[name$="enerator"]'); // we leave out the G because might be upper/lower
+
+  var hasRowHeaders = checkElement.querySelector('tbody th') !== null;
+  var trElement = checkElement.querySelector('tr'); // we try to get the max col count...
+  // however, this is not perfect as individual cells might have different spans... and we only check the first row
+
+  var countCols = !trElement ? 0 : Array.from(trElement.cells).reduce(function (cols, cell) {
+    return cols + cell.colSpan;
+  }, 0) - (hasRowHeaders ? 1 : 0);
+  var fixedRowsBottom = checkElement.tFoot && Array.from(checkElement.tFoot.rows) || [];
+  var fixedRowsTop = [];
+  var hasColHeaders = false;
+  var thRowsLen = 0;
+  var countRows = 0; // we omit row headers and col headers in the data
+
+  if (checkElement.tHead) {
+    var thRows = Array.from(checkElement.tHead.rows).filter(function (tr) {
+      var isDataRow = tr.querySelector('td') !== null;
+
+      if (isDataRow) {
+        fixedRowsTop.push(tr);
+      }
+
+      return !isDataRow;
+    });
+    thRowsLen = thRows.length;
+    hasColHeaders = thRowsLen > 0;
+
+    if (thRowsLen > 1) {
+      settingsObj.nestedHeaders = Array.from(thRows).reduce(function (rows, row) {
+        var headersRow = Array.from(row.cells).reduce(function (headers, header, currentIndex) {
+          if (hasRowHeaders && currentIndex === 0) {
+            return headers;
+          }
+
+          var colspan = header.colSpan,
+              innerHTML = header.innerHTML;
+          var nextHeader = colspan > 1 ? {
+            label: innerHTML,
+            colspan: colspan
+          } : innerHTML;
+          headers.push(nextHeader);
+          return headers;
+        }, []);
+        rows.push(headersRow);
+        return rows;
+      }, []);
+    } else if (hasColHeaders) {
+      settingsObj.colHeaders = Array.from(thRows[0].children).reduce(function (headers, header, index) {
+        if (hasRowHeaders && index === 0) {
+          return headers;
+        }
+
+        headers.push(header.innerHTML);
+        return headers;
+      }, []);
+    }
+  }
+
+  if (fixedRowsTop.length) {
+    settingsObj.fixedRowsTop = fixedRowsTop.length;
+  }
+
+  if (fixedRowsBottom.length) {
+    settingsObj.fixedRowsBottom = fixedRowsBottom.length;
+  }
+
+  var dataRows = [].concat(fixedRowsTop, _toConsumableArray(Array.from(checkElement.tBodies).reduce(function (sections, section) {
+    sections.push.apply(sections, _toConsumableArray(Array.from(section.rows)));
+    return sections;
+  }, [])), _toConsumableArray(fixedRowsBottom));
+  countRows = dataRows.length;
+  var dataArr = new Array(countRows);
+
+  for (var r = 0; r < countRows; r++) {
+    dataArr[r] = new Array(countCols);
+  }
+
+  var mergeCells = [];
+  var rowHeaders = [];
+
+  for (var row = 0; row < countRows; row++) {
+    var tr = dataRows[row];
+    var cells = Array.from(tr.cells);
+    var cellsLen = cells.length;
+
+    for (var cellId = 0; cellId < cellsLen; cellId++) {
+      var cell = cells[cellId];
+      var nodeName = cell.nodeName,
+          innerHTML = cell.innerHTML,
+          rowspan = cell.rowSpan,
+          colspan = cell.colSpan; // as merged cells contain null as data the first col we find with undefined is the first free cell
+
+      var col = dataArr[row].findIndex(function (value) {
+        return value === undefined;
+      });
+
+      if (nodeName === 'TD') {
+        if (rowspan > 1 || colspan > 1) {
+          for (var rstart = row; rstart < row + rowspan; rstart++) {
+            if (rstart < countRows) {
+              for (var cstart = col; cstart < col + colspan; cstart++) {
+                dataArr[rstart][cstart] = null;
+              }
+            }
+          }
+
+          var styleAttr = cell.getAttribute('style');
+          var ignoreMerge = styleAttr && styleAttr.includes('mso-ignore:colspan');
+
+          if (!ignoreMerge) {
+            mergeCells.push({
+              col: col,
+              row: row,
+              rowspan: rowspan,
+              colspan: colspan
+            });
+          }
+        }
+
+        var cellValue = '';
+
+        if (generator && /excel/gi.test(generator.content)) {
+          cellValue = innerHTML.replace(/[\r\n][\x20]{0,2}/g, '\x20').replace(/<br(\s*|\/)>[\r\n]?[\x20]{0,3}/gim, '\r\n');
+        } else {
+          cellValue = innerHTML.replace(/<br(\s*|\/)>[\r\n]?/gim, '\r\n');
+        }
+
+        dataArr[row][col] = cellValue.replace(regEscapedChars, function (match) {
+          return ESCAPED_HTML_CHARS[match];
+        });
+      } else {
+        rowHeaders.push(innerHTML);
+      }
+    }
+  }
+
+  if (mergeCells.length) {
+    settingsObj.mergeCells = mergeCells;
+  }
+
+  if (rowHeaders.length) {
+    settingsObj.rowHeaders = rowHeaders;
+  }
+
+  if (dataArr.length) {
+    settingsObj.data = dataArr;
+  } // we only need the data
+
+
+  return settingsObj.data;
 }
 
 /***/ }),
