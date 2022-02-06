@@ -809,7 +809,7 @@ function createEditorHtml(webview, context, initialVars) {
 				<h3 class="title is-3">Source file changed</h3>
 
 				<p>
-					The source file changed, thus the tabel is not up-to-date. <br />
+					The source file changed, thus the table is not up-to-date. <br />
 					You can reload the file content which will discard all changes to the table! <br /><br />
 					Or you can ignore the changes. <br />
 					<br />
