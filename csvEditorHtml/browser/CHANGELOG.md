@@ -6,6 +6,12 @@ note that the changelog is also present on the website when you click on the ver
 
 ## 1.2.4
 
+- (same as vs code extension v0.6.5)
+- fixed issue 77: Newlines inserted into pasted data (clipboard)
+	- fixed via new internal handsontable version
+
+## 1.2.4
+
 - (same as vs code extension v0.6.4)
 - fixed issue 72: copy limited to 1000 cells
 	- changed the limit to 10000000

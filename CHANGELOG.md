@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## 0.6.5
+
+- fixed issue 77: Newlines inserted into pasted data (clipboard)
+	- fixed via new internal handsontable version
+
 ## 0.6.4
 
 - fixed issue 72: copy limited to 1000 cells
