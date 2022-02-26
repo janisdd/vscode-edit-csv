@@ -350,6 +350,15 @@ function setupGlobalShortcutsInVs() {
 	if (vscode) {
 		Mousetrap.bindGlobal(['meta+s', 'ctrl+s'], (e) => {
 			e.preventDefault()
+
+			if (hot) {
+				let editor = hot.getActiveEditor() as any
+				// see https://handsontable.com/docs/6.2.2/tutorial-cell-editor.html
+				if (editor.isOpened()) {
+					editor.finishEditing(false)
+				}
+			}
+
 			postApplyContent(true)
 		})
 	}

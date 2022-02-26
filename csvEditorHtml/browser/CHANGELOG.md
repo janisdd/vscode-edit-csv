@@ -4,7 +4,12 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
-## 1.2.4
+## 1.2.6
+
+- (same as vs code extension v0.6.6)
+- fixed issue 80: cell editor is not commited after pressing `ctrl/cmd+s`, so changes are not applied to file
+
+## 1.2.5
 
 - (same as vs code extension v0.6.5)
 - fixed issue 77: Newlines inserted into pasted data (clipboard)

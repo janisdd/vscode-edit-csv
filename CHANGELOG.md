@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## 0.6.6
+
+- fixed issue 80: cell editor is not commited after pressing `ctrl/cmd+s`, so changes are not applied to file
+
 ## 0.6.5
 
 - fixed issue 77: Newlines inserted into pasted data (clipboard)
