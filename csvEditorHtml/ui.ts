@@ -2270,7 +2270,6 @@ function showColHeaderNameEditor(visualColIndex: number) {
 
 function _updateToggleReadonlyModeUi() {
 
-	console.log(`asdasdasdas`)
 	//new state is isReadonlyMode
 	if (isReadonlyMode) {
 		isReadonlyModeToggleSpan.classList.add(`active`)

@@ -48,51 +48,35 @@ function activate(context) {
             vscode.window.showInformationMessage("Open a csv editor first to show the source csv file");
             return;
         }
-        openSourceFileFunc();
+        openSourceFileFunc(instanceManager);
     });
     const editCsvCommand = vscode.commands.registerCommand('edit-csv.edit', () => {
-        if (!vscode.window.activeTextEditor && instanceManager.hasActiveEditorInstance()) {
-            //open source file ... probably better for usability when we use recently used
-            openSourceFileFunc();
+        const shouldOpenEditor = beforeEditCsvCheck(instanceManager);
+        if (!shouldOpenEditor)
             return;
-        }
-        //vscode.window.activeTextEditor will be undefined if file is too large...
-        //see https://github.com/microsoft/vscode/issues/32118
-        //see https://github.com/Microsoft/vscode/blob/master/src/vs/editor/common/model/textModel.ts > MODEL_SYNC_LIMIT
-        if (!vscode.window.activeTextEditor || !util_1.isCsvFile(vscode.window.activeTextEditor.document)) {
-            vscode.window.showInformationMessage("Open a csv file first to show the csv editor or file too large");
-            return;
-        }
-        const uri = vscode.window.activeTextEditor.document.uri;
-        //check if we already got an editor for this file
-        const oldInstance = instanceManager.findInstanceBySourceUri(uri);
-        if (oldInstance) {
-            //...then show the editor
-            oldInstance.panel.reveal();
-            //webview panel is not a document, so this does not work
-            // vscode.workspace.openTextDocument(oldInstance.editorUri)
-            // .then(document => {
-            // 	vscode.window.showTextDocument(document)
-            // })
+        //this is checked in beforeEditCsvCheck
+        if (!vscode.window.activeTextEditor) {
             return;
         }
         //we have no old editor -> create new one
         createNewEditorInstance(context, vscode.window.activeTextEditor, instanceManager);
     });
-    const openSourceFileFunc = () => {
-        let instance;
-        try {
-            instance = instanceManager.getActiveEditorInstance();
-        }
-        catch (error) {
-            vscode.window.showErrorMessage(`Could not find the source file for the editor (no instance found), error: ${error.message}`);
+    //only use this programmatically to open the editor with the given config
+    const editCsvWithConfigCommand = vscode.commands.registerCommand('edit-csv.editWithConfig', (overwriteConfigObj) => {
+        if (!overwriteConfigObj) {
+            vscode.window.showErrorMessage("No settings object provided");
             return;
         }
-        vscode.workspace.openTextDocument(instance.sourceUri)
-            .then(document => {
-            vscode.window.showTextDocument(document);
-        });
-    };
+        const shouldOpenEditor = beforeEditCsvCheck(instanceManager);
+        if (!shouldOpenEditor)
+            return;
+        //this is checked in beforeEditCsvCheck
+        if (!vscode.window.activeTextEditor) {
+            return;
+        }
+        //we have no old editor -> create new one
+        createNewEditorInstance(context, vscode.window.activeTextEditor, instanceManager, overwriteConfigObj);
+    });
     //@ts-ignore
     // const askRefresh = function (instance: Instance) {
     // 	const options = ['Yes', 'No']
@@ -180,6 +164,7 @@ function activate(context) {
     const onDidChangeConfigurationCallback = onDidChangeConfiguration.bind(undefined, instanceManager);
     const onDidChangeConfigurationHandler = vscode.workspace.onDidChangeConfiguration(onDidChangeConfigurationCallback);
     context.subscriptions.push(editCsvCommand);
+    context.subscriptions.push(editCsvWithConfigCommand);
     context.subscriptions.push(gotoSourceCsvCommand);
     context.subscriptions.push(applyCsvCommand);
     context.subscriptions.push(applyAndSaveCsvCommand);
@@ -212,7 +197,61 @@ function onDidChangeConfiguration(instanceManager, e) {
 function getEditorTitle(document) {
     return `CSV edit ${path.basename(document.fileName)}`;
 }
-function createNewEditorInstance(context, activeTextEditor, instanceManager) {
+/**
+ * tries to open the source file for the current csv editor
+ * @param instanceManager the instance manager
+ * @returns
+ */
+function openSourceFileFunc(instanceManager) {
+    let instance;
+    try {
+        instance = instanceManager.getActiveEditorInstance();
+    }
+    catch (error) {
+        vscode.window.showErrorMessage(`Could not find the source file for the editor (no instance found), error: ${error.message}`);
+        return;
+    }
+    vscode.workspace.openTextDocument(instance.sourceUri)
+        .then(document => {
+        vscode.window.showTextDocument(document);
+    });
+}
+/**
+ * some checks before we open the csv editor, e.g.
+ * 		- check if the file is a csv file
+ * 		- check if the file is already opened in an editor
+ * @param instanceManager the instance manager
+ * @returns true: we can open the csv editor, false: not
+ */
+function beforeEditCsvCheck(instanceManager) {
+    if (!vscode.window.activeTextEditor && instanceManager.hasActiveEditorInstance()) {
+        //open source file ... probably better for usability when we use recently used
+        openSourceFileFunc(instanceManager);
+        return false;
+    }
+    //vscode.window.activeTextEditor will be undefined if file is too large...
+    //see https://github.com/microsoft/vscode/issues/32118
+    //see https://github.com/Microsoft/vscode/blob/master/src/vs/editor/common/model/textModel.ts > MODEL_SYNC_LIMIT
+    if (!vscode.window.activeTextEditor || !util_1.isCsvFile(vscode.window.activeTextEditor.document)) {
+        vscode.window.showInformationMessage("Open a csv file first to show the csv editor or file too large");
+        return false;
+    }
+    const uri = vscode.window.activeTextEditor.document.uri;
+    //check if we already got an editor for this file
+    const oldInstance = instanceManager.findInstanceBySourceUri(uri);
+    if (oldInstance) {
+        //...then show the editor
+        oldInstance.panel.reveal();
+        //webview panel is not a document, so this does not work
+        // vscode.workspace.openTextDocument(oldInstance.editorUri)
+        // .then(document => {
+        // 	vscode.window.showTextDocument(document)
+        // })
+        return false;
+    }
+    return true;
+}
+function createNewEditorInstance(context, activeTextEditor, instanceManager, overwriteSettings = null) {
     var _a, _b;
     const uri = activeTextEditor.document.uri;
     const title = getEditorTitle(activeTextEditor.document);
@@ -225,6 +264,9 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
     //check if the file is in the current workspace
     let isInCurrentWorkspace = activeTextEditor.document.uri.fsPath !== vscode.workspace.asRelativePath(activeTextEditor.document.uri.fsPath);
     const config = configurationHelper_1.getExtensionConfiguration();
+    if (overwriteSettings !== null) {
+        configurationHelper_1.overwriteConfiguration(config, overwriteSettings);
+    }
     //a file watcher works when the file is in the current workspace (folder) even if it's not opened
     //it also works when we open any file (not in the workspace) and 
     //	we edit the file inside vs code
@@ -432,7 +474,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager) {
             vscode.window.showErrorMessage(`Could not dispose source file watcher for file ${instance.document.uri.fsPath}, error: ${error.message}`);
         }
     }, null, context.subscriptions);
-    panel.webview.html = getHtml_1.createEditorHtml(panel.webview, context, {
+    panel.webview.html = getHtml_1.createEditorHtml(panel.webview, context, config, {
         isWatchingSourceFile: instance.supportsAutoReload
     });
 }

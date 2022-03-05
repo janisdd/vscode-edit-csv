@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## 0.6.7
+
+- added new command `edit-csv.editWithConfig"` which is the same as `edit-csv.edit` but one can supply settings to overwrite (see type `[project root]/csvEditorHtml/types.d.ts > EditCsvConfigOverwrite`)
+	- added setting `hideOpenCsvEditorUiActions` to hide the title bar button and file context menu action, in case the other extension want to show custom button to trigger the editor
+	- example how to use this from another extension can be found in the readme
+- removed `editor/title/context` actions (probably not used...)
+- small readme updates
+
 ## 0.6.6
 
 - fixed issue 80: cell editor is not commited after pressing `ctrl/cmd+s`, so changes are not applied to file

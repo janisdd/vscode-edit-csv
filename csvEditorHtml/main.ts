@@ -7,7 +7,7 @@ const defaultInitialVars: InitialVars = {
 
 declare var acquireVsCodeApi: any
 declare var initialContent: string
-declare var initialConfig: CsvEditSettings | undefined
+declare var initialConfig: EditCsvConfig | undefined
 
 declare var initialVars: InitialVars
 
@@ -19,7 +19,7 @@ if (typeof acquireVsCodeApi !== 'undefined') {
 
 if (typeof initialConfig === 'undefined') {
 	// tslint:disable-next-line:no-duplicate-variable
-	var initialConfig = undefined as CsvEditSettings | undefined
+	var initialConfig = undefined as EditCsvConfig | undefined
 	// tslint:disable-next-line:no-duplicate-variable
 	var initialVars = {
 		...defaultInitialVars
@@ -172,7 +172,7 @@ let shouldApplyHasHeaderAfterRowsAdded = false
 
 /**
  * table is editable or not, also disables some related ui, e.g. buttons
- * set via {@link CsvEditSettings.initiallyIsInReadonlyMode}
+ * set via {@link EditCsvConfig.initiallyIsInReadonlyMode}
  */
 let isReadonlyMode = false
 

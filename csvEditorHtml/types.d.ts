@@ -11,9 +11,17 @@ type InitialVars = {
 }
 
 /**
+ * type used for overwriting the configuration/settings
+ * if we supply the setting, we need to have the right type
+ */
+type EditCsvConfigOverwrite = {
+	[key in keyof Omit<EditCsvConfig, 'hideOpenCsvEditorUiActions'>]?: Omit<EditCsvConfig, 'hideOpenCsvEditorUiActions'>[key]
+}
+
+/**
  * the settings for the plugin
  */
-type CsvEditSettings = {
+type EditCsvConfig = {
 
 	/**
 	 * * true: the cell/row color is changed if the first cell is a comment, (might have negative impact on performance e.g. for large data sets), false: no additional highlighting (comments are still treated as comments)
@@ -220,6 +228,14 @@ type CsvEditSettings = {
 	 * NOTE that initial fixes (e.g. all rows should have the same length) are applied because readonly is only applied after/during the table is created
 	 */
 	initiallyIsInReadonlyMode: boolean
+
+	/**
+	 * false: hide the edit csv button and the file context menu action to open the editor (useful if you want to call this extension from another extension and show a custom button), 
+	 * true: show them
+	 * 
+	 * NOTE this can be set via other extension BUT has no effect (!) as the setting is used stored in the users config by vs code
+	 */
+	 hideOpenCsvEditorUiActions: boolean
 }
 
 /* --- frontend settings --- */

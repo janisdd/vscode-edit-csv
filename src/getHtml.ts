@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { getExtensionConfiguration } from './configurationHelper';
 
 /**
  * returns a local file path relative to the extension root dir
@@ -19,7 +18,7 @@ export function getResourcePath(webview: vscode.Webview, context: vscode.Extensi
  * this is copied from csvEditorHtml/index.html
  * @param context 
  */
-export function createEditorHtml(webview: vscode.Webview, context: vscode.ExtensionContext, initialVars: InitialVars): string {
+export function createEditorHtml(webview: vscode.Webview, context: vscode.ExtensionContext, config: EditCsvConfig, initialVars: InitialVars): string {
 
 	const _getResourcePath = getResourcePath.bind(undefined, webview, context)
 
@@ -56,8 +55,6 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	const mainJs = _getResourcePath('csvEditorHtml/out/main.js')
 
 	const beforeDomLoadedJs = _getResourcePath('csvEditorHtml/out/beforeDomLoaded.js')
-
-	const config = getExtensionConfiguration()
 
 	//use blocks so vs code adds folding
 

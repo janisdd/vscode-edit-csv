@@ -668,7 +668,7 @@ function _error(text: string) {
  * some options have impact e.g. on how to parse the data...
  * some options depend on the state after parse ... e.g. has before/after comments?
  */
-function setupAndApplyInitialConfigPart1(initialConfig: CsvEditSettings | undefined, initialVars: InitialVars) {
+function setupAndApplyInitialConfigPart1(initialConfig: EditCsvConfig | undefined, initialVars: InitialVars) {
 
 
 	//first apply the initial vars
@@ -1068,7 +1068,7 @@ const knownNumberStylesMap: KnownNumberStylesMap = {
 /**
  * sets the number style ui from the given nubmer style
  */
-function setNumbersStyleUi(numbersStyleToUse: CsvEditSettings["initialNumbersStyle"]) {
+function setNumbersStyleUi(numbersStyleToUse: EditCsvConfig["initialNumbersStyle"]) {
 
 	numbersStyleEnRadio.checked = false
 	numbersStyleNonEnRadio.checked = false

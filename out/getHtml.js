@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createEditorHtml = exports.getResourcePath = void 0;
 const vscode = require("vscode");
 const path = require("path");
-const configurationHelper_1 = require("./configurationHelper");
 /**
  * returns a local file path relative to the extension root dir
  * @param filePath
@@ -21,7 +20,7 @@ exports.getResourcePath = getResourcePath;
  * this is copied from csvEditorHtml/index.html
  * @param context
  */
-function createEditorHtml(webview, context, initialVars) {
+function createEditorHtml(webview, context, config, initialVars) {
     const _getResourcePath = getResourcePath.bind(undefined, webview, context);
     let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.min.css');
     // let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
@@ -50,7 +49,6 @@ function createEditorHtml(webview, context, initialVars) {
     const utilJs = _getResourcePath('csvEditorHtml/out/util.js');
     const mainJs = _getResourcePath('csvEditorHtml/out/main.js');
     const beforeDomLoadedJs = _getResourcePath('csvEditorHtml/out/beforeDomLoaded.js');
-    const config = configurationHelper_1.getExtensionConfiguration();
     //use blocks so vs code adds folding
     let findWidgetHtml = ``;
     {

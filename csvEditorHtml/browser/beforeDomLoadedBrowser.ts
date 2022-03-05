@@ -12,7 +12,7 @@ var initialVars: InitialVars = {
 	isWatchingSourceFile: false,
 }
 
-var initialConfig: CsvEditSettings | undefined = {
+var initialConfig: EditCsvConfig | undefined = {
 	highlightCsvComments: true,
 	lastRowEnterBehavior: 'default',
 	lastColumnTabBehavior: 'createColumn',
@@ -48,6 +48,7 @@ var initialConfig: CsvEditSettings | undefined = {
 	insertRowBehavior: 'keepRowKeepColumn',
 	insertColBehavior: 'keepRowKeepColumn',
 	initiallyIsInReadonlyMode: false,
+	hideOpenCsvEditorUiActions: false, //noop, has only effect if set inside the user settings (vs code extension)
 }
 
 function __getById(id: string): HTMLElement {

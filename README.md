@@ -117,7 +117,9 @@ Now the file is treated as a csv file and is recognized by the extension
 
 ## Alternatives
 
-*If you want to preview csv files you can go for the extension [Excel Viewer](https://marketplace.visualstudio.com/items?itemName=GrapeCity.gc-excelviewer). It has some more advanced sorting and filtering features.*
+I recommend installing the `Rainbow CSV` extension, the extensions play well together!
+
+*If you want to only view csv files you can go for the extension [Excel Viewer](https://marketplace.visualstudio.com/items?itemName=GrapeCity.gc-excelviewer). It has some more advanced sorting and filtering features.*
 
 ## How long will it stay in preview?
 
@@ -145,6 +147,32 @@ There is one things missing...
 *see `thirdParty` folders*
 
 There are some more in `package.json`. Even if they are not referenced directly, they are used e.g. for the browser build. We copy them from `node_modules` into the `thirdParty` folders.
+
+## Open the editor from other (your) extension with custom settings
+
+There is a command `edit-csv.editWithConfig`. It can be used to open the editor with settings specified by you.
+
+All possible settings can be found in `[project root]/csvEditorHtml/types.d.ts > EditCsvConfig`. The easiest way is to copy both types `EditCsvConfig` and `EditCsvConfigOverwrite` and then call the extenion command like this:
+
+```ts
+ vscode.commands.registerCommand('yourExtension.yourCommand', () => {
+	let overwriteSettings: EditCsvConfigOverwrite = {
+		readOption_hasHeader: "true",
+		//other options, auto completion enabled
+	}
+
+	vscode.commands.executeCommand(`edit-csv.editWithConfig`, overwriteSettings)
+})
+```
+
+There is one problem left: the `Edit csv` button in the title bar (and the file right click menu action) will still use the settings set by the user...
+For this there is the option `csv-edit.hideOpenCsvEditorUiActions`. If set to true it will hide the two ui actions. This way you can create a buttom from your extension and open the editor and force your settings.
+
+**Make sure to keep the type EditCsvConfig up-to-date (in case any types change)**
+
+The extension will warn you about any unknown settings supplied but will not check the actual property values!
+
+It will overwrite the settings configured by the user and call the same method as `edit-csv.edit` (the default when the editor is opened via the `Edit csv` button).
 
 ## How to build locally
 

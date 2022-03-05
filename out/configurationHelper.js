@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getExtensionConfiguration = void 0;
+exports.overwriteConfiguration = exports.getExtensionConfiguration = void 0;
 const vscode = require("vscode");
 const extension_1 = require("./extension");
 const util_1 = require("./util");
@@ -40,6 +40,7 @@ const defaultConfig = {
     insertRowBehavior: 'keepRowKeepColumn',
     insertColBehavior: 'keepRowKeepColumn',
     initiallyIsInReadonlyMode: false,
+    hideOpenCsvEditorUiActions: false,
 };
 /**
  * returns the configuration for this extension
@@ -61,7 +62,21 @@ function getExtensionConfiguration() {
     copy.readOption_escapeChar = util_1.limitSingleCharacterString(copy.readOption_escapeChar);
     copy.writeOption_quoteChar = util_1.limitSingleCharacterString(copy.writeOption_quoteChar);
     copy.writeOption_escapeChar = util_1.limitSingleCharacterString(copy.writeOption_escapeChar);
+    console.log(`[edit csv] settings`, copy);
     return copy;
 }
 exports.getExtensionConfiguration = getExtensionConfiguration;
+function overwriteConfiguration(currentConfig, overwriteConfigObj) {
+    for (const key in overwriteConfigObj) {
+        if (!currentConfig.hasOwnProperty(key)) {
+            vscode.window.showWarningMessage(`unknown setting '${key}', skipping this setting`);
+            continue;
+        }
+        //@ts-ignore
+        currentConfig[key] = overwriteConfigObj[key];
+        console.log(`[edit csv] overwrote config key: '${key}' with value: `, overwriteConfigObj[key]);
+    }
+    console.log(`[edit csv] resulting settings`, currentConfig);
+}
+exports.overwriteConfiguration = overwriteConfiguration;
 //# sourceMappingURL=configurationHelper.js.map
