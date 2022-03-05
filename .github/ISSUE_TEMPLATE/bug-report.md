@@ -12,11 +12,6 @@ assignees: ''
 - Mac
 - Linux
 
-### Version?
-- vs code plugin
-- browser
-- both
-
 
 ### Description
 A clear and concise description of what the bug is.
