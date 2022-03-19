@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.6.7",
+	"version": "0.6.8",
 	"license": "MIT",
 	"icon": "images/logo.png",
 	"publisher": "janisdd",
@@ -501,6 +501,19 @@
 					"type": "boolean",
 					"default": false,
 					"description": "false: hide the edit csv button and the file context menu action to open the editor (useful if you want to call this extension from another extension and show a custom button), true: show them"
+				},
+				"csv-edit.openTableAtCursorPos": {
+					"type": "string",
+					"default": "onlyInitially",
+					"description": "true: open the table at the cursor position (cell), false: open the table at the top left corner",
+					"enum": [
+						"onlyInitially",
+						"never"
+					],
+					"enumDescriptions": [
+						"only opens the table at the cursor position (cell) the first time the table is opened",
+						"never open the table at the cursor position, open the table at the top left corner"
+					]
 				}
 			}
 		}

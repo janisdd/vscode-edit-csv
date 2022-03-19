@@ -8,6 +8,22 @@ type InitialVars = {
 	 * false: not (e.g. file is not in the workspace or something other)
 	 */
 	isWatchingSourceFile: boolean
+	/**
+	 * the cursor line position in the source file (if set we want to pre select this line in the table)
+	 */
+	sourceFileCursorLineIndex: number | null
+	/**
+	 * the cursor column position in the source file (if set we want to pre select this column in the table)
+	 * clamped to line length - 1
+	 * 
+	 * for this we actually need {@link sourceFileCursorLineIndex} because we might have a multi text line csv row (we need to add the lengths)
+	 */
+	sourceFileCursorColumnIndex: number | null
+
+	/**
+	 * true: cursor is after the last column pos (not a real string index)
+	 */
+	isCursorPosAfterLastColumn: boolean
 }
 
 /**
@@ -236,6 +252,12 @@ type EditCsvConfig = {
 	 * NOTE this can be set via other extension BUT has no effect (!) as the setting is used stored in the users config by vs code
 	 */
 	 hideOpenCsvEditorUiActions: boolean
+
+	 /**
+		* onlyInitially: only opens the table at the cursor position (cell) the first time the table is opened
+		* never: open the table at the top left corner
+		*/
+	 openTableAtCursorPos: "onlyInitially" | "never"
 }
 
 /* --- frontend settings --- */
@@ -513,6 +535,9 @@ type Point = {
 type ExtendedCsvParseResult = {
 	data: string[][]
 	columnIsQuoted: boolean[]
+	outLineIndexToCsvLineIndexMapping: number[] | null
+	outColumnIndexToCsvColumnIndexMapping: number[][] | null
+	originalContent: string
 }
 
 type NumbersStyle = {
@@ -555,3 +580,29 @@ type RemoveColumnAction = {
 type InsertColumnAction = {
 	actionType: 'insert_col'
 }
+
+
+
+interface ParseResult {
+	data: Array<any>;
+	errors: Array<ParseError>;
+	meta: ParseMeta;
+	outLineIndexToCsvLineIndexMapping: number[] | undefined
+	outColumnIndexToCsvColumnIndexMapping: number[][] | undefined
+}
+
+interface ParseConfig {
+	calcLineIndexToCsvLineIndexMapping: boolean
+	calcColumnIndexToCsvColumnIndexMapping: boolean
+}
+
+type HotCellPos = {
+	rowIndex: number
+	colIndex: number
+}
+
+type HotViewportOffsetInPx = {
+	top: number
+	left: number
+}
+

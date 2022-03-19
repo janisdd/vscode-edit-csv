@@ -594,8 +594,19 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	}, null, context.subscriptions)
 
+	
+
+	//because for col it is the cursor pos, it can be larger than the line length! (well, equall numbers)
+	let activeCol = activeTextEditor.selection.active.character
+	if (activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeCol) {
+		activeCol =  activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length - 1
+	}
+
 	panel.webview.html = createEditorHtml(panel.webview, context, config, {
-		isWatchingSourceFile: instance.supportsAutoReload
+		isWatchingSourceFile: instance.supportsAutoReload,
+		sourceFileCursorLineIndex: config.openTableAtCursorPos === 'onlyInitially' ? activeTextEditor.selection.active.line : null,
+		sourceFileCursorColumnIndex: config.openTableAtCursorPos === 'onlyInitially' ? activeCol : null,
+		isCursorPosAfterLastColumn: activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeTextEditor.selection.active.character
 	})
 
 }

@@ -41,6 +41,7 @@ const defaultConfig: EditCsvConfig = {
 	insertColBehavior: 'keepRowKeepColumn',
 	initiallyIsInReadonlyMode: false,
 	hideOpenCsvEditorUiActions: false, //noop, has only effect if set inside the user settings
+	openTableAtCursorPos: "onlyInitially",
 }
 
 /**

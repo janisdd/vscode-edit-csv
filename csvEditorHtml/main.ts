@@ -2,7 +2,10 @@
 
 
 const defaultInitialVars: InitialVars = {
-	isWatchingSourceFile: false
+	isWatchingSourceFile: false,
+	sourceFileCursorLineIndex: null,
+	sourceFileCursorColumnIndex: null,
+	isCursorPosAfterLastColumn: false,
 }
 
 declare var acquireVsCodeApi: any
@@ -57,14 +60,14 @@ let _onTableScrollThrottled: ((this: HTMLDivElement, e: Event) => void) | null =
 
 let hiddenPhysicalRowIndices: number[] = []
 
-let copyPasteRowLimit = 10000000
-let copyPasteColLimit = 10000000
+let copyPasteRowLimit = 10_000_000
+let copyPasteColLimit = 10_000_000
 
 
 type HeaderRowWithIndexUndoStackItem = {
-	action: 'added' | 'removed'
+	action: 'added' | 'removed'
 	visualIndex: number
-	headerData: Array<string | null>
+	headerData: Array<string | null>
 }
 let headerRowWithIndexUndoStack: Array<HeaderRowWithIndexUndoStackItem> = []
 let headerRowWithIndexRedoStack: Array<HeaderRowWithIndexUndoStackItem> = []
@@ -265,6 +268,10 @@ setupSideBarResizeHandle()
 
 
 /* main */
+
+//used to restore cell selection and scroll pos
+let previousSelectedCell: HotCellPos | null = null
+let previousViewportOffsets: HotViewportOffsetInPx | null = null
 
 //set defaults when we are in browser
 setCsvReadOptionsInitial(defaultCsvReadOptions)

@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## 0.6.8
+
+- added option `openTableAtCursorPos` to open the table and selected the cell where the cursor was (fixed feature request #83)
+	- on by default!
+	- note for multi character delimiters it might not work properly (but should most of the time, only tested a few cases and it worked)
+	- if comments are hidden and the cursor is on a comment, the next row is selected
+- after `reset dat and apply read options` the scroll position and selected cell is restored
+
 ## 0.6.7
 
 - added new command `edit-csv.editWithConfig"` which is the same as `edit-csv.edit` but one can supply settings to overwrite (see type `[project root]/csvEditorHtml/types.d.ts > EditCsvConfigOverwrite`)

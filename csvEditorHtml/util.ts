@@ -16,10 +16,10 @@ function _getById(id: string): HTMLElement {
 }
 
 function ensuredSingleCharacterString(el: HTMLInputElement) {
-	
+
 	if (el.value.length > 1) {
 		//using last char is more user friendly as we can click and press a key to use the new char
-		el.value = el.value.substring(el.value.length-1)
+		el.value = el.value.substring(el.value.length - 1)
 	}
 
 }
@@ -1134,3 +1134,399 @@ function formatBigJsNumber(bigJsNumber: typeof b, numbersStyleToUse: NumbersStyl
 	//@ts-ignore
 	return bigJsNumber.toFormat()
 }
+
+function calcHotCellToSelectFromCurosPos(
+	sourceFileCursorLineIndex: number | null,
+	sourceFileCursorColumnIndex: number | null,
+	isCursorPosAfterLastColumn: boolean,
+	csvParseResult: ExtendedCsvParseResult,
+	csvReadOptions: CsvReadOptions
+): HotCellPos {
+
+	if (sourceFileCursorLineIndex === null
+		|| sourceFileCursorColumnIndex === null
+		|| !csvParseResult
+		|| !csvParseResult.outLineIndexToCsvLineIndexMapping
+		|| !csvParseResult.outColumnIndexToCsvColumnIndexMapping
+	) {
+		return {
+			rowIndex: 0,
+			colIndex: 0,
+		}
+	}
+
+	let modifySelectedRowBecauseIfHeaderBy = 0
+	let csvRowToSelect = 0
+	let csvColToSelect = 0
+
+	//wrap in a try catch in case csv was corrupted and we can't finde some index...
+	try {
+
+		let currentCsvRowStartTextFileLineIndex = 0
+		//actually only needed to check if the csv row spans multiple text lines
+		//for indices we can use the editor text file line (we only need to add the line lengths before the current editor line)
+		let currentCsvRowEndTextFileLineIndex = 0
+		let currentCursorColAsCsvCol = sourceFileCursorColumnIndex ?? 0
+
+		//find the csv row we need to select
+		if (sourceFileCursorLineIndex < csvParseResult.outLineIndexToCsvLineIndexMapping.length) {
+
+			//this is the csv row/index we want to select in the table ui
+			csvRowToSelect = csvParseResult.outLineIndexToCsvLineIndexMapping[sourceFileCursorLineIndex]
+
+			//we are not done yet, because the (single) csv row could span multiple text file lines
+			//  if this is the case, the columns are harder to calculate
+			currentCsvRowStartTextFileLineIndex = csvParseResult.outLineIndexToCsvLineIndexMapping.indexOf(csvRowToSelect)
+			currentCsvRowEndTextFileLineIndex = currentCsvRowStartTextFileLineIndex
+
+			if (currentCsvRowStartTextFileLineIndex == -1) {
+				throw new Error(`Could not find text line for csv row ${csvRowToSelect}`)
+			}
+
+			//search down to find end/last text file line for the current csv row
+			{
+				for (let i = currentCsvRowStartTextFileLineIndex; i < csvParseResult.outLineIndexToCsvLineIndexMapping.length; i++) {
+					let csvRowIndex = csvParseResult.outLineIndexToCsvLineIndexMapping[i]
+
+					if (csvRowIndex === csvRowToSelect) {
+						currentCsvRowEndTextFileLineIndex = i
+						continue
+					}
+					//break is we get to the next csv line
+					break
+				}
+			}
+
+			//if we have new line inside a field... (csv row spans multiple text file lines)
+			//now we know the current csv row spans from currentCsvRowStartTextFileLineIndex to currentCsvRowEndTextFileLineIndex
+			//because the editor only knows the column of the text file line, we need to calculate the column in the csv file
+			//e.g.
+			//"633","Hanns-
+			//Heinr
+			//ich","F
+			//
+			//#test
+			//alse
+			//",Java,1,3,"2",,,
+			//our csv column data only gives us the field/string end offsets for the whole csv row
+			//as the csv row spans multiple text file lines, we need to calculate the column index starting from the first text file line of the csv row
+			if (currentCsvRowStartTextFileLineIndex !== currentCsvRowEndTextFileLineIndex) {
+				//we need to know the text file line lengths
+				//\r\n is no problem because the csv content also contains \r\n, our split lines ends with \r but this is ok
+				let allLines = csvParseResult.originalContent.split('\n')
+				let startLineToSearch = currentCsvRowStartTextFileLineIndex
+				//-1 because we know the offset in the current text file line (exactly sourceFileCursorLineIndex)
+				let maxTextLineToSearch = sourceFileCursorLineIndex - 1
+				currentCursorColAsCsvCol = 0
+
+				for (let i = startLineToSearch; i <= maxTextLineToSearch; i++) {
+					const textFileLine = allLines[i];
+					currentCursorColAsCsvCol += textFileLine.length + 1 //+1 for the new line
+				}
+
+				currentCursorColAsCsvCol += sourceFileCursorColumnIndex ?? 0
+			}
+
+		}
+
+		//col, we only got data for the first row... so get the data for the row we want to select
+		{
+			let fieldEndIndices = csvParseResult.outColumnIndexToCsvColumnIndexMapping[csvRowToSelect]
+
+			//select the last cell, not working normally because our col indices only cover string indices...
+			//but the cursor is after the last character here...
+
+			let findColByEndIndex = true
+			if (isCursorPosAfterLastColumn) {
+
+				//this indicates that the cursor is after the last character... so select the last cell (even if empty e.g. ",,,")
+				//but we could be on a multi csv row...
+
+				//multi text line csv row?
+				if (currentCsvRowStartTextFileLineIndex !== currentCsvRowEndTextFileLineIndex) {
+
+					//the cursor might be at the end of the line BUT inside a multi line row...
+					//but there is a special case if we are on the last text line of the csv row
+
+					//cursor on the last text line of the multi line csv row?
+					if (sourceFileCursorLineIndex === currentCsvRowEndTextFileLineIndex) {
+						//cursor is on the last text line of the multi line csv row
+						csvColToSelect = fieldEndIndices.length - 1
+						findColByEndIndex = false
+					} else {
+						//inside the multi line csv row and the cursor is at the end of a line (but not the last text line of the csv row)
+						findColByEndIndex = true
+					}
+
+				} else {
+					//not a multi line csv row... just select last cell because the cursor is at the end of the line
+					csvColToSelect = fieldEndIndices.length - 1
+					findColByEndIndex = false
+				}
+
+			} else {
+				//the csv row might span multiple rows
+				findColByEndIndex = true
+			}
+
+			if (findColByEndIndex) {
+				for (let i = 0; i < fieldEndIndices.length; i++) {
+					let colEndIndex = fieldEndIndices[i] //can be -1 for empty rows but this is ok as we would select col 0
+
+					if (currentCursorColAsCsvCol <= colEndIndex) {
+						csvColToSelect = i
+						break
+					}
+				}
+			}
+
+		}
+
+		//now account for has header
+		if (csvReadOptions._hasHeader) {
+
+			//if we have a header, the first row is the header
+			//so we need to subtract 1 from the csv row to select
+
+			//there is a special case:
+			//if we have comment lines before the first real csv line
+			//  AND the cursor is placed anywhere before the first real csv line or on the first real csv line
+
+			//first non comment line
+			/** see {@link getFirstRowWithIndex} */
+			let csvHeaderRowIndex = 0
+
+			for (let i = 0; i < csvParseResult.data.length; i++) {
+				const csvRow = csvParseResult.data[i]
+
+				if (csvRow.length > 0 && isCommentCell(csvRow[0], csvReadOptions) === false) {
+					csvHeaderRowIndex = i
+					break
+				}
+			}
+
+			if (csvRowToSelect === csvHeaderRowIndex) {
+				//cursor is on the row that will become the header...
+
+				csvRowToSelect++ //use next row
+				modifySelectedRowBecauseIfHeaderBy = -1
+
+			} else if (csvRowToSelect > csvHeaderRowIndex) {
+				//-1 because the header line is removed from the "data rows"
+				modifySelectedRowBecauseIfHeaderBy = -1
+
+			} else {
+				//csvRowToSelect < csvHeaderRowIndex
+				//cursor is before the first real csv line, on a comment row, before are comment rows
+				//we don't need to change the row index because only indices after the header row are changed
+
+				//TODO not working ... one to much??
+				if (hiddenPhysicalRowIndices.length > 0) {
+					//we hide comment rows... select the next row after the hidden comment row
+					csvRowToSelect = getNextRowIfCommentsAreHidden(csvHeaderRowIndex + 1)
+					//-1 because we remove the header cell from indices...
+					modifySelectedRowBecauseIfHeaderBy = -1
+				}
+			}
+
+		}
+
+	} catch (e) {
+		console.warn(`[edit csv] could not select line ${sourceFileCursorLineIndex ?? -1} or column ${sourceFileCursorColumnIndex ?? -1}`, e)
+		return {
+			rowIndex: 0,
+			colIndex: 0
+		}
+	}
+
+	let selectCellPos: HotCellPos = {
+		rowIndex: Math.max(0, csvRowToSelect),
+		colIndex: Math.max(0, csvColToSelect)
+	}
+
+	//in case we hide comments and the cursor is on a comment row
+	selectCellPos.rowIndex = getNextRowIfCommentsAreHidden(selectCellPos.rowIndex)
+	selectCellPos.rowIndex += modifySelectedRowBecauseIfHeaderBy
+
+	try {
+		selectCellPos.rowIndex = Math.max(0, Math.min(csvParseResult.data.length - 1, selectCellPos.rowIndex))
+		let dataRow = csvParseResult.data[selectCellPos.rowIndex]
+		selectCellPos.colIndex = Math.max(0, Math.min(dataRow.length - 1, selectCellPos.colIndex))
+	} catch(e) {
+	}
+
+	return selectCellPos
+}
+
+function scrollToSelectedCell(hot: Handsontable, cellToSelect: HotCellPos) {
+
+	//center selected cell in viewport
+	let viewportTopRowToShow = 0
+	if (cellToSelect.rowIndex !== 0) {
+		let autoRowSizePlugin = hot.getPlugin('autoRowSize')
+		let firstVisibleRow = autoRowSizePlugin.getFirstVisibleRow()
+		let lastVisibleRow = autoRowSizePlugin.getLastVisibleRow()
+		let visibleRowCount = lastVisibleRow - firstVisibleRow + 1
+		viewportTopRowToShow = lastVisibleRow - Math.floor(visibleRowCount / 2)
+
+		let maxRowCount = hot.countRows()
+		viewportTopRowToShow = Math.max(0, Math.min(viewportTopRowToShow, maxRowCount - 1))
+	}
+
+
+	//simply calculating the middle column is not working because they are probably not all the same width!
+	//for rows this is not that important because they are normally all the same width
+	let viewportLeftColToShow = 0
+	if (cellToSelect.colIndex !== 0) {
+		let autoColumnSizePlugin = hot.getPlugin('autoColumnSize')
+		let firstVisibleCol = autoColumnSizePlugin.getFirstVisibleColumn()
+		let lastVisibleCol = autoColumnSizePlugin.getLastVisibleColumn()
+		let colWidths: number[] = autoColumnSizePlugin.widths
+
+		let viewportAbsoluteLeftOffset = 0
+		let viewportWidth = 0
+		let cumulativeAbsoluteOffsets: number[] = []
+		let selectedCellLeftOffsetMiddle = 0
+		for (let i = 0; i <= lastVisibleCol; i++) {
+
+			if (i < firstVisibleCol) {
+				viewportAbsoluteLeftOffset += colWidths[i]
+			} else {
+				viewportWidth += colWidths[i]
+			}
+
+			if (i < cellToSelect.colIndex) {
+				selectedCellLeftOffsetMiddle += colWidths[i]
+			} else if (i === cellToSelect.colIndex) {
+				selectedCellLeftOffsetMiddle += Math.floor(colWidths[i] / 2)
+			}
+
+			if (i === 0) {
+				cumulativeAbsoluteOffsets.push(colWidths[i])
+			} else {
+				cumulativeAbsoluteOffsets.push(colWidths[i] + cumulativeAbsoluteOffsets[i - 1])
+			}
+		}
+		//check if after middle: viewport width, cumulative width until selected col...
+
+		if (firstVisibleCol === 0 && selectedCellLeftOffsetMiddle <= viewportWidth / 2) {
+			//special case because here the table is not scrolled and the selected cell 
+			//is not on the right or not over the half viewport
+			//--> don't scoll
+			viewportLeftColToShow = 0
+			//we could also check hot.view.activeWt.wtOverlays.scrollableElement.scrollLeft for scroll bar pos
+		} else {
+			//we want to center the selected cell in the viewport
+
+			//select sell will scroll the viewport to show the last column on the very right
+			//e.g. out viewportoffset starts with 10 and last pivel sown is 100 --> width: 100-10 = 90, middle: (100+10)/2 = 55
+			//our goal is that our selected cell middle is in the middle of the viewport
+			//so we need to change the first/left visible column and move ti to the right
+			//e.g. selected column with: 30, 50% -> 15
+			//we want that the column middle is at 55, so we need to move the first visible column 
+			//the difference between the current viewport middle and the column middle is: (100-15) - 55 = 30
+			//so we need to move the first visible column by 30 --> 10 + 30 = 40 (last pixel is 100 + 30 = 130)
+			//now we need to find the column that fits this the best...
+
+			let viewportAbsoluteMiddle = viewportAbsoluteLeftOffset + Math.floor(viewportWidth / 2)
+			let viewportMiddleDiff = selectedCellLeftOffsetMiddle - viewportAbsoluteMiddle
+			//the absolute left offset needed to center the column in the viewport
+			let neededViewporLeftOffsetAbsolute = viewportAbsoluteLeftOffset + viewportMiddleDiff
+
+			//now we need to find the column that fits this the best...
+			for (let i = 0; i <= lastVisibleCol; i++) {
+				let cumulativeOffset = cumulativeAbsoluteOffsets[i]
+
+				if (neededViewporLeftOffsetAbsolute <= cumulativeOffset) {
+					viewportLeftColToShow = i
+					break
+				}
+			}
+		}
+	}
+
+	// console.log(`viewport`, viewportTopRowToShow, viewportLeftColToShow)
+	//by default this the row will be top, the col on the left side
+	//see https://handsontable.com/docs/6.2.2/Core.html#scrollViewportTo
+	hot.scrollViewportTo(viewportTopRowToShow, viewportLeftColToShow, false, false)
+}
+
+function getHotScrollPosition(hot: Handsontable): HotViewportOffsetInPx {
+	return {
+		top: (hot as any).view.activeWt.wtOverlays.topOverlay.getScrollPosition(),
+		left: (hot as any).view.activeWt.wtOverlays.leftOverlay.getScrollPosition()
+	}
+}
+
+function setHotScrollPosition(hot: Handsontable, viewportOffsetInPx: HotViewportOffsetInPx): void {
+	; (hot as any).view.activeWt.wtOverlays.topOverlay.setScrollPosition(viewportOffsetInPx.top)
+		; (hot as any).view.activeWt.wtOverlays.leftOverlay.setScrollPosition(viewportOffsetInPx.left)
+}
+
+function storeHotSelectedCellAndScrollPosition(): void {
+	//preserve selected cell and scroll positions
+	if (hot) {
+
+		let hotSelection = hot.getSelected()
+		if (hotSelection && hotSelection.length > 0) {
+			previousSelectedCell = {
+				rowIndex: hotSelection[0][0],
+				colIndex: hotSelection[0][1]
+			}
+		}
+
+		previousViewportOffsets = getHotScrollPosition(hot)
+	}
+}
+
+/**
+ * changed the row index if the given index is a comment line (and we hide comments via settings)
+ * @param visualRowIndex 
+ * @returns 
+ */
+function getNextRowIfCommentsAreHidden(visualRowIndex: number): number {
+
+	if (!hot) return visualRowIndex
+
+	//comments are visible as normal rows
+	if (hiddenPhysicalRowIndices.length === 0) return visualRowIndex
+
+	const lastPossibleRowIndex = hot.countRows() - 1
+
+	//move down if we find comments
+	for (let i = visualRowIndex; i <= lastPossibleRowIndex; i++) {
+
+		//@ts-ignore
+		let physicalIndex = hot.toPhysicalRow(i)
+
+		let isRowCommentAndHidden = hiddenPhysicalRowIndices.indexOf(physicalIndex) !== -1
+
+		if (isRowCommentAndHidden) {
+			//search next row
+			continue
+		}
+
+		//found a real row!
+		return i
+	}
+
+	//no real row found search top
+	for (let i = visualRowIndex; i >= 0; i--) {
+
+		//@ts-ignore
+		let physicalIndex = hot.toPhysicalRow(i)
+		let isRowCommentAndHidden = hiddenPhysicalRowIndices.indexOf(physicalIndex) !== -1
+
+		if (isRowCommentAndHidden) {
+			//search next row
+			continue
+		}
+
+		//found a real row!
+		return i
+	}
+
+	//give up
+	return 0
+}
+

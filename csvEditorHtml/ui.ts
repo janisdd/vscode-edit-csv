@@ -559,7 +559,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					callback: function () { //key, selection, clickEvent
 						insertRowAbove()
 					},
-					disabled: function() {
+					disabled: function () {
 						return isReadonlyMode
 					}
 				},
@@ -567,7 +567,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					callback: function () { //key, selection, clickEvent
 						insertRowBelow()
 					},
-					disabled: function() {
+					disabled: function () {
 						return isReadonlyMode
 					}
 				},
@@ -578,7 +578,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					callback: function () { //key, selection, clickEvent
 						insertColLeft()
 					},
-					disabled: function() {
+					disabled: function () {
 						return isReadonlyMode
 					}
 				},
@@ -586,7 +586,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					callback: function () { //key, selection, clickEvent
 						insertColRight()
 					},
-					disabled: function() {
+					disabled: function () {
 						return isReadonlyMode
 					}
 				},
@@ -658,13 +658,13 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 						showColHeaderNameEditor(targetCol)
 					},
-					disabled: function() {
+					disabled: function () {
 						return isReadonlyMode
 					}
 				}
 			}
 		} as ContextMenuSettings,
-		beforeColumnSort: function(currentSortConfig, destinationSortConfigs) {
+		beforeColumnSort: function (currentSortConfig, destinationSortConfigs) {
 
 			//we cannot use the setting columnSorting because this would remove the hidden indicators, this would change the coulmn width...
 			if (isReadonlyMode) return false
@@ -865,11 +865,11 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 			} else if (__action.actionType === 'remove_col' && headerRowWithIndex) {
 				// let action = __action as RemoveColumnAction
-				
+
 				let lastAction = headerRowWithIndexUndoStack.pop()
 				if (lastAction && lastAction.action === "removed") {
-	
-					headerRowWithIndex.row.splice(lastAction.visualIndex,0, ...lastAction.headerData)
+
+					headerRowWithIndex.row.splice(lastAction.visualIndex, 0, ...lastAction.headerData)
 
 					headerRowWithIndexRedoStack.push({
 						action: 'removed',
@@ -881,11 +881,11 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 			} else if (__action.actionType === 'insert_col' && headerRowWithIndex) {
 				// let action = __action as InsertColumnAction
-				
+
 				let lastAction = headerRowWithIndexUndoStack.pop()
 				if (lastAction && lastAction.action === "added") {
-	
-					headerRowWithIndex.row.splice(lastAction.visualIndex,lastAction.headerData.length)
+
+					headerRowWithIndex.row.splice(lastAction.visualIndex, lastAction.headerData.length)
 
 					headerRowWithIndexRedoStack.push({
 						action: 'added',
@@ -941,34 +941,34 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				return false
 
 			} else if (__action.actionType === 'remove_col' && headerRowWithIndex) {
-			// let action = __action as RemoveColumnAction
-			
-			let lastAction = headerRowWithIndexRedoStack.pop()
-			if (lastAction && lastAction.action === "removed") {
+				// let action = __action as RemoveColumnAction
 
-				headerRowWithIndex.row.splice(lastAction.visualIndex, lastAction.headerData.length)
+				let lastAction = headerRowWithIndexRedoStack.pop()
+				if (lastAction && lastAction.action === "removed") {
 
-				headerRowWithIndexUndoStack.push({
-					action: 'removed',
-					visualIndex: lastAction.visualIndex,
-					headerData: lastAction.headerData
-				})
+					headerRowWithIndex.row.splice(lastAction.visualIndex, lastAction.headerData.length)
+
+					headerRowWithIndexUndoStack.push({
+						action: 'removed',
+						visualIndex: lastAction.visualIndex,
+						headerData: lastAction.headerData
+					})
+				}
+			} else if (__action.actionType === 'insert_col' && headerRowWithIndex) {
+
+				let lastAction = headerRowWithIndexRedoStack.pop()
+				if (lastAction && lastAction.action === "added") {
+
+					headerRowWithIndex.row.splice(lastAction.visualIndex, 0, ...lastAction.headerData)
+
+					headerRowWithIndexUndoStack.push({
+						action: 'added',
+						visualIndex: lastAction.visualIndex,
+						headerData: lastAction.headerData
+					})
+				}
+
 			}
-		} else if (__action.actionType === 'insert_col' && headerRowWithIndex) {
-
-			let lastAction = headerRowWithIndexRedoStack.pop()
-			if (lastAction && lastAction.action === "added") {
-
-				headerRowWithIndex.row.splice(lastAction.visualIndex, 0, ...lastAction.headerData)
-
-				headerRowWithIndexUndoStack.push({
-					action: 'added',
-					visualIndex: lastAction.visualIndex,
-					headerData: lastAction.headerData
-				})
-			}
-
-		}
 
 			// if (headerRowWithIndex && action.actionType === 'remove_row' && action.index === headerRowWithIndex.physicalIndex) { //first row cannot be removed normally so it must be the header row option
 			// 	//we re insert header row
@@ -1130,7 +1130,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					})
 
 					headerRowWithIndex.row.splice(visualColIndex, 0, ...Array(amount).fill(null))
-				} 
+				}
 			}
 
 			if (columnIsQuoted) {
@@ -1236,6 +1236,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				}
 			}
 
+			//maybe refactor to iterative?
 			const getNextRow: (a: number) => number = (visualRowIndex: number) => {
 
 				let visualRow = visualRowIndex;
@@ -1372,8 +1373,43 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	setupScrollListeners()
 
 	if (hot) {
-		//select first cell by default so we have always a context
-		hot.selectCell(0, 0)
+
+		if (previousSelectedCell === null || previousViewportOffsets === null) {
+			//the whole set select cell takes for 100k rows ~1.5s
+			// console.time('setSelectedCell')
+			//select first cell by default so we have always a context
+			let cellToSelect: HotCellPos = {
+				rowIndex: 0,
+				colIndex: 0,
+			}
+
+			if (csvParseResult) {
+				cellToSelect = calcHotCellToSelectFromCurosPos(
+					initialVars.sourceFileCursorLineIndex,
+					initialVars.sourceFileCursorColumnIndex,
+					initialVars.isCursorPosAfterLastColumn,
+					csvParseResult,
+					csvReadConfig
+				)
+			} else {
+				cellToSelect = {
+					rowIndex: 0,
+					colIndex: 0
+				}
+			}
+
+			//this will select the cell and scroll the viewport to show the cell
+			//at the bottom and on the right side
+			hot.selectCell(cellToSelect.rowIndex, cellToSelect.colIndex) //this takes to most time... 100k ~1.3s
+			scrollToSelectedCell(hot, cellToSelect)  //even for 100k file and worst path (where we need to split the file at \n, only ~150ms)
+
+			// console.timeEnd('setSelectedCell')
+
+		} else {
+			//user moved the cell selection manually, so not reset selection
+			hot.selectCell(previousSelectedCell.rowIndex, previousSelectedCell.colIndex)
+			setHotScrollPosition(hot, previousViewportOffsets)
+		}
 	}
 }
 
@@ -1597,6 +1633,7 @@ function toggleSourceFileChangedModalDiv(isVisible: boolean) {
  * @param {string} content 
  */
 function resetData(content: string, csvReadOptions: CsvReadOptions) {
+
 	const _data = parseCsv(content, csvReadOptions)
 	// console.log(`_data`, _data)
 	displayData(_data, csvReadOptions)
@@ -1615,6 +1652,7 @@ function resetDataFromResetDialog() {
 
 	postSetEditorHasChanges(false)
 
+	storeHotSelectedCellAndScrollPosition()
 	startRenderData()
 }
 
@@ -1642,6 +1680,8 @@ function reloadFileFromDisk() {
 	toggleAskReloadFileModalDiv(false)
 	toggleSourceFileChangedModalDiv(false)
 	_setHasUnsavedChangesUiIndicator(false)
+
+	storeHotSelectedCellAndScrollPosition()
 	postReloadFile()
 }
 
@@ -1974,7 +2014,7 @@ function getHandsontableOverlayScrollLeft(): HTMLDivElement | null {
 function setupScrollListeners() {
 
 	let overlayWrapper = getHandsontableOverlayScrollLeft()!
-	
+
 	if (_onTableScrollThrottled) {
 		overlayWrapper.removeEventListener(`scroll`, _onTableScrollThrottled)
 	}
@@ -2278,7 +2318,7 @@ function _updateToggleReadonlyModeUi() {
 		//disable edit ui
 		const btnEditableUi = document.querySelectorAll(`.on-readonly-disable-btn`)
 		for (let i = 0; i < btnEditableUi.length; i++) {
-			btnEditableUi.item(i).setAttribute('disabled','true')
+			btnEditableUi.item(i).setAttribute('disabled', 'true')
 		}
 
 		const divEditableUi = document.querySelectorAll(`.on-readonly-disable-div`)
@@ -2290,16 +2330,16 @@ function _updateToggleReadonlyModeUi() {
 		isReadonlyModeToggleSpan.classList.remove(`active`)
 		isReadonlyModeToggleSpan.title = `Sets the table to readonly mode`
 
-			//enable edit ui
-			const btnEditableUi = document.querySelectorAll(`.on-readonly-disable-btn`)
-			for (let i = 0; i < btnEditableUi.length; i++) {
-				btnEditableUi.item(i).removeAttribute('disabled')
-			}
+		//enable edit ui
+		const btnEditableUi = document.querySelectorAll(`.on-readonly-disable-btn`)
+		for (let i = 0; i < btnEditableUi.length; i++) {
+			btnEditableUi.item(i).removeAttribute('disabled')
+		}
 
-			const divEditableUi = document.querySelectorAll(`.on-readonly-disable-div`)
-			for (let i = 0; i < divEditableUi.length; i++) {
-				divEditableUi.item(i).classList.remove('div-readonly-disabled')
-			}
+		const divEditableUi = document.querySelectorAll(`.on-readonly-disable-div`)
+		for (let i = 0; i < divEditableUi.length; i++) {
+			divEditableUi.item(i).classList.remove('div-readonly-disabled')
+		}
 	}
 }
 
@@ -2315,6 +2355,6 @@ function toggleReadonlyMode() {
 		manualColumnMove: !isReadonlyMode,
 		undo: !isReadonlyMode
 	}, false)
-	
+
 	_updateToggleReadonlyModeUi()
 }

@@ -6,11 +6,7 @@
 
 /**
 * parses the content as csv
-* also fills the commentLinesBefore and commentLinesAfter array if comments is enabled
-* commentLinesAfter contains all comments after the commentLinesBefore (this includes comments in the data)
 * on error the errors are displayed and null is returned
-* @param {string} content 
-* @returns {[string[], string[][], string[]]| null} [0] comments before, [1] csv data, [2] comments after
 */
 function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvParseResult | null {
 
@@ -21,6 +17,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 	//comments are parses as normal text, only one cell is added
 	const parseResult = csv.parse(content, {
 		...csvReadOptions,
+		//note this overwrites the comments string from the read config!
 		comments: false, //false gives use all lines we later check each line if it's a comment to merge the cells in that row
 		//left trimmed lines are comments and if !== null we want to include comments as one celled row (in the ui)
 		//papaparse parses comments with this only if the begin with the comment string (no space before!!)
@@ -39,6 +36,8 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 		 * comment rows are ignored for this
 		 */
 		retainQuoteInformation: true, //we keep true here and decide if we use it whe nwe output data
+		calcLineIndexToCsvLineIndexMapping: initialVars.sourceFileCursorLineIndex !== null ? true : false,
+		calcColumnIndexToCsvColumnIndexMapping: initialVars.sourceFileCursorColumnIndex !== null ? true : false,
 	} as any)
 
 	if (parseResult.errors.length === 1 && parseResult.errors[0].type === 'Delimiter' && parseResult.errors[0].code === 'UndetectableDelimiter') {
@@ -78,9 +77,14 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 
 	readDelimiterTooltip.setAttribute('data-tooltip', `${readDelimiterTooltipText} (detected: ${defaultCsvWriteOptions.delimiter.replace("\t", "⇥")})`)
 
+	//maybe use namespace merging? (didn't work or don't kow how)
+	let _parseResult = parseResult as ParseResult
 	return {
 		data: parseResult.data,
-		columnIsQuoted: (parseResult as any).columnIsQuoted
+		columnIsQuoted: (parseResult as any).columnIsQuoted,
+		outLineIndexToCsvLineIndexMapping: _parseResult.outLineIndexToCsvLineIndexMapping ?? null,
+		outColumnIndexToCsvColumnIndexMapping: _parseResult.outColumnIndexToCsvColumnIndexMapping ?? null,
+		originalContent: content
 	}
 }
 
