@@ -10,7 +10,7 @@ note that the changelog is also present on the website when you click on the ver
 - added option `openTableAndSelectCellAtCursorPos` to open the table and selected the cell where the cursor was (fixed feature request #83)
 	- on by default!
 	- note for multi character delimiters it might not work properly (but should most of the time, only tested a few cases and it worked)
-- after `reset dat and apply read options` the scroll position and selected cell is restored
+- after `reset dat and apply read options` the scroll position and selected cell is restored (issue #84)
 
 ## 1.2.6
 

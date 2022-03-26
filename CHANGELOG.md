@@ -8,7 +8,7 @@
 	- on by default!
 	- note for multi character delimiters it might not work properly (but should most of the time, only tested a few cases and it worked)
 	- if comments are hidden and the cursor is on a comment, the next row is selected
-- after `reset dat and apply read options` the scroll position and selected cell is restored
+- after `reset dat and apply read options` the scroll position and selected cell is restored (issue #84)
 
 ## 0.6.7
 
