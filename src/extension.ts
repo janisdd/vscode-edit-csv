@@ -293,9 +293,10 @@ function beforeEditCsvCheck(instanceManager: InstanceManager): boolean {
 
 	//vscode.window.activeTextEditor will be undefined if file is too large...
 	//see https://github.com/microsoft/vscode/issues/32118
+	//see //see https://github.com/microsoft/vscode/issues/31078
 	//see https://github.com/Microsoft/vscode/blob/master/src/vs/editor/common/model/textModel.ts > MODEL_SYNC_LIMIT
 	if (!vscode.window.activeTextEditor || !isCsvFile(vscode.window.activeTextEditor.document)) {
-		vscode.window.showInformationMessage("Open a csv file first to show the csv editor or file too large")
+		vscode.window.showInformationMessage("Open a csv file first to show the csv editor or file too large (> 50MB)")
 		return false
 	}
 
