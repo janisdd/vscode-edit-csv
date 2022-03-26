@@ -254,10 +254,10 @@ type EditCsvConfig = {
 	 hideOpenCsvEditorUiActions: boolean
 
 	 /**
-		* onlyInitially: only opens the table at the cursor position (cell) the first time the table is opened
+		* initialOnly: only opens the table at the cursor position (cell) the first time the table is opened
 		* never: open the table at the top left corner
 		*/
-	 openTableAtCursorPos: "onlyInitially" | "never"
+	 openTableAndSelectCellAtCursorPos: "initialOnly" | "never"
 }
 
 /* --- frontend settings --- */

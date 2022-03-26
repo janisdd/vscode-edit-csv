@@ -482,8 +482,8 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
     }
     panel.webview.html = getHtml_1.createEditorHtml(panel.webview, context, config, {
         isWatchingSourceFile: instance.supportsAutoReload,
-        sourceFileCursorLineIndex: config.openTableAtCursorPos === 'onlyInitially' ? activeTextEditor.selection.active.line : null,
-        sourceFileCursorColumnIndex: config.openTableAtCursorPos === 'onlyInitially' ? activeCol : null,
+        sourceFileCursorLineIndex: config.openTableAndSelectCellAtCursorPos === 'initialOnly' ? activeTextEditor.selection.active.line : null,
+        sourceFileCursorColumnIndex: config.openTableAndSelectCellAtCursorPos === 'initialOnly' ? activeCol : null,
         isCursorPosAfterLastColumn: activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeTextEditor.selection.active.character
     });
 }

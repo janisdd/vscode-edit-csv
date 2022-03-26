@@ -41,7 +41,7 @@ const defaultConfig = {
     insertColBehavior: 'keepRowKeepColumn',
     initiallyIsInReadonlyMode: false,
     hideOpenCsvEditorUiActions: false,
-    openTableAtCursorPos: "onlyInitially",
+    openTableAndSelectCellAtCursorPos: "initialOnly",
 };
 /**
  * returns the configuration for this extension

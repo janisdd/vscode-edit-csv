@@ -4,7 +4,7 @@
 
 ## 0.6.8
 
-- added option `openTableAtCursorPos` to open the table and selected the cell where the cursor was (fixed feature request #83)
+- added option `openTableAndSelectCellAtCursorPos` to open the table and selected the cell where the cursor was (fixed feature request #83)
 	- on by default!
 	- note for multi character delimiters it might not work properly (but should most of the time, only tested a few cases and it worked)
 	- if comments are hidden and the cursor is on a comment, the next row is selected

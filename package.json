@@ -502,12 +502,12 @@
 					"default": false,
 					"description": "false: hide the edit csv button and the file context menu action to open the editor (useful if you want to call this extension from another extension and show a custom button), true: show them"
 				},
-				"csv-edit.openTableAtCursorPos": {
+				"csv-edit.openTableAndSelectCellAtCursorPos": {
 					"type": "string",
-					"default": "onlyInitially",
-					"description": "true: open the table at the cursor position (cell), false: open the table at the top left corner",
+					"default": "initialOnly",
+					"description": "if the table should be opened at the cursor position and select the corresponding csv cell",
 					"enum": [
-						"onlyInitially",
+						"initialOnly",
 						"never"
 					],
 					"enumDescriptions": [

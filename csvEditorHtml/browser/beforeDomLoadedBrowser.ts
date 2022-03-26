@@ -52,7 +52,7 @@ var initialConfig: EditCsvConfig | undefined = {
 	insertColBehavior: 'keepRowKeepColumn',
 	initiallyIsInReadonlyMode: false,
 	hideOpenCsvEditorUiActions: false, //noop, has only effect if set inside the user settings (vs code extension)
-	openTableAtCursorPos: "onlyInitially",
+	openTableAndSelectCellAtCursorPos: "never",
 }
 
 function __getById(id: string): HTMLElement {
