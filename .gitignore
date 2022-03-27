@@ -6,9 +6,12 @@ TODO.md
 scripts.md
 backup
 *.vsix
-out/test
+out/**/*
 cypress
 csvEditorHtml/browser/dist
 csvEditorHtml/browser/imgs/private
+# only needed for web start folder
+exampleCSV/
 images/logo_backup/*
 .vscode-test-web/*
+dist/web/

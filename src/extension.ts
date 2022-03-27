@@ -4,7 +4,7 @@ import { isCsvFile, getCurrentViewColumn, debugLog, partitionString } from './ut
 import { createEditorHtml } from './getHtml';
 import { InstanceManager, Instance, SomeInstance } from './instanceManager';
 import { getExtensionConfiguration, overwriteConfiguration } from './configurationHelper';
-import * as chokidar from "chokidar";
+// import * as chokidar from "chokidar";
 
 
 // const debounceDocumentChangeInMs = 1000
@@ -390,22 +390,23 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	} else {
 
-		let watcher: chokidar.FSWatcher | null = null
+		// let watcher: chokidar.FSWatcher | null = null
+		let watcher: null = null
 
 		if (config.shouldWatchCsvSourceFile) {
 			//the problem with this is that it is faster than the file model (in vs code) can sync the file...
-			watcher = chokidar.watch(activeTextEditor.document.fileName)
+			// watcher = chokidar.watch(activeTextEditor.document.fileName)
 
-			watcher.on('change', (path) => {
+			// watcher.on('change', (path) => {
 
-				if (instance.ignoreNextChangeEvent) {
-					instance.ignoreNextChangeEvent = false
-					debugLog(`source file (external) changed: ${path}, ignored`)
-					return
-				}
-				debugLog(`source file (external) changed: ${path}`)
-				onSourceFileChanged(path, instance)
-			})
+			// 	if (instance.ignoreNextChangeEvent) {
+			// 		instance.ignoreNextChangeEvent = false
+			// 		debugLog(`source file (external) changed: ${path}, ignored`)
+			// 		return
+			// 	}
+			// 	debugLog(`source file (external) changed: ${path}`)
+			// 	onSourceFileChanged(path, instance)
+			// })
 		}
 
 		instance = {

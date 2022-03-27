@@ -7,7 +7,7 @@ const util_1 = require("./util");
 const getHtml_1 = require("./getHtml");
 const instanceManager_1 = require("./instanceManager");
 const configurationHelper_1 = require("./configurationHelper");
-const chokidar = require("chokidar");
+// import * as chokidar from "chokidar";
 // const debounceDocumentChangeInMs = 1000
 //for a full list of context keys see https://code.visualstudio.com/docs/getstarted/keybindings#_when-clause-contexts
 /**
@@ -308,19 +308,20 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
         };
     }
     else {
+        // let watcher: chokidar.FSWatcher | null = null
         let watcher = null;
         if (config.shouldWatchCsvSourceFile) {
             //the problem with this is that it is faster than the file model (in vs code) can sync the file...
-            watcher = chokidar.watch(activeTextEditor.document.fileName);
-            watcher.on('change', (path) => {
-                if (instance.ignoreNextChangeEvent) {
-                    instance.ignoreNextChangeEvent = false;
-                    util_1.debugLog(`source file (external) changed: ${path}, ignored`);
-                    return;
-                }
-                util_1.debugLog(`source file (external) changed: ${path}`);
-                onSourceFileChanged(path, instance);
-            });
+            // watcher = chokidar.watch(activeTextEditor.document.fileName)
+            // watcher.on('change', (path) => {
+            // 	if (instance.ignoreNextChangeEvent) {
+            // 		instance.ignoreNextChangeEvent = false
+            // 		debugLog(`source file (external) changed: ${path}, ignored`)
+            // 		return
+            // 	}
+            // 	debugLog(`source file (external) changed: ${path}`)
+            // 	onSourceFileChanged(path, instance)
+            // })
         }
         instance = {
             kind: 'externalFile',

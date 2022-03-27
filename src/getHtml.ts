@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import * as path from 'path';
 
 /**
  * returns a local file path relative to the extension root dir
@@ -9,7 +8,14 @@ export function getResourcePath(webview: vscode.Webview, context: vscode.Extensi
 	//fix for windows because there path.join will use \ as separator and when we inline this string in html/js
 	//we get specials strings e.g. c:\n
 	// return `vscode-resource:${path.join(context.extensionPath, filePath).replace(/\\/g, '/')}`
-	return `${webview.asWebviewUri(vscode.Uri.file(path.join(context.extensionPath, filePath).replace(/\\/g, '/')))}`
+	// return `${webview.asWebviewUri(vscode.Uri.file(path.join(context.extensionPath, "out", "web", filePath).replace(/\\/g, '/')))}`
+	// let prePath = ""
+	console.log(`process.env.IS_WEB_MODE`, process.env.IS_WEB_MODE)
+	// if (process.env.IS_WEB_MODE) {
+	// 	prePath = path.join("out", "web")
+	// }
+	// return vscode.Uri.joinPath(context.extensionUri, prePath, filePath).toString(true)
+	return `${webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, filePath))}`
 }
 
 /**
