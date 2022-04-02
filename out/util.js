@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.partitionString = exports.isCsvFile = exports.debounce = exports.limitSingleCharacterString = exports.getCurrentViewColumn = exports.debugLog = void 0;
 const vscode = require("vscode");
 function debugLog(msg) {
-    // console.log(msg)
+    console.log(msg);
 }
 exports.debugLog = debugLog;
 /**
@@ -24,20 +24,21 @@ function limitSingleCharacterString(value) {
 }
 exports.limitSingleCharacterString = limitSingleCharacterString;
 //from https://davidwalsh.name/javascript-debounce-function
+//added typing
 function debounce(func, wait, immediate = false) {
     var timeout;
-    return function () {
-        var context = this, args = arguments;
+    return function (..._args) {
+        var context = this; //args = arguments;
         var later = function () {
             timeout = null;
             if (!immediate)
-                func.apply(context, args);
+                func.apply(context, _args);
         };
         var callNow = immediate && !timeout;
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
         if (callNow)
-            func.apply(context, args);
+            func.apply(context, _args);
     };
 }
 exports.debounce = debounce;

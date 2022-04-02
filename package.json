@@ -2,12 +2,12 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.6.8",
+	"version": "0.6.9",
 	"license": "MIT",
 	"icon": "images/logo.png",
 	"publisher": "janisdd",
 	"engines": {
-		"vscode": "^1.38.0"
+		"vscode": "^1.65.0"
 	},
 	"categories": [
 		"Other"
@@ -534,7 +534,6 @@
 		"open-in-browser": "vscode-test-web --browserType=chromium --extensionDevelopmentPath=. ./exampleCSV --port 3000"
 	},
 	"dependencies": {
-		"chokidar": "3.4.2",
 		"path-browserify": "^1.0.1"
 	},
 	"devDependencies": {
@@ -548,12 +547,11 @@
 		"@types/node": "^8.10.25",
 		"@types/papaparse": "4.5.6",
 		"@types/readline-sync": "^1.4.3",
-		"@types/vscode": "^1.38.0",
+		"@types/vscode": "^1.65.0",
 		"@types/webpack-env": "^1.16.3",
 		"@vscode/test-web": "^0.0.24",
 		"bulma-toast": "^2.0.3",
 		"chardet": "^1.2.1",
-		"copy-webpack-plugin": "^10.2.4",
 		"fs-extra": "^9.0.1",
 		"glob": "^7.1.6",
 		"iconv-lite": "^0.6.2",

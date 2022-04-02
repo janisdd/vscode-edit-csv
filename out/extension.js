@@ -7,7 +7,6 @@ const util_1 = require("./util");
 const getHtml_1 = require("./getHtml");
 const instanceManager_1 = require("./instanceManager");
 const configurationHelper_1 = require("./configurationHelper");
-// import * as chokidar from "chokidar";
 // const debounceDocumentChangeInMs = 1000
 //for a full list of context keys see https://code.visualstudio.com/docs/getstarted/keybindings#_when-clause-contexts
 /**
@@ -77,52 +76,6 @@ function activate(context) {
         //we have no old editor -> create new one
         createNewEditorInstance(context, vscode.window.activeTextEditor, instanceManager, overwriteConfigObj);
     });
-    //@ts-ignore
-    // const askRefresh = function (instance: Instance) {
-    // 	const options = ['Yes', 'No']
-    // 	vscode.window.showInformationMessage('The source file changed or was saved. Would you like to overwrite your csv edits with the new content?',
-    // 		{
-    // 			modal: false,
-    // 		}, ...options)
-    // 		.then((picked) => {
-    // 			if (!picked) return
-    // 			picked = picked.toLowerCase()
-    // 			if (picked === 'no') return
-    // 			//update
-    // 			console.log('update');
-    // 			if (!vscode.window.activeTextEditor) {
-    // 				vscode.workspace.openTextDocument(instance.sourceUri)
-    // 					.then((document) => {
-    // 						const newContent = document.getText()
-    // 						instance.panel.webview.html = createEditorHtml(context, newContent)
-    // 					})
-    // 				return
-    // 			}
-    // 			const newContent = vscode.window.activeTextEditor.document.getText()
-    // 			//see https://github.com/Microsoft/vscode/issues/47534
-    // 			// const msg = {
-    // 			// 	command: 'csvUpdate',
-    // 			// 	csvContent: newContent
-    // 			// }
-    // 			// instance.panel.webview.postMessage(msg)
-    // 			instance.panel.webview.html = createEditorHtml(context, newContent)
-    // 		})
-    // }
-    //we could use this hook to check if the file was changed (outside of the editor) and show a message to the user
-    //but we would need to distinguish our own changes from external changes...
-    //this only works if the file is opened inside an editor (inside vs code) and visible (the current file)
-    //not working even if the file is in the current workspace (directoy), the file must be open and visible!
-    // vscode.workspace.onDidChangeTextDocument((args: vscode.TextDocumentChangeEvent) => {
-    // 	//see https://github.com/Microsoft/vscode/issues/50344
-    // 	//when dirty flag changes this is called
-    // 	// if (args.contentChanges.length === 0) {
-    // 	// 	return
-    // 	// }
-    // 	console.log(`onDidChangeTextDocument`, args)
-    // })
-    // 	if (!isCsvFile(args.document)) return //closed non-csv file ... we cannot have an editor for this document
-    // 	console.log(`CHANGE ${args.document.uri.toString()}`);
-    // }, debounceDocumentChangeInMs));
     //when an unnamed file is saved the new file (new uri) is opened
     //	when the extension calls save the new file is not displayed
     //	because we don't know the new uri we wait for new csv files to be opened and show them
@@ -140,11 +93,6 @@ function activate(context) {
         //also this would show almost every opened csv file (even if we don't wan to display it e.g. only for silent editing from other extensions)
         // vscode.window.showTextDocument(args.uri)
     });
-    // vscode.workspace.onDidSaveTextDocument(debounce((args: vscode.TextDocument) => {
-    // }, debounceDocumentChangeInMs))
-    // vscode.workspace.onDidSaveTextDocument((args: vscode.TextDocument) => {
-    // console.log(`onDidSaveTextDocument ${args.uri.toString()}`);
-    // })
     //when an unnamed csv file is closed and we have an editor for it then close the editor
     //	this is because we currently not updating the editor (e.g. title, uris) after an unnamed file is saved
     const onDidCloseTextDocumentHandler = vscode.workspace.onDidCloseTextDocument((args) => {
@@ -264,6 +212,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
     });
     //check if the file is in the current workspace
     let isInCurrentWorkspace = activeTextEditor.document.uri.fsPath !== vscode.workspace.asRelativePath(activeTextEditor.document.uri.fsPath);
+    //returns the wrong result for web??
     const config = configurationHelper_1.getExtensionConfiguration();
     if (overwriteSettings !== null) {
         configurationHelper_1.overwriteConfiguration(config, overwriteSettings);
@@ -276,10 +225,10 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
     // const watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, true)
     let instance;
     // NOTE that watching new files (untitled) is not supported by this is probably no issue...
-    if (isInCurrentWorkspace) {
+    if (isInCurrentWorkspace || vscode.env.uiKind === vscode.UIKind.Web) { //on the web we only have workspace files (hopefully)?
         let watcher = null;
         if (config.shouldWatchCsvSourceFile) {
-            //if the file is in the current workspace we the file model in vs code is always synced so is this (faster reads/cached)
+            //if the file is in the current workspace, the file model in vs code is always synced (faster reads/cached)
             watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, true);
             //not needed because on apply changes we create a new file if this is needed
             watcher.onDidChange((e) => {
@@ -308,20 +257,27 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
         };
     }
     else {
-        // let watcher: chokidar.FSWatcher | null = null
         let watcher = null;
         if (config.shouldWatchCsvSourceFile) {
-            //the problem with this is that it is faster than the file model (in vs code) can sync the file...
-            // watcher = chokidar.watch(activeTextEditor.document.fileName)
-            // watcher.on('change', (path) => {
-            // 	if (instance.ignoreNextChangeEvent) {
-            // 		instance.ignoreNextChangeEvent = false
-            // 		debugLog(`source file (external) changed: ${path}, ignored`)
-            // 		return
-            // 	}
-            // 	debugLog(`source file (external) changed: ${path}`)
-            // 	onSourceFileChanged(path, instance)
-            // })
+            watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(activeTextEditor.document.uri, `*`), true, false, true);
+            // not needed because on apply changes we create a new file if this is needed
+            const onChangeHandler = (e) => {
+                if (instance.ignoreNextChangeEvent) {
+                    instance.ignoreNextChangeEvent = false;
+                    util_1.debugLog(`source file changed: ${e.fsPath}, ignored`);
+                    return;
+                }
+                util_1.debugLog(`source file changed: ${e.fsPath}`);
+                onSourceFileChanged(e.fsPath, instance);
+            };
+            //called multiple times for the same file (3 normally)... even for one change, even with 2s decounce sometimes we get 2 events
+            //works on windows without any issue (without debounce), on mac we get normally 2 events
+            //while debugging the extension we get 3 events... so to test this, install via vsix and open the developer tools
+            const onChangeHandlerDebounced = util_1.debounce(onChangeHandler, 2000, false);
+            watcher.onDidChange((e) => {
+                onChangeHandlerDebounced(e);
+                // onChangeHandler(e)
+            });
         }
         instance = {
             kind: 'externalFile',
@@ -347,7 +303,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
             (_a = instance.sourceFileWatcher) === null || _a === void 0 ? void 0 : _a.dispose();
         }
         else {
-            (_b = instance.sourceFileWatcher) === null || _b === void 0 ? void 0 : _b.close();
+            (_b = instance.sourceFileWatcher) === null || _b === void 0 ? void 0 : _b.dispose();
         }
         return;
     }
@@ -469,7 +425,8 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
                 (_a = instance.sourceFileWatcher) === null || _a === void 0 ? void 0 : _a.dispose();
             }
             else {
-                (_b = instance.sourceFileWatcher) === null || _b === void 0 ? void 0 : _b.close();
+                // instance.sourceFileWatcher?.close()
+                (_b = instance.sourceFileWatcher) === null || _b === void 0 ? void 0 : _b.dispose();
             }
         }
         catch (error) {

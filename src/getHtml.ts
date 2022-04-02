@@ -9,11 +9,6 @@ export function getResourcePath(webview: vscode.Webview, context: vscode.Extensi
 	//we get specials strings e.g. c:\n
 	// return `vscode-resource:${path.join(context.extensionPath, filePath).replace(/\\/g, '/')}`
 	// return `${webview.asWebviewUri(vscode.Uri.file(path.join(context.extensionPath, "out", "web", filePath).replace(/\\/g, '/')))}`
-	// let prePath = ""
-	console.log(`process.env.IS_WEB_MODE`, process.env.IS_WEB_MODE)
-	// if (process.env.IS_WEB_MODE) {
-	// 	prePath = path.join("out", "web")
-	// }
 	// return vscode.Uri.joinPath(context.extensionUri, prePath, filePath).toString(true)
 	return `${webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, filePath))}`
 }
@@ -234,7 +229,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 
 										<span id="source-file-unwatched-indicator" class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline" style="float: right;margin-right: 5px;"
-											data-tooltip="The csv source file cannot be automatically reloaded if the file on disk is changed (because it's not in the current workspace). You will get notified if the file is changed but then you need to open/display the source csv file in vs code and manually refresh the table (refresh button). Alternatively just close this table and reopen it.">
+											data-tooltip="The csv source file cannot be automatically reloaded if the file on disk is changed (because it's not in the current workspace). You will get notified if the file is changed but then you need to open/display the source csv file in vs code and manually refresh the table (this view, refresh button top right buttons). Alternatively just close this table and reopen it.">
 											<i class="fas fa-eye"></i>
 										</span>
 										<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"

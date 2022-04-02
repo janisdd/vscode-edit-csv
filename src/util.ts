@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 export function debugLog(msg: any) {
-	// console.log(msg)
+	console.log(msg)
 }
 
 /**
@@ -24,18 +24,19 @@ export function limitSingleCharacterString(value: string): string {
 }
 
 //from https://davidwalsh.name/javascript-debounce-function
-export function debounce(func: Function, wait: number, immediate = false) {
+//added typing
+export function debounce<T extends any[]>(func: (...__args: T) => void, wait: number, immediate = false) {
 	var timeout: any;
-	return function (this: any) {
-		var context = this, args = arguments;
+	return function (this: any, ..._args: T) {
+		var context = this //args = arguments;
 		var later = function () {
 			timeout = null;
-			if (!immediate) func.apply(context, args);
+			if (!immediate) func.apply(context, _args);
 		};
 		var callNow = immediate && !timeout;
 		clearTimeout(timeout);
 		timeout = setTimeout(later, wait);
-		if (callNow) func.apply(context, args);
+		if (callNow) func.apply(context, _args);
 	};
 }
 
