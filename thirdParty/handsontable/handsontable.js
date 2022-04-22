@@ -23,8 +23,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Version: 6.4.4
- * Release date: 19/12/2018 (built at 06/02/2022 13:06:54)
+ * Version: 6.4.5
+ * Release date: 19/12/2018 (built at 22/04/2022 18:33:20)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29737,9 +29737,9 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "06/02/2022 13:06:54";
+Handsontable.buildDate = "22/04/2022 18:33:20";
 Handsontable.packageName = "handsontable";
-Handsontable.version = "6.4.4";
+Handsontable.version = "6.4.5";
 var baseVersion = "";
 
 if (baseVersion) {
@@ -51918,6 +51918,28 @@ function (_BasePlugin) {
      */
 
     _this.rowsLimit = ROWS_LIMIT;
+    /**
+     * when pasting text data (normally from spreadsheets) there are two types of separators
+     * row separators, which are new line characters (when we read a new line, we start a new row)
+     * column separators, which are tabs (when we read a column, we start a new column)
+     *
+     * this way we can paste multiple cells from text
+     * despite the options we always process the text (if we got text from clipboard) with sheet.js and get cells
+     * the options only re-introduce the not ignored separators
+     *
+     * `"normal"`: when pasting text data, we respect row and column separators (new line characters and tabs, respectively)
+     * `"onlyKeepColumnSeparators"`: when pasting text data, we only keep columns (ignore row separators)
+     * `"onlyKeepRowSeparators"`: when pasting text data, we only keep rows (ignore column separators)
+     * `"ignoreAllSeparators"`: always paste the content into a single cell (keep all separators)
+     *
+     * NOTE that we still use the multi cell logic and only convert the cells back with join (so Sheet js parse is applied, e.g. convert double quotes to single quotes, etc).
+     * @type {"normal" | "onlyKeepRowSeparators" | "onlyKeepColumnSeparators" | "ignoreAllSeparators"}
+     */
+
+    _this.pasteSeparatorMode = 'normal'; // these are only used for combining the cells again
+
+    _this.pasteRowJoinSeparator = '\n';
+    _this.pasteColumnJoinSeparator = '\t';
     privatePool.set(_assertThisInitialized(_assertThisInitialized(_this)), {
       isTriggeredByCopy: false,
       isTriggeredByCut: false,
@@ -51960,6 +51982,7 @@ function (_BasePlugin) {
         this.pasteMode = settings.copyPaste.pasteMode || this.pasteMode;
         this.rowsLimit = settings.copyPaste.rowsLimit || this.rowsLimit;
         this.columnsLimit = settings.copyPaste.columnsLimit || this.columnsLimit;
+        this.pasteIntoSingleCell = settings.copyPaste.pasteIntoSingleCell || this.pasteIntoSingleCell;
       }
 
       this.addHook('afterContextMenuDefaultOptions', function (options) {
@@ -52358,6 +52381,87 @@ function (_BasePlugin) {
 
       if (inputArray.length === 0) {
         return;
+      }
+
+      var colCount = inputArray[0].length;
+
+      switch (this.pasteSeparatorMode) {
+        case 'onlyKeepColumnSeparators':
+          {
+            /*
+              a | b | c           a | b | c
+              --|---|--     --->  d | e | f
+              d | e | f
+             */
+            var _tmpColsArray = [];
+
+            for (var colIndex = 0; colIndex < colCount; colIndex++) {
+              _tmpColsArray[colIndex] = '';
+
+              for (var rowIndex = 0; rowIndex < inputArray.length; rowIndex++) {
+                // eslint-disable-next-line prefer-template
+                _tmpColsArray[colIndex] += inputArray[rowIndex][colIndex] + (rowIndex !== inputArray.length - 1 ? this.pasteRowJoinSeparator : '');
+              }
+            }
+
+            inputArray = [_tmpColsArray];
+            break;
+          }
+
+        case 'onlyKeepRowSeparators':
+          {
+            /*
+              a | b | c           a \t b \t c
+              --|---|--     --->  ---------
+              d | e | f           d \t e \t f
+             */
+            var _tmpRowsArray = [];
+
+            for (var _rowIndex = 0; _rowIndex < inputArray.length; _rowIndex++) {
+              _tmpRowsArray.push(['']);
+
+              for (var _colIndex = 0; _colIndex < colCount; _colIndex++) {
+                // add back the col separator for the single cell
+                // eslint-disable-next-line prefer-template
+                _tmpRowsArray[_rowIndex][0] += inputArray[_rowIndex][_colIndex] + (_colIndex !== colCount - 1 ? this.pasteColumnJoinSeparator : '');
+              }
+            }
+
+            inputArray = _tmpRowsArray;
+            break;
+          }
+
+        case 'ignoreAllSeparators':
+          {
+            /*
+              a | b | c           a \t b \t c \n
+              --|---|--     --->  d \t e \t f
+              d | e | f
+             */
+            var cellValue = '';
+
+            for (var _rowIndex2 = 0; _rowIndex2 < inputArray.length; _rowIndex2++) {
+              for (var _colIndex2 = 0; _colIndex2 < colCount; _colIndex2++) {
+                // add back the col separator for the single cell
+                // eslint-disable-next-line prefer-template
+                cellValue += inputArray[_rowIndex2][_colIndex2] + (_colIndex2 !== colCount - 1 ? this.pasteColumnJoinSeparator : '');
+              } // add back the row separator for the single cell
+
+
+              if (_rowIndex2 !== inputArray.length - 1) {
+                cellValue += this.pasteRowJoinSeparator;
+              }
+            }
+
+            inputArray = [[cellValue]];
+            break;
+          }
+
+        case 'normal':
+        default:
+          {
+            break;
+          }
       }
 
       if (this.hot.runHooks('beforePaste', inputArray, this.copyableRanges) === false) {

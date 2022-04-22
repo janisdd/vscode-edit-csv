@@ -42,6 +42,7 @@ const defaultConfig = {
     initiallyIsInReadonlyMode: false,
     hideOpenCsvEditorUiActions: false,
     openTableAndSelectCellAtCursorPos: "initialOnly",
+    pasteMode: 'normal',
 };
 /**
  * returns the configuration for this extension

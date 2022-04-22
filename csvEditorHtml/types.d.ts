@@ -258,6 +258,17 @@ type EditCsvConfig = {
 		* never: open the table at the top left corner
 		*/
 	 openTableAndSelectCellAtCursorPos: "initialOnly" | "never"
+
+	 /**
+		* the paste mode/behavior
+		* note that the normal processing is done by handsontable (sheet.js) and we just join the cells back again
+		*
+		* "normal paste (rows and columns are respected)",
+		* "only keep row separators (ignore column separators) (every row will have 1 column)",
+		* "only keep column separators (ignore row separators) (only 1 row will be pasted)",
+		* "always paste into a single cell (ignoring row and column separators)"
+		*/
+	 pasteMode: "normal" | "onlyKeepRowSeparators" | "onlyKeepColumnSeparators" | "ignoreAllSeparators"
 }
 
 /* --- frontend settings --- */

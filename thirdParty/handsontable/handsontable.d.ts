@@ -785,6 +785,9 @@ declare namespace Handsontable {
       pasteMode: PasteModeType;
       rowsLimit: number;
       focusableElement: FocusableWrapper;
+      pasteSeparatorMode: "normal" | "onlyKeepRowSeparators" | "onlyKeepColumnSeparators" | "ignoreAllSeparators"
+      pasteRowJoinSeparator: string | '\n';
+      pasteColumnJoinSeparator: string| '\t';
 
       setCopyableText(): void;
       getRangedCopyableData(ranges: RangeType[]): string;

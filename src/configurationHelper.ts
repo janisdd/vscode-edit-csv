@@ -42,6 +42,7 @@ const defaultConfig: EditCsvConfig = {
 	initiallyIsInReadonlyMode: false,
 	hideOpenCsvEditorUiActions: false, //noop, has only effect if set inside the user settings
 	openTableAndSelectCellAtCursorPos: "initialOnly",
+	pasteMode: 'normal',
 }
 
 /**

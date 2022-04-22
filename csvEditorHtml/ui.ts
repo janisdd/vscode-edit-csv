@@ -1338,6 +1338,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 	hot.getPlugin('copyPaste').rowsLimit = copyPasteRowLimit
 	hot.getPlugin('copyPaste').columnsLimit = copyPasteColLimit
+	hot.getPlugin('copyPaste').pasteSeparatorMode = initialConfig?.pasteMode || 'normal'
 
 	const oldShouldApplyHeaderReadOption = defaultCsvReadOptions._hasHeader
 	const settingsApplied = checkIfHasHeaderReadOptionIsAvailable(true)
