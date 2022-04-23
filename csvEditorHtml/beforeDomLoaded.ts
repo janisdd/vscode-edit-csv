@@ -7,3 +7,6 @@ document.documentElement.style.setProperty('--extension-side-panel-display', ini
 document.documentElement.style.setProperty('--extension-side-panel-expand-icon-display', initialConfig?.sidePanelAppearance === "collapsed" ? `block` : `none`)
 document.documentElement.style.setProperty('--extension-side-panel-collapse-icon-display', initialConfig?.sidePanelAppearance === "collapsed" ? `none` : `block`)
 
+//--- table style
+document.documentElement.style.setProperty('--extension-table-font-family', initialConfig?.fontFamilyInTable === "sameAsCodeEditor" ? `var(--vscode-editor-font-family)` : `inherit`)
+

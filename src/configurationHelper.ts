@@ -43,6 +43,7 @@ const defaultConfig: EditCsvConfig = {
 	hideOpenCsvEditorUiActions: false, //noop, has only effect if set inside the user settings
 	openTableAndSelectCellAtCursorPos: "initialOnly",
 	pasteMode: 'normal',
+	fontFamilyInTable: 'default',
 }
 
 /**

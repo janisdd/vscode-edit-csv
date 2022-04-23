@@ -43,6 +43,7 @@ const defaultConfig = {
     hideOpenCsvEditorUiActions: false,
     openTableAndSelectCellAtCursorPos: "initialOnly",
     pasteMode: 'normal',
+    fontFamilyInTable: 'default',
 };
 /**
  * returns the configuration for this extension

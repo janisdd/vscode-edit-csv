@@ -54,6 +54,7 @@ var initialConfig: EditCsvConfig | undefined = {
 	hideOpenCsvEditorUiActions: false, //noop, has only effect if set inside the user settings (vs code extension)
 	openTableAndSelectCellAtCursorPos: "never",
 	pasteMode: 'normal',
+	fontFamilyInTable: 'default',
 }
 
 function __getById(id: string): HTMLElement {

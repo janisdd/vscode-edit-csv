@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.6.8",
+	"version": "0.6.9",
 	"license": "MIT",
 	"icon": "images/logo.png",
 	"publisher": "janisdd",
@@ -530,6 +530,19 @@
 						"only keep row separators (ignore column separators) (every row will have 1 column)",
 						"only keep column separators (ignore row separators) (only 1 row will be pasted)",
 						"always paste into a single cell (ignoring row and column separators)"
+					]
+				},
+				"csv-edit.fontFamilyInTable": {
+					"type": "string",
+					"default": "default",
+					"description": "sets the font family usesd in the table",
+					"enum": [
+						"default",
+						"sameAsCodeEditor"
+					],
+					"enumDescriptions": [
+						"use the default font",
+						"use the same font family as the code editor"
 					]
 				}
 			}

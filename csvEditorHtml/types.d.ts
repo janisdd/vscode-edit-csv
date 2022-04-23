@@ -269,6 +269,13 @@ type EditCsvConfig = {
 		* "always paste into a single cell (ignoring row and column separators)"
 		*/
 	 pasteMode: "normal" | "onlyKeepRowSeparators" | "onlyKeepColumnSeparators" | "ignoreAllSeparators"
+
+	 /**
+		* sets the font family usesd in the table
+		* "default": use the default font
+		* "sameAsCodeEditor": use the same font family as the code editor
+		*/
+	 fontFamilyInTable: "default" | "sameAsCodeEditor"
 }
 
 /* --- frontend settings --- */

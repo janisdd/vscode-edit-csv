@@ -6,6 +6,8 @@ html {
 	--extension-side-panel-collapse-icon-display: none;
 
 	--warning-color-all-themes: rgb(193 166 63);
+	/* will be set before dom loaded to: inherit OR var(--vscode-editor-font-family) */
+	--extension-table-font-family: inherit;
 }
 
 html, body {
@@ -30,6 +32,10 @@ html, body {
 .csv-editor-wrapper {
 	overflow: hidden;
 	flex: 1;
+}
+
+#csv-editor-wrapper {
+	font-family: var(--extension-table-font-family);
 }
 
 #csv-editor {
