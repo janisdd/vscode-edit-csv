@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## 0.6.9
+- added option `pasteMode` to control how clipboard content is pasted into the table
+	- it allows to ignore row/column separators (\n, \t) to paste the data into "fewer" cells
+- added setting `fontFamilyInTable` to control which font is used for the table
+- added option `initialOnly_correctRowAlwaysFirstColumn` to setting `openTableAndSelectCellAtCursorPos` to only open the correct row but always column one
+	- this is now the new default
+- in the setting `openTableAndSelectCellAtCursorPos` the option `initalOnly` was renamed to `initialOnly_correctRowAndColumn`
+
 ## 0.6.8
 
 - added option `openTableAndSelectCellAtCursorPos` to open the table and selected the cell where the cursor was (fixed feature request #83)

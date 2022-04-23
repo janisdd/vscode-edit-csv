@@ -1136,6 +1136,7 @@ function formatBigJsNumber(bigJsNumber: typeof b, numbersStyleToUse: NumbersStyl
 }
 
 function calcHotCellToSelectFromCurosPos(
+	openTableAndSelectCellAtCursorPos: InitialVars["openTableAndSelectCellAtCursorPos"],
 	sourceFileCursorLineIndex: number | null,
 	sourceFileCursorColumnIndex: number | null,
 	isCursorPosAfterLastColumn: boolean,
@@ -1143,7 +1144,8 @@ function calcHotCellToSelectFromCurosPos(
 	csvReadOptions: CsvReadOptions
 ): HotCellPos {
 
-	if (sourceFileCursorLineIndex === null
+	if (openTableAndSelectCellAtCursorPos === 'never'
+		|| sourceFileCursorLineIndex === null
 		|| sourceFileCursorColumnIndex === null
 		|| !csvParseResult
 		|| !csvParseResult.outLineIndexToCsvLineIndexMapping
@@ -1230,7 +1232,8 @@ function calcHotCellToSelectFromCurosPos(
 		}
 
 		//col, we only got data for the first row... so get the data for the row we want to select
-		{
+		if (openTableAndSelectCellAtCursorPos === 'initialOnly_correctRowAndColumn') { //initial only is row AND col position
+
 			let fieldEndIndices = csvParseResult.outColumnIndexToCsvColumnIndexMapping[csvRowToSelect]
 
 			//select the last cell, not working normally because our col indices only cover string indices...
@@ -1352,7 +1355,9 @@ function calcHotCellToSelectFromCurosPos(
 		selectCellPos.rowIndex = Math.max(0, Math.min(csvParseResult.data.length - 1, selectCellPos.rowIndex))
 		let dataRow = csvParseResult.data[selectCellPos.rowIndex]
 		selectCellPos.colIndex = Math.max(0, Math.min(dataRow.length - 1, selectCellPos.colIndex))
-	} catch(e) {
+	} catch (e) {
+		selectCellPos.rowIndex = 0
+		selectCellPos.colIndex = 0
 	}
 
 	return selectCellPos

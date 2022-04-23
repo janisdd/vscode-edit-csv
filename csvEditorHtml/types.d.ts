@@ -24,6 +24,12 @@ type InitialVars = {
 	 * true: cursor is after the last column pos (not a real string index)
 	 */
 	isCursorPosAfterLastColumn: boolean
+
+
+	/**
+	 * if the table should be opened at the cursor position and select the corresponding csv cell
+	 */
+	openTableAndSelectCellAtCursorPos: EditCsvConfig['openTableAndSelectCellAtCursorPos']
 }
 
 /**
@@ -183,7 +189,7 @@ type EditCsvConfig = {
 	 * true: borders are set to 0 (in css). This helps if you encounter some border color issues, false: normal borders
 	 */
 	disableBorders: boolean
-	
+
 	/**
 	 * the first X rows are pinned so they will stay in view even if you scroll. This option and readOption_hasHeader are mutually exclusive
 	 */
@@ -251,31 +257,34 @@ type EditCsvConfig = {
 	 * 
 	 * NOTE this can be set via other extension BUT has no effect (!) as the setting is used stored in the users config by vs code
 	 */
-	 hideOpenCsvEditorUiActions: boolean
+	hideOpenCsvEditorUiActions: boolean
 
-	 /**
-		* initialOnly: only opens the table at the cursor position (cell) the first time the table is opened
-		* never: open the table at the top left corner
-		*/
-	 openTableAndSelectCellAtCursorPos: "initialOnly" | "never"
+	/**
+	 * if the table should be opened at the cursor position and select the corresponding csv cell
+	 *
+	 * initialOnly_correctRowAlwaysFirstColumn: (initial only) select the correct row at the cursor position but always select the first column
+	 * initialOnly_correctRowAndColumn: only opens the table at the cursor position (cell) the first time the table is opened
+	 * never: open the table at the top left corner
+	 */
+	openTableAndSelectCellAtCursorPos: "initialOnly_correctRowAlwaysFirstColumn" | "initialOnly_correctRowAndColumn" | "never"
 
-	 /**
-		* the paste mode/behavior
-		* note that the normal processing is done by handsontable (sheet.js) and we just join the cells back again
-		*
-		* "normal paste (rows and columns are respected)",
-		* "only keep row separators (ignore column separators) (every row will have 1 column)",
-		* "only keep column separators (ignore row separators) (only 1 row will be pasted)",
-		* "always paste into a single cell (ignoring row and column separators)"
-		*/
-	 pasteMode: "normal" | "onlyKeepRowSeparators" | "onlyKeepColumnSeparators" | "ignoreAllSeparators"
+	/**
+	 * the paste mode/behavior
+	 * note that the normal processing is done by handsontable (sheet.js) and we just join the cells back again
+	 *
+	 * normal: normal paste (rows and columns are respected),
+	 * onlyKeepRowSeparators: only keep row separators (ignore column separators) (every row will have 1 column),
+	 * onlyKeepColumnSeparators: only keep column separators (ignore row separators) (only 1 row will be pasted),
+	 * ignoreAllSeparators: always paste into a single cell (ignoring row and column separator)"
+	 */
+	pasteMode: "normal" | "onlyKeepRowSeparators" | "onlyKeepColumnSeparators" | "ignoreAllSeparators"
 
-	 /**
-		* sets the font family usesd in the table
-		* "default": use the default font
-		* "sameAsCodeEditor": use the same font family as the code editor
-		*/
-	 fontFamilyInTable: "default" | "sameAsCodeEditor"
+	/**
+	 * sets the font family usesd in the table
+	 * default: use the default font
+	 * sameAsCodeEditor: use the same font family as the code editor
+	 */
+	fontFamilyInTable: "default" | "sameAsCodeEditor"
 }
 
 /* --- frontend settings --- */
@@ -488,7 +497,7 @@ type StringSlice = {
 	totalSlices: number
 }
 
-/*+
+/*
  * see https://handsontable.com/docs/6.2.2/demo-searching.html
  */
 type HandsontableSearchResult = {
@@ -501,8 +510,8 @@ type HandsontableSearchResult = {
 	 * the physical row index (needed because the visual index depends on sorting (and maybe virtual rendering?))
 	 */
 	rowReal: number
-		/**
-	 * the visual index
+	/**
+ 	 * the visual index
 	 */
 	col: number
 
@@ -526,10 +535,10 @@ type HeaderRowWithIndex = {
 	 * these are visual indices as we use this for rendering...
 	 */
 	row: Array<string | null>
-/**
- * the physical row index of the header row
- * this is needed if we want to insert the header row back into the table (or remove)
- */
+	/**
+	 * the physical row index of the header row
+	 * this is needed if we want to insert the header row back into the table (or remove)
+	 */
 	physicalIndex: number
 }
 

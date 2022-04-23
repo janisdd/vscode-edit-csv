@@ -6,6 +6,7 @@ const defaultInitialVars: InitialVars = {
 	sourceFileCursorLineIndex: null,
 	sourceFileCursorColumnIndex: null,
 	isCursorPosAfterLastColumn: false,
+	openTableAndSelectCellAtCursorPos: 'initialOnly_correctRowAlwaysFirstColumn',
 }
 
 declare var acquireVsCodeApi: any

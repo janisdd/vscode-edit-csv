@@ -605,9 +605,10 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	panel.webview.html = createEditorHtml(panel.webview, context, config, {
 		isWatchingSourceFile: instance.supportsAutoReload,
-		sourceFileCursorLineIndex: config.openTableAndSelectCellAtCursorPos === 'initialOnly' ? activeTextEditor.selection.active.line : null,
-		sourceFileCursorColumnIndex: config.openTableAndSelectCellAtCursorPos === 'initialOnly' ? activeCol : null,
-		isCursorPosAfterLastColumn: activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeTextEditor.selection.active.character
+		sourceFileCursorLineIndex: activeTextEditor.selection.active.line,
+		sourceFileCursorColumnIndex:  activeCol,
+		isCursorPosAfterLastColumn: activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeTextEditor.selection.active.character,
+		openTableAndSelectCellAtCursorPos: config.openTableAndSelectCellAtCursorPos,
 	})
 
 }

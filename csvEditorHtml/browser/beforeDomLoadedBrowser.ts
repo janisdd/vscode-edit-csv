@@ -13,6 +13,7 @@ var initialVars: InitialVars = {
 	sourceFileCursorLineIndex: null,
 	sourceFileCursorColumnIndex: null,
 	isCursorPosAfterLastColumn: false,
+	openTableAndSelectCellAtCursorPos: 'initialOnly_correctRowAlwaysFirstColumn',
 }
 
 var initialConfig: EditCsvConfig | undefined = {

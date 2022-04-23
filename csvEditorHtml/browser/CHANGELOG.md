@@ -4,6 +4,16 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.2.8
+
+- (same as vs code extension v0.6.9)
+- added option `pasteMode` to control how clipboard content is pasted into the table
+	- it allows to ignore row/column separators (\n, \t) to paste the data into "fewer" cells
+- added setting `fontFamilyInTable` to control which font is used for the table
+- added option `initialOnly_correctRowAlwaysFirstColumn` to setting `openTableAndSelectCellAtCursorPos` to only open the correct row but always column one
+	- this is now the new default
+- in the setting `openTableAndSelectCellAtCursorPos` the option `initalOnly` was renamed to `initialOnly_correctRowAndColumn`
+
 ## 1.2.7
 
 - (same as vs code extension v0.6.8)

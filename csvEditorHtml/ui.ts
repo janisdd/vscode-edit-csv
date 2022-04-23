@@ -1386,6 +1386,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 			if (csvParseResult) {
 				cellToSelect = calcHotCellToSelectFromCurosPos(
+					initialVars.openTableAndSelectCellAtCursorPos,
 					initialVars.sourceFileCursorLineIndex,
 					initialVars.sourceFileCursorColumnIndex,
 					initialVars.isCursorPosAfterLastColumn,

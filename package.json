@@ -504,13 +504,15 @@
 				},
 				"csv-edit.openTableAndSelectCellAtCursorPos": {
 					"type": "string",
-					"default": "initialOnly",
+					"default": "initialOnly_correctRowAlwaysFirstColumn",
 					"description": "if the table should be opened at the cursor position and select the corresponding csv cell",
 					"enum": [
-						"initialOnly",
+						"initialOnly_correctRowAlwaysFirstColumn",
+						"initialOnly_correctRowAndColumn",
 						"never"
 					],
 					"enumDescriptions": [
+						"(initial only) select the correct row at the cursor position but always select the first column",
 						"only opens the table at the cursor position (cell) the first time the table is opened",
 						"never open the table at the cursor position, open the table at the top left corner"
 					]

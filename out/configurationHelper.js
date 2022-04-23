@@ -41,7 +41,7 @@ const defaultConfig = {
     insertColBehavior: 'keepRowKeepColumn',
     initiallyIsInReadonlyMode: false,
     hideOpenCsvEditorUiActions: false,
-    openTableAndSelectCellAtCursorPos: "initialOnly",
+    openTableAndSelectCellAtCursorPos: "initialOnly_correctRowAlwaysFirstColumn",
     pasteMode: 'normal',
     fontFamilyInTable: 'default',
 };
