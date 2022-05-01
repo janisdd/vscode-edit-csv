@@ -252,7 +252,7 @@
 						"createRow"
 					],
 					"enumDescriptions": [
-						"default of handsontable",
+						"default of handsontable (or lastRowOrFirstRowNavigationBehavior)",
 						"create a new row"
 					]
 				},
@@ -265,8 +265,34 @@
 						"createColumn"
 					],
 					"enumDescriptions": [
-						"default of handsontable",
+						"default of handsontable (or lastColumnOrFirstColumnNavigationBehavior)",
 						"create a new column"
+					]
+				},
+				"csv-edit.lastRowOrFirstRowNavigationBehavior": {
+					"type": "string",
+					"default": "wrap",
+					"description": "if a cell in the last row (or first) is selected and one presses arrow down or (enter in cell editor), what should happen?",
+					"enum": [
+						"wrap",
+						"stop"
+					],
+					"enumDescriptions": [
+						"the next cell in the first row (or last) should be selected (wrap)",
+						"the selection should stay the same (stop)"
+					]
+				},
+				"csv-edit.lastColumnOrFirstColumnNavigationBehavior": {
+					"type": "string",
+					"default": "wrap",
+					"description": "if a cell in the last column (or first) is selected and one presses arrow right or tab, what should happen?",
+					"enum": [
+						"wrap",
+						"stop"
+					],
+					"enumDescriptions": [
+						"the first cell in the next row should be selected (wrap)",
+						"the selection should stay the same (stop)"
 					]
 				},
 				"csv-edit.optionsBarAppearance": {

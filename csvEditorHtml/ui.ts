@@ -533,6 +533,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		currentRowClassName: 'foo', //actually used to overwrite highlighting
 		//plugins
 		comments: false,
+		autoWrapRow: initialConfig?.lastColumnOrFirstColumnNavigationBehavior === 'stop' ? false : true, //seems wrong, but this way around is correct...
+		autoWrapCol: initialConfig?.lastRowOrFirstRowNavigationBehavior === 'stop' ? false : true, //seems wrong, but this way around is correct...
 		search: {
 			queryMethod: customSearchMethod,
 			searchResultClass: 'search-result-cell',

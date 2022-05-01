@@ -67,6 +67,21 @@ type EditCsvConfig = {
 	lastColumnTabBehavior: 'default' | 'createColumn'
 
 	/**
+	 * if a cell in the last row (or first) is selected and one presses arrow down or (enter in cell editor), what should happen?
+	 * 
+	 * wrap: the next cell in the first row (or last) should be selected (wrap)
+	 * stop: the selection should stay the same (stop)
+	 */
+	lastRowOrFirstRowNavigationBehavior: 'wrap' | 'stop'
+
+	/**
+	 * if a cell in the last column (or first) is selected and one presses arrow right or tab, what should happen?
+	 * wrap: the first cell in the next row should be selected (wrap)
+	 * stop: the selection should stay the same (stop)
+	 */
+	lastColumnOrFirstColumnNavigationBehavior: 'wrap' | 'stop'
+
+	/**
 	 * the appearance of the (top) option bar
 	 * expanded: option bar will always start expanded
 	 * collapsed: option bar will always start collapsed

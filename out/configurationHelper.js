@@ -8,6 +8,8 @@ const defaultConfig = {
     highlightCsvComments: true,
     lastRowEnterBehavior: 'default',
     lastColumnTabBehavior: 'default',
+    lastRowOrFirstRowNavigationBehavior: 'wrap',
+    lastColumnOrFirstColumnNavigationBehavior: 'wrap',
     optionsBarAppearance: "collapsed",
     readOption_comment: "#",
     readOption_quoteChar: '"',

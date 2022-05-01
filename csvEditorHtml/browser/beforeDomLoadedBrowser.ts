@@ -20,6 +20,8 @@ var initialConfig: EditCsvConfig | undefined = {
 	highlightCsvComments: true,
 	lastRowEnterBehavior: 'default',
 	lastColumnTabBehavior: 'createColumn',
+	lastRowOrFirstRowNavigationBehavior: 'wrap',
+	lastColumnOrFirstColumnNavigationBehavior: 'wrap',
 	optionsBarAppearance: "collapsed",
 	readOption_comment: "#",
 	readOption_quoteChar: '"',
