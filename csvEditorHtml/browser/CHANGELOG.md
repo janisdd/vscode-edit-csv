@@ -4,6 +4,10 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.2.9
+- (same as vs code extension v0.6.10
+- fixed issue 93 - regex search ignored match-case option)
+
 ## 1.2.8
 
 - (same as vs code extension v0.6.9)

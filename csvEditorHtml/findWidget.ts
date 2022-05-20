@@ -665,17 +665,20 @@ class FindWidget {
 		}
 
 		try {
+
 			//global flag is not needed here because we only want the first match
-			this.findWidgetCurrRegex = new RegExp(this.findWidgetInput.value, '')
+			//it is enough to check this.findOptionMatchCaseCache here and don't refresh regex if this.findOptionMatchCaseCache changes
+			//  because we refresh the regex anyway when we start a search
+			this.findWidgetCurrRegex = new RegExp(this.findWidgetInput.value, this.findOptionMatchCaseCache ? '' : 'i')
 			this.findWWidgetErrorMessage.innerText = ''
 			this.findWidgetInput.classList.remove('error-input')
 
 			return true
 
-		} catch (error) {
-			console.log(`error:`, error.message)
+		} catch (error: any) {
+			console.log(`error:`, error?.message)
 			this.findWidgetCurrRegex = null
-			this.findWWidgetErrorMessage.innerText = error.message
+			this.findWWidgetErrorMessage.innerText = error?.message
 			this.findWidgetInput.classList.add('error-input')
 
 			return false

@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## 0.6.10
+- fixed issue 93 - regex search ignored match-case option
+
 ## 0.6.9
 - added option `pasteMode` to control how clipboard content is pasted into the table
 	- it allows to ignore row/column separators (\n, \t) to paste the data into "fewer" cells
