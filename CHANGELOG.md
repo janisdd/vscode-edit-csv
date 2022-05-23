@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 ## 0.6.10
-- fixed issue 93 - regex search ignored match-case option
+- fixed issue #93 - regex search ignored match-case option
 
 ## 0.6.9
 - added option `pasteMode` to control how clipboard content is pasted into the table
@@ -34,28 +34,28 @@
 
 ## 0.6.6
 
-- fixed issue 80: cell editor is not commited after pressing `ctrl/cmd+s`, so changes are not applied to file
+- fixed issue #80: cell editor is not commited after pressing `ctrl/cmd+s`, so changes are not applied to file
 
 ## 0.6.5
 
-- fixed issue 77: Newlines inserted into pasted data (clipboard)
+- fixed issue #77: Newlines inserted into pasted data (clipboard)
 	- fixed via new internal handsontable version
 
 ## 0.6.4
 
-- fixed issue 72: copy limited to 1000 cells
+- fixed issue #72: copy limited to 1000 cells
 	- changed the limit to 10000000
 
 ## 0.6.3
 
-- fixed issue 70: Removing columns doesn't remove header
+- fixed issue #70: Removing columns doesn't remove header
 	- undo/redo does not work with column headers
 
 ## 0.6.2
 
-- fixed issue 63: column header cells can now be edited
-- fixed issue 66: added readonly mode
-- fixed issue 64: some non-text keys (e.g. volume controls) not longer clear cell values
+- fixed issue #63: column header cells can now be edited
+- fixed issue #66: added readonly mode
+- fixed issue #64: some non-text keys (e.g. volume controls) not longer clear cell values
 	- also compound characters also not clear cell values
 
 ## 0.6.1
