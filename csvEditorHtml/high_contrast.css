@@ -2,10 +2,6 @@ body.vscode-high-contrast {
 	color: white;
 }
 
-.vscode-high-contrast input.input,
-.vscode-high-contrast .textarea {
-	color: black;
-}
 
 .vscode-high-contrast .button.is-light {
 	color: black;

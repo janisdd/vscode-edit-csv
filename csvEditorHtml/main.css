@@ -173,6 +173,7 @@ input.input {
 	resize: vertical;
 	min-width: 200px;
 	height: 100%;
+	--type-ramp-base-font-size: 14px;
 }
 
 body .modal {
@@ -1063,6 +1064,23 @@ vscode-button span {
 	font-size: 14px;
 }
 
+/* ca vs code webview toolkit */
+
+input.vscode-text-field {
+	height: calc(var(--input-height) * 1px);
+	color: var(--input-foreground);
+	background: var(--input-background);
+	border-radius: calc(var(--corner-radius) * 1px);
+	border: calc(var(--border-width) * 1px) solid var(--dropdown-border);
+	padding: 0 calc(var(--design-unit) * 2px + 1px);
+	outline: none;
+	margin-top: 3px;
+	font-size: 14px;
+}
+
+input.vscode-text-field:focus {
+	border-color: var(--focus-border);
+}
 
 /* from bulma */
 html {

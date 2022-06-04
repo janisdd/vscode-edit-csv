@@ -290,8 +290,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 																<i class="fas fa-question-circle"></i>
 															</span>
 														</label>
-														<vscode-text-field id="delimiter-string" class="input" type="text" placeholder="auto" oninput="setDelimiterString()">
-														</vscode-text-field>
+														<!--<vscode-text-field id="delimiter-string" class="input" type="text" placeholder="auto" oninput="setDelimiterString()" />-->
+														<input id="delimiter-string" class="input vscode-text-field" type="text" placeholder="auto" oninput="setDelimiterString()" />
 													</div>
 						
 													<div class="field mar-left-half">
@@ -302,8 +302,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 																<i class="fas fa-question-circle"></i>
 															</span>
 														</label>
-														<vscode-text-field id="comment-string" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentString()">
-														</vscode-text-field>
+														<!--<vscode-text-field id="comment-string" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentString()" />-->
+														<input id="comment-string" class="input vscode-text-field" type="text" placeholder="Empty for no comments" oninput="setCommentString()" />
 													</div>
 												</div>
 						
@@ -313,8 +313,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 														<label>
 															<span>QuoteChar</span>
 														</label>
-														<vscode-text-field id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()">
-														</vscode-text-field>
+														<!--<vscode-text-field id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()" onchange="setQuoteCharString()" /> -->
+														<input id="quote-char-string" class="input vscode-text-field" type="text" oninput="setQuoteCharString()" />
 													</div>
 						
 													<div class="field mar-left-half">
@@ -326,22 +326,23 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 																<i class="fas fa-question-circle"></i>
 															</span>
 														</label>
-														<vscode-text-field id="escape-char-string" placeholder="Placeholder Text" class="input" type="text" oninput="setEscapeCharString()">
-														</vscode-text-field>
+														<!--<vscode-text-field id="escape-char-string" placeholder="Placeholder Text" class="input" type="text" oninput="setEscapeCharString()"/>-->
+														<input id="escape-char-string" placeholder="Placeholder Text" class="input vscode-text-field" type="text" oninput="setEscapeCharString()" />
 													</div>
 												</div>
-						
-						
-												<vscode-button appearance="secondary" class="" style="height: 36px" onclick="toggleAskReadAgainModal(true)">
-													<span style="width: 14rem">Reset data and apply read options</span>
 
-													<span slot="end" class="icon is-small">
-														<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
-															data-tooltip="The input file content was stored locally and is used as data. Thus this view is independent of the source file">
-															<i class="fas fa-question-circle"></i>
+												<div>
+													<vscode-button appearance="secondary" class="" style="height: 36px; margin-top: 1rem;" onclick="toggleAskReadAgainModal(true)">
+														<span style="width: 14rem">Reset data and apply read options</span>
+
+														<span slot="end" class="icon is-small">
+															<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
+																data-tooltip="The input file content was stored locally and is used as data. Thus this view is independent of the source file">
+																<i class="fas fa-question-circle"></i>
+															</span>
 														</span>
-													</span>
-												</vscode-button>
+													</vscode-button>
+												</div>
 						
 											</div>
 									</div>
@@ -371,8 +372,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 															</span>
 														</label>
 													</label>
-													<vscode-text-field id="delimiter-string-write" class="input" type="text" placeholder="auto" oninput="setDelimiterStringWrite()">
-													</vscode-text-field>
+													<!--<vscode-text-field id="delimiter-string-write" class="input" type="text" placeholder="auto" oninput="setDelimiterStringWrite()" />-->
+													<input id="delimiter-string-write" class="input vscode-text-field"" type="text" placeholder="auto" oninput="setDelimiterStringWrite()" />
 												</div>
 						
 												<div class="field mar-left-half">
@@ -385,8 +386,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 															</span>
 														</label>
 													</label>
-													<vscode-text-field id="comment-string-write" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()">
-													</vscode-text-field>
+													<!--<vscode-text-field id="comment-string-write" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()" />-->
+													<input id="comment-string-write" class="input vscode-text-field"" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()" />
 												</div>
 											</div>
 						
@@ -396,8 +397,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 													<label>
 														<span>QuoteChar</span>
 													</label>
-													<vscode-text-field id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()">
-													</vscode-text-field>
+													<!--<vscode-text-field id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()" />-->
+													<input id="quote-char-string-write" class="input vscode-text-field" type="text" oninput="setQuoteCharStringWrite()" />
 												</div>
 						
 												<div class="field mar-left-half">
@@ -408,8 +409,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 															<i class="fas fa-question-circle"></i>
 														</span>
 													</label>
-													<vscode-text-field id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()">
-													</vscode-text-field>
+													<!--<vscode-text-field id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()" />-->
+													<input id="escape-char-string-write" class="input vscode-text-field" type="text" oninput="setEscapeCharStringWrite()" />
 												</div>
 											</div>
 						
@@ -439,7 +440,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 							</td>
 							<td>
 								<div id="preview-content" class="options-content">
-										<vscode-text-area resize="vertical" id="csv-preview" style="display: block;" class="preview-csv-textarea" rows="12"></vscode-text-area>
+										<vscode-text-area resize="vertical" id="csv-preview" style="display: block;" class="preview-csv-textarea" rows="11"></vscode-text-area>
 									</div>
 							</td>
 						</tr>

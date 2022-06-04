@@ -3,13 +3,6 @@ body.vscode-dark {
 	color: #d0d0d0;
 }
 
-.vscode-dark input.input,
-.vscode-dark .textarea {
-	background-color: #504f4f;
-	color: #d0d0d0;
-	border-color: #8e8e8e;
-}
-
 .vscode-dark input.input::placeholder {
 	color: #7d7d7d;
 }
