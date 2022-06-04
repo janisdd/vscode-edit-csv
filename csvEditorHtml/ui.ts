@@ -1580,6 +1580,7 @@ function defaultColHeaderFunc(useLettersAsColumnNames: boolean, colIndex: number
  * @param isVisible 
  */
 function toggleHelpModal(isVisible: boolean) {
+	console.log(`toggleHelpModal`, isVisible)
 
 	if (isVisible) {
 		helModalDiv.classList.add('is-active')
@@ -1809,12 +1810,12 @@ function showOrHideAllComments(show: boolean) {
 
 	if (show) {
 		showCommentsBtn.style.display = 'none'
-		hideCommentsBtn.style.display = 'initial'
+		hideCommentsBtn.style.display = ''
 
 		hiddenPhysicalRowIndices = []
 	}
 	else {
-		showCommentsBtn.style.display = 'initial'
+		showCommentsBtn.style.display = ''
 		hideCommentsBtn.style.display = 'none'
 
 		if (hot) {

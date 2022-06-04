@@ -232,9 +232,8 @@ body.vscode-dark {
 }
 
 .vscode-dark .all-options table {
-	border: 1px solid #8e8e8e;
+	border: 1px solid #5e5e5e;
 	border-collapse: initial;
-	border-radius: 10px;
 }
 
 .vscode-dark a {
@@ -244,4 +243,8 @@ body.vscode-dark {
 .vscode-dark .handsontable .htDimmed {
 	/*color: #b7b7b7*/ /*harder to read*/
 	color: inherit;
+}
+
+.vscode-dark .row-col-insert-btns {
+	border-left: 1px solid #5e5e5e;
 }

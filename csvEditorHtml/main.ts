@@ -259,6 +259,8 @@ const statSumOfNumbers = _getById(`stat-sum-of-numbers`) as HTMLDivElement
 const numbersStyleEnRadio = _getById(`numbers-style-en`) as HTMLInputElement //radio
 const numbersStyleNonEnRadio = _getById(`numbers-style-non-en`) as HTMLInputElement //radio
 
+console.log(numbersStyleEnRadio)
+
 const isReadonlyModeToggleSpan = _getById(`is-readonly-mode-toggle`) as HTMLSpanElement
 
 //--- find widget controls

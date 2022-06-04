@@ -120,7 +120,7 @@ body.vscode-light {
 }
 
 .vscode-light .all-options table {
-	border: 1px solid #8e8e8e;
+	border: 1px solid #5e5e5e;
 	border-collapse: initial;
 	border-radius: 10px;
 }
@@ -132,4 +132,8 @@ body.vscode-light {
 .vscode-light .handsontable .htDimmed {
 	/*color: #8c8c8c*/ /*harder to read*/
 	color: inherit;
+}
+
+.vscode-light .row-col-insert-btns {
+	border-left: 1px solid #5e5e5e;
 }

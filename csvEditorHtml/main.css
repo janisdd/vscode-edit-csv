@@ -8,6 +8,7 @@ html {
 	--warning-color-all-themes: rgb(193 166 63);
 	/* will be set before dom loaded to: inherit OR var(--vscode-editor-font-family) */
 	--extension-table-font-family: inherit;
+	--type-ramp-base-font-size: 14px;
 }
 
 html, body {
@@ -198,13 +199,12 @@ body .modal {
 	display: flex;
 	flex-direction: column;
 	margin-right: 10px;
+	width: 33px;
 }
-.row-col-insert-btns button {
+.row-col-insert-btns vscode-button {
 	padding: 1px;
 	height: auto;
 	margin: 0;
-	padding: 0 4px;
-	width: 20px;
 	height: 18px;
 }
 
@@ -395,7 +395,7 @@ tr.hidden-row-previous-row > th:after {
 
 .find-widget .btn.option {
 	font-size: 13px;
-	min-width: 15px;
+	min-width: 23px;
 	margin: 5px 2px;
 }
 
@@ -415,19 +415,26 @@ tr.hidden-row-previous-row > th:after {
 	margin: 5px;
 	align-self: center;
 	align-items: center;
+	white-space: nowrap;
 }
 
 .find-widget .search-input-wrapper {
+	display: inline-flex;
+	flex-direction: column;
 	position: relative;
 	margin: 5px;
 	flex: 1;
 }
 .find-widget .search-input-wrapper .input {
 	height: 23px;
-	width: 100%;
-	padding: 4px;
+	width: auto;
+	padding: 0 4px;
 	border-radius: 0;
 	border: 1px solid transparent;
+}
+.find-widget .search-input-wrapper .input:focus {
+	border-color: var(--focus-border);
+	outline: none;
 }
 
 .find-widget .search-input-wrapper .input:disabled {
@@ -521,13 +528,27 @@ div.field.same-line label {
 	white-space: nowrap;
 }
 
-.options-title i {
-	vertical-align: text-bottom
+.options-title vscode-button {
+	vertical-align: middle;
+	height: 28px;
+}
+
+.options-title vscode-button span {
+	width: 20px;
+	margin: 0 3px;
+}
+.options-title vscode-button i {
+	font-size: 1.3rem;
+}
+
+.options-title vscode-button#force-column-resize-icon {
+
 }
 
 /* e.g. fixed rows */
 .options-title .changeable-indicator {
 	vertical-align: middle;
+	align-items: center;
 	display: inline-flex;
 	font-size: calc(var(--vscode-editor-font-size) + 2px);
 }
@@ -540,7 +561,6 @@ div.field.same-line label {
 	display: inline-flex;
 	flex-direction: column;
 	vertical-align: top;
-	margin-top: -3px;
 }
 
 .options-title .toggle-btn {
@@ -586,7 +606,7 @@ div.field.same-line label {
 }
 
 .all-options tbody td:not(:last-child) .options-content {
-	padding: 0.5em 2.5em 0.5em 0.5em;
+	padding: 0.5em 2em 0.5em 0.5em;
 }
 
 .options-content {
@@ -599,6 +619,12 @@ div.field.same-line label {
 #preview-content {
 	display: var(--extension-options-bar-display);
 }
+
+#read-options-content > .field,
+#write-options-content > .field {
+	margin-top: 0;
+}
+
 
 /* END options bar*/
 
@@ -1025,4 +1051,160 @@ textarea.handsontableInput {
 .tooltip.is-tooltip-danger::before {
 	background: rgba(255,56,96,.9);
 	color: #fff
+}
+
+vscode-checkbox,
+vscode-button,
+vscode-radio {
+	font-size: 14px;
+}
+
+vscode-button span {
+	font-size: 14px;
+}
+
+
+/* from bulma */
+html {
+	font-size: 16px;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	text-rendering: optimizeLegibility;
+	-webkit-text-size-adjust: 100%;
+	-moz-text-size-adjust: 100%;
+	-ms-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+	box-sizing: border-box;
+}
+body {
+	line-height: 1.5
+}
+span {
+	font-style: inherit;
+	font-weight: inherit
+}
+*,::after,::before {
+	box-sizing: inherit;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+table td,table th {
+	text-align: left;
+	vertical-align: top
+}
+.file-cta,.file-name,.input,.pagination-ellipsis,.pagination-link,.pagination-next,.pagination-previous,.select select,.textarea {
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	align-items: center;
+	display: inline-flex;
+	font-size: 1rem;
+	height: 2.25em;
+	justify-content: flex-start;
+	line-height: 1.5;
+	padding-bottom: calc(.375em - 1px);
+	padding-right: 0.5rem;
+	position: relative;
+	vertical-align: top;
+	min-width: 110px;
+}
+body,button,input,select,textarea {
+	font-family: BlinkMacSystemFont,-apple-system,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.field {
+	margin-top: 0.5rem;
+}
+
+.modal {
+	align-items: center;
+	display: none;
+	flex-direction: column;
+	justify-content: center;
+	overflow: hidden;
+	position: fixed;
+	z-index: 40
+}
+
+.modal.is-active {
+	display:flex;
+}
+
+.modal-background {
+	background-color: rgba(10,10,10,.86)
+}
+
+.is-overlay,.modal,.modal-background {
+	bottom: 0;
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0
+}
+
+.modal-card,.modal-content {
+	margin: 0 20px;
+	max-height: calc(100vh - 160px);
+	overflow: auto;
+	position: relative;
+	width: 100%
+}
+
+@media screen and (min-width: 769px),print {
+	.modal-card,.modal-content {
+			margin:0 auto;
+			max-height: calc(100vh - 40px);
+			width: 640px
+	}
+}
+
+.modal-close {
+	background: 0 0;
+	height: 40px;
+	position: fixed;
+	right: 20px;
+	top: 20px;
+	width: 40px
+}
+
+.box {
+	background-color: #fff;
+	border-radius: 6px;
+	box-shadow: 0 2px 3px rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.1);
+	color: #4a4a4a;
+	display: block;
+	padding: 1.25rem
+}
+
+.title {
+	color: #363636;
+	font-size: 2rem;
+	font-weight: 600;
+	line-height: 1.125
+}
+
+.title.is-3 {
+	font-size: 2rem
+}
+
+h1,h2,h3,h4,h5 {
+	margin: 0;
+	padding: 0
+}
+
+
+.modal-content .block:not(:last-child),.box:not(:last-child),.breadcrumb:not(:last-child),.content:not(:last-child),.highlight:not(:last-child),.level:not(:last-child),.list:not(:last-child),.message:not(:last-child),.notification:not(:last-child),.progress:not(:last-child),.subtitle:not(:last-child),.table-container:not(:last-child),.table:not(:last-child),.tabs:not(:last-child),.title:not(:last-child) {
+	margin-bottom: 1.5rem
+}
+
+.modal .modal-close.is-large {
+	height: 40px;
+	width: 40px;
+	font-size: 2rem;
+	color: white;
+	border: none;
 }

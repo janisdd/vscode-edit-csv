@@ -209,3 +209,7 @@ body.vscode-high-contrast {
 	cursor: pointer; /*as color does not really work maybe this helps?*/
 	color: inherit;
 }
+
+.vscode-light .row-col-insert-btns {
+	border-left: 1px solid white;
+}

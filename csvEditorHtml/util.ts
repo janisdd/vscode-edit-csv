@@ -684,7 +684,7 @@ function setupAndApplyInitialConfigPart1(initialConfig: EditCsvConfig | undefine
 		toggleOptionsBar(true)
 
 		showCommentsBtn.style.display = 'none'
-		hideCommentsBtn.style.display = 'initial'
+		hideCommentsBtn.style.display = ''
 
 		return
 	}
@@ -767,12 +767,12 @@ function setupAndApplyInitialConfigPart1(initialConfig: EditCsvConfig | undefine
 	}
 
 	if (initialConfig.initiallyHideComments) {
-		showCommentsBtn.style.display = 'initial'
+		showCommentsBtn.style.display = ''
 		hideCommentsBtn.style.display = 'none'
 	}
 	else {
 		showCommentsBtn.style.display = 'none'
-		hideCommentsBtn.style.display = 'initial'
+		hideCommentsBtn.style.display = ''
 	}
 
 	//--- other options
@@ -1072,15 +1072,19 @@ function setNumbersStyleUi(numbersStyleToUse: EditCsvConfig["initialNumbersStyle
 
 	numbersStyleEnRadio.checked = false
 	numbersStyleNonEnRadio.checked = false
+	numbersStyleEnRadio.removeAttribute('checked')
+	numbersStyleEnRadio.removeAttribute('checked')
 
 	switch (numbersStyleToUse) {
 		case 'en': {
 			numbersStyleEnRadio.checked = true
+			numbersStyleEnRadio.setAttribute('checked', 'true')
 			break
 		}
 
 		case 'non-en': {
 			numbersStyleNonEnRadio.checked = true
+			numbersStyleNonEnRadio.setAttribute('checked', 'true')
 			break
 		}
 

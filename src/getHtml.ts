@@ -56,6 +56,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 	const beforeDomLoadedJs = _getResourcePath('csvEditorHtml/out/beforeDomLoaded.js')
 
+	const toolkit = _getResourcePath('node_modules/@vscode/webview-ui-toolkit/dist/toolkit.js');
+
 	//use blocks so vs code adds folding
 
 	let findWidgetHtml = ``
@@ -163,38 +165,45 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 								<div class="options-title">
 										<span class="clickable" onclick="toggleOptionsBar()">Preview</span>
 
-										<span class="mar-left-half clickable" onclick="generateCsvPreview()"
-											title="Refresh the preview">
+										<vscode-button appearance="icon" class="mar-left-half clickable" onclick="generateCsvPreview()" title="Refresh the preview">
+										<span>
 											<i class="fas fa-redo-alt"></i>
 										</span>
+										</vscode-button>
 				
 										<!-- no css tooltip because we want a delay-->
-										<span class="mar-left-half clickable" onclick="copyPreviewToClipboard()"
-											title="Creates the preview and copies it to the clipboard">
-											<i id="preview-copy-icon" class="fas fa-paste"></i>
-										</span>
+										<vscode-button appearance="icon" id="preview-copy-icon" class="mar-left-half clickable" onclick="copyPreviewToClipboard()" title="Creates the preview and copies it to the clipboard">
+											<span>
+												<i class="fas fa-paste"></i>
+											</span>
+										</vscode-button>
 				
-										<span class="mar-left-half clickable" onclick="reRenderTable()" style="margin-left: 2em;"
-											title="Redraws the table. This can fix some measuring issues (e.g. after the font size changed)">
-											<i id="re-render-table-icon" class="fas fa-ruler-combined"></i>
-										</span>
+										<vscode-button appearance="icon" id="re-render-table-icon" class="mar-left-half clickable" onclick="reRenderTable()" style="margin-left: 2em;" title="Redraws the table. This can fix some measuring issues (e.g. after the font size changed)">
+											<span>
+												<i class="fas fa-ruler-combined"></i>
+											</span>
+										</vscode-button>
 
-										<span class="mar-left-half clickable" onclick="forceResizeColumns()" style="margin-left: 0.5em;"
-											title="Resizes all column widths to match their content">
-											<i id="force-column-resize-icon" class="fas fa-arrows-alt-h"></i>
-										</span>
+										<vscode-button appearance="icon" id="force-column-resize-icon" class="mar-left-half clickable" onclick="forceResizeColumns()" style="margin-left: 0.5em;" title="Resizes all column widths to match their content">
+											<span>
+												<i class="fas fa-arrows-alt-h"></i>
+											</span>
+										</vscode-button>
 
-										<span id="reload-file" class="clickable" onclick="preReloadFileFromDisk()" style="margin-left: 2em;"
-											title="Reload the csv file content (from disk)">
-											<i class="fas fa-sync-alt"></i>
-										</span>
+										<vscode-button appearance="icon" id="reload-file" class="clickable" onclick="preReloadFileFromDisk()" style="margin-left: 2em;" title="Reload the csv file content (from disk)">
+											<span>
+												<i class="fas fa-sync-alt"></i>
+											</span>
+										</vscode-button>
 
 										<!-- fixed rows top -->
 										<div class="flexed changeable-indicator" style="margin-left: 2em;">
 											<div>
-												<span id="fixed-rows-icon" class="clickable" title="Set fixed rows top" onclick="_toggleFixedRowsText()">
-													<i class="rotated-90deg fas fa-align-left"></i>
-												</span>
+												<vscode-button appearance="icon" id="fixed-rows-icon" class="clickable" title="Set fixed rows top" onclick="_toggleFixedRowsText()">
+													<span>
+														<i class="rotated-90deg fas fa-align-left"></i>
+													</span>
+												</vscode-button>
 												<span id="fixed-rows-text" style="margin-left: 0.5rem;" class="dis-hidden">fixed rows:</span>
 											</div>
 											<div id="fixed-rows-top-info" class="text" style="margin-left: 0.5rem;">0</div>
@@ -206,9 +215,11 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 										<!-- fixed columns left -->
 										<div class="flexed changeable-indicator" style="margin-left: 1em;">
 											<div>
-												<span id="fixed-columns-icon" class="clickable" title="Set fixed columns left" onclick="_toggleFixedColumnsText()">
-													<i class="fas fa-align-left"></i>
-												</span>
+												<vscode-button appearance="icon" id="fixed-columns-icon" class="clickable" title="Set fixed columns left" onclick="_toggleFixedColumnsText()">
+													<span>
+														<i class="fas fa-align-left"></i>
+													</span>
+												</vscode-button>
 												<span id="fixed-columns-text" style="margin-left: 0.5rem;" class="dis-hidden">fixed columns:</span>
 											</div>
 											<div id="fixed-columns-top-info" class="text" style="margin-left: 0.5rem;">0</div>
@@ -219,12 +230,13 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 										</div>
 										<!-- toggle readonly mode -->
 										<div class="flexed toggle-btn clickable" style="margin-left: 1em;">
-											<span id="is-readonly-mode-toggle" onclick="toggleReadonlyMode()" 
-											title="Toggls the readonly table mode (SET IN CODE AT STARTUP)">
-												<i class="fas fa-pen"></i>
-												<i class="fas fa-slash"></i>
-												<i class="fas fa-slash"></i>
-											</span>
+											<vscode-button appearance="icon" id="is-readonly-mode-toggle" onclick="toggleReadonlyMode()" title="Toggls the readonly table mode (SET IN CODE AT STARTUP)">
+												<span>
+													<i class="fas fa-pen"></i>
+													<i class="fas fa-slash"></i>
+													<i class="fas fa-slash"></i>
+												</span>
+											</vscode-button>
 										</div>
 
 
@@ -247,11 +259,9 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 											<div>
 						
 												<div class="field">
-													<input id="has-header" type="checkbox" name="has-header" class="switch is-rounded" checked="checked"
-														onchange="tryApplyHasHeader(true, false)">
-													<label id="has-header-label" for="has-header">
-														<span>Has header</span>
-													</label>
+													<vscode-checkbox id="has-header" type="checkbox" name="has-header" class="" checked="checked" onchange="tryApplyHasHeader(true, false)">
+														<span id="has-header-label">Has header</span>
+													</vscode-checkbox>
 													<span class="tooltip is-tooltip-right is-tooltip-multiline"
 														data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applies immediately, it will be applied if the table has more than 1 row.">
 														<i class="fas fa-question-circle"></i>
@@ -280,11 +290,11 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 																<i class="fas fa-question-circle"></i>
 															</span>
 														</label>
-														<input id="delimiter-string" class="input" type="text" placeholder="auto"
-															oninput="setDelimiterString()">
+														<vscode-text-field id="delimiter-string" class="input" type="text" placeholder="auto" oninput="setDelimiterString()">
+														</vscode-text-field>
 													</div>
 						
-													<div class="field mar-left">
+													<div class="field mar-left-half">
 														<label>
 															<span>Comment</span>
 															<span class="tooltip is-tooltip-multiline"
@@ -292,8 +302,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 																<i class="fas fa-question-circle"></i>
 															</span>
 														</label>
-														<input id="comment-string" class="input" type="text" placeholder="Empty for no comments"
-															oninput="setCommentString()">
+														<vscode-text-field id="comment-string" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentString()">
+														</vscode-text-field>
 													</div>
 												</div>
 						
@@ -303,10 +313,12 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 														<label>
 															<span>QuoteChar</span>
 														</label>
-														<input id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()">
+														<vscode-text-field id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()">
+														</vscode-text-field>
 													</div>
 						
-													<div class="field mar-left">
+													<div class="field mar-left-half">
+													
 														<label>
 															<span>EscapeChar</span>
 															<span class="tooltip is-tooltip-multiline"
@@ -314,18 +326,22 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 																<i class="fas fa-question-circle"></i>
 															</span>
 														</label>
-														<input id="escape-char-string" class="input" type="text" oninput="setEscapeCharString()">
+														<vscode-text-field id="escape-char-string" placeholder="Placeholder Text" class="input" type="text" oninput="setEscapeCharString()">
+														</vscode-text-field>
 													</div>
 												</div>
 						
 						
-												<button class="button is-light" onclick="toggleAskReadAgainModal(true)">
-													<span>Reset data and apply read options</span>
-													<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
-														data-tooltip="The input file content was stored locally and is used as data. Thus this view is independent of the source file">
-														<i class="fas fa-question-circle"></i>
+												<vscode-button appearance="secondary" class="" style="height: 36px" onclick="toggleAskReadAgainModal(true)">
+													<span style="width: 14rem">Reset data and apply read options</span>
+
+													<span slot="end" class="icon is-small">
+														<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
+															data-tooltip="The input file content was stored locally and is used as data. Thus this view is independent of the source file">
+															<i class="fas fa-question-circle"></i>
+														</span>
 													</span>
-												</button>
+												</vscode-button>
 						
 											</div>
 									</div>
@@ -333,11 +349,10 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 							<td>
 									<div id="write-options-content" class="options-content on-readonly-disable-div">
 											<div class="field">
-												<input id="has-header-write" type="checkbox" name="has-header-write" class="switch is-rounded"
-													checked="checked" onchange="setHasHeaderWrite()">
-												<label for="has-header-write">
+											
+												<vscode-checkbox id="has-header-write" type="checkbox" name="has-header-write" class="" checked="checked" onchange="setHasHeaderWrite()">
 													<span>Write header</span>
-												</label>
+												</vscode-checkbox>
 												<span class="tooltip is-tooltip-bottom" data-tooltip="Checked: writes the header row, unchecked: not">
 													<i class="fas fa-question-circle"></i>
 												</span>
@@ -356,11 +371,11 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 															</span>
 														</label>
 													</label>
-													<input id="delimiter-string-write" class="input" type="text" placeholder="auto"
-														oninput="setDelimiterStringWrite()">
+													<vscode-text-field id="delimiter-string-write" class="input" type="text" placeholder="auto" oninput="setDelimiterStringWrite()">
+													</vscode-text-field>
 												</div>
 						
-												<div class="field mar-left">
+												<div class="field mar-left-half">
 													<label for="comment-string-write">
 														<label>
 															<span>Comment</span>
@@ -370,8 +385,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 															</span>
 														</label>
 													</label>
-													<input id="comment-string-write" class="input" type="text" placeholder="Empty for no comments"
-														oninput="setCommentStringWrite()">
+													<vscode-text-field id="comment-string-write" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()">
+													</vscode-text-field>
 												</div>
 											</div>
 						
@@ -381,10 +396,11 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 													<label>
 														<span>QuoteChar</span>
 													</label>
-													<input id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()">
+													<vscode-text-field id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()">
+													</vscode-text-field>
 												</div>
 						
-												<div class="field mar-left">
+												<div class="field mar-left-half">
 													<label>
 														<span>EscapeChar</span>
 														<span class="tooltip is-tooltip-multiline"
@@ -392,18 +408,17 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 															<i class="fas fa-question-circle"></i>
 														</span>
 													</label>
-													<input id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()">
+													<vscode-text-field id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()">
+													</vscode-text-field>
 												</div>
 											</div>
 						
 											<div class="flexed">
 						
 												<div class="field">
-													<input id="quote-all-fields-write" type="checkbox" name="quote-all-fields-write" class="switch is-rounded"
-														checked="checked" onchange="setQuoteAllFieldsWrite()">
-													<label for="quote-all-fields-write">
-														<span>Quote all fields</span>
-													</label>
+													<vscode-checkbox id="quote-all-fields-write" type="checkbox" name="quote-all-fields-write" class="" checked="checked" onchange="setQuoteAllFieldsWrite()">
+													<span>Quote all fields</span>
+													</vscode-checkbox>
 												</div>
 						
 											</div>
@@ -424,7 +439,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 							</td>
 							<td>
 								<div id="preview-content" class="options-content">
-										<textarea id="csv-preview" class="textarea preview-csv-textarea" rows="8"></textarea>
+										<vscode-text-area resize="vertical" id="csv-preview" style="display: block;" class="preview-csv-textarea" rows="12"></vscode-text-area>
 									</div>
 							</td>
 						</tr>
@@ -445,56 +460,55 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 						</div>
 					</div>
 					
-					<button id="add-row-btn" class="button is-outlined on-readonly-disable-btn" onclick="addRow()">
-						<span class="icon is-small">
-							<i class="fas fa-plus"></i>
-						</span>
-						<span>Add row</span>
-					</button>
+					<vscode-button appearance="secondary" id="add-row-btn" class="on-readonly-disable-btn" onclick="addRow()">
+						<span slot="start" class="icon is-small"><i class="fas fa-plus"></i></span>
+						<span style="width: 4rem">Add row</span>
+					</vscode-button>
 					<div class="row-col-insert-btns">
-						<button class="button is-outlined on-readonly-disable-btn" onclick="insertRowAbove()" title="Insert row above current row [ctrl+shift+alt+up, ctrl+shift+ins]">
+					
+						<vscode-button appearance="secondary" class="on-readonly-disable-btn" onclick="insertRowAbove()" title="Insert row above current row [ctrl+shift+alt+up, ctrl+shift+ins]">
 							<i class="fas fas fa-caret-up "></i>
-						</button>
-						<button class="button is-outlined on-readonly-disable-btn" onclick="insertRowBelow() " title="Insert row below current row [ctrl+shift+alt+down, ctrl+ins]">
+						</vscode-button>
+						<vscode-button appearance="secondary" class="on-readonly-disable-btn" onclick="insertRowBelow() " title="Insert row below current row [ctrl+shift+alt+down, ctrl+ins]">
 							<i class="fas fa-caret-down ad"></i>
-						</button>
+						</vscode-button>
 					</div>
 
-					<button id="add-col-btn" class="button is-outlined on-readonly-disable-btn" onclick="addColumn()">
-						<span class="icon is-small">
-							<i class="fas fa-plus"></i>
-						</span>
-						<span>Add column</span>
-					</button>
+					<vscode-button appearance="secondary" id="add-col-btn" class="on-readonly-disable-btn" onclick="addColumn()">
+						<span slot="start" class="icon is-small"><i class="fas fa-plus"></i></span>
+						<span style="width: 5rem">Add column</span>
+					</vscode-button>
 					<div class="row-col-insert-btns">
-						<button class="button is-outlined on-readonly-disable-btn" onclick="insertColLeft()" title="Insert column left to current column [ctrl+shift+alt+left]">
+						<vscode-button appearance="secondary" class="on-readonly-disable-btn" onclick="insertColLeft()" title="Insert column left to current column [ctrl+shift+alt+left]">
 							<i class="fas fas fa-caret-left"></i>
-						</button>
-						<button class="button is-outlined on-readonly-disable-btn" onclick="insertColRight()" title="Insert column right to current column [ctrl+shift+alt+right]">
+						</vscode-button>
+						<vscode-button appearance="secondary" class="on-readonly-disable-btn" onclick="insertColRight()" title="Insert column right to current column [ctrl+shift+alt+right]">
 							<i class="fas fa-caret-right"></i>
-						</button>
+						</vscode-button>
 					</div>
 
-					<button id="btn-apply-changes-to-file-and-save" class="button is-outlined mar-left on-readonly-disable-btn" onclick="postApplyContent(true)">
-						<span class="icon is-small">
-							<i class="fas fa-save"></i>
-						</span>
-						<span>Apply changes to file and save</span>
-						<span class="tooltip is-tooltip-multiline mar-left-half"
-							data-tooltip="Applies the csv content back to the source file and saves the source file (if something changed) [ctrl+s/cmd+s]">
-							<i class="fas fa-question-circle"></i>
-						</span>
-					</button>
+					<vscode-button appearance="secondary" id="btn-apply-changes-to-file-and-save" class="mar-left on-readonly-disable-btn" onclick="postApplyContent(true)">
+						<span slot="start" class="icon is-small"><i class="fas fa-save"></i></span>
+						<span style="width: 13rem">Apply changes to file and save</span>
 
-					<button id="btn-apply-changes-to-file" class="button is-outlined on-readonly-disable-btn" onclick="postApplyContent(false)">
-						<span class="icon is-small">
-							<i class="fas fa-reply"></i>
+						<span slot="end" class="icon is-small">
+							<span class="tooltip is-tooltip-multiline mar-left-half"
+								data-tooltip="Applies the csv content back to the source file and saves the source file (if something changed) [ctrl+s/cmd+s]">
+								<i class="fas fa-question-circle"></i>
+							</span>
 						</span>
-						<span>Apply changes to file</span>
-						<span class="tooltip mar-left-half is-tooltip-multiline" data-tooltip="Applies the csv content back to the source file (if something changed). After this the editor has no unsaved changes.">
-							<i class="fas fa-question-circle"></i>
+					</vscode-button>
+
+					<vscode-button appearance="secondary" id="btn-apply-changes-to-file" class="on-readonly-disable-btn mar-left-half" onclick="postApplyContent(false)">
+						<span slot="start" class="icon is-small"><i class="fas fa-reply"></i></span>
+						<span style="width: 9rem">Apply changes to file</span>
+
+						<span slot="end" class="icon is-small">
+							<span class="tooltip mar-left-half is-tooltip-multiline" data-tooltip="Applies the csv content back to the source file (if something changed). After this the editor has no unsaved changes.">
+								<i class="fas fa-question-circle"></i>
+							</span>
 						</span>
-					</button>
+					</vscode-button>
 
 					<div id="status-info-wrapper">
 						<div>
@@ -505,41 +519,39 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 					<div class="flexed">
 
 						<div>
-							<button id="show-comments-btn" style="margin-right: 1em" class="button is-outlined" onclick="showOrHideAllComments(true)">
-								<span class="icon is-small">
-									<i class="far fa-comments"></i>
+							<vscode-button appearance="secondary" id="show-comments-btn" style="margin-right: 1em; height: 100%" onclick="showOrHideAllComments(true)">
+								<span slot="start" class="icon is-small"><i class="far fa-comments"></i></span>
+								<span style="width: 7rem">Show comments</span>
+							</vscode-button>
+							<vscode-button appearance="secondary" id="hide-comments-btn" style="margin-right: 1em; height: 100%" onclick="showOrHideAllComments(false)">
+								<span slot="start" class="icon is-small"><i class="fas fa-comments"></i></span>
+								<span style="width: 7rem">Hide comments</span>
+
+								<span slot="end" class="icon is-small">
+									<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
+										data-tooltip="Hides rows starting with a comment. The row headers will display an indicator if a row above or below is hidden. Hidden rows are also exported!">
+										<i class="fas fa-question-circle"></i>
+									</span>
 								</span>
-								<span>Show comments</span>
-							</button>
-							<button id="hide-comments-btn" style="margin-right: 1em" class="button is-outlined" onclick="showOrHideAllComments(false)">
-								<span class="icon is-small">
-									<i class="fas fa-comments"></i>
-								</span>
-								<span>Hide comments</span>
-								<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
-									data-tooltip="Hides rows starting with a comment. The row headers will display an indicator if a row above or below is hidden. Hidden rows are also exported!">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</button>
+								</vscode-button>
 						</div>
 
-						<button style="margin-right: 1em" class="button is-outlined on-readonly-disable-btn" onclick="trimAllCells()">
-							<span class="icon is-small">
-								<i class="fas fa-hand-scissors"></i>
-							</span>
-							<span>Trim</span>
-							<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
-								data-tooltip="Trims every cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo stack!">
-								<i class="fas fa-question-circle"></i>
-							</span>
-						</button>
+						<vscode-button appearance="secondary" style="margin-right: 1em" class="on-readonly-disable-btn" onclick="trimAllCells()">
+							<span slot="start" class="icon is-small"><i class="fas fa-hand-scissors"></i></span>
+							<span style="width: 2rem">Trim</span>
 
-						<button class="button is-outlined" onclick="toggleHelpModal(true)">
-							<span class="icon is-small">
-								<i class="fas fa-question"></i>
+							<span slot="end" class="icon is-small">
+								<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
+									data-tooltip="Trims every cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo stack!">
+									<i class="fas fa-question-circle"></i>
+								</span>
 							</span>
-							<span>Help</span>
-						</button>
+						</vscode-button>
+
+						<vscode-button appearance="secondary" class="" onclick="toggleHelpModal(true)">
+							<span slot="start" class="icon is-small"><i class="fas fa-question"></i></span>
+							<span style="width: 2rem">Help</span>
+						</vscode-button>
 					</div>
 
 				</div>
@@ -618,26 +630,25 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 						<div class="stat">
 							<div>Numbers style
-								<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="The number style only applies for the stats, does not affect sorting!!">
+								<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="The number style only applies for the stats, does not affect sorting! Change before selecting cells.">
 									<i class="far fa-question-circle"></i>
 								</span>
 							</div>
 							<div class="control" style="padding-left: 0;">
-								<label class="radio">
-									<input id="numbers-style-en" type="radio" name="numbers-style">
-									en: 3.14 
+							<vscode-radio-group>
+								<vscode-radio id="numbers-style-en">
+									<span>en: 3.14</span>
 									<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="Decimal separator: '.' Thousand separator: a single whitespace or ','">
 										<i class="far fa-question-circle"></i>
 									</span>
-								</label>
-								<br />
-								<label class="radio">
-									<input id="numbers-style-non-en" type="radio" name="numbers-style">
-									non-en: 3,14
+								</vscode-radio>
+								<vscode-radio  id="numbers-style-non-en">
+									<span>non-en: 3,14</span>
 									<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="Decimal separator: ',' Thousand separator: a single whitespace or '.'">
 										<i class="far fa-question-circle"></i>
 									</span>
-								</label>
+								</vscode-radio>
+							</vscode-radio-group>
 							</div>
 						</div>
 
@@ -741,7 +752,9 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 			</div>
 		</div>
-		<button class="modal-close is-large" aria-label="close" onclick="toggleHelpModal(false)"></button>
+		<button class="modal-close is-large clickable" aria-label="close" onclick="toggleHelpModal(false)">
+			<i class="fas fa-times"></i>
+		</button>
 	</div>
 		`
 	}
@@ -763,18 +776,20 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 				</p>
 
 				<div style="margin-top: 1em">
-					<button class="button is-warning" onclick="resetDataFromResetDialog()">
-						<span>Reset</span>
-					</button>
+					<vscode-button class="" onclick="resetDataFromResetDialog()">
+						<span style="width: 3rem">Reset</span>
+					</vscode-button>
 
-					<button style="margin-left: 0.5em" class="button is-outlined" onclick="toggleAskReadAgainModal(false)">
-						<span>Cancel</span>
-					</button>
+					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleAskReadAgainModal(false)">
+						<span style="width: 3rem">Cancel</span>
+					</vscode-button>
 				</div>
 
 			</div>
 		</div>
-		<button class="modal-close is-large" aria-label="close" onclick="toggleAskReadAgainModal(false)"></button>
+		<button class="modal-close is-large clickable" aria-label="close" onclick="toggleAskReadAgainModal(false)">
+			<i class="fas fa-times"></i>
+		</button>
 	</div>
 	`
 	}
@@ -796,18 +811,20 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 				</p>
 
 				<div style="margin-top: 1em">
-					<button class="button is-warning" onclick="reloadFileFromDisk()">
-						<span>Reload</span>
-					</button>
+					<vscode-button class="" onclick="reloadFileFromDisk()">
+						<span style="width: 3rem">Reload</span>
+					</vscode-button>
 
-					<button style="margin-left: 0.5em" class="button is-outlined" onclick="toggleAskReloadFileModalDiv(false)">
-						<span>Cancel</span>
-					</button>
+					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleAskReloadFileModalDiv(false)">
+						<span style="width: 3rem">Cancel</span>
+					</vscode-button>
 				</div>
 
 			</div>
 		</div>
-		<button class="modal-close is-large" aria-label="close" onclick="toggleAskReloadFileModalDiv(false)"></button>
+		<button class="modal-close is-large clickable" aria-label="close" onclick="toggleAskReloadFileModalDiv(false)">
+			<i class="fas fa-times"></i>
+		</button>
 	</div>
 		`
 	}
@@ -830,18 +847,20 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 				</p>
 
 				<div style="margin-top: 1em">
-					<button class="button is-warning" onclick="reloadFileFromDisk()">
-						<span>Reload</span>
-					</button>
+					<vscode-button class="" onclick="reloadFileFromDisk()">
+						<span style="width: 3rem">Reload</span>
+					</vscode-button>
 
-					<button style="margin-left: 0.5em" class="button is-outlined" onclick="toggleSourceFileChangedModalDiv(false)">
-						<span>Ignore</span>
-					</button>
+					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleSourceFileChangedModalDiv(false)">
+						<span style="width: 3rem">Ignore</span>
+					</vscode-button>
 				</div>
 
 			</div>
 		</div>
-		<button class="modal-close is-large" aria-label="close" onclick="toggleSourceFileChangedModalDiv(false)"></button>
+		<!--<button class="modal-close is-large clickable" aria-label="close" onclick="toggleSourceFileChangedModalDiv(false)">
+			<i class="fas fa-times"></i>
+		</button>-->
 	</div>
 		`
 	}
@@ -864,7 +883,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 		<link rel="stylesheet" href="${fontAwesomeCss}">
 
-		<link rel="stylesheet" href="${bulmaCss}">
+		<!--<link rel="stylesheet" href="${bulmaCss}">-->
 		<link rel="stylesheet" href="${mainCss}">
 		<link rel="stylesheet" href="${darkThemeCss}">
 		<link rel="stylesheet" href="${lightThemeCss}">
@@ -891,6 +910,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	${sourceFileChangedModalHtml}
 
 
+	<script async type="module" src="${toolkit}"></script>
 	<script src="${handsontableJs}"></script>
 	<script src="${papaparseJs}"></script>
 	<script src="${mousetrapJs}"></script>

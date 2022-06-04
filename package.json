@@ -589,6 +589,7 @@
 		"buildBrowser": "node ./csvEditorHtml/out/browser/build/build.js"
 	},
 	"dependencies": {
+		"@vscode/webview-ui-toolkit": "1.0.0",
 		"chokidar": "3.4.2"
 	},
 	"devDependencies": {
