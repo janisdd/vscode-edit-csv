@@ -859,6 +859,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 			</div>
 		</div>
+		<!-- user must choose -->
 		<!--<button class="modal-close is-large clickable" aria-label="close" onclick="toggleSourceFileChangedModalDiv(false)">
 			<i class="fas fa-times"></i>
 		</button>-->
@@ -884,7 +885,6 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 		<link rel="stylesheet" href="${fontAwesomeCss}">
 
-		<!--<link rel="stylesheet" href="${bulmaCss}">-->
 		<link rel="stylesheet" href="${mainCss}">
 		<link rel="stylesheet" href="${darkThemeCss}">
 		<link rel="stylesheet" href="${lightThemeCss}">
