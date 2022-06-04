@@ -60,7 +60,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 	let findWidgetHtml = ``
 	{
-		findWidgetHtml = `
+		// Tip: Install the es6-string-html VS Code extension to enable code highlighting below
+		findWidgetHtml = /*html*/`
 		<div id="find-widget" class="find-widget" style="display: none; right: 100px;">
 
 		<div id="find-widget-progress-bar" class="progress-bar"></div>
@@ -138,7 +139,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 	let bodyPageHtml = ``
 	 {
-		bodyPageHtml= `
+		bodyPageHtml= /*html*/`
 		<div class="page full-h">
 
 			<div class="all-options">
@@ -667,7 +668,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 	let helpModalHtml = ``
 	{
-		helpModalHtml = `
+		helpModalHtml = /*html*/`
 		<div id="help-modal" class="modal">
 		<div class="modal-background" onclick="toggleHelpModal(false)"></div>
 		<div class="modal-content">
@@ -748,7 +749,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	
 	let askReadAgainModalHtml = ``
 	{
-		askReadAgainModalHtml = `
+		askReadAgainModalHtml = /*html*/`
 		<div id="ask-read-again-modal" class="modal modal-centered">
 		<div class="modal-background"></div>
 		<div class="modal-content">
@@ -780,7 +781,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 	let askReloadFileModalHtml = ``
 	{
-		askReloadFileModalHtml =`
+		askReloadFileModalHtml = /*html*/`
 		<div id="ask-reload-file-modal" class="modal modal-centered">
 		<div class="modal-background"></div>
 		<div class="modal-content">
@@ -813,7 +814,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 	let sourceFileChangedModalHtml = ``
 	{
-		sourceFileChangedModalHtml = `
+		sourceFileChangedModalHtml = /*html*/`
 		<div id="source-file-changed-modal" class="modal modal-centered">
 		<div class="modal-background"></div>
 		<div class="modal-content">
@@ -845,7 +846,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 		`
 	}
 
-	return `
+	return /*html*/`
 	<!DOCTYPE html>
 	<html>
 	<head>
