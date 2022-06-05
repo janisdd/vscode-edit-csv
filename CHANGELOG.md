@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## 0.7.0
+- fixed issue #73 - changed style to match vs code ones (with webview-ui-toolki)
+	- however, there are some issues with 
+		- text input: input event don't get triggered when some table cell has focus...
+		- dropdown: chaning font size is not possible
+	- removed bulma css
+
 ## 0.6.10
 - fixed issue #93 - regex search ignored match-case option
 

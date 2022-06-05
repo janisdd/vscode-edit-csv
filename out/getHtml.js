@@ -246,152 +246,78 @@ function createEditorHtml(webview, context, config, initialVars) {
 						<tr>
 							<td>
 									<div id="read-options-content" class="options-content on-readonly-disable-div">
-											<div>
-						
-												<div class="field">
-													<vscode-checkbox id="has-header" type="checkbox" name="has-header" class="" checked="checked" onchange="tryApplyHasHeader(true, false)">
-														<span id="has-header-label">Has header</span>
-													</vscode-checkbox>
-													<span class="tooltip is-tooltip-right is-tooltip-multiline"
-														data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applies immediately, it will be applied if the table has more than 1 row.">
-														<i class="fas fa-question-circle"></i>
-													</span>
-												</div>
-						
-												<!-- this makes the row data invalid if we have more than 1 col-->
-												<!-- <div class="field">
-														<input id="skip-empty-lines" type="checkbox" name="skip-empty-lines" class="switch is-rounded" checked="checked" onchange="setSkipEmptyLines()" disabled>
-														<label for="skip-empty-lines">
-															<span>Skip empty lines</span>
-															<span class="tooltip is-tooltip-multiline" data-tooltip="If enabled empty lines will be used as row. Disabled because empty rows are invalid if we have more than 1 column.">
-																	<i class="fas fa-question-circle"></i>
-															</span>
-														</label>
-												</div> -->
-						
-												<!-- delimiter and comment -->
-												<div class="flexed">
-													<div class="field">
-														<label>
-															<span>Delimiter</span>
-															<span class="clickable tooltip" data-tooltip="Set to tab character"
-																onclick="setReadDelimiter('\t')">⇥</span>
-															<span id="read-delimiter-tooltip" class="tooltip" data-tooltip="Empty to auto detect">
-																<i class="fas fa-question-circle"></i>
-															</span>
-														</label>
-														<!--<vscode-text-field id="delimiter-string" class="input" type="text" placeholder="auto" oninput="setDelimiterString()" />-->
-														<input id="delimiter-string" class="input vscode-text-field" type="text" placeholder="auto" oninput="setDelimiterString()" />
-													</div>
-						
-													<div class="field mar-left-half">
-														<label>
-															<span>Comment</span>
-															<span class="tooltip is-tooltip-multiline"
-																data-tooltip="Comments before and after csv data are preserved. Comments between data rows are ignored. Empty to treat every line as data (no comments).">
-																<i class="fas fa-question-circle"></i>
-															</span>
-														</label>
-														<!--<vscode-text-field id="comment-string" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentString()" />-->
-														<input id="comment-string" class="input vscode-text-field" type="text" placeholder="Empty for no comments" oninput="setCommentString()" />
-													</div>
-												</div>
-						
-												<!-- quote and escape -->
-												<div class="flexed">
-													<div class="field">
-														<label>
-															<span>QuoteChar</span>
-														</label>
-														<!--<vscode-text-field id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()" onchange="setQuoteCharString()" /> -->
-														<input id="quote-char-string" class="input vscode-text-field" type="text" oninput="setQuoteCharString()" />
-													</div>
-						
-													<div class="field mar-left-half">
-													
-														<label>
-															<span>EscapeChar</span>
-															<span class="tooltip is-tooltip-multiline"
-																data-tooltip="The character used to escape the QuoteChar inside field values">
-																<i class="fas fa-question-circle"></i>
-															</span>
-														</label>
-														<!--<vscode-text-field id="escape-char-string" placeholder="Placeholder Text" class="input" type="text" oninput="setEscapeCharString()"/>-->
-														<input id="escape-char-string" placeholder="Placeholder Text" class="input vscode-text-field" type="text" oninput="setEscapeCharString()" />
-													</div>
-												</div>
 
-												<div>
-													<vscode-button appearance="secondary" class="" style="height: 36px; margin-top: 1rem;" onclick="toggleAskReadAgainModal(true)">
-														<span style="width: 14rem">Reset data and apply read options</span>
-
-														<span slot="end" class="icon is-small">
-															<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
-																data-tooltip="The input file content was stored locally and is used as data. Thus this view is independent of the source file">
-																<i class="fas fa-question-circle"></i>
-															</span>
-														</span>
-													</vscode-button>
+										<div class="field same-line" style="display: none;">
+												<label>Encoding</label>
+												<div class="select">
+													<vscode-dropdown id="read-option-encoding" style="width: 11rem;">
+														<vscode-option id="read-option-encoding-auto" value="auto">Auto detect</vscode-option>
+														<!-- options will be auto inserted here -->
+													</vscode-dropdown>
 												</div>
-						
 											</div>
-									</div>
-							</td>
-							<td>
-									<div id="write-options-content" class="options-content on-readonly-disable-div">
+					
 											<div class="field">
-											
-												<vscode-checkbox id="has-header-write" type="checkbox" name="has-header-write" class="" checked="checked" onchange="setHasHeaderWrite()">
-													<span>Write header</span>
+												<vscode-checkbox id="has-header" type="checkbox" name="has-header" class="" checked="checked" onchange="tryApplyHasHeader(true, false)">
+													<span id="has-header-label">Has header</span>
 												</vscode-checkbox>
-												<span class="tooltip is-tooltip-bottom" data-tooltip="Checked: writes the header row, unchecked: not">
+												<span class="tooltip is-tooltip-right is-tooltip-multiline"
+													data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applies immediately, it will be applied if the table has more than 1 row.">
 													<i class="fas fa-question-circle"></i>
 												</span>
 											</div>
-						
+					
+											<!-- this makes the row data invalid if we have more than 1 col-->
+											<!-- <div class="field">
+													<input id="skip-empty-lines" type="checkbox" name="skip-empty-lines" class="switch is-rounded" checked="checked" onchange="setSkipEmptyLines()" disabled>
+													<label for="skip-empty-lines">
+														<span>Skip empty lines</span>
+														<span class="tooltip is-tooltip-multiline" data-tooltip="If enabled empty lines will be used as row. Disabled because empty rows are invalid if we have more than 1 column.">
+																<i class="fas fa-question-circle"></i>
+														</span>
+													</label>
+											</div> -->
+					
 											<!-- delimiter and comment -->
 											<div class="flexed">
 												<div class="field">
-													<label for="delimiter-string-write">
-														<label>
-															<span>Delimiter</span>
-															<span class="clickable tooltip" data-tooltip="Set to tab character"
-																onclick="setWriteDelimiter('\t')">⇥</span>
-															<span class="tooltip" data-tooltip="Empty to use delimiter from read">
-																<i class="fas fa-question-circle"></i>
-															</span>
-														</label>
+													<label>
+														<span>Delimiter</span>
+														<span class="clickable tooltip" data-tooltip="Set to tab character"
+															onclick="setReadDelimiter('\t')">⇥</span>
+														<span id="read-delimiter-tooltip" class="tooltip" data-tooltip="Empty to auto detect">
+															<i class="fas fa-question-circle"></i>
+														</span>
 													</label>
-													<!--<vscode-text-field id="delimiter-string-write" class="input" type="text" placeholder="auto" oninput="setDelimiterStringWrite()" />-->
-													<input id="delimiter-string-write" class="input vscode-text-field"" type="text" placeholder="auto" oninput="setDelimiterStringWrite()" />
+													<!--<vscode-text-field id="delimiter-string" class="input" type="text" placeholder="auto" oninput="setDelimiterString()" />-->
+													<input id="delimiter-string" class="input vscode-text-field" type="text" placeholder="auto" oninput="setDelimiterString()" />
 												</div>
-						
+					
 												<div class="field mar-left-half">
-													<label for="comment-string-write">
-														<label>
-															<span>Comment</span>
-															<span class="tooltip is-tooltip-multiline"
-																data-tooltip="Empty for no comments. Comments before and after csv data are written if char is present. Empty to exclude comments.">
-																<i class="fas fa-question-circle"></i>
-															</span>
-														</label>
+													<label>
+														<span>Comment</span>
+														<span class="tooltip is-tooltip-multiline"
+															data-tooltip="Comments before and after csv data are preserved. Comments between data rows are ignored. Empty to treat every line as data (no comments).">
+															<i class="fas fa-question-circle"></i>
+														</span>
 													</label>
-													<!--<vscode-text-field id="comment-string-write" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()" />-->
-													<input id="comment-string-write" class="input vscode-text-field"" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()" />
+													<!--<vscode-text-field id="comment-string" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentString()" />-->
+													<input id="comment-string" class="input vscode-text-field" type="text" placeholder="Empty for no comments" oninput="setCommentString()" />
 												</div>
 											</div>
-						
+					
 											<!-- quote and escape -->
 											<div class="flexed">
 												<div class="field">
 													<label>
 														<span>QuoteChar</span>
 													</label>
-													<!--<vscode-text-field id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()" />-->
-													<input id="quote-char-string-write" class="input vscode-text-field" type="text" oninput="setQuoteCharStringWrite()" />
+													<!--<vscode-text-field id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()" onchange="setQuoteCharString()" /> -->
+													<input id="quote-char-string" class="input vscode-text-field" type="text" oninput="setQuoteCharString()" />
 												</div>
-						
+					
 												<div class="field mar-left-half">
+												
 													<label>
 														<span>EscapeChar</span>
 														<span class="tooltip is-tooltip-multiline"
@@ -399,32 +325,124 @@ function createEditorHtml(webview, context, config, initialVars) {
 															<i class="fas fa-question-circle"></i>
 														</span>
 													</label>
-													<!--<vscode-text-field id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()" />-->
-													<input id="escape-char-string-write" class="input vscode-text-field" type="text" oninput="setEscapeCharStringWrite()" />
+													<!--<vscode-text-field id="escape-char-string" placeholder="Placeholder Text" class="input" type="text" oninput="setEscapeCharString()"/>-->
+													<input id="escape-char-string" placeholder="Placeholder Text" class="input vscode-text-field" type="text" oninput="setEscapeCharString()" />
 												</div>
 											</div>
-						
-											<div class="flexed">
-						
-												<div class="field">
-													<vscode-checkbox id="quote-all-fields-write" type="checkbox" name="quote-all-fields-write" class="" checked="checked" onchange="setQuoteAllFieldsWrite()">
-													<span>Quote all fields</span>
-													</vscode-checkbox>
-												</div>
-						
+
+											<div>
+												<vscode-button appearance="secondary" class="" style="height: 36px; margin-top: 1rem;" onclick="toggleAskReadAgainModal(true)">
+													<span style="width: 14rem">Reset data and apply read options</span>
+
+													<span slot="end" class="icon is-small">
+														<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
+															data-tooltip="The input file content was stored locally and is used as data. Thus this view is independent of the source file">
+															<i class="fas fa-question-circle"></i>
+														</span>
+													</span>
+												</vscode-button>
 											</div>
+									</div>
+							</td>
+							<td>
+									<div id="write-options-content" class="options-content on-readonly-disable-div">
+
+										<div class="field same-line" style="display: none;">
+											<label>Encoding</label>
+											<div class="select">
+												<vscode-dropdown id="write-option-encoding" style="width: 11rem;">
+													<vscode-option value="auto">Same as read</vscode-option>
+												</vscode-dropdown>
+											</div>
+										</div>
+
+										<div class="field">
+											<vscode-checkbox id="has-header-write" type="checkbox" name="has-header-write" class="" checked="checked" onchange="setHasHeaderWrite()">
+												<span>Write header</span>
+											</vscode-checkbox>
+											<span class="tooltip is-tooltip-bottom" data-tooltip="Checked: writes the header row, unchecked: not">
+												<i class="fas fa-question-circle"></i>
+											</span>
+										</div>
 						
-											<!-- see help modal why -->
-											<div class="field" style="display: none;">
-												<label for="comment-string-write">NewLine</label>
+										<!-- delimiter and comment -->
+										<div class="flexed">
+											<div class="field">
+												<label for="delimiter-string-write">
+													<label>
+														<span>Delimiter</span>
+														<span class="clickable tooltip" data-tooltip="Set to tab character"
+															onclick="setWriteDelimiter('\t')">⇥</span>
+														<span class="tooltip" data-tooltip="Empty to use delimiter from read">
+															<i class="fas fa-question-circle"></i>
+														</span>
+													</label>
+												</label>
+												<!--<vscode-text-field id="delimiter-string-write" class="input" type="text" placeholder="auto" oninput="setDelimiterStringWrite()" />-->
+												<input id="delimiter-string-write" class="input vscode-text-field"" type="text" placeholder="auto" oninput="setDelimiterStringWrite()" />
+											</div>
+					
+											<div class="field mar-left-half">
+												<label for="comment-string-write">
+													<label>
+														<span>Comment</span>
+														<span class="tooltip is-tooltip-multiline"
+															data-tooltip="Empty for no comments. Comments before and after csv data are written if char is present. Empty to exclude comments.">
+															<i class="fas fa-question-circle"></i>
+														</span>
+													</label>
+												</label>
+												<!--<vscode-text-field id="comment-string-write" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()" />-->
+												<input id="comment-string-write" class="input vscode-text-field"" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()" />
+											</div>
+										</div>
+					
+										<!-- quote and escape -->
+										<div class="flexed">
+											<div class="field">
+												<label>
+													<span>QuoteChar</span>
+												</label>
+												<!--<vscode-text-field id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()" />-->
+												<input id="quote-char-string-write" class="input vscode-text-field" type="text" oninput="setQuoteCharStringWrite()" />
+											</div>
+					
+											<div class="field mar-left-half">
+												<label>
+													<span>EscapeChar</span>
+													<span class="tooltip is-tooltip-multiline"
+														data-tooltip="The character used to escape the QuoteChar inside field values">
+														<i class="fas fa-question-circle"></i>
+													</span>
+												</label>
+												<!--<vscode-text-field id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()" />-->
+												<input id="escape-char-string-write" class="input vscode-text-field" type="text" oninput="setEscapeCharStringWrite()" />
+											</div>
+										</div>
+					
+										<div class="flexed">
+					
+											<div class="field">
+												<vscode-checkbox id="quote-all-fields-write" type="checkbox" name="quote-all-fields-write" class="" checked="checked" onchange="setQuoteAllFieldsWrite()">
+												<span>Quote all fields</span>
+												</vscode-checkbox>
+											</div>
+					
+										</div>
+					
+										<!-- see help modal why -->
+										<div class="flexed" style="display: none;">
+											<div class="field same-line" title="End of line terminator">
+												<label for="comment-string-write">EOL</label>
 												<div class="select">
-													<select id="newline-select-write" onchange="setNewLineWrite()">
-														<option id="newline-same-as-input-option" value="">Same as input</option>
-														<option value="crlf">Windows (CRLF)</option>
-														<option value="lf">Linux/Mac (LF)</option>
-													</select>
+													<vscode-dropdown id="newline-select-write" onchange="setNewLineWrite()">
+														<vscode-option id="newline-same-as-input-option" value="">Same as input</vscode-option>
+														<vscode-option value="lf">Linux/Mac (LF)</vscode-option>
+														<vscode-option value="crlf">Windows (CRLF)</vscode-option>
+													</vscode-dropdown>
 												</div>
 											</div>
+										</div>
 						
 										</div>
 							</td>

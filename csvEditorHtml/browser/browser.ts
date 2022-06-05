@@ -84,14 +84,14 @@ const supportedAutoDetectEncodings: SupportedEncoding[] = [
 ]
 
 supportedAutoDetectEncodings.forEach((p, index) => {
-	const opt = document.createElement(`option`)
+	const opt = document.createElement(`vscode-option`)
 	opt.innerText = p.name
 	opt.value = `${index}`
 	readOptionEncodingSelect.appendChild(opt)
 })
 
 supportedAutoDetectEncodings.forEach((p, index) => {
-	const opt = document.createElement(`option`)
+	const opt = document.createElement(`vscode-option`)
 	opt.innerText = p.name
 	opt.value = `${index}`
 	writeOptionEncodingSelect.appendChild(opt)

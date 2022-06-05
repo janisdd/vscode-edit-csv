@@ -214,7 +214,7 @@
 
 			<div id="version-n-changelog" style="margin-right: 1rem;">
 				<a href="https://github.com/janisdd/vscode-edit-csv/blob/master/csvEditorHtml/browser/CHANGELOG.md" target="_blank">
-					v1.2.9
+					v1.3.0
 				</a>
 			</div>
 
@@ -262,38 +262,45 @@
 							<div class="options-title">
 								<span class="clickable" onclick="toggleOptionsBar()">Preview</span>
 
-								<span class="mar-left-half clickable" onclick="generateCsvPreview()" title="Refresh the preview">
-									<i class="fas fa-redo-alt"></i>
-								</span>
+									<vscode-button appearance="icon" class="mar-left-half clickable" onclick="generateCsvPreview()" title="Refresh the preview">
+									<span>
+										<i class="fas fa-redo-alt"></i>
+									</span>
+									</vscode-button>
+			
+									<!-- no css tooltip because we want a delay-->
+									<vscode-button appearance="icon" id="preview-copy-icon" class="mar-left-half clickable" onclick="copyPreviewToClipboard()" title="Creates the preview and copies it to the clipboard">
+										<span>
+											<i class="fas fa-paste"></i>
+										</span>
+									</vscode-button>
+			
+									<vscode-button appearance="icon" id="re-render-table-icon" class="mar-left-half clickable" onclick="reRenderTable()" style="margin-left: 2em;" title="Redraws the table. This can fix some measuring issues (e.g. after the font size changed)">
+										<span>
+											<i class="fas fa-ruler-combined"></i>
+										</span>
+									</vscode-button>
 
-								<!-- no css tooltip because we want a delay-->
-								<span class="mar-left-half clickable" onclick="copyPreviewToClipboard()"
-									title="Creates the preview and copies it to the clipboard">
-									<i id="preview-copy-icon" class="fas fa-paste"></i>
-								</span>
+									<vscode-button appearance="icon" id="force-column-resize-icon" class="mar-left-half clickable" onclick="forceResizeColumns()" style="margin-left: 0.5em;" title="Resizes all column widths to match their content">
+										<span>
+											<i class="fas fa-arrows-alt-h"></i>
+										</span>
+									</vscode-button>
 
-								<span class="mar-left-half clickable" onclick="reRenderTable()" style="margin-left: 2em;"
-									title="Redraws the table. This can fix some measuring issues (e.g. after the font size changed)">
-									<i id="re-render-table-icon" class="fas fa-ruler-combined"></i>
-								</span>
-
-								<span class="mar-left-half clickable" onclick="forceResizeColumns()" style="margin-left: 0.5em;"
-									title="Resizes all column widths to match their content">
-									<i id="force-column-resize-icon" class="fas fa-arrows-alt-h"></i>
-								</span>
-
-								<span id="reload-file" class="clickable" onclick="preReloadFileFromDisk()" style="margin-left: 2em;"
-									title="Reload the csv file content (from disk)">
-									<i class="fas fa-sync-alt"></i>
-								</span>
+									<vscode-button appearance="icon" id="reload-file" class="clickable" onclick="preReloadFileFromDisk()" style="margin-left: 2em;" title="Reload the csv file content (from disk)">
+										<span>
+											<i class="fas fa-sync-alt"></i>
+										</span>
+									</vscode-button>
 
 								<!-- fixed rows top -->
 								<div class="flexed changeable-indicator" style="margin-left: 2em;">
 									<div>
-										<span id="fixed-rows-icon" class="clickable" title="Set fixed rows top"
-											onclick="_toggleFixedRowsText()">
-											<i class="rotated-90deg fas fa-align-left"></i>
-										</span>
+										<vscode-button appearance="icon" id="fixed-rows-icon" class="clickable" title="Set fixed rows top" onclick="_toggleFixedRowsText()">
+											<span>
+												<i class="rotated-90deg fas fa-align-left"></i>
+											</span>
+										</vscode-button>
 										<span id="fixed-rows-text" style="margin-left: 0.5rem;" class="dis-hidden">fixed rows:</span>
 									</div>
 									<div id="fixed-rows-top-info" class="text" style="margin-left: 0.5rem;">0</div>
@@ -305,10 +312,11 @@
 								<!-- fixed columns left -->
 								<div class="flexed changeable-indicator" style="margin-left: 1em;">
 									<div>
-										<span id="fixed-columns-icon" class="clickable" title="Set fixed columns left"
-											onclick="_toggleFixedColumnsText()">
-											<i class="fas fa-align-left"></i>
-										</span>
+										<vscode-button appearance="icon" id="fixed-columns-icon" class="clickable" title="Set fixed columns left" onclick="_toggleFixedColumnsText()">
+											<span>
+												<i class="fas fa-align-left"></i>
+											</span>
+										</vscode-button>
 										<span id="fixed-columns-text" style="margin-left: 0.5rem;" class="dis-hidden">fixed columns:</span>
 									</div>
 									<div id="fixed-columns-top-info" class="text" style="margin-left: 0.5rem;">0</div>
@@ -319,12 +327,13 @@
 								</div>
 								<!-- toggle readonly mode -->
 								<div class="flexed toggle-btn clickable" style="margin-left: 1em;">
-									<span id="is-readonly-mode-toggle" onclick="toggleReadonlyMode()" 
-									title="Toggls the readonly table mode (SET IN CODE AT STARTUP)">
-										<i class="fas fa-pen"></i>
-										<i class="fas fa-slash"></i>
-										<i class="fas fa-slash"></i>
-									</span>
+									<vscode-button appearance="icon" id="is-readonly-mode-toggle" onclick="toggleReadonlyMode()" title="Toggls the readonly table mode (SET IN CODE AT STARTUP)">
+										<span>
+											<i class="fas fa-pen"></i>
+											<i class="fas fa-slash"></i>
+											<i class="fas fa-slash"></i>
+										</span>
+									</vscode-button>
 								</div>
 
 								<span class="clickable" style="margin-left: 2em;">
@@ -352,14 +361,14 @@
 					<tr>
 						<td>
 							<div id="read-options-content" class="options-content on-readonly-disable-div">
-								<div>
+								
 									<div class="field same-line">
 										<label>Encoding</label>
 										<div class="select">
-											<select id="read-option-encoding">
-												<option id="read-option-encoding-auto" value="auto">Auto detect</option>
+											<vscode-dropdown id="read-option-encoding" style="width: 11rem;">
+												<vscode-option id="read-option-encoding-auto" value="auto">Auto detect</vscode-option>
 												<!-- options will be auto inserted here -->
-											</select>
+											</vscode-dropdown>
 										</div>
 									</div>
 
@@ -448,7 +457,6 @@
 										</vscode-button>
 									</div>
 
-								</div>
 							</div>
 						</td>
 						<td>
@@ -457,9 +465,9 @@
 								<div class="field same-line">
 									<label>Encoding</label>
 									<div class="select">
-										<select id="write-option-encoding">
-											<option value="auto">Same as read</option>
-										</select>
+										<vscode-dropdown id="write-option-encoding" style="width: 11rem;">
+											<vscode-option value="auto">Same as read</vscode-option>
+										</vscode-dropdown>
 									</div>
 								</div>
 
@@ -536,14 +544,16 @@
 								</div>
 
 								<!-- see help modal why -->
-								<div class="field same-line" title="End of line terminator">
-									<label for="comment-string-write">EOL</label>
-									<div class="select">
-										<select id="newline-select-write" onchange="setNewLineWrite()">
-											<option id="newline-same-as-input-option" value="">Same as input</option>
-											<option value="lf">Linux/Mac (LF)</option>
-											<option value="crlf">Windows (CRLF)</option>
-										</select>
+								<div class="flexed">
+									<div class="field same-line" title="End of line terminator">
+										<label for="comment-string-write">EOL</label>
+										<div class="select">
+											<vscode-dropdown id="newline-select-write" onchange="setNewLineWrite()">
+												<vscode-option id="newline-same-as-input-option" value="">Same as input</vscode-option>
+												<vscode-option value="lf">Linux/Mac (LF)</vscode-option>
+												<vscode-option value="crlf">Windows (CRLF)</vscode-option>
+											</vscode-dropdown>
+										</div>
 									</div>
 								</div>
 

@@ -1,5 +1,26 @@
 body.vscode-light {
 	color: #657b83;
+
+	--button-icon-background: transparent;
+	--button-icon-hover-background: rgba(90, 93, 94, 0.31);
+	
+	--input-foreground: #586e75;
+	--input-background: #ddd6c1;
+	--dropdown-border: #d3af86;
+	--dropdown-background: #eee8d5;
+	--checkbox-background: #eee8d5;
+	--checkbox-border: #d3af86;
+
+	--button-secondary-hover-background: #4c5561;
+
+	--button-secondary-background: #5f6a79;
+	--button-secondary-foreground: #ffffff;
+	--foreground: #616161;
+	--input-foreground: #586e75;
+	--focus-border: #d3af86;
+	--list-active-selection-background: #dfca88;
+	--list-active-selection-foreground: #6c6c6c;
+	--list-hover-background: rgba(223, 202, 136, 0.27);
 }
 
 .vscode-light .button.is-light {

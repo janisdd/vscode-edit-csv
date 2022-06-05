@@ -621,9 +621,15 @@ div.field.same-line label {
 	display: var(--extension-options-bar-display);
 }
 
-#read-options-content > .field,
-#write-options-content > .field {
+#read-options-content > div:nth-child(1),
+#write-options-content > div:nth-child(1) {
 	margin-top: 0;
+}
+
+/* TODO not working */
+vscode-dropdown .selected-value {
+	--type-ramp-base-font-size: 14px;
+	font-size: 14px;
 }
 
 

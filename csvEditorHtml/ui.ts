@@ -1580,7 +1580,6 @@ function defaultColHeaderFunc(useLettersAsColumnNames: boolean, colIndex: number
  * @param isVisible 
  */
 function toggleHelpModal(isVisible: boolean) {
-	console.log(`toggleHelpModal`, isVisible)
 
 	if (isVisible) {
 		helModalDiv.classList.add('is-active')

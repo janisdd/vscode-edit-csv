@@ -4,8 +4,18 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.3.0
+
+- (same as vs code extension v0.7.0)
+- fixed issue #73 - changed style to match vs code ones (with webview-ui-toolki)
+	- however, there are some issues with 
+		- text input: input event don't get triggered when some table cell has focus...
+		- dropdown: chaning font size is not possible
+	- removed bulma css
+
 ## 1.2.9
-- (same as vs code extension v0.6.10
+
+- (same as vs code extension v0.6.10)
 - fixed issue 93 - regex search ignored match-case option)
 
 ## 1.2.8

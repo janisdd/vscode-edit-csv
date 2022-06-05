@@ -1,6 +1,9 @@
 
 body.vscode-dark {
 	color: #d0d0d0;
+
+	--button-icon-background: transparent;
+	--button-icon-hover-background: rgba(90, 93, 94, 0.31);
 }
 
 .vscode-dark input.input::placeholder {
