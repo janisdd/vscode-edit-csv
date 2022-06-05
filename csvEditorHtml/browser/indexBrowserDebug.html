@@ -609,24 +609,13 @@
 					</vscode-button>
 				</div>
 
-				<vscode-button appearance="secondary" id="btn-apply-changes-to-file-and-save" class="mar-left on-readonly-disable-btn" onclick="postApplyContent(true)">
+				<vscode-button appearance="secondary" id="btn-apply-changes-to-file-and-save" class="mar-left" onclick="downloadAsFile()">
 					<span slot="start" class="icon is-small"><i class="fas fa-save"></i></span>
-					<span style="width: 13rem">Apply changes to file and save</span>
+					<span style="width: 7rem;">Download file</span>
 
 					<span slot="end" class="icon is-small">
 						<span class="tooltip is-tooltip-multiline mar-left-half"
-							data-tooltip="Applies the csv content back to the source file and saves the source file (if something changed) [ctrl+s/cmd+s]">
-							<i class="fas fa-question-circle"></i>
-						</span>
-					</span>
-				</vscode-button>
-
-				<vscode-button appearance="secondary" id="btn-apply-changes-to-file" class="on-readonly-disable-btn mar-left-half" onclick="postApplyContent(false)">
-					<span slot="start" class="icon is-small"><i class="fas fa-reply"></i></span>
-					<span style="width: 9rem">Apply changes to file</span>
-
-					<span slot="end" class="icon is-small">
-						<span class="tooltip mar-left-half is-tooltip-multiline" data-tooltip="Applies the csv content back to the source file (if something changed). After this the editor has no unsaved changes.">
+							data-tooltip="Downloads the current state of the table as csv file [ctrl+s/cmd+s]">
 							<i class="fas fa-question-circle"></i>
 						</span>
 					</span>
