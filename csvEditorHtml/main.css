@@ -18,6 +18,7 @@ html, body {
 	/* light */
 	/* background-color: #c3b990; */
 	background-color: var(--vscode-editor-background);
+	padding: 0;
 }
 
 .page {

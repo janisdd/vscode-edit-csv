@@ -38,7 +38,6 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	let fontAwesomeCss = _getResourcePath('thirdParty/fortawesome/fontawesome-free/css/all.min.css')
 	//we need to load the font manually because the url() seems to not work properly with vscode-resource
 	const iconFont = _getResourcePath('thirdParty/fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2')
-	let bulmaCss = _getResourcePath('thirdParty/bulma/bulma.min.css')
 
 	const mainCss = _getResourcePath('csvEditorHtml/main.css')
 	const darkThemeCss = _getResourcePath('csvEditorHtml/dark.css')

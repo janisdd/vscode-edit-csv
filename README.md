@@ -141,7 +141,7 @@ There is one things missing...
 - for csv parsing/writing: [papaparse](https://github.com/mholt/PapaParse)
 	- with small custom modifications to handle comments specially
 - for grid/table element: [handsontable](https://github.com/handsontable/handsontable)
-- for ui: [vs code webview-ui-toolkit](https://github.com/microsoft/vscode-webview-ui-toolkit), [bulma-extension](https://github.com/Wikiki/bulma-extensions), [fontawesome](https://github.com/FortAwesome/Font-Awesome)
+- for ui: [vs code webview-ui-toolkit](https://github.com/microsoft/vscode-webview-ui-toolkit), [fontawesome](https://github.com/FortAwesome/Font-Awesome)
 - for shortcuts: [mousetrap](https://github.com/ccampbell/mousetrap)
 
 *see `thirdParty` folders*
