@@ -137,8 +137,6 @@ body.vscode-light {
 
 .vscode-light .all-options table {
 	border: 1px solid #5e5e5e;
-	border-collapse: initial;
-	border-radius: 10px;
 }
 
 .vscode-light a {
