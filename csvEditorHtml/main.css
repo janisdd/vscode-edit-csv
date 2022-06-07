@@ -529,11 +529,12 @@ div.field.same-line label {
 .options-title {
 	padding: 0 10px;
 	white-space: nowrap;
+	font-size: 100%;
 }
 
 .options-title vscode-button {
 	vertical-align: middle;
-	height: 28px;
+	height: 26px;
 }
 
 .options-title vscode-button span {
@@ -541,7 +542,13 @@ div.field.same-line label {
 	margin: 0 3px;
 }
 .options-title vscode-button i {
-	font-size: 1.3rem;
+	font-size: 1rem;
+}
+.options-title i {
+	font-size: 1rem;
+}
+.options-title .changeable i {
+	font-size: inherit;
 }
 
 .options-title vscode-button#force-column-resize-icon {
@@ -574,13 +581,13 @@ div.field.same-line label {
 
 #is-readonly-mode-toggle .fas.fa-slash:nth-child(2) {
 	position: absolute;
-	left: 0;
+	left: 5px;
 	top: 7px;
 }
 
 #is-readonly-mode-toggle .fas.fa-slash:nth-child(3) {
 	position: absolute;
-	left: -1px;
+	left: 4px;
 	top: 9px;
 	color: var(--vscode-editor-background);
 }
@@ -1072,6 +1079,12 @@ vscode-button span {
 	font-size: 14px;
 }
 
+#find-widget-input {
+	background: var(--input-background);
+	border-radius: calc(var(--corner-radius) * 1px);
+	border: calc(var(--border-width) * 1px) solid var(--dropdown-border);
+	color: var(--input-foreground);
+}
 /* ca vs code webview toolkit */
 
 input.vscode-text-field {
