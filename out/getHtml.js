@@ -48,7 +48,7 @@ function createEditorHtml(webview, context, config, initialVars) {
     const utilJs = _getResourcePath('csvEditorHtml/out/util.js');
     const mainJs = _getResourcePath('csvEditorHtml/out/main.js');
     const beforeDomLoadedJs = _getResourcePath('csvEditorHtml/out/beforeDomLoaded.js');
-    const toolkit = _getResourcePath('node_modules/@vscode/webview-ui-toolkit/dist/toolkit.js');
+    const toolkit = _getResourcePath('node_modules/@vscode/webview-ui-toolkit/dist/toolkit.min.js');
     //use blocks so vs code adds folding
     let findWidgetHtml = ``;
     {
@@ -152,7 +152,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 							</th>
 							<th style="width: 100%;">
 								<div class="options-title">
-										<span class="clickable" onclick="toggleOptionsBar()">Preview</span>
+										<div class="clickable" onclick="toggleOptionsBar()">Preview</div>
 
 										<vscode-button appearance="icon" class="mar-left-half clickable" onclick="generateCsvPreview()" title="Refresh the preview">
 										<span>
@@ -228,15 +228,19 @@ function createEditorHtml(webview, context, config, initialVars) {
 											</vscode-button>
 										</div>
 
-
-										<span id="source-file-unwatched-indicator" class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline" style="float: right;margin-right: 5px;"
+										<div id="source-file-unwatched-indicator" class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline" style="float: right;margin-right: 5px;"
 											data-tooltip="The csv source file cannot be automatically reloaded if the file on disk is changed (because it's not in the current workspace). You will get notified if the file is changed but then you need to open/display the source csv file in vs code and manually refresh the table (refresh button). Alternatively just close this table and reopen it.">
-											<i class="fas fa-eye"></i>
-										</span>
-										<span id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 5px;"
+											<span>
+												<i class="fas fa-eye"></i>
+											</span>
+										</div>
+										<div id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 10px;"
 											data-tooltip="You might have unsaved changes">
-											<i class="fas fa-save"></i>
-										</span>
+											<span>
+												<i class="fas fa-save"></i>
+											</span>
+										</div>
+										
 								</div>
 							</th>
 						</tr>

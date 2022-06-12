@@ -68,6 +68,7 @@ html, body {
 .unsaved-changes-indicator {
 	color: var(--warning-color-all-themes);
 	transition: opacity 0.5s ease-in-out;
+	margin-top: 3px;
 }
 
 .op-hidden {
@@ -78,6 +79,7 @@ html, body {
 
 #source-file-unwatched-indicator {
 	color: #dd514c;
+	margin-top: 3px;
 }
 #source-file-unwatched-indicator.tooltip.is-tooltip-left::before {
 	bottom: -37%; /* else we clip outside the viewport */
@@ -530,6 +532,11 @@ div.field.same-line label {
 	padding: 0 10px;
 	white-space: nowrap;
 	font-size: 100%;
+}
+
+.options-title > div:nth-child(1) {
+	display: inline-block;
+	vertical-align: middle;
 }
 
 .options-title vscode-button {
