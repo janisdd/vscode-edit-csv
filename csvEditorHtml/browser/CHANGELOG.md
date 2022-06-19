@@ -4,6 +4,13 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+
+## 1.3.1
+
+- (same as vs code extension v0.7.1)
+- fixed issue 94 - find widget buttons are outside if panel
+- find widget design is now more similar to vs code ones
+
 ## 1.3.0
 
 - (same as vs code extension v0.7.0)

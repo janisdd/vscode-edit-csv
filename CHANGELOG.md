@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## 0.7.1
+- fixed issue #94 - find widget buttons are outside if panel
+- find widget design is now more similar to vs code ones
+
 ## 0.7.0
 - fixed issue #73 - changed style to match vs code ones (with webview-ui-toolki)
 	- however, there are some issues with 

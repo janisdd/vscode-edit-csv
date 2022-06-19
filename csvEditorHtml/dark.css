@@ -207,7 +207,8 @@ body.vscode-dark {
 }
 
 .vscode-dark .find-widget {
-	background-color: rgb(51, 51, 51);
+	background-color: #2a2a2a;
+	/* filter: brightness(120%); */
 }
 
 .vscode-dark .find-widget .divider {
@@ -215,7 +216,8 @@ body.vscode-dark {
 }
 
 .vscode-dark .find-widget .btn.active {
-	background-color: #3384ff;
+	border-color: rgba(0, 122, 204, 0);
+	background-color: rgba(0, 127, 212, 0.4);
 }
 
 .vscode-dark .find-widget .error-message {

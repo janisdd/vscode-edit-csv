@@ -111,11 +111,12 @@ body.vscode-light {
 }
 
 .vscode-light .ht_master tr> td.search-result-cell {
-	background-color: #ffff00!important;
+	background-color: #ffff5f!important;
 }
 
 .vscode-light .find-widget {
-	background-color: rgb(221, 221, 221);
+	background-color: #f3f3f3; /*from vs code light */
+	/* filter: brightness(80%); */
 }
 
 .vscode-light .find-widget .divider {
@@ -123,7 +124,8 @@ body.vscode-light {
 }
 
 .vscode-light .find-widget .btn.active {
-	background-color: #a3c7ff;
+	border-color: rgba(0, 122, 204, 0);
+	background-color:rgba(0, 144, 241, 0.2)
 }
 
 .vscode-light .find-widget .error-message {

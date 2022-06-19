@@ -7,7 +7,7 @@ class FindWidget {
 
 	findWidget: HTMLDivElement
 	findWidgetStartSearch: HTMLSpanElement
-	findWidgetInput: HTMLInputElement
+	findWidgetInput: HTMLInputElement //actually a vs code input field 
 	findWWidgetErrorMessage: HTMLDivElement
 	findWidgetInfo: HTMLSpanElement
 	findWidgetOutdatedSearch: HTMLSpanElement
@@ -754,6 +754,10 @@ class FindWidget {
 	 */
 	getIsSearchCancelDisplayed() {
 		return this.findWidgetCancelSearch.style.display === 'block'
+	}
+
+	selectAllInputText() {
+		((this.findWidgetInput as any).control as HTMLInputElement).select()
 	}
 
 	//--- find matches

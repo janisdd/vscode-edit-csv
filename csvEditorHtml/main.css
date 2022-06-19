@@ -374,9 +374,10 @@ tr.hidden-row-previous-row > th:after {
 	top: 0;
 	height: 34px;
 
-	box-shadow: 0 2px 8px #000000;
+	box-shadow: 0 0 8px 2px rgb(0 0 0 / 16%);
 	z-index: 2;
-	width: 480px;
+	/* width: 440px; */
+	background-color: var(--vscode-editor-background);
 }
 .find-widget #find-widget-info {
 	font-size: 13px;
@@ -391,32 +392,67 @@ tr.hidden-row-previous-row > th:after {
 	cursor: grabbing;
 }
 
-.find-widget .btn {
-	opacity: 0.7;
-	cursor: pointer;
-	margin: 5px;
+.find-widget .find-options {
+	margin-top: -2px;
 }
 
-.find-widget .btn.option {
-	font-size: 13px;
-	min-width: 23px;
-	margin: 5px 2px;
+.find-widget .find-options vscode-button {
+	margin-left: 2px;
+	border-radius: 3px;
+	height: 20px;
+	width: 20px;
 }
 
-.find-widget .btn span {
-	vertical-align: middle;
-	line-height: 27px;
+.find-widget .find-options vscode-button span {
+	font-size: 11px;
+	margin-top: 5px;
+}
+
+
+.find-widget .find-options #find-window-option-regex span {
+	position: relative;
+}
+
+.find-widget .find-options #find-window-option-regex span i:nth-child(1) {
+	position: absolute;
+	bottom: 2px;
+	left: 2px;
+	font-size: 4px;
+}
+.find-widget .find-options #find-window-option-regex span i:nth-child(2) {
+	position: absolute;
+	top: -1px;
+	right: 1px;
+	font-size: 7px;
+}
+
+.find-widget .find-options #find-window-option-whole-cell span {
+	/* border-bottom: 1px solid var(--foreground); */
+	/* border-top: 1px solid var(--foreground); */
+	text-decoration: overline underline;
+}
+
+.find-widget .find-options #find-window-option-whole-cell-trimmed span {
+	/* border-bottom: 1px solid var(--foreground); */
+	text-decoration: underline;
+}
+
+.find-widget .find-navigation-actions {
+	margin-right: 5px;
+	display: flex;
+	align-items: center;
+}
+
+.find-widget .find-navigation-actions vscode-button,
+.find-widget #find-widget-start-search {
+	width: 26px;
+	height: 26px;
 	text-align: center;
-	padding: 3px;
-}
-
-.find-widget .btn:hover {
-	opacity: 1;
 }
 
 .find-widget .info {
 	display: flex;
-	margin: 5px;
+	margin-right: 5px;
 	align-self: center;
 	align-items: center;
 	white-space: nowrap;
@@ -426,15 +462,14 @@ tr.hidden-row-previous-row > th:after {
 	display: inline-flex;
 	flex-direction: column;
 	position: relative;
-	margin: 5px;
-	flex: 1;
+	margin: 5px 3px 5px 5px;
 }
 .find-widget .search-input-wrapper .input {
 	height: 23px;
-	width: auto;
-	padding: 0 4px;
+	/* width: auto; */
+	/* padding: 0 4px;
 	border-radius: 0;
-	border: 1px solid transparent;
+	border: 1px solid transparent; */
 }
 .find-widget .search-input-wrapper .input:focus {
 	border-color: var(--focus-border);
@@ -1091,6 +1126,10 @@ vscode-button span {
 	border-radius: calc(var(--corner-radius) * 1px);
 	border: calc(var(--border-width) * 1px) solid var(--dropdown-border);
 	color: var(--input-foreground);
+	padding: 0;
+}
+#find-widget-input input {
+	padding: 0;
 }
 /* ca vs code webview toolkit */
 

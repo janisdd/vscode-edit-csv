@@ -1312,6 +1312,12 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				return
 			}
 
+			if ((event.ctrlKey || event.metaKey) && event.key === 'a' && findWidgetInstance.isFindWidgetDisplayed()) {
+				event.stopImmediatePropagation()
+				findWidgetInstance.selectAllInputText()
+				return
+			}
+
 			//NOTE that this can prevent all vs code shortcuts... e.g. cmd+p (on mac)!!!
 			if (event.ctrlKey && event.shiftKey && event.altKey && event.key === 'ArrowDown') {
 				event.stopImmediatePropagation()
