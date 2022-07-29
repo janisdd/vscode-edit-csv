@@ -95,8 +95,8 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			el.checked = true //sync ui in case we get here via autoApplyHasHeader
 
 			hot.updateSettings({
-				fixedRowsTop: 0,
-				fixedColumnsLeft: 0,
+				fixedRowsTop: fixedRowsTop,
+				fixedColumnsLeft: fixedColumnsLeft,
 			}, false)
 
 			let hasAnyChangesBefore = getHasAnyChangesUi()
