@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## 0.7.2
+- fixed issue #97 - fixed rows/columns is ignored if `hasHeader` was changed
+
 ## 0.7.1
 - fixed issue #94 - find widget buttons are outside if panel
 - find widget design is now more similar to vs code ones

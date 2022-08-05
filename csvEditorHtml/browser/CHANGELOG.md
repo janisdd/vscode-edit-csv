@@ -4,6 +4,9 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.3.2
+- (same as vs code extension v0.7.2)
+- fixed issue #97 - fixed rows/columns is ignored if `hasHeader` was changed
 
 ## 1.3.1
 
