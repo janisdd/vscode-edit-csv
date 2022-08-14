@@ -261,6 +261,15 @@ const numbersStyleNonEnRadio = _getById(`numbers-style-non-en`) as HTMLInputElem
 
 const isReadonlyModeToggleSpan = _getById(`is-readonly-mode-toggle`) as HTMLSpanElement
 
+
+const findWdigetToggleReplaceModeBtnWrapper = _getById(`find-widget-toggle-replace-mode-btn-wrapper`) as HTMLButtonElement
+const findWdigetToggleReplaceModeBtn = _getById(`find-widget-toggle-replace-mode-btn`) as HTMLButtonElement
+const findWidgetReplaceLine = _getById(`find-widget-replace-line`) as HTMLDivElement
+
+const findWidgetSearchMode = _getById(`find-widget-search-mode`) as HTMLElement
+const findWidgetReplaceMode = _getById(`find-widget-replace-mode`) as HTMLElement
+
+
 //--- find widget controls
 
 const findWidgetInstance = new FindWidget()

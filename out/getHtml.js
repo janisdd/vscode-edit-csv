@@ -56,82 +56,123 @@ function createEditorHtml(webview, context, config, initialVars) {
         findWidgetHtml = /*html*/ `
 		<div id="find-widget" class="find-widget" style="display: none; right: 100px;">
 
-		<div id="find-widget-progress-bar" class="progress-bar"></div>
-
 		<div class="gripper" onmousedown="findWidgetInstance.onFindWidgetGripperMouseDown(event)">
 			<i class="fas fa-grip-vertical"></i>
 		</div>
 
-		<div class="search-input-wrapper">
-			<vscode-text-field id="find-widget-input" placeholder="Find..." class="input" title="Enter to start search">
-			<span slot="end" style="width: 81px";>
-					<!-- search options -->
-				<div class="flexed find-options">
-					<vscode-button appearance="icon" id="find-window-option-match-case" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionMatchCase()" title="Match case">
-						<span>Aa</span>
-					</vscode-button>
+		<!-- expand to replace button-->
+		<div id="find-widget-toggle-replace-mode-btn-wrapper" class="toggle-replace-btn" onmousedown="toggleReplaceMode()">
+			<vscode-button id="find-widget-toggle-replace-mode-btn" appearance="icon" class="btn option" onclick="" title="Toggle replace">
+				<span>
+					<i id="find-widget-search-mode" class="fas fa-chevron-right"></i>
+					<i id="find-widget-replace-mode" class="fas fa-chevron-down" style="display: none;"></i>
+				</span>
+			</vscode-button>
+		</div>
 
-					<vscode-button appearance="icon" id="find-window-option-whole-cell" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionWholeCell()" title="Match whole cell value">
-						<span>Abl</span>
-					</vscode-button>
+		<div class="search-line">
 
-					<vscode-button appearance="icon" id="find-window-option-whole-cell-trimmed" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionMatchTrimmedCell()" title="Trims the cell value before comparing">
-						<span>A</span>
-					</vscode-button>
+			<div id="find-widget-progress-bar" class="progress-bar"></div>
 
-					<vscode-button appearance="icon" id="find-window-option-regex" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionRegex()" title="Use regular expression">
-						<span>
-							<i class="fas fa-square-full"></i>
-							<i class="fas fa-asterisk"></i>
-						</span>
-					</vscode-button>
+			<div class="search-input-wrapper">
+				<vscode-text-field id="find-widget-input" placeholder="Find..." class="input" title="Enter to start search">
+				<span slot="end" style="width: 81px";>
+						<!-- search options -->
+					<div class="flexed find-options">
+						<vscode-button appearance="icon" id="find-window-option-match-case" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionMatchCase()" title="Match case">
+							<span>Aa</span>
+						</vscode-button>
+
+						<vscode-button appearance="icon" id="find-window-option-whole-cell" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionWholeCell()" title="Match whole cell value">
+							<span>Abl</span>
+						</vscode-button>
+
+						<vscode-button appearance="icon" id="find-window-option-whole-cell-trimmed" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionMatchTrimmedCell()" title="Trims the cell value before comparing">
+							<span>A</span>
+						</vscode-button>
+
+						<vscode-button appearance="icon" id="find-window-option-regex" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionRegex()" title="Use regular expression">
+							<span>
+								<i class="fas fa-square-full"></i>
+								<i class="fas fa-asterisk"></i>
+							</span>
+						</vscode-button>
+					</div>
+				
+				</span>
+				</vscode-text-field>
+
+
+				<div id="find-widget-error-message" class="error-message">
 				</div>
-			
-			</span>
-			</vscode-text-field>
+			</div>
 
+			<div class="info">
+				<vscode-button appearance="icon" id="find-widget-start-search" class="clickable" style="margin-right: 3px;" onclick="findWidgetInstance.refreshCurrentSearch()"
+					title="Start search (Enter)">
+					<i class="fas fa-search"></i>
+				</vscode-button>
+				<span id="find-widget-info">0/0</span>
+				<span id="find-widget-cancel-search" title="Cancel search (Escape)" class="clickable" onclick="findWidgetInstance.onCancelSearch()" style="display: none;">
+					<i class="fas fa-hand-paper"></i>
+				</span>
+				<span id="find-widget-outdated-search" class="outdated-search clickable" style="display: none;" onclick="findWidgetInstance.refreshCurrentSearch()"
+					title="The table has changed, thus the search is outdated. Click to refresh the search.">
+					<i class="fas fa-exclamation-triangle"></i>
+				</span>
+			</div>	
 
-			<div id="find-widget-error-message" class="error-message">
+			<!-- search navigation buttons-->
+			<div class="find-navigation-actions">
+
+				<vscode-button appearance="icon" id="find-widget-previous" class="clickable" onclick="findWidgetInstance.gotoPreviousFindMatch()" title="Previous match (⇧F3)">
+					<span>
+						<i class="fas fa-chevron-up"></i>
+					</span>
+				</vscode-button>
+		
+				<vscode-button appearance="icon" id="find-widget-next"  class="clickable" onclick="findWidgetInstance.gotoNextFindMatch()" title="Next match (F3)">
+					<span>
+						<i class="fas fa-chevron-down"></i>
+					</span>
+				</vscode-button>
+		
+				<vscode-button appearance="icon" class="clickable"  onclick="findWidgetInstance.showOrHideWidget(false)" title="Close (Escape)">
+					<span>
+						<i class="fas fa-times"></i>
+					</span>
+				</vscode-button>
+
+			</div>
+
+		</div>
+
+		<!-- replace line -->
+		<div class="replace-line hidden" id="find-widget-replace-line">
+			<div class="replace-input-wrapper">
+				<vscode-text-field id="find-widget-replace-input" placeholder="Replace..." class="input" title="Enter to start replace" style="width: 257px;">
+					<span slot="end" style="width: 17px";>
+							<!-- search options -->
+						<div class="flexed find-options">
+							<vscode-button appearance="icon" id="find-widget-option-replace-preserve-case" class="btn option" onclick="findWidgetInstance.toggleReplaceModeOptionPreserveCase()" title="Preserve Case">
+								<span>AB</span>
+							</vscode-button>
+						</div>
+					
+					</span>
+					</vscode-text-field>
+			</div>
+	
+			<div class="replace-actions">
+				<vscode-button id="find-widget-replace-single-btn" appearance="icon" class="btn option" onclick="findWidgetInstance.replaceSingle()" title="Replace single occurrence">
+					<span><i class="fas fa-step-forward"></i></span>
+				</vscode-button>
+				<vscode-button id="find-widget-replace-multiple-btn" appearance="icon" class="btn option" onclick="findWidgetInstance.replaceAll()" title="Replace all occurrences">
+					<span><i class="fas fa-fast-forward"></i></span>
+				</vscode-button>
 			</div>
 		</div>
-
-		<div class="info">
-			<vscode-button appearance="icon" id="find-widget-start-search" class="clickable" style="margin-right: 3px;" onclick="findWidgetInstance.refreshCurrentSearch()"
-				title="Start search (Enter)">
-				<i class="fas fa-search"></i>
-			</vscode-button>
-			<span id="find-widget-info">0/0</span>
-			<span id="find-widget-cancel-search" title="Cancel search (Escape)" class="clickable" onclick="findWidgetInstance.onCancelSearch()" style="display: none;">
-				<i class="fas fa-hand-paper"></i>
-			</span>
-			<span id="find-widget-outdated-search" class="outdated-search clickable" style="display: none;" onclick="findWidgetInstance.refreshCurrentSearch()"
-				title="The table has changed, thus the search is outdated. Click to refresh the search.">
-				<i class="fas fa-exclamation-triangle"></i>
-			</span>
-		</div>	
-
-		<!-- search navigation buttons-->
-		<div class="find-navigation-actions">
-
-			<vscode-button appearance="icon" id="find-widget-previous" class="clickable" onclick="findWidgetInstance.gotoPreviousFindMatch()" title="Previous match (⇧F3)">
-				<span>
-					<i class="fas fa-chevron-up"></i>
-				</span>
-			</vscode-button>
-	
-			<vscode-button appearance="icon" id="find-widget-next"  class="clickable" onclick="findWidgetInstance.gotoNextFindMatch()" title="Next match (F3)">
-				<span>
-					<i class="fas fa-chevron-down"></i>
-				</span>
-			</vscode-button>
-	
-			<vscode-button appearance="icon" class="clickable"  onclick="findWidgetInstance.showOrHideWidget(false)" title="Close (Escape)">
-				<span>
-					<i class="fas fa-times"></i>
-				</span>
-			</vscode-button>
-
-		</div>
+		
 
 	</div>
 		`;

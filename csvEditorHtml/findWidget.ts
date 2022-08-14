@@ -13,6 +13,11 @@ class FindWidget {
 	findWidgetOutdatedSearch: HTMLSpanElement
 	findWidgetCancelSearch: HTMLSpanElement
 
+	findWidgetReplaceInput: HTMLInputElement //actually a vs code input field
+	findWidgetReplaceOptionPreserveCase: HTMLDivElement
+	findWidgetReplaceSingleBtn: HTMLDivElement
+	findWidgetReplaceMultipleBtn: HTMLDivElement
+
 	findWidgetOptionMatchCase: HTMLDivElement
 	findWidgetOptionWholeCell: HTMLDivElement
 	findWidgetOptionWholeCellTrimmed: HTMLDivElement
@@ -31,6 +36,8 @@ class FindWidget {
 	findOptionMatchWholeCellCache = false
 	findOptionTrimCellCache = false
 	findOptionUseRegexCache = false
+
+	findOptionReplacePreserveCase = false
 
 	//store old toggle state to show refresh search only when options really change
 	findOptionMatchCasePreviousCache = false
@@ -64,6 +71,8 @@ class FindWidget {
 	onFindWidgetDragEndBound: (e: MouseEvent) => void
 	onFindWidgetDragBound: (e: MouseEvent) => void
 
+	visibleStyle = `grid`
+
 	/**
 	 * stores the last find results
 	 */
@@ -82,6 +91,11 @@ class FindWidget {
 		this.findWidgetInfo = _getById('find-widget-info') as HTMLSpanElement
 		this.findWidgetOutdatedSearch = _getById('find-widget-outdated-search') as HTMLSpanElement
 		this.findWidgetCancelSearch = _getById('find-widget-cancel-search') as HTMLSpanElement
+
+		this.findWidgetReplaceInput = _getById('find-widget-replace-input') as HTMLInputElement
+		this.findWidgetReplaceOptionPreserveCase = _getById('find-widget-option-replace-preserve-case') as HTMLDivElement
+		this.findWidgetReplaceSingleBtn = _getById('find-widget-replace-single-btn') as HTMLDivElement
+		this.findWidgetReplaceMultipleBtn = _getById('find-widget-replace-multiple-btn') as HTMLDivElement
 
 		this.findWidgetOptionMatchCase = _getById('find-window-option-match-case') as HTMLDivElement
 		this.findWidgetOptionWholeCell = _getById('find-window-option-whole-cell') as HTMLDivElement
@@ -128,7 +142,7 @@ class FindWidget {
 			return
 		}
 
-		this.findWidget.style.display = show ? 'flex' : 'none'
+		this.findWidget.style.display = show ? this.visibleStyle : 'none'
 
 		if (show) {
 
@@ -161,7 +175,7 @@ class FindWidget {
 				//search is in progress...
 				this.onCancelSearch()
 				//when we cancel via esc we don't want to hide the find widget
-				this.findWidget.style.display = 'flex'
+				this.findWidget.style.display = this.visibleStyle
 			} else {
 				//search has already finished... just hide old result
 				hot.updateSettings({
@@ -227,7 +241,9 @@ class FindWidget {
 
 	onDocumentRootKeyDown(e: ExtendedKeyboardEvent) {
 
-		if (this.isFindWidgetDisplayed() && document.activeElement === this.findWidgetInput) {
+		if (this.isFindWidgetDisplayed() && 
+		(document.activeElement === this.findWidgetInput || document.activeElement === this.findWidgetReplaceInput)
+		) {
 
 			//when the find widget is displayed AND has focus do not pass the event to handsontable
 			//else we would input into the cell editor...
@@ -482,6 +498,16 @@ class FindWidget {
 
 	toggleFindWindowOptionMatchCase() {
 		this.setFindWindowOptionMatchCase(this.findWidgetOptionMatchCase.classList.contains(`active`) ? false : true)
+	}
+
+	toggleReplaceModeOptionPreserveCase() {
+		if (this.findWidgetReplaceOptionPreserveCase.classList.contains(`active`)) {
+			this.findOptionReplacePreserveCase = false
+			this.findWidgetReplaceOptionPreserveCase.classList.remove(`active`)
+		} else {
+			this.findOptionReplacePreserveCase = true
+			this.findWidgetReplaceOptionPreserveCase.classList.add(`active`)
+		}
 	}
 
 	setFindWindowOptionMatchCase(enabled: boolean) {
@@ -934,6 +960,20 @@ class FindWidget {
 		currRight = Math.max(currRight, 0)
 		currRight = Math.min(currRight, document.body.clientWidth - this.findWidget.clientWidth)
 		this.findWidget.style.right = `${currRight}px`
+	}
+
+	replaceSingle() {
+		
+		//last search result might be outdated...
+
+		//optimizse: if the replaced value matches again, keep the match, if not discard the match
+
+	}
+
+	replaceAll() {
+
+		//TODO must be one undo set
+
 	}
 
 

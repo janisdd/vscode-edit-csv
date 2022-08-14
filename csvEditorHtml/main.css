@@ -368,22 +368,33 @@ tr.hidden-row-previous-row > th:after {
 }
 
 .find-widget {
-	display: flex;
+	display: grid;
+	grid-template-rows: auto auto;
+	grid-template-columns: auto auto 1fr;
 	position: fixed;
 	/* right: 100px; */ /* set this directly in html so we can access it via .style*/
 	top: 0;
-	height: 34px;
+	/* height: 34px; */
 
 	box-shadow: 0 0 8px 2px rgb(0 0 0 / 16%);
 	z-index: 2;
 	/* width: 440px; */
 	background-color: var(--vscode-editor-background);
 }
+
+.find-widget .search-line {
+	grid-row: 1;
+	grid-column: 3;
+	display: flex;
+}
+
 .find-widget #find-widget-info {
 	font-size: 13px;
 }
 
 .find-widget .gripper {
+	grid-row: 1;
+	grid-column: 1;
 	cursor: grab;
 	margin: 5px;
 	color: #6d6d6d;
@@ -444,6 +455,7 @@ tr.hidden-row-previous-row > th:after {
 }
 
 .find-widget .find-navigation-actions vscode-button,
+.find-widget .replace-actions vscode-button,
 .find-widget #find-widget-start-search {
 	width: 26px;
 	height: 26px;
@@ -458,25 +470,29 @@ tr.hidden-row-previous-row > th:after {
 	white-space: nowrap;
 }
 
-.find-widget .search-input-wrapper {
+.find-widget .search-input-wrapper,
+.find-widget .replace-input-wrapper {
 	display: inline-flex;
 	flex-direction: column;
 	position: relative;
 	margin: 5px 3px 5px 5px;
 }
-.find-widget .search-input-wrapper .input {
+.find-widget .search-input-wrapper .input,
+.find-widget .replace-input-wrapper .input {
 	height: 23px;
 	/* width: auto; */
 	/* padding: 0 4px;
 	border-radius: 0;
 	border: 1px solid transparent; */
 }
-.find-widget .search-input-wrapper .input:focus {
+.find-widget .search-input-wrapper .input:focus
+.find-widget .replace-input-wrapper .input:focus {
 	border-color: var(--focus-border);
 	outline: none;
 }
 
-.find-widget .search-input-wrapper .input:disabled {
+.find-widget .search-input-wrapper .input:disabled
+.find-widget .replace-input-wrapper .input:disabled {
 	color: #757575;
 }
 
@@ -515,6 +531,35 @@ tr.hidden-row-previous-row > th:after {
 
 	height: 2px;
 	background-color: #3384ff;
+}
+
+.find-widget .toggle-replace-btn {
+	grid-row-start: 1;
+	grid-row-end: 1;
+
+	grid-column: 2;
+}
+
+.find-widget .toggle-replace-btn.expanded {
+	grid-row-start: 1;
+	grid-row-end: 3;
+}
+
+.find-widget .replace-line {
+	grid-row: 2;
+	grid-column: 3;
+	display: flex;
+}
+
+.find-widget .replace-line.hidden {
+	display: none;
+}
+
+.find-widget .replace-line .replace-input-wrapper {
+
+}
+.find-widget .replace-line .replace-actions {
+	display: flex;
 }
 
 .div-disabled {

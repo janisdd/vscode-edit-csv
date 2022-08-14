@@ -2368,3 +2368,20 @@ function toggleReadonlyMode() {
 
 	_updateToggleReadonlyModeUi()
 }
+
+function toggleReplaceMode() {
+	
+	if (findWdigetToggleReplaceModeBtnWrapper.classList.contains(`expanded`)) {
+		//will be collapsed to search mode
+		findWidgetSearchMode.style.display = `block`
+		findWidgetReplaceMode.style.display = `none`
+	} else {
+		//will be expanded to replace mode
+		findWidgetSearchMode.style.display = `none`
+		findWidgetReplaceMode.style.display = `block`
+	}
+
+	findWdigetToggleReplaceModeBtnWrapper.classList.toggle(`expanded`)
+	findWidgetReplaceLine.classList.toggle(`hidden`)
+	findWdigetToggleReplaceModeBtn.style.height = `100%`
+}
