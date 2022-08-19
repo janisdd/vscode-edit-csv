@@ -269,6 +269,8 @@ const findWidgetReplaceLine = _getById(`find-widget-replace-line`) as HTMLDivEle
 const findWidgetSearchMode = _getById(`find-widget-search-mode`) as HTMLElement
 const findWidgetReplaceMode = _getById(`find-widget-replace-mode`) as HTMLElement
 
+const findWidgetGripper = _getById(`find-widget-gripper`) as HTMLElement
+
 
 //--- find widget controls
 

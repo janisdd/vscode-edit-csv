@@ -29,6 +29,12 @@ class FindWidget {
 	findWidgetDownPointOffsetInPx: number
 
 	findWidgetInputValueCache: string
+	/**
+	 * needed because user could change the input after the search has been finished
+	 */
+	findWidgetReplaceInputCache: string
+
+	findWidgetReplaceSameCellOffset: number | null = null
 
 
 	//cache the state for query method to not interact with dom
@@ -107,6 +113,7 @@ class FindWidget {
 		this.findWidgetGripperIsMouseDown = false
 		this.findWidgetDownPointOffsetInPx = 0 //gripper relative to the find widget
 		this.findWidgetInputValueCache = ''
+		this.findWidgetReplaceInputCache = ''
 
 		this.onWindowResizeThrottled = throttle(this.onWindowResize, 200)
 		this.onSearchInputPreDebounced = debounce(this.onSearchInputPre, 200)
@@ -149,6 +156,10 @@ class FindWidget {
 			//we cleared the search input but didn't search
 			if (this.findWidgetInput.value === '' && this.findWidgetInputValueCache !== '') {
 				this.findWidgetInput.value = this.findWidgetInputValueCache
+			}
+
+			if (this.findWidgetReplaceInput.value === '' && this.findWidgetReplaceInputCache !== '') {
+				this.findWidgetReplaceInput.value = this.findWidgetReplaceInputCache
 			}
 
 			//when the last search was cancelled then we don't want to show highlighted cells
@@ -241,8 +252,8 @@ class FindWidget {
 
 	onDocumentRootKeyDown(e: ExtendedKeyboardEvent) {
 
-		if (this.isFindWidgetDisplayed() && 
-		(document.activeElement === this.findWidgetInput || document.activeElement === this.findWidgetReplaceInput)
+		if (this.isFindWidgetDisplayed() &&
+			(document.activeElement === this.findWidgetInput || document.activeElement === this.findWidgetReplaceInput)
 		) {
 
 			//when the find widget is displayed AND has focus do not pass the event to handsontable
@@ -811,6 +822,8 @@ class FindWidget {
 
 		if (!hot) return
 
+		this.findWidgetReplaceSameCellOffset = null
+
 		if (matchIndex >= this.lastFindResults.length) {
 			this.gotoFindMatchByIndex(0)
 			return
@@ -962,18 +975,152 @@ class FindWidget {
 		this.findWidget.style.right = `${currRight}px`
 	}
 
-	replaceSingle() {
-		
+	getCurrentCellData(match: HandsontableSearchResult): string | undefined {
+		const visualRowIndex = hot!.toVisualRow(match.rowReal)
+		const visualColIndex = hot!.toVisualColumn(match.colReal)
+		const cellData = hot!.getDataAtCell(visualRowIndex, visualColIndex)
+		return cellData
+	}
+
+	/**
+	 * @param onlyIncrementFindIndexNotUi true: only increment the find index and do not update the UI (index might get out of bounds), useful for rapid replacements)
+	 * @returns true if we have more matches in the same cell
+	 */
+	replaceSingle(onlyIncrementFindIndexNotUi: boolean = false): boolean {
+		if (!hot) return false
+
+		//TODO what on undo? findWidgetReplaceSameCellOffset is outdated!!!
+		this.findWidgetReplaceInputCache = this.findWidgetReplaceInput.value
+
 		//last search result might be outdated...
 
 		//optimizse: if the replaced value matches again, keep the match, if not discard the match
+		let match = this.lastFindResults[this.currentFindIndex]
+
+		this.gotoFindMatchByIndex(this.currentFindIndex)
+
+		let matchData = this.getCurrentCellData(match)
+		if (matchData !== null && matchData !== undefined) {
+
+			if (this.findWidgetReplaceSameCellOffset === null) {
+				this.findWidgetReplaceSameCellOffset = 0
+			}
+
+			const newValue = this.getReplacedCellValue(matchData, this.findWidgetReplaceSameCellOffset)
+			hot.setDataAtCell(match.row, match.col, newValue.newValue)
+
+			if (newValue.nextStartIndex !== null) {
+
+				let leftValue = newValue.newValue.substring(newValue.nextStartIndex)
+
+			let isStillMatch = customSearchMethod(this.findWidgetInputValueCache, leftValue)
+			if (isStillMatch) {
+				//keep replacing in this cell...
+				this.findWidgetReplaceSameCellOffset = newValue.nextStartIndex
+				return true
+			} else {
+				//proceed to next match...
+				//also resets cell offset
+				if (onlyIncrementFindIndexNotUi) {
+					this.currentFindIndex++
+				} else {
+					this.gotoNextFindMatch()
+				}
+			}
+
+			} else {
+				//proceed to next match...
+				//also resets cell offset
+				if (onlyIncrementFindIndexNotUi) {
+					this.currentFindIndex++
+				} else {
+					this.gotoNextFindMatch()
+				}
+			}
+			
+		}
+		return false
+	}
+
+	/**
+	 * @see {@link customSearchMethod}
+	 * @param value 
+	 */
+	getReplacedCellValue(value: string, startIndex: number): {newValue: string, nextStartIndex: number | null} {
+
+		let originalValue = value
+		let query = this.findWidgetInputValueCache
+		let replaceValue = this.findWidgetReplaceInputCache
+
+		const isMatch = customSearchMethod(query, value)
+
+		if (!this.findOptionMatchCaseCache) {
+			value = value.toLowerCase()
+			query = query.toLowerCase()
+		}
+
+		//not needed ?
+		// if (this.findOptionTrimCellCache) {
+		// 	value = value.trim()
+		// }
+
+		if (findWidgetInstance.findOptionUseRegexCache) {
+			//TODO 
+
+			throw new Error("not implemented")
+
+		} else {
+
+			if (findWidgetInstance.findOptionMatchWholeCellCache && isMatch) {
+				return {
+					newValue: replaceValue,
+					nextStartIndex: 0,
+				}
+
+			} else {
+				//no regex, we might match multiple parts...
+
+				let index = value.indexOf(query, startIndex)
+
+				if (index === -1) {
+					return {
+						newValue: originalValue,
+						nextStartIndex: null,
+					}
+				}
+
+				let newValue = originalValue.substring(0, index) + replaceValue + originalValue.substring(index + query.length)
+				return {
+					newValue,
+					nextStartIndex: index + replaceValue.length,
+				}
+			}
+		}
 
 	}
 
 	replaceAll() {
 
 		//TODO must be one undo set
+		//TODO slow, check on browser dev tools (vs code do not show function...)
 
+		let prevIndex = this.currentFindIndex
+		this.currentFindIndex = 0
+		let firstRun = true
+		let hasMoreMatches = false
+
+		console.time("replaceAll")
+
+
+		//because we cycle with next match, this is when we need to end
+		while (this.currentFindIndex < this.lastFindResults.length && (this.currentFindIndex !== 0 || firstRun || hasMoreMatches)) {
+			hasMoreMatches = this.replaceSingle(true)
+			firstRun = false
+		}
+
+		console.timeEnd("replaceAll")
+
+		this.gotoFindMatchByIndex(prevIndex)
 	}
 
 

@@ -56,7 +56,7 @@ function createEditorHtml(webview, context, config, initialVars) {
         findWidgetHtml = /*html*/ `
 		<div id="find-widget" class="find-widget" style="display: none; right: 100px;">
 
-		<div class="gripper" onmousedown="findWidgetInstance.onFindWidgetGripperMouseDown(event)">
+		<div id="find-widget-gripper" class="gripper" onmousedown="findWidgetInstance.onFindWidgetGripperMouseDown(event)">
 			<i class="fas fa-grip-vertical"></i>
 		</div>
 
@@ -150,7 +150,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 		<!-- replace line -->
 		<div class="replace-line hidden" id="find-widget-replace-line">
 			<div class="replace-input-wrapper">
-				<vscode-text-field id="find-widget-replace-input" placeholder="Replace..." class="input" title="Enter to start replace" style="width: 257px;">
+				<vscode-text-field id="find-widget-replace-input" placeholder="Replace..." class="input" title="Enter to start replace">
 					<span slot="end" style="width: 17px";>
 							<!-- search options -->
 						<div class="flexed find-options">

@@ -398,9 +398,16 @@ tr.hidden-row-previous-row > th:after {
 	cursor: grab;
 	margin: 5px;
 	color: #6d6d6d;
+	display: flex;
+	align-items: center;
 }
 .find-widget .gripper:active {
 	cursor: grabbing;
+}
+
+.find-widget .gripper.expanded {
+	grid-row-start: 1;
+	grid-row-end: 3;
 }
 
 .find-widget .find-options {

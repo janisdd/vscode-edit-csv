@@ -2381,6 +2381,7 @@ function toggleReplaceMode() {
 		findWidgetReplaceMode.style.display = `block`
 	}
 
+	findWidgetGripper.classList.toggle(`expanded`)
 	findWdigetToggleReplaceModeBtnWrapper.classList.toggle(`expanded`)
 	findWidgetReplaceLine.classList.toggle(`hidden`)
 	findWdigetToggleReplaceModeBtn.style.height = `100%`
