@@ -59,10 +59,22 @@ body.vscode-light {
 	background-color: white;
 }
 
+.vscode-light .ht_clone_top tr:nth-of-type(odd)> td.search-result-cell,
+.vscode-light .ht_clone_left tr:nth-of-type(odd)> td.search-result-cell,
+.vscode-light .ht_clone_top_left_corner tr:nth-of-type(odd)> td.search-result-cell {
+	background-color: #ffff5f!important;
+}
+
 .vscode-light .ht_clone_top tr:nth-of-type(even)> td,
 .vscode-light .ht_clone_left tr:nth-of-type(even)> td,
 .vscode-light .ht_clone_top_left_corner tr:nth-of-type(even)> td {
 	background-color: #f7f7f7;
+}
+
+.vscode-light .ht_clone_top tr:nth-of-type(even)> td.search-result-cell,
+.vscode-light .ht_clone_left tr:nth-of-type(even)> td.search-result-cell,
+.vscode-light .ht_clone_top_left_corner tr:nth-of-type(even)> td.search-result-cell {
+	background-color: #ffff5f!important;
 }
 
 .vscode-light .ht_clone_top tr:last-child > td,

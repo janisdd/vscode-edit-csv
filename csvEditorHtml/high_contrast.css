@@ -85,9 +85,17 @@ body.vscode-high-contrast {
 	border-color: #5c5c5c;
 }
 
+.vscode-high-contrast .ht_clone_top tr:nth-of-type(odd)> td.search-result-cell {
+	background-color: #9d00ff!important;
+}
+
 .vscode-high-contrast .ht_clone_top tr:nth-of-type(even)> td {
 	background-color: #1d1d1d;
 	border-color: #5c5c5c;
+}
+
+.vscode-high-contrast .ht_clone_top tr:nth-of-type(even)> td.search-result-cell {
+	background-color: #9d00ff!important;
 }
 
 .vscode-high-contrast .ht_clone_top tr:last-child > td {

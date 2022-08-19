@@ -112,11 +112,24 @@ body.vscode-dark {
 	border-color: #5c5c5c;
 }
 
+.vscode-dark .ht_clone_top tr:nth-of-type(odd)> td.search-result-cell,
+.vscode-dark .ht_clone_left tr:nth-of-type(odd)> td.search-result-cell,
+.vscode-dark .ht_clone_top_left_corner tr:nth-of-type(odd)> td.search-result-cell {
+	background-color: #585802;
+}
+
+
 .vscode-dark .ht_clone_top tr:nth-of-type(even)> td,
 .vscode-dark .ht_clone_left tr:nth-of-type(even)> td,
 .vscode-dark .ht_clone_top_left_corner tr:nth-of-type(even)> td {
 	background-color: #2d3436;
 	border-color: #5c5c5c;
+}
+
+.vscode-dark .ht_clone_top tr:nth-of-type(even)> td.search-result-cell,
+.vscode-dark .ht_clone_left tr:nth-of-type(even)> td.search-result-cell,
+.vscode-dark .ht_clone_top_left_corner tr:nth-of-type(even)> td.search-result-cell {
+	background-color: #585802;
 }
 
 .vscode-dark .ht_clone_top tr:last-child > td,
