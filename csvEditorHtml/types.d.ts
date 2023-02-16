@@ -191,6 +191,13 @@ type EditCsvConfig = {
 	initialColumnWidth: number
 
 	/**
+	 * true: auto sizing columns will ignore comments, false: auto sizing columns will take comments into account
+	 * e.g. with double click on column handle
+	 * NOTE that cell values are trimmend and checked if the value starts with the comment string
+	 */
+	autoColumnWithsIgnoreComments: boolean
+
+	/**
 	 * true: information about quoted fields are retained during parsing (for more details see readme), false: information about quoted field is discarded
 	 */
 	retainQuoteInformation: boolean

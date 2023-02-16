@@ -23,8 +23,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Version: 6.4.5
- * Release date: 19/12/2018 (built at 22/04/2022 18:33:20)
+ * Version: 6.5.0
+ * Release date: 19/12/2018 (built at 16/02/2023 13:34:41)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29737,9 +29737,9 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "22/04/2022 18:33:20";
+Handsontable.buildDate = "16/02/2023 13:34:41";
 Handsontable.packageName = "handsontable";
-Handsontable.version = "6.4.5";
+Handsontable.version = "6.5.0";
 var baseVersion = "";
 
 if (baseVersion) {
@@ -43263,6 +43263,12 @@ function (_BasePlugin) {
 
     _this.widths = [];
     /**
+     * used to ignore cell widths of comment cells
+     * @type {(cellValue) => boolean}
+     */
+
+    _this.ignoreCellWidthFunc = null;
+    /**
      * Instance of {@link GhostTable} for rows and columns size calculations.
      *
      * @private
@@ -43459,7 +43465,33 @@ function (_BasePlugin) {
       } : rowRange;
       (0, _number.rangeEach)(columnsRange.from, columnsRange.to, function (col) {
         if (force || _this4.widths[col] === void 0 && !_this4.hot._getColWidthFromSettings(col)) {
+          // samples is a map with one entry for every requested col (only one in this case), key is the column index, e.g. { 0 => ...}
+          // value is also a map with entries: { key: char count => {needed: 1, strings: [...]}}
+          // needed use by handsontable to track how many more samples are needed (decreased by 1 for each sample, initial value is 3)
+          // strings are the samples strings from the real table... in the format {value: string, row: 0-based index }
           var samples = _this4.samplesGenerator.generateColumnSamples(col, rowsRange);
+
+          if (_this4.ignoreCellWidthFunc) {
+            samples.forEach(function (sample) {
+              sample.forEach(function (obj, lengthInChars) {
+                for (var i = 0; i < obj.strings.length; i++) {
+                  var stringObj = obj.strings[i];
+
+                  var ignoreCellWidth = _this4.ignoreCellWidthFunc(stringObj.value);
+
+                  if (ignoreCellWidth) {
+                    obj.strings.splice(i, 1); // eslint-disable-next-line no-plusplus
+
+                    i--;
+                  }
+                }
+
+                if (obj.strings.length === 0) {
+                  sample.delete(lengthInChars);
+                }
+              });
+            });
+          }
 
           (0, _array.arrayEach)(samples, function (_ref) {
             var _ref2 = _slicedToArray(_ref, 2),

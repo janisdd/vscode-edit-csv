@@ -29,6 +29,7 @@ const defaultConfig: EditCsvConfig = {
 	initiallyHideComments: false,
 	enableWrapping: true,
 	initialColumnWidth: 0,
+	autoColumnWithsIgnoreComments: true,
 	retainQuoteInformation: true,
 	newColumnQuoteInformationIsQuoted: false,
 	disableBorders: false,

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+# 0.7.3
+
+- added option `csv-edit.autoColumnWithsIgnoreComments` to ignore comment cells for auto column sizing
+- `csv-edit.lastRowOrFirstRowNavigationBehavior` default is now `stop` (was `wrap`)
+- `csv-edit.lastColumnOrFirstColumnNavigationBehavior` default is now `stop` (was `wrap`)
+
 ## 0.7.2
 - fixed issue #97 - fixed rows/columns is ignored if `hasHeader` was changed
 
