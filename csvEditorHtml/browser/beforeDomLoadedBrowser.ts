@@ -39,7 +39,7 @@ var initialConfig: EditCsvConfig | undefined = {
 	quoteAllFields: false,
 	quoteEmptyOrNullFields: 'false',
 	initiallyHideComments: false,
-	autoColumnWithsIgnoreComments: true,
+	autoColumnWidthsIgnoreComments: true,
 	enableWrapping: true,
 	initialColumnWidth: 0,
 	retainQuoteInformation: true,

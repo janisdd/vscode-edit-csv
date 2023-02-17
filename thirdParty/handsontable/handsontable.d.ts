@@ -629,7 +629,7 @@ declare namespace Handsontable {
       samplesGenerator: SamplesGenerator;
       widths: any[];
 
-      ignoreCellWidthFunc: null | (value: string) => boolean;
+      ignoreCellWidthFunc: null | ((value: string) => boolean);
 
       calculateAllColumnsWidth(rowRange?: number | object): void;
       calculateColumnsWidth(colRange?: number | object, rowRange?: number | object, force?: boolean): void;

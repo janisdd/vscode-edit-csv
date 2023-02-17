@@ -195,7 +195,7 @@ type EditCsvConfig = {
 	 * e.g. with double click on column handle
 	 * NOTE that cell values are trimmend and checked if the value starts with the comment string
 	 */
-	autoColumnWithsIgnoreComments: boolean
+	autoColumnWidthsIgnoreComments: boolean
 
 	/**
 	 * true: information about quoted fields are retained during parsing (for more details see readme), false: information about quoted field is discarded

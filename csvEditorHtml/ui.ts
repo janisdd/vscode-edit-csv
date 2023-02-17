@@ -1341,9 +1341,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		//this is enough (to set it once [after hot creation], because plugins are only disabled but never destroyed)
 		let autoColumnSizePlugin = hot.getPlugin('autoColumnSize')
 		autoColumnSizePlugin.ignoreCellWidthFunc = (value: string) => {
-			const ignoreCommentCellWiths = initialConfig?.autoColumnWithsIgnoreComments ?? true
+			const ignoreCommentCellWidths = initialConfig?.autoColumnWidthsIgnoreComments ?? true
 
-			return ignoreCommentCellWiths && isCommentCell(value, csvReadConfig)
+			return ignoreCommentCellWidths && isCommentCell(value, csvReadConfig)
 		}
 	}
 

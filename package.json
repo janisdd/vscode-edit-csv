@@ -426,7 +426,7 @@
 					"default": 0,
 					"description": "the initial width for columns, 0 or a negative number will disable this and auto column size is used on initial render"
 				},
-				"csv-edit.autoColumnWithsIgnoreComments": {
+				"csv-edit.autoColumnWidthsIgnoreComments": {
 					"type": "boolean",
 					"default": true,
 					"description": "true: auto sizing columns will ignore comments, false: auto sizing columns will take comments into account"

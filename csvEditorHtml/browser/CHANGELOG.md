@@ -6,7 +6,7 @@ note that the changelog is also present on the website when you click on the ver
 
 ## 1.3.3
 - (same as vs code extension v0.7.3)
-- added option `csv-edit.autoColumnWithsIgnoreComments` to ignore comment cells for auto column sizing
+- added option `csv-edit.autoColumnWidthsIgnoreComments` to ignore comment cells for auto column sizing
 - `csv-edit.lastRowOrFirstRowNavigationBehavior` default is now `stop` (was `wrap`)
 - `csv-edit.lastColumnOrFirstColumnNavigationBehavior` default is now `stop` (was `wrap`)
 
