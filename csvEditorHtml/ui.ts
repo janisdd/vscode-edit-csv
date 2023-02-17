@@ -1342,8 +1342,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		let autoColumnSizePlugin = hot.getPlugin('autoColumnSize')
 		autoColumnSizePlugin.ignoreCellWidthFunc = (value: string) => {
 			const ignoreCommentCellWidths = initialConfig?.autoColumnWidthsIgnoreComments ?? true
+			const commentsAreHidden = !getAreCommentsDisplayed() //when user has chosen to hide comments, we should not ignore them for column widths
 
-			return ignoreCommentCellWidths && isCommentCell(value, csvReadConfig)
+			return (ignoreCommentCellWidths || commentsAreHidden) && isCommentCell(value, csvReadConfig)
 		}
 	}
 

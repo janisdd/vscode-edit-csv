@@ -29,7 +29,7 @@ const defaultConfig = {
     initiallyHideComments: false,
     enableWrapping: true,
     initialColumnWidth: 0,
-    autoColumnWithsIgnoreComments: true,
+    autoColumnWidthsIgnoreComments: true,
     retainQuoteInformation: true,
     newColumnQuoteInformationIsQuoted: false,
     disableBorders: false,
