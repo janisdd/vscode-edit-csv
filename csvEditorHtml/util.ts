@@ -378,6 +378,15 @@ function _insertColInternal(afterCurrCol: boolean) {
 		default: notExhaustiveSwitch(focusBehavior)
 	}
 }
+
+function deleteCurrentRow() {
+	const currRowIndex = _getSelectedVisualRowIndex()
+
+	if (currRowIndex === null) return
+
+	removeRow(currRowIndex)
+}
+
 /**
  * removes a row by index
  * @param {number} index 0 based
@@ -477,13 +486,13 @@ function _setOption<T extends {}>(targetOptions: T, options: T, optionName: keyo
 	if (options.hasOwnProperty(optionName)) {
 
 		if (targetOptions.hasOwnProperty(optionName) === false) {
-			_error(`target options object has not property '${optionName}'`)
+			_error(`target options object has not property '${String(optionName)}'`)
 			return
 		}
 
 		targetOptions[optionName] = options[optionName]
 	} else {
-		_error(`options object has not property '${optionName}'`)
+		_error(`options object has not property '${String(optionName)}'`)
 	}
 }
 
@@ -1185,7 +1194,7 @@ function calcHotCellToSelectFromCurosPos(
 			currentCsvRowStartTextFileLineIndex = csvParseResult.outLineIndexToCsvLineIndexMapping.indexOf(csvRowToSelect)
 			currentCsvRowEndTextFileLineIndex = currentCsvRowStartTextFileLineIndex
 
-			if (currentCsvRowStartTextFileLineIndex == -1) {
+			if (currentCsvRowStartTextFileLineIndex === -1) {
 				throw new Error(`Could not find text line for csv row ${csvRowToSelect}`)
 			}
 
