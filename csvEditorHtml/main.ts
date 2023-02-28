@@ -379,7 +379,7 @@ function setupGlobalShortcutsInVs() {
 	})
 	//bad for mac... deletes row but inserts hyphens (of different lengths, depending in ctrl or shift is pressed or combined)
 	Mousetrap.bindGlobal(['ctrl+shift+alt+-'], (e) => {
-		deleteCurrentRow()
+		pretendRemoveRowContextMenuActionClicked()
 	})
 
 	//---- some shortcuts are also in ui.ts where the handsontable instance is created...

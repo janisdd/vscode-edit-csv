@@ -379,12 +379,65 @@ function _insertColInternal(afterCurrCol: boolean) {
 	}
 }
 
-function deleteCurrentRow() {
-	const currRowIndex = _getSelectedVisualRowIndex()
+function getIsCallRemoveRowContextMenuActionDisabled(): boolean {
 
-	if (currRowIndex === null) return
+	if (isReadonlyMode) return true
 
-	removeRow(currRowIndex)
+	const selection = hot!.getSelected()
+	let allRowsAreSelected = false
+	if (selection) {
+		const selectedRowsCount = Math.abs(selection[0][0] - selection[0][2]) //starts at 0 --> +1
+		allRowsAreSelected = hot!.countRows() === selectedRowsCount + 1
+	}
+
+	return hot!.countRows() === 1 || allRowsAreSelected
+}
+
+/**
+ * different than {@link removeRow} because this can remove whole ranges (also not contiguous)
+ */
+function pretendRemoveRowContextMenuActionClicked() {
+
+	if (!hot) return
+
+	let isMenuActionDisabled = getIsCallRemoveRowContextMenuActionDisabled()
+
+	if (isMenuActionDisabled) return
+
+	const activeEditor = hot.getActiveEditor() as any
+	//this is needed because current shortcut (ctrl+shift+alt+-) will insert dash in the cell
+	if (activeEditor && activeEditor.isOpened()) {
+		activeEditor.finishEditing(true) //true reverses the changes (does not interact with the undo stack)
+		activeEditor.close()
+	}
+
+	// setTimeout(() => { //not needed active editor is closed immediately (dash insert is fixed even without this)
+
+		const currRowIndex = _getSelectedVisualRowIndex()
+
+		if (currRowIndex === null) return
+	
+		//copied from context menu remove row action
+		const selRanges = hot!.getSelectedRange()
+		// function normalizeSelection(selRanges) {
+		// 	return (0, _array.arrayMap)(selRanges, function (range) {
+		// 		return {
+		// 			start: range.getTopLeftCorner(),
+		// 			end: range.getBottomRightCorner()
+		// 		};
+		// 	});
+		// }
+		const normalizedSelection = selRanges 
+		? selRanges.map(range => ({
+			start: (range as any).getTopLeftCorner(),
+			end: (range as any).getBottomRightCorner(),
+		}))
+		: [];
+	
+		//actual context menu also passes mouse event, but we don't need it here
+		hot!.getPlugin('contextMenu')?.executeCommand('remove_row', normalizedSelection)
+	// }, 0)
+
 }
 
 /**

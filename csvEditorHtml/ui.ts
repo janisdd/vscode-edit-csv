@@ -598,16 +598,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				'remove_row': {
 					disabled: function () {
 
-						if (isReadonlyMode) return true
-
-						const selection = hot!.getSelected()
-						let allRowsAreSelected = false
-						if (selection) {
-							const selectedRowsCount = Math.abs(selection[0][0] - selection[0][2]) //starts at 0 --> +1
-							allRowsAreSelected = hot!.countRows() === selectedRowsCount + 1
-						}
-
-						return hot!.countRows() === 1 || allRowsAreSelected
+						return getIsCallRemoveRowContextMenuActionDisabled()
 					},
 				},
 				'remove_col': {
