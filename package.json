@@ -577,6 +577,16 @@
 						"use the default font",
 						"use the same font family as the code editor"
 					]
+				},
+				"csv-edit.showDeleteColumnHeaderButton": {
+					"type": "boolean",
+					"default": true,
+					"description": "true: shows a delete column button in the column header (on hover), false: not"
+				},
+				"csv-edit.showDeleteRowHeaderButton": {
+					"type": "boolean",
+					"default": true,
+					"description": "true: shows a delete row button in the row header (on hover), false: not"
 				}
 			}
 		}

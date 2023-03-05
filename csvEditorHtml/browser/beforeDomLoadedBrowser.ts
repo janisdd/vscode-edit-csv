@@ -19,9 +19,9 @@ var initialVars: InitialVars = {
 var initialConfig: EditCsvConfig | undefined = {
 	highlightCsvComments: true,
 	lastRowEnterBehavior: 'default',
-	lastColumnTabBehavior: 'createColumn',
-	lastRowOrFirstRowNavigationBehavior: 'wrap',
-	lastColumnOrFirstColumnNavigationBehavior: 'wrap',
+	lastColumnTabBehavior: 'default',
+	lastRowOrFirstRowNavigationBehavior: 'stop',
+	lastColumnOrFirstColumnNavigationBehavior: 'stop',
 	optionsBarAppearance: "collapsed",
 	readOption_comment: "#",
 	readOption_quoteChar: '"',
@@ -59,6 +59,8 @@ var initialConfig: EditCsvConfig | undefined = {
 	openTableAndSelectCellAtCursorPos: "never",
 	pasteMode: 'normal',
 	fontFamilyInTable: 'default',
+	showDeleteColumnHeaderButton: true,
+	showDeleteRowHeaderButton: true,
 }
 
 function __getById(id: string): HTMLElement {

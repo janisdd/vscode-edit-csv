@@ -515,8 +515,11 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		rowHeaders: function (row: number) { //the visual row index
 			let text = (row + 1).toString()
 
-			if (csvParseResult.data.length === 1 || isReadonlyMode) {
-				return `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
+			let showDeleteRowHeaderButton = initialConfig?.showDeleteRowHeaderButton ?? true //default is true
+
+			if (csvParseResult.data.length === 1 || isReadonlyMode || showDeleteRowHeaderButton === false) {
+				//do not remove (hidden) icon to prevent the header from jumping
+				return `${text} <span class="remove-row clickable" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
 			}
 
 			return `${text} <span class="remove-row clickable" onclick="removeRow(${row})"><i class="fas fa-trash"></i></span>`
@@ -1576,8 +1579,11 @@ function defaultColHeaderFunc(useLettersAsColumnNames: boolean, colIndex: number
 
 	visualIndex = hot.toVisualColumn(colIndex)
 
-	if (hot.countCols() === 1 || isReadonlyMode) {
-		return `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
+	let showDeleteColumnHeaderButton = initialConfig?.showDeleteColumnHeaderButton ?? true //default is true
+
+	if (hot.countCols() === 1 || isReadonlyMode || showDeleteColumnHeaderButton === false) {
+		//do not remove the (hidden) icon to prevent "jumping" / size changing when this gets toggled
+		return `${text} <span class="remove-col clickable" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
 	}
 
 	return `${text} <span class="remove-col clickable" onclick="removeColumn(${visualIndex})"><i class="fas fa-trash"></i></span>`

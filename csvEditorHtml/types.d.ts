@@ -307,6 +307,16 @@ type EditCsvConfig = {
 	 * sameAsCodeEditor: use the same font family as the code editor
 	 */
 	fontFamilyInTable: "default" | "sameAsCodeEditor"
+
+	/**
+	 * true: shows a delete column button in the column header (on hover), false: not
+	 */
+	showDeleteColumnHeaderButton: boolean
+
+	/**
+	 * true: shows a delete row button in the row header (on hover), false: not
+	 */
+	showDeleteRowHeaderButton: boolean
 }
 
 /* --- frontend settings --- */

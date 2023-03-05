@@ -47,6 +47,8 @@ const defaultConfig: EditCsvConfig = {
 	openTableAndSelectCellAtCursorPos: "initialOnly_correctRowAlwaysFirstColumn",
 	pasteMode: 'normal',
 	fontFamilyInTable: 'default',
+	showDeleteColumnHeaderButton: true,
+	showDeleteRowHeaderButton: true,
 }
 
 /**

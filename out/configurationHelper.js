@@ -47,6 +47,8 @@ const defaultConfig = {
     openTableAndSelectCellAtCursorPos: "initialOnly_correctRowAlwaysFirstColumn",
     pasteMode: 'normal',
     fontFamilyInTable: 'default',
+    showDeleteColumnHeaderButton: true,
+    showDeleteRowHeaderButton: true,
 };
 /**
  * returns the configuration for this extension
