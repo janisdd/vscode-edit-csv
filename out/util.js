@@ -48,7 +48,7 @@ function isCsvFile(document) {
     let lang = document.languageId.toLowerCase();
     let possible = ['csv', 'tsv', 'plaintext',
         //rainbow csv extension types, see https://github.com/mechatroner/vscode_rainbow_csv
-        'csv (semicolon)', 'csv (pipe)', 'csv (whitespace)', 'csv (tilde)', 'csv (caret)', 'csv (colon)', 'csv (double quote)', 'csv (equals)', 'csv (dot)', 'csv (hyphen)'
+        'csv (semicolon)', 'csv (pipe)', 'csv (whitespace)', 'csv (tilde)', 'csv (caret)', 'csv (colon)', 'csv (double quote)', 'csv (equals)', 'csv (dot)', 'csv (hyphen)', 'dynamic csv'
     ];
     const _isCsvFile = possible.find(p => p === lang) && document.uri.scheme !== 'csv-edit';
     return _isCsvFile;
