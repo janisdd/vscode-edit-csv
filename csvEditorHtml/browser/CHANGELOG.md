@@ -4,6 +4,15 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.3.4
+- (same as vs code extension v0.7.4)
+- fixed issue #112 - added keyboard shortcut to delete the current row (`ctrl+shift+alt+minus`)
+	- behaves the same was as context menu action (actually uses it)
+	- also works on mac (because normally `alt+-` [and or shift] will insert a dash)
+- added option `csv-edit.showDeleteColumnHeaderButton` true: shows a delete column button in the column header (on hover), false: not
+- added option `csv-edit.showDeleteRowHeaderButton` true: shows a delete row button in the row header (on hover), false: not
+
+
 ## 1.3.3
 - (same as vs code extension v0.7.3)
 - added option `csv-edit.autoColumnWidthsIgnoreComments` to ignore comment cells for auto column sizing
