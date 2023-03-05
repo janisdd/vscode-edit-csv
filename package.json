@@ -568,7 +568,7 @@
 				"csv-edit.fontFamilyInTable": {
 					"type": "string",
 					"default": "default",
-					"description": "sets the font family usesd in the table",
+					"description": "sets the font family used in the table",
 					"enum": [
 						"default",
 						"sameAsCodeEditor"
