@@ -9,8 +9,9 @@ note that the changelog is also present on the website when you click on the ver
 - fixed issue #112 - added keyboard shortcut to delete the current row (`ctrl+shift+alt+minus`)
 	- behaves the same was as context menu action (actually uses it)
 	- also works on mac (because normally `alt+-` [and or shift] will insert a dash)
-- added option `csv-edit.showDeleteColumnHeaderButton` true: shows a delete column button in the column header (on hover), false: not
-- added option `csv-edit.showDeleteRowHeaderButton` true: shows a delete row button in the row header (on hover), false: not
+- added option `csv-edit.showDeleteColumnHeaderButton` true: shows a delete column button in the column header (on hover), false: not (fixes issue #113)
+- added option `csv-edit.showDeleteRowHeaderButton` true: shows a delete row button in the row header (on hover), false: not  (fixes issue #113)
+- fixed issue #114 - "dynamic csv" is now also supported as *language id*
 
 
 ## 1.3.3
