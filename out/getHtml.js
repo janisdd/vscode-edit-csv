@@ -764,7 +764,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 						<li>If a row has more cell than the others empty cells are added to match the row with the highest cell
 							count</li>
 						<li>Extension configuration is only applied for new editors</li>
-						<li>You can delete multiple rows/cols by selecting them via shift and right click then remove</li>
+						<li>You can delete multiple rows/cols by selecting them via shift and right click then remove (or <div class="keys">Ctrl</div>+<div class="keys">Shift</div>+<div class="keys">Alt</div>+<div class="keys">Minus</div>)</li>
 					</ul>
 				</div>
 
