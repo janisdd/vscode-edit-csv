@@ -23,8 +23,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Version: 6.5.0
- * Release date: 19/12/2018 (built at 16/02/2023 13:34:41)
+ * Version: 6.5.1
+ * Release date: 19/12/2018 (built at 15/04/2023 13:46:12)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29737,9 +29737,9 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "16/02/2023 13:34:41";
+Handsontable.buildDate = "15/04/2023 13:46:12";
 Handsontable.packageName = "handsontable";
-Handsontable.version = "6.5.0";
+Handsontable.version = "6.5.1";
 var baseVersion = "";
 
 if (baseVersion) {
@@ -43329,10 +43329,12 @@ function (_BasePlugin) {
      */
 
     _this.inProgress = false; // we need this for width calculation when resizing the col via double click (ManualColumnResize)
+    // this.addHook('beforeColumnResize', (col, size, isDblClick) => this.onBeforeColumnResize(col, size, isDblClick));
+    // we need a func reference because hook handler works with indexOf(callback) -> use references
+    // when we enable the plugin and add the hook it also checks for references and re-uses hooks (to keep order)
+    // this.addHook('beforeColumnResize', this.onBeforeColumnResize);
 
-    _this.addHook('beforeColumnResize', function (col, size, isDblClick) {
-      return _this.onBeforeColumnResize(col, size, isDblClick);
-    });
+    _this.onBeforeColumnResizeBound = _this.onBeforeColumnResize.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     /**
      * number for the max initial (only on first render) column width or
      * a function arguments: column index, column width, returns: new column width
@@ -43340,7 +43342,6 @@ function (_BasePlugin) {
      * you need to set the in the handsontable cosntructor else this setting has no effect
      * set it via instance = {... autoColumnSize: { maxColumnWidth: function() {...}}}
      */
-
 
     _this.maxColumnWidth = void 0;
     return _this;
@@ -43381,7 +43382,10 @@ function (_BasePlugin) {
         this.maxColumnWidth = setting.maxColumnWidth;
       }
 
-      this.setSamplingOptions();
+      this.setSamplingOptions(); // we need a func reference because hook handler works with indexOf(callback) -> use references
+      // when we enable the plugin and add the hook it also checks for references and re-uses hooks (to keep order)
+
+      this.addHook('beforeColumnResize', this.onBeforeColumnResizeBound);
       this.addHook('afterLoadData', function () {
         return _this2.onAfterLoadData();
       });
@@ -43422,16 +43426,12 @@ function (_BasePlugin) {
   }, {
     key: "disablePlugin",
     value: function disablePlugin() {
-      var _this3 = this;
-
-      _get(_getPrototypeOf(AutoColumnSize.prototype), "disablePlugin", this).call(this); // we need this because after we removed all hooks 'beforeColumnResize' is not longer active (skipped)
+      _get(_getPrototypeOf(AutoColumnSize.prototype), "disablePlugin", this).call(this); // we need this because after we removed all hooks 'beforeColumnResize' is no longer active (skipped)
       // but above we register this only once so we cannot longer enable it...
       // we need this for width calculation when resizing the col via double click (ManualColumnResize)
+      // this.addHook('beforeColumnResize',
+      //   (size, column, isDblClick) => this.onBeforeColumnResize(size, column, isDblClick));
 
-
-      this.addHook('beforeColumnResize', function (size, column, isDblClick) {
-        return _this3.onBeforeColumnResize(size, column, isDblClick);
-      });
     }
     /**
      * Calculates a columns width.
@@ -43444,7 +43444,7 @@ function (_BasePlugin) {
   }, {
     key: "calculateColumnsWidth",
     value: function calculateColumnsWidth() {
-      var _this4 = this;
+      var _this3 = this;
 
       var colRange = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
         from: 0,
@@ -43464,20 +43464,20 @@ function (_BasePlugin) {
         to: rowRange
       } : rowRange;
       (0, _number.rangeEach)(columnsRange.from, columnsRange.to, function (col) {
-        if (force || _this4.widths[col] === void 0 && !_this4.hot._getColWidthFromSettings(col)) {
+        if (force || _this3.widths[col] === void 0 && !_this3.hot._getColWidthFromSettings(col)) {
           // samples is a map with one entry for every requested col (only one in this case), key is the column index, e.g. { 0 => ...}
           // value is also a map with entries: { key: char count => {needed: 1, strings: [...]}}
           // needed use by handsontable to track how many more samples are needed (decreased by 1 for each sample, initial value is 3)
           // strings are the samples strings from the real table... in the format {value: string, row: 0-based index }
-          var samples = _this4.samplesGenerator.generateColumnSamples(col, rowsRange);
+          var samples = _this3.samplesGenerator.generateColumnSamples(col, rowsRange);
 
-          if (_this4.ignoreCellWidthFunc) {
+          if (_this3.ignoreCellWidthFunc) {
             samples.forEach(function (sample) {
               sample.forEach(function (obj, lengthInChars) {
                 for (var i = 0; i < obj.strings.length; i++) {
                   var stringObj = obj.strings[i];
 
-                  var ignoreCellWidth = _this4.ignoreCellWidthFunc(stringObj.value);
+                  var ignoreCellWidth = _this3.ignoreCellWidthFunc(stringObj.value);
 
                   if (ignoreCellWidth) {
                     obj.strings.splice(i, 1); // eslint-disable-next-line no-plusplus
@@ -43498,14 +43498,14 @@ function (_BasePlugin) {
                 column = _ref2[0],
                 sample = _ref2[1];
 
-            return _this4.ghostTable.addColumn(column, sample);
+            return _this3.ghostTable.addColumn(column, sample);
           });
         }
       });
 
       if (this.ghostTable.columns.length) {
         this.ghostTable.getWidths(function (col, width) {
-          _this4.widths[col] = width;
+          _this3.widths[col] = width;
         });
         this.ghostTable.clean();
       }
@@ -43520,7 +43520,7 @@ function (_BasePlugin) {
   }, {
     key: "calculateAllColumnsWidth",
     value: function calculateAllColumnsWidth() {
-      var _this5 = this;
+      var _this4 = this;
 
       var rowRange = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
         from: 0,
@@ -43533,13 +43533,13 @@ function (_BasePlugin) {
 
       var loop = function loop() {
         // When hot was destroyed after calculating finished cancel frame
-        if (!_this5.hot) {
+        if (!_this4.hot) {
           (0, _feature.cancelAnimationFrame)(timer);
-          _this5.inProgress = false;
+          _this4.inProgress = false;
           return;
         }
 
-        _this5.calculateColumnsWidth({
+        _this4.calculateColumnsWidth({
           from: current,
           to: Math.min(current + AutoColumnSize.CALCULATION_STEP, length)
         }, rowRange);
@@ -43550,13 +43550,13 @@ function (_BasePlugin) {
           timer = (0, _feature.requestAnimationFrame)(loop);
         } else {
           (0, _feature.cancelAnimationFrame)(timer);
-          _this5.inProgress = false; // @TODO Should call once per render cycle, currently fired separately in different plugins
+          _this4.inProgress = false; // @TODO Should call once per render cycle, currently fired separately in different plugins
 
-          _this5.hot.view.wt.wtOverlays.adjustElementsSize(true); // tmp
+          _this4.hot.view.wt.wtOverlays.adjustElementsSize(true); // tmp
 
 
-          if (_this5.hot.view.wt.wtOverlays.leftOverlay.needFullRender) {
-            _this5.hot.view.wt.wtOverlays.leftOverlay.clone.draw();
+          if (_this4.hot.view.wt.wtOverlays.leftOverlay.needFullRender) {
+            _this4.hot.view.wt.wtOverlays.leftOverlay.clone.draw();
           }
         }
       };
@@ -43762,13 +43762,13 @@ function (_BasePlugin) {
   }, {
     key: "clearCache",
     value: function clearCache() {
-      var _this6 = this;
+      var _this5 = this;
 
       var columns = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 
       if (columns.length) {
         (0, _array.arrayEach)(columns, function (physicalIndex) {
-          _this6.widths[physicalIndex] = void 0;
+          _this5.widths[physicalIndex] = void 0;
         });
       } else {
         this.widths.length = 0;
@@ -43828,15 +43828,15 @@ function (_BasePlugin) {
   }, {
     key: "onAfterLoadData",
     value: function onAfterLoadData() {
-      var _this7 = this;
+      var _this6 = this;
 
       if (this.hot.view) {
         this.recalculateAllColumnsWidth();
       } else {
         // first load - initialization
         setTimeout(function () {
-          if (_this7.hot) {
-            _this7.recalculateAllColumnsWidth();
+          if (_this6.hot) {
+            _this6.recalculateAllColumnsWidth();
           }
         }, 0);
       }
@@ -43851,13 +43851,13 @@ function (_BasePlugin) {
   }, {
     key: "onBeforeChange",
     value: function onBeforeChange(changes) {
-      var _this8 = this;
+      var _this7 = this;
 
       var changedColumns = (0, _array.arrayMap)(changes, function (_ref3) {
         var _ref4 = _slicedToArray(_ref3, 2),
             column = _ref4[1];
 
-        return _this8.hot.propToCol(column);
+        return _this7.hot.propToCol(column);
       });
       this.clearCache(changedColumns);
     }
@@ -56313,6 +56313,7 @@ function (_BasePlugin) {
     _this.dblclick = 0;
     _this.autoresizeTimeout = null;
     _this.manualColumnWidths = [];
+    _this.onBeforeColumnResizeBound = _this.onBeforeColumnResize.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     (0, _element.addClass)(_this.handle, 'manualColumnResizer');
     (0, _element.addClass)(_this.guide, 'manualColumnResizerGuide');
     return _this;
@@ -56351,10 +56352,11 @@ function (_BasePlugin) {
       });
       this.addHook('beforeStretchingColumnWidth', function (stretchedWidth, column) {
         return _this2.onBeforeStretchingColumnWidth(stretchedWidth, column);
-      });
-      this.addHook('beforeColumnResize', function (currentColumn, newSize, isDoubleClick) {
-        return _this2.onBeforeColumnResize(currentColumn, newSize, isDoubleClick);
-      });
+      }); // we need a func reference because hook handler works with indexOf(callback) -> use references
+      // when we enable the plugin and add the hook it also checks for references and re-uses hooks (to keep order)
+      // this.addHook('beforeColumnResize', (currentColumn, newSize, isDoubleClick) => this.onBeforeColumnResize(currentColumn, newSize, isDoubleClick));
+
+      this.addHook('beforeColumnResize', this.onBeforeColumnResizeBound);
 
       if (typeof loadedManualColumnWidths !== 'undefined') {
         this.manualColumnWidths = loadedManualColumnWidths;

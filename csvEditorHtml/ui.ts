@@ -94,10 +94,10 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			headerRowWithIndex = dataWithIndex
 			el.checked = true //sync ui in case we get here via autoApplyHasHeader
 
-			hot.updateSettings({
+			_updateHandsontableSettings({
 				fixedRowsTop: fixedRowsTop,
 				fixedColumnsLeft: fixedColumnsLeft,
-			}, false)
+			}, false, false)
 
 			let hasAnyChangesBefore = getHasAnyChangesUi()
 
@@ -147,10 +147,10 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 		defaultCsvWriteOptions.header = false
 		defaultCsvReadOptions._hasHeader = false
 
-		hot.updateSettings({
+		_updateHandsontableSettings({
 			fixedRowsTop: fixedRowsTop,
 			fixedColumnsLeft: fixedColumnsLeft,
-		}, false)
+		}, false, false)
 
 		if (isFirstHasHeaderChangedEvent) {
 
@@ -431,10 +431,10 @@ function forceResizeColumns() {
 	let setColSizeFunc = () => {
 		if (!hot) return
 		hot.getSettings().manualColumnResize = false //this prevents setting manual col size?
-		hot.updateSettings({ colWidths: plugin.widths }, false)
+		_updateHandsontableSettings({ colWidths: plugin.widths }, false, true)
 		hot.getSettings().manualColumnResize = true
-		hot.updateSettings({}, false) //change to manualColumnResize is only applied after updating setting?
-		plugin.enablePlugin()
+		_updateHandsontableSettings({}, false, false) //change to manualColumnResize is only applied after updating setting?
+		// plugin.enablePlugin() //done in _updateHandsontableSettings
 	}
 
 	if (plugin.widths.length === 0) {
@@ -657,7 +657,25 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					disabled: function () {
 						return isReadonlyMode
 					}
-				}
+				},
+				'resize_header_cell': {
+					name: `Resize column to ${initialConfig?.doubleClickColumnHandleForcedWith ?? 200}px`,
+					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
+
+						//should be up-to-date but to be sure
+						syncColWidths()
+
+						let desiredColWidth = initialConfig?.doubleClickColumnHandleForcedWith ?? 200
+
+						//also allow resizing multiple cols at once
+						for (let i = selection[0].start.col; i <= selection[0].end.col; i++) {
+							// let colWidth = hot!.getColWidth(i)
+							allColWidths[i] = desiredColWidth
+						}
+
+						applyColWidths()
+					}
+				},
 			}
 		} as ContextMenuSettings,
 		beforeColumnSort: function (currentSortConfig, destinationSortConfigs) {
@@ -741,6 +759,59 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		//see https://github.com/handsontable/handsontable/issues/3328
 		//ONLY working because first argument is actually the old size, which is a bug
 		beforeColumnResize: function (oldSize, newSize, isDoubleClick) { //after change but before render
+
+			/*
+				NOTE : oldSize is not always the old size... this is a bug in handsontable
+				it comes from the event handler code in handsontable... specifically the lines:
+			
+						var _res = localHandlers[_index].call(context, p1, p2, p3, p4, p5, p6);
+
+						if (_res !== void 0) {
+							// eslint-disable-next-line no-param-reassign
+							p1 = _res;
+						}
+
+				the localHandlers are all callbacks
+				the resize on header cell calls: onMouseUp which runs the hooks for beforeColumnResize:
+					_this7.hot.runHooks('beforeColumnResize', selectedCol, _this7.newSize, false);
+				as we can see the first argument is the column index, not the old size (p1)
+				however, the first handler is the autoResizeColumns Plugin which checks for double clicks and resizes to column to auto size (fit content)
+				the code looks like this:
+						{
+							key: "onBeforeColumnResize",
+							value: function onBeforeColumnResize(col, size, isDblClick) {
+								var newSize = size;
+
+								if (isDblClick) {
+									this.calculateColumnsWidth(col, void 0, true);
+									newSize = this.getColumnWidth(col, void 0, false);
+								}
+
+								return newSize;
+						}
+
+				p1 is the column index -> first param col, size is the new size (without double click, the size the sizer dragged the column to)
+				after this we execute "p1 = _res;" which overwrites the column index with the new size (which is the auto size)
+				thus, oldSize is sometimes the new size after auto resize (if double clicked) and sometimes the old size (if not double clicked)
+
+				after we applied the column sizes programmatically the order of handlers in localHandlers is wrong
+				  actually the handlers before this func are skipped and new ones (2) are added each time (2 from Plugins: AutoColumnSize and ManualColumnResize [in this order])
+					ManualColumnResize only resets some internal state, so getting column size instead of column index is not important
+
+				the only way to fix this is by ensuring the same order of handlers in localHandlers (else we woun't get the old column size)
+
+				the last hook in the handlers can return a new size (or undefined) to change the final column size
+				...
+				we updated handsontable to use function references, so callbacks have the same reference and are reused -> executed in the same order
+				(actually we only changed beforeColumnResize hooks, to not break other plugins?)
+				...
+				it turns out that when we set manual col widths via update settings the update will trigger AutoResizeColumns update method
+				which checks if the plugin was disabled...via isEnabled() but this also checks if we have set manual column widths and disables the plugin itself...
+				but we need the plugin enabled because we want to use the auto resize feature (double click)... (see above, the hook would be skipped if the plugin is disabled)
+				...
+				thus, we need to re-enable the plugin after every(!) update settings call
+
+				*/
 
 			if (oldSize === newSize) {
 				//e.g. we have a large column and the auto size is too large...
@@ -1484,10 +1555,10 @@ function onResizeGrid() {
 
 	const height = parseInt(heightString.substring(0, heightString.length - 2))
 
-	hot.updateSettings({
+	_updateHandsontableSettings({
 		width: width,
 		height: height,
-	}, false)
+	}, false, false)
 
 	//get all col sizes
 	syncColWidths()
@@ -1515,10 +1586,10 @@ function applyColWidths() {
 
 	//note that setting colWidths will disable the auto size column plugin (see Plugin AutoColumnSize.isEnabled)
 	//it is enabled if (!colWidths)
-	hot.updateSettings({ colWidths: allColWidths }, false)
+	_updateHandsontableSettings({ colWidths: allColWidths }, false, true)
 	hot.getSettings().manualColumnResize = true
-	hot.updateSettings({}, false)
-	hot.getPlugin('autoColumnSize').enablePlugin()
+	_updateHandsontableSettings({}, false, false)
+	// hot.getPlugin('autoColumnSize').enablePlugin() //done in _updateHandsontableSettings
 }
 /**
  * syncs the {@link allColWidths} with the ui/handsonable state
@@ -1659,6 +1730,12 @@ function resetData(content: string, csvReadOptions: CsvReadOptions) {
 	//might be bigger than the current view
 	onResizeGrid()
 	toggleAskReadAgainModal(false)
+
+	//ObserveChangesPlugin calls update settings which disables the autoColumnSize plugin...
+	setTimeout(() => {
+		_updateHandsontableSettings({}, false, false)
+	}, 0)
+
 }
 
 /**
@@ -1796,9 +1873,9 @@ function trimAllCells() {
 		}
 	}
 
-	hot.updateSettings({
+	_updateHandsontableSettings({
 		data: allData
-	}, false)
+	}, false, false)
 
 	//hot.updateSettings reloads data and thus afterChange hook is triggered
 	//BUT the change reason is loadData and thus we ignore it...
@@ -1897,10 +1974,10 @@ function updateFixedRowsCols() {
 
 	if (!hot) return
 
-	hot.updateSettings({
+	_updateHandsontableSettings({
 		fixedRowsTop: Math.max(fixedRowsTop, 0),
 		fixedColumnsLeft: Math.max(fixedColumnsLeft, 0),
-	}, false)
+	}, false, false)
 }
 
 /**
@@ -2367,12 +2444,26 @@ function toggleReadonlyMode() {
 
 	isReadonlyMode = !isReadonlyMode
 
-	hot.updateSettings({
+	_updateHandsontableSettings({
 		readOnly: isReadonlyMode,
 		manualRowMove: !isReadonlyMode,
 		manualColumnMove: !isReadonlyMode,
 		undo: !isReadonlyMode
-	}, false)
+	}, false, false)
 
 	_updateToggleReadonlyModeUi()
+}
+
+
+//see new hot({beforeColumnResize: ...}) above why we need an additional method for this (and re-enable the plugin each time)
+function _updateHandsontableSettings(settings: Handsontable.DefaultSettings, init: boolean, skipEnablingAutoColumnSizePlugin: boolean) {
+
+	if (!hot) return
+
+	hot.updateSettings(settings, init)
+	//ensure AutoResizeColumn plugin is enabled... else it's callback is skipped in beforeColumnResize hook which is critical
+	//as the following callbacks in the chain would get wrong values
+	if (skipEnablingAutoColumnSizePlugin) return
+	
+	hot.getPlugin('autoColumnSize').enablePlugin()
 }

@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+# 0.7.5
+- fixed issue #111 - add feature resize columns and rows
+  - context menu item (which sets the column width(s) to `doubleClickColumnHandleForcedWith`)
+- fixed many issues that would break the `doubleClickColumnHandleForcedWith` feature
+
 # 0.7.4
 - fixed issue #112 - added keyboard shortcut to delete the current row (`ctrl+shift+alt+minus`)
 	- behaves the same was as context menu action (actually uses it)

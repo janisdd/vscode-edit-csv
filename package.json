@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.7.4",
+	"version": "0.7.5",
 	"license": "MIT",
 	"icon": "images/logo.png",
 	"publisher": "janisdd",
@@ -381,7 +381,7 @@
 				"csv-edit.doubleClickColumnHandleForcedWith": {
 					"type": "number",
 					"default": "200",
-					"description": "normally the columns are auto sized, if we click on the handle when it has auto size then its with is set to this value (in px). Useful if we have a very wide column (wider than the screen and quickly want to shrink it)"
+					"description": "normally the columns are auto sized, if we click on the handle when it has auto size then its with is set to this value (in px). Useful if we have a very wide column (wider than the screen and quickly want to shrink it). Also controls which size is displayed in the context menu for resizing columns."
 				},
 				"csv-edit.openSourceFileAfterApply": {
 					"type": "boolean",

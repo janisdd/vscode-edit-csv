@@ -143,11 +143,11 @@ class FindWidget {
 
 			//when we searched and found results we want't to re-show them
 			if (this.lastFindResults.length > 0) {
-				hot.updateSettings({
+				_updateHandsontableSettings({
 					search: {
 						isSuspended: false
 					}
-				} as any, false)
+				} as any, false, false)
 			}
 
 			//handsontable probably tries to grab the focus...
@@ -164,11 +164,11 @@ class FindWidget {
 				this.findWidget.style.display = 'flex'
 			} else {
 				//search has already finished... just hide old result
-				hot.updateSettings({
+				_updateHandsontableSettings({
 					search: {
 						isSuspended: true
 					}
-				} as any, false)
+				} as any, false, false)
 			}
 
 		}
@@ -470,11 +470,11 @@ class FindWidget {
 
 		if (!hot) return
 
-		hot.updateSettings({
+		_updateHandsontableSettings({
 			search: {
 				isSuspended: true
 			}
-		} as any, false)
+		} as any, false, false)
 	}
 
 

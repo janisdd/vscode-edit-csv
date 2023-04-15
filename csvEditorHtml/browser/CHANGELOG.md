@@ -4,6 +4,12 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.3.5
+- (same as vs code extension v0.7.5)
+- fixed issue #111 - add feature resize columns and rows
+  - context menu item (which sets the column width(s) to `doubleClickColumnHandleForcedWith`)
+- fixed many issues that would break the `doubleClickColumnHandleForcedWith` feature
+
 ## 1.3.4
 - (same as vs code extension v0.7.4)
 - fixed issue #112 - added keyboard shortcut to delete the current row (`ctrl+shift+alt+minus`)
