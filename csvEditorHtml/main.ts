@@ -181,6 +181,12 @@ let shouldApplyHasHeaderAfterRowsAdded = false
 let isReadonlyMode = false
 
 /**
+ * original data had a final new line or not
+ * set in {@link parseCsv}
+ */
+let hasFinalNewLine: boolean
+
+/**
  * stores the widths of the handsontable columns
  * THIS is always synced with the ui
  * it allows us to modify the widths better e.g. restore widths...

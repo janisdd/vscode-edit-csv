@@ -49,6 +49,7 @@ const defaultConfig = {
     fontFamilyInTable: 'default',
     showDeleteColumnHeaderButton: true,
     showDeleteRowHeaderButton: true,
+    finalNewLine: 'sameAsSourceFile',
 };
 /**
  * returns the configuration for this extension

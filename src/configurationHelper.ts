@@ -49,6 +49,7 @@ const defaultConfig: EditCsvConfig = {
 	fontFamilyInTable: 'default',
 	showDeleteColumnHeaderButton: true,
 	showDeleteRowHeaderButton: true,
+	finalNewLine: 'sameAsSourceFile',
 }
 
 /**

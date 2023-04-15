@@ -6,6 +6,8 @@
 - fixed issue #111 - add feature resize columns and rows
   - context menu item (which sets the column width(s) to `doubleClickColumnHandleForcedWith`)
 - fixed many issues that would break the `doubleClickColumnHandleForcedWith` feature
+- fixed issue #115 - Add newline at the end of file
+	- new setting `finalNewLine` whcih controls how the final newline is handled
 
 # 0.7.4
 - fixed issue #112 - added keyboard shortcut to delete the current row (`ctrl+shift+alt+minus`)

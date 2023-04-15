@@ -9,6 +9,8 @@ note that the changelog is also present on the website when you click on the ver
 - fixed issue #111 - add feature resize columns and rows
   - context menu item (which sets the column width(s) to `doubleClickColumnHandleForcedWith`)
 - fixed many issues that would break the `doubleClickColumnHandleForcedWith` feature
+- fixed issue #115 - Add newline at the end of file
+	- new setting `finalNewLine` whcih controls how the final newline is handled
 
 ## 1.3.4
 - (same as vs code extension v0.7.4)

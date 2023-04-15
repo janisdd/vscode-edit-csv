@@ -317,6 +317,15 @@ type EditCsvConfig = {
 	 * true: shows a delete row button in the row header (on hover), false: not
 	 */
 	showDeleteRowHeaderButton: boolean
+
+	/**
+	 * Decides how to handle final new lines when writing the csv data back to the source file
+	 * 
+	 * sameAsSourceFile: If the source csv file had a new line at the end, the resulting csv will also have one. Otherwise, no final new line will be inserted after the data.
+	 * add: Will add a final new line after the csv data
+	 * remove: Will not write a final new line after the csv data
+	 */
+	finalNewLine: "sameAsSourceFile" | "add" | "remove"
 }
 
 /* --- frontend settings --- */
@@ -597,6 +606,10 @@ type ExtendedCsvParseResult = {
 	outLineIndexToCsvLineIndexMapping: number[] | null
 	outColumnIndexToCsvColumnIndexMapping: number[][] | null
 	originalContent: string
+	/**
+	 * true: original content has a final new line (LR or CRLF does not matter)
+	 */
+	hasFinalNewLine: boolean
 }
 
 type NumbersStyle = {

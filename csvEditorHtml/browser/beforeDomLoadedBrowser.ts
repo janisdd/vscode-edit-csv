@@ -61,6 +61,7 @@ var initialConfig: EditCsvConfig | undefined = {
 	fontFamilyInTable: 'default',
 	showDeleteColumnHeaderButton: true,
 	showDeleteRowHeaderButton: true,
+	finalNewLine: 'sameAsSourceFile',
 }
 
 function __getById(id: string): HTMLElement {

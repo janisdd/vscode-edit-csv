@@ -14,6 +14,8 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 		content = defaultCsvContentIfEmpty
 	}
 
+	hasFinalNewLine = content.endsWith('\n')
+
 	//comments are parses as normal text, only one cell is added
 	const parseResult = csv.parse(content, {
 		...csvReadOptions,
@@ -84,7 +86,8 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 		columnIsQuoted: (parseResult as any).columnIsQuoted,
 		outLineIndexToCsvLineIndexMapping: _parseResult.outLineIndexToCsvLineIndexMapping ?? null,
 		outColumnIndexToCsvColumnIndexMapping: _parseResult.outColumnIndexToCsvColumnIndexMapping ?? null,
-		originalContent: content
+		originalContent: content,
+		hasFinalNewLine: hasFinalNewLine,
 	}
 }
 
@@ -248,6 +251,35 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 	_conf['columnIsQuoted'] = csvWriteOptions.retainQuoteInformation ? columnIsQuoted : null
 
 	let dataAsString = csv.unparse(data, _conf)
+
+	let finalNewLineOption: EditCsvConfig["finalNewLine"] = "sameAsSourceFile"
+	if (initialConfig) {
+		finalNewLineOption = initialConfig.finalNewLine
+	}
+
+	switch (finalNewLineOption) {
+		case 'sameAsSourceFile':{
+			
+			if (hasFinalNewLine) {
+				dataAsString += csvWriteOptions.newline
+			} else {
+				//just don't add it back
+			}
+
+			break
+		}
+		case 'add': {
+			dataAsString += csvWriteOptions.newline
+			break
+		}
+		case 'remove':{
+			//just don't add it back
+			break
+		}
+		default:
+			notExhaustiveSwitch(finalNewLineOption)
+	}
+
 
 	return dataAsString
 }
