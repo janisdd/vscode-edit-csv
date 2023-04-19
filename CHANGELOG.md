@@ -7,7 +7,8 @@
   - context menu item (which sets the column width(s) to `doubleClickColumnHandleForcedWith`)
 - fixed many issues that would break the `doubleClickColumnHandleForcedWith` feature
 - fixed issue #115 - Add newline at the end of file
-	- new setting `finalNewLine` whcih controls how the final newline is handled
+	- new setting `finalNewLine` which controls how the final newline is handled
+- fixed issue where edit button was not shown for `dynamic csv` mode (rainbow csv extension)
 
 # 0.7.4
 - fixed issue #112 - added keyboard shortcut to delete the current row (`ctrl+shift+alt+minus`)

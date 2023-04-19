@@ -154,6 +154,11 @@
 					"when": "resourceLangId == 'csv (hyphen)' && !config.csv-edit.hideOpenCsvEditorUiActions",
 					"command": "edit-csv.edit",
 					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'dynamic csv' && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
 				}
 			],
 			"editor/title": [
@@ -229,6 +234,11 @@
 				},
 				{
 					"when": "editorLangId == 'csv (hyphen)' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "editorLangId == 'dynamic csv' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
 					"command": "edit-csv.edit",
 					"group": "navigation"
 				}
@@ -602,7 +612,6 @@
 						"Will add a final new line after the csv data",
 						"Will not write a final new line after the csv data"
 					]
-
 				}
 			}
 		}
@@ -640,7 +649,7 @@
 		"fs-extra": "9.0.1",
 		"glob": "7.1.6",
 		"iconv-lite": "0.6.2",
-		"jsdom": "16.5.0",
+		"jsdom": "16.7.0",
 		"mocha": "9.2.2",
 		"readline-sync": "1.4.10",
 		"sweetalert2": "9.17.2",
