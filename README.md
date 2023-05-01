@@ -95,6 +95,14 @@ As you can see this **does not** scale very well with **large csv files** (needs
 
 There are some settings for this plugin. Open the VS Code Settings and search for `csv-edit`
 
+### Supported file types/extension
+
+Files with the extension `.csv`, `.tsv` should work out of the box.
+
+You can change the file type in the bottom right corner of the editor (select language mode). This is required for unnamed/new files.
+
+For `tsv`, make sure the indention is set to `tabs`.
+
 ### File extension xyz is not recognized by the vs code extension
 
 See https://code.visualstudio.com/docs/languages/overview#_adding-a-file-extension-to-a-language
