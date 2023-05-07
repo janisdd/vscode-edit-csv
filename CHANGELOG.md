@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+# 0.7.6
+- fixed issue #110 - Add feature to swap rows and columns
+
 # 0.7.5
 - fixed issue #111 - add feature resize columns and rows
   - context menu item (which sets the column width(s) to `doubleClickColumnHandleForcedWith`)

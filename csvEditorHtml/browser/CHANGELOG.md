@@ -4,6 +4,10 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.3.6
+- (same as vs code extension v0.7.6)
+- fixed issue #110 - Add feature to swap rows and columns
+
 ## 1.3.5
 - (same as vs code extension v0.7.5)
 - fixed issue #111 - add feature resize columns and rows

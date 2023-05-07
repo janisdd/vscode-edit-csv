@@ -795,7 +795,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				thus, oldSize is sometimes the new size after auto resize (if double clicked) and sometimes the old size (if not double clicked)
 
 				after we applied the column sizes programmatically the order of handlers in localHandlers is wrong
-				  actually the handlers before this func are skipped and new ones (2) are added each time (2 from Plugins: AutoColumnSize and ManualColumnResize [in this order])
+					actually the handlers before this func are skipped and new ones (2) are added each time (2 from Plugins: AutoColumnSize and ManualColumnResize [in this order])
 					ManualColumnResize only resets some internal state, so getting column size instead of column index is not important
 
 				the only way to fix this is by ensuring the same order of handlers in localHandlers (else we woun't get the old column size)
@@ -1896,6 +1896,43 @@ function trimAllCells() {
 
 }
 
+function transposeColumsAndRows() {
+
+	if (!hot) return
+
+	const allData = getData()
+
+	//is always rectangular because we call
+	//_normalizeDataArray
+	// console.log(`allData`, allData)
+
+	//if we have a header row, we not transpose it (as this is probably what the user intended)
+	//when we have a header row, it is not included in the data array
+
+	//NOTE there is an isse when we have comments above the header row
+	//  because we use the first row with data as header row
+	//  (which is by design)
+	//  but when we transpose the data AND reset to no header row
+	//  then the header row is inserted at the initial position (where we got it from)
+	//  and if we transpose again, the operation is not reversed (origianl -> transpose -> transpose -> original)
+	//  BUT this is ok for now
+
+	//see https://stackoverflow.com/questions/17428587/transposing-a-2d-array-in-javascript
+	let transpose = allData[0].map((col, i) => allData.map(row => row[i]))
+
+	statusInfo.innerText = `Swapping finished, rendering...`
+
+	setTimeout(() => {
+		statusInfo.innerText = ''
+		_updateHandsontableSettings({
+			data: transpose
+		}, false, false)
+		
+		onAnyChange()
+
+	}, 0)
+}
+
 function showOrHideAllComments(show: boolean) {
 
 	if (show) {
@@ -2094,6 +2131,24 @@ function setupSideBarResizeHandle() {
 		downX = null
 	})
 
+}
+
+function setupDropdownHandlers() {
+
+	document.querySelectorAll(`.btn-with-menu`).forEach(btn => {
+		btn.addEventListener(`mouseup`, (e) => {
+			e.stopPropagation()
+		})
+	})
+
+	document.addEventListener(`mouseup`, (e) => {
+
+		let wrappers = document.querySelectorAll(`.btn-with-menu-wrapper`)
+		wrappers.forEach(wrapper => {
+			wrapper.classList.remove('is-menu-open')
+		})
+
+	})
 }
 
 function getHandsontableOverlayScrollLeft(): HTMLDivElement | null {
@@ -2464,6 +2519,18 @@ function _updateHandsontableSettings(settings: Handsontable.DefaultSettings, ini
 	//ensure AutoResizeColumn plugin is enabled... else it's callback is skipped in beforeColumnResize hook which is critical
 	//as the following callbacks in the chain would get wrong values
 	if (skipEnablingAutoColumnSizePlugin) return
-	
+
 	hot.getPlugin('autoColumnSize').enablePlugin()
+}
+
+function toggleToolMenu() {
+
+	const isMenuOpen = toolMenuWrapper.classList.contains(`is-menu-open`)
+
+	if (isMenuOpen) {
+		toolMenuWrapper.classList.remove(`is-menu-open`)
+	} else {
+		toolMenuWrapper.classList.add(`is-menu-open`)
+	}
+
 }

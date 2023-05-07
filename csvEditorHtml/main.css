@@ -1293,3 +1293,48 @@ h1,h2,h3,h4,h5 {
 	color: white;
 	border: none;
 }
+
+.btn-with-menu-wrapper {
+	position: relative;
+}
+
+#tools-menu-wrapper {
+	margin-right: 1rem;
+}
+
+.btn-with-menu {
+	/*required for listerner */
+}
+
+.btn-with-menu-wrapper.is-menu-open .menu {
+	display: block;
+}
+
+.btn-with-menu-wrapper .menu {
+	display: none;
+	margin-top: 0.5rem;
+	border: 1px solid var(--dropdown-border);
+	background-color: var(--dropdown-background);
+	position: absolute;
+	top: 100%;
+	right: 0;
+	z-index: 199; /* modals have 200 */
+
+	box-shadow: 0 16px 24px 2px rgba(0,0,0,0.14), 0 6px 30px 5px rgba(0,0,0,0.12), 0 8px 10px -7px rgba(0,0,0,0.2);
+}
+
+.btn-with-menu-wrapper .menu .menu-item {
+	padding: 0.5rem;
+	display: grid;
+	grid-template-columns: 1.5rem 1fr auto;
+	cursor: pointer;
+	color: var(--button-secondary-foreground);
+}
+
+.btn-with-menu-wrapper .menu .menu-item:hover {
+	background-color: var(--button-secondary-hover-background);
+}
+
+.btn-with-menu-wrapper .menu .menu-item:active {
+	background-color: rgba(0, 0, 0, 0.3)
+}

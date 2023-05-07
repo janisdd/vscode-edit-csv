@@ -566,17 +566,43 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 								</vscode-button>
 						</div>
 
-						<vscode-button appearance="secondary" style="margin-right: 1em" class="on-readonly-disable-btn" onclick="trimAllCells()">
-							<span slot="start" class="icon is-small"><i class="fas fa-hand-scissors"></i></span>
-							<span style="width: 2rem">Trim</span>
+						
+						<div id="tools-menu-wrapper" class="btn-with-menu-wrapper">
 
-							<span slot="end" class="icon is-small">
-								<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
-									data-tooltip="Trims every cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo stack!">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</span>
-						</vscode-button>
+							<vscode-button appearance="secondary" style="height: 100%;" class="on-readonly-disable-btn btn-with-menu" onclick="toggleToolMenu()">
+								<span slot="start" class="icon is-small"><i class="fas fa-toolbox"></i></span>
+								<span style="width: 2.8rem">Tools</span>
+								<span slot="end" class="icon is-small"><i class="fas fa-chevron-down"></i></span>
+							</vscode-button>
+
+							<div class="menu" style="width: 9rem;">
+
+								<div class="menu-item" onclick="trimAllCells()">
+									<span slot="start" class="icon is-small"><i class="fas fa-hand-scissors"></i></span>
+									<span style="width: 2rem">Trim</span>
+
+									<span slot="end" class="icon is-small">
+										<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
+											data-tooltip="Trims every cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo stack!">
+											<i class="fas fa-question-circle"></i>
+										</span>
+									</span>
+								</div>
+
+								<div class="menu-item" onclick="transposeColumsAndRows()">
+									<span slot="start" class="icon is-small"><i class="fas fa-retweet"></i></span>
+									<span style="width: 2rem">Transpose</span>
+
+									<span slot="end" class="icon is-small">
+										<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
+											data-tooltip="Swaps columns and rows. This excludes the header row. This will clear undo/redo stack!">
+											<i class="fas fa-question-circle"></i>
+										</span>
+									</span>
+								</div>
+
+							</div>
+						</div>
 
 						<vscode-button appearance="secondary" class="" onclick="toggleHelpModal(true)">
 							<span slot="start" class="icon is-small"><i class="fas fa-question"></i></span>

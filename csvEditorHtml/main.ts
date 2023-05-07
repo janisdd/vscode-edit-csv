@@ -267,11 +267,14 @@ const numbersStyleNonEnRadio = _getById(`numbers-style-non-en`) as HTMLInputElem
 
 const isReadonlyModeToggleSpan = _getById(`is-readonly-mode-toggle`) as HTMLSpanElement
 
+const toolMenuWrapper = _getById(`tools-menu-wrapper`) as HTMLDivElement
+
 //--- find widget controls
 
 const findWidgetInstance = new FindWidget()
 
 setupSideBarResizeHandle()
+setupDropdownHandlers()
 
 
 /* main */

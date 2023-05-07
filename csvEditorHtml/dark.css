@@ -244,3 +244,8 @@ body.vscode-dark {
 .vscode-dark .row-col-insert-btns {
 	border-left: 1px solid #5e5e5e;
 }
+
+.vscode-dark .btn-with-menu-wrapper .menu {
+	border: 1px solid var(--dropdown-border);
+	background-color: var(--dropdown-background);
+}
