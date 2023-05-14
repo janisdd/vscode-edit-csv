@@ -2145,7 +2145,9 @@ function setupDropdownHandlers() {
 
 		let wrappers = document.querySelectorAll(`.btn-with-menu-wrapper`)
 		wrappers.forEach(wrapper => {
-			wrapper.classList.remove('is-menu-open')
+			
+			//close all menus (in extra function because we might also need to change icons)
+			setToolMenuIsOpen(false)
 		})
 
 	})
@@ -2527,10 +2529,19 @@ function toggleToolMenu() {
 
 	const isMenuOpen = toolMenuWrapper.classList.contains(`is-menu-open`)
 
-	if (isMenuOpen) {
-		toolMenuWrapper.classList.remove(`is-menu-open`)
-	} else {
+	setToolMenuIsOpen(!isMenuOpen)
+}
+
+function setToolMenuIsOpen(setOpen: boolean) {
+
+	if (setOpen) {
 		toolMenuWrapper.classList.add(`is-menu-open`)
+		toolsMenuBtnIcon.classList.remove(`fa-chevron-down`)
+		toolsMenuBtnIcon.classList.add(`fa-chevron-up`)
+	} else {
+		toolMenuWrapper.classList.remove(`is-menu-open`)
+		toolsMenuBtnIcon.classList.add(`fa-chevron-down`)
+		toolsMenuBtnIcon.classList.remove(`fa-chevron-up`)
 	}
 
 }

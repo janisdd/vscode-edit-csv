@@ -268,6 +268,7 @@ const numbersStyleNonEnRadio = _getById(`numbers-style-non-en`) as HTMLInputElem
 const isReadonlyModeToggleSpan = _getById(`is-readonly-mode-toggle`) as HTMLSpanElement
 
 const toolMenuWrapper = _getById(`tools-menu-wrapper`) as HTMLDivElement
+const toolsMenuBtnIcon = _getById(`tools-menu-btn-icon`) as HTMLButtonElement
 
 //--- find widget controls
 
