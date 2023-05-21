@@ -1838,6 +1838,8 @@ function trimAllCells() {
 	let data: string = ''
 	let hasAnyChanges = false
 
+	let changeSet: Array<[visualRowIndex: number, visualColIndex: number, value: string]> = []
+
 	for (let row = 0; row < numRows; row++) {
 		for (let col = 0; col < numCols; col++) {
 			data = allData[row][col]
@@ -1851,6 +1853,7 @@ function trimAllCells() {
 
 			if (allData[row][col] !== data) {
 				hasAnyChanges = true
+				changeSet.push([row, col, allData[row][col]])
 			}
 			//tooo slow for large tables
 			// hot.setDataAtCell(row, col, data.trim())
@@ -1873,9 +1876,15 @@ function trimAllCells() {
 		}
 	}
 
-	_updateHandsontableSettings({
-		data: allData
-	}, false, false)
+	//because we no longer use 'loadData' (_updateHandsontableSettings)
+	//this enables us to use undo!
+	//however, als the header is not part of the data it is not included in undo...
+	//this is probably ok
+	hot.setDataAtCell(changeSet)
+
+	// _updateHandsontableSettings({
+	// 	data: allData
+	// }, false, false)
 
 	//hot.updateSettings reloads data and thus afterChange hook is triggered
 	//BUT the change reason is loadData and thus we ignore it...

@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+# 0.7.7
+- trim cells can now be undone (not for header cells)
+
 # 0.7.6
 - fixed issue #110 - Add feature to swap rows and columns
 
