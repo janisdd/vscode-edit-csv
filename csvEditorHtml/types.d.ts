@@ -326,6 +326,16 @@ type EditCsvConfig = {
 	 * remove: Will not write a final new line after the csv data
 	 */
 	finalNewLine: "sameAsSourceFile" | "add" | "remove"
+
+	/**
+	 * the color used for text in the dark theme (some valid css string)
+	 */
+	darkThemeTextColor: string
+	/**
+	 * the color used for text in the light theme  (some valid css string)
+	 */
+	lightThemeTextColor
+
 }
 
 /* --- frontend settings --- */

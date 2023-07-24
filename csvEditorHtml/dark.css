@@ -1,6 +1,6 @@
 
 body.vscode-dark {
-	color: #d0d0d0;
+	--text-color: #d0d0d0;
 
 	--button-icon-background: transparent;
 	--button-icon-hover-background: rgba(90, 93, 94, 0.31);
@@ -81,14 +81,14 @@ body.vscode-dark {
 
 .vscode-dark .ht_master,
 .vscode-dark .handsontable th {
-	color: #d0d0d0 !important;
+	color: var(--text-color, #d0d0d0) !important;
 }
 
 
 /* Edit mode */
 .vscode-dark .handsontableInput {
 	background-color: #504f4f!important;
-	color: #d0d0d0;
+	color: var(--text-color) !important;
 }
 
 /* All headers */

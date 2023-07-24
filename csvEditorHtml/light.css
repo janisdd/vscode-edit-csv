@@ -1,5 +1,5 @@
 body.vscode-light {
-	color: #657b83;
+	--text-color: #657b83;
 
 	--button-icon-background: transparent;
 	--button-icon-hover-background: rgba(90, 93, 94, 0.31);
@@ -49,7 +49,7 @@ body.vscode-light {
 
 .vscode-light .ht_master,
 .vscode-light .handsontable th {
-	color: #657b83 !important;
+	color: var(--text-color, #657b83) !important;
 }
 
 /* fixed rows/columns */

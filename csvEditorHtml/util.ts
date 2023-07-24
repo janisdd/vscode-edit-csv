@@ -534,7 +534,7 @@ function commentValueRenderer(instance: Handsontable, td: HTMLTableDataCellEleme
  * @param {*} options the option to take the value from
  * @param {*} optionName the option name
  */
-function _setOption<T extends {}>(targetOptions: T, options: T, optionName: keyof T) {
+function _setOption<T extends {}>(targetOptions: T, options: T, optionName: keyof T & string) {
 
 	if (options.hasOwnProperty(optionName)) {
 
@@ -845,6 +845,34 @@ function setupAndApplyInitialConfigPart1(initialConfig: EditCsvConfig | undefine
 	_updateToggleReadonlyModeUi()
 
 	setNumbersStyleUi(initialConfig.initialNumbersStyle)
+
+	//iterate document.styleSheets
+	for (let i = 0; i < document.styleSheets.length; i++) {
+		const styleSheet = document.styleSheets[i];
+
+		//only use dark.css and light.css because there is our prop we need to change
+		if (!styleSheet.href?.toLowerCase().endsWith(`dark.css`) &&
+			!styleSheet.href?.toLowerCase().endsWith(`light.css`)) continue
+
+		console.log(`styleSheet.href`, styleSheet.href)
+
+		//iterate cssRules
+		for (let j = 0; j < styleSheet.cssRules.length; j++) {
+			const cssRule = styleSheet.cssRules[j]
+
+			if (cssRule instanceof CSSStyleRule) {
+				const cssStyleRule = cssRule as CSSStyleRule
+
+				if (cssStyleRule.selectorText === `body.vscode-light`) {
+					cssStyleRule.style.setProperty(cssFgColorVariableName, initialConfig.lightThemeTextColor)
+				}
+
+				if (cssStyleRule.selectorText === `body.vscode-dark`) {
+					cssStyleRule.style.setProperty(cssFgColorVariableName, initialConfig.darkThemeTextColor)
+				}
+			}
+		}
+	}
 }
 
 

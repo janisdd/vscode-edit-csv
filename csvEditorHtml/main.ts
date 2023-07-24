@@ -199,6 +199,8 @@ let allColWidths: number[] = []
 //afterRender is called directly after we render the table but we might want to apply old col widths here
 let isInitialHotRender = true
 
+const cssFgColorVariableName = `--text-color`
+
 const csvEditorWrapper = _getById('csv-editor-wrapper')
 const csvEditorDiv = _getById('csv-editor')
 const helModalDiv = _getById('help-modal')

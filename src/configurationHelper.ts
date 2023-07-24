@@ -50,6 +50,8 @@ const defaultConfig: EditCsvConfig = {
 	showDeleteColumnHeaderButton: true,
 	showDeleteRowHeaderButton: true,
 	finalNewLine: 'sameAsSourceFile',
+	darkThemeTextColor: '#d0d0d0',
+	lightThemeTextColor: '#657b83',
 }
 
 /**

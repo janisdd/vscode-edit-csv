@@ -4,6 +4,11 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.3.7
+- (same as vs code extension v0.7.7)
+- trim cells can now be undone (not for header cells)
+- fixed issue #122 - add option customize text color
+
 ## 1.3.6
 - (same as vs code extension v0.7.6)
 - fixed issue #110 - Add feature to swap rows and columns

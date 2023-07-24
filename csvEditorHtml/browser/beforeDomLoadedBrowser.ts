@@ -62,6 +62,8 @@ var initialConfig: EditCsvConfig | undefined = {
 	showDeleteColumnHeaderButton: true,
 	showDeleteRowHeaderButton: true,
 	finalNewLine: 'sameAsSourceFile',
+	darkThemeTextColor: '#d0d0d0',
+	lightThemeTextColor: '#657b83',
 }
 
 function __getById(id: string): HTMLElement {

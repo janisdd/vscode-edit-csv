@@ -4,6 +4,7 @@
 
 # 0.7.7
 - trim cells can now be undone (not for header cells)
+- fixed issue #122 - add option customize text color
 
 # 0.7.6
 - fixed issue #110 - Add feature to swap rows and columns

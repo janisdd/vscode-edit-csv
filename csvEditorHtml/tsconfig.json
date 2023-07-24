@@ -1,11 +1,11 @@
 {
 	"compilerOptions": {
 		"module": "none",
-		"target": "es6",
+		"target": "es2021",
 		"moduleResolution": "node",
 		"outDir": "./out",
 		"lib": [
-			"es2016", "dom", "es2015.core"
+			"ES2021", "dom"
 		],
 		"sourceMap": true,
 		/* Strict Type-Checking Option */
