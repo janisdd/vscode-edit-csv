@@ -134,7 +134,7 @@ function activate(context) {
         //when we save an unnamed (temp file) file a new file with the new uri is opened and saved
         //TODO i don't think we can get the old/new name of the file os wait for 
         //so just filter for csv file and show it 
-        if (args.isUntitled || util_1.isCsvFile(args) === false || args.version !== 1)
+        if (args.isUntitled || (0, util_1.isCsvFile)(args) === false || args.version !== 1)
             return;
         //this will display the new file (after unnamed was saved) but the reference is still broken...
         //also this would show almost every opened csv file (even if we don't wan to display it e.g. only for silent editing from other extensions)
@@ -151,7 +151,7 @@ function activate(context) {
         if (args.uri.scheme === exports.editorUriScheme)
             return; //closed an editor nothing to do here... onDispose will handle it
         // console.log(`onDidCloseTextDocument ${args.uri.toString()}`);
-        if (util_1.isCsvFile(args) && args.isUntitled && args.uri.scheme === "untitled") {
+        if ((0, util_1.isCsvFile)(args) && args.isUntitled && args.uri.scheme === "untitled") {
             const instance = instanceManager.findInstanceBySourceUri(args.uri);
             if (!instance)
                 return;
@@ -183,7 +183,7 @@ exports.deactivate = deactivate;
  */
 function onDidChangeConfiguration(instanceManager, e) {
     if (e === null || e.affectsConfiguration('csv-edit.fontSizeInPx')) {
-        const newFontSize = configurationHelper_1.getExtensionConfiguration().fontSizeInPx;
+        const newFontSize = (0, configurationHelper_1.getExtensionConfiguration)().fontSizeInPx;
         const instances = instanceManager.getAllInstances();
         for (let i = 0; i < instances.length; i++) {
             const instance = instances[i];
@@ -233,7 +233,7 @@ function beforeEditCsvCheck(instanceManager) {
     //see https://github.com/microsoft/vscode/issues/32118
     //see //see https://github.com/microsoft/vscode/issues/31078
     //see https://github.com/Microsoft/vscode/blob/master/src/vs/editor/common/model/textModel.ts > MODEL_SYNC_LIMIT
-    if (!vscode.window.activeTextEditor || !util_1.isCsvFile(vscode.window.activeTextEditor.document)) {
+    if (!vscode.window.activeTextEditor || !(0, util_1.isCsvFile)(vscode.window.activeTextEditor.document)) {
         vscode.window.showInformationMessage("Open a csv file first to show the csv editor or file too large (> 50MB)");
         return false;
     }
@@ -256,7 +256,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
     var _a, _b;
     const uri = activeTextEditor.document.uri;
     const title = getEditorTitle(activeTextEditor.document);
-    let panel = vscode.window.createWebviewPanel('csv-editor', title, util_1.getCurrentViewColumn(), {
+    let panel = vscode.window.createWebviewPanel('csv-editor', title, (0, util_1.getCurrentViewColumn)(), {
         enableFindWidget: false,
         enableCommandUris: true,
         enableScripts: true,
@@ -264,9 +264,9 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
     });
     //check if the file is in the current workspace
     let isInCurrentWorkspace = activeTextEditor.document.uri.fsPath !== vscode.workspace.asRelativePath(activeTextEditor.document.uri.fsPath);
-    const config = configurationHelper_1.getExtensionConfiguration();
+    const config = (0, configurationHelper_1.getExtensionConfiguration)();
     if (overwriteSettings !== null) {
-        configurationHelper_1.overwriteConfiguration(config, overwriteSettings);
+        (0, configurationHelper_1.overwriteConfiguration)(config, overwriteSettings);
     }
     //a file watcher works when the file is in the current workspace (folder) even if it's not opened
     //it also works when we open any file (not in the workspace) and 
@@ -285,10 +285,10 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
             watcher.onDidChange((e) => {
                 if (instance.ignoreNextChangeEvent) {
                     instance.ignoreNextChangeEvent = false;
-                    util_1.debugLog(`source file changed: ${e.fsPath}, ignored`);
+                    (0, util_1.debugLog)(`source file changed: ${e.fsPath}, ignored`);
                     return;
                 }
-                util_1.debugLog(`source file changed: ${e.fsPath}`);
+                (0, util_1.debugLog)(`source file changed: ${e.fsPath}`);
                 onSourceFileChanged(e.fsPath, instance);
             });
         }
@@ -315,10 +315,10 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
             watcher.on('change', (path) => {
                 if (instance.ignoreNextChangeEvent) {
                     instance.ignoreNextChangeEvent = false;
-                    util_1.debugLog(`source file (external) changed: ${path}, ignored`);
+                    (0, util_1.debugLog)(`source file (external) changed: ${path}, ignored`);
                     return;
                 }
-                util_1.debugLog(`source file (external) changed: ${path}`);
+                (0, util_1.debugLog)(`source file (external) changed: ${path}`);
                 onSourceFileChanged(path, instance);
             });
         }
@@ -355,11 +355,11 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
     panel.webview.onDidReceiveMessage((message) => {
         switch (message.command) {
             case 'ready': {
-                util_1.debugLog('received ready from webview');
+                (0, util_1.debugLog)('received ready from webview');
                 instance.hasChanges = false;
                 setEditorHasChanges(instance, false);
                 let funcSendContent = (initialText) => {
-                    const textSlices = util_1.partitionString(initialText, 1024 * 1024); //<1MB less should be loaded in a blink
+                    const textSlices = (0, util_1.partitionString)(initialText, 1024 * 1024); //<1MB less should be loaded in a blink
                     for (let i = 0; i < textSlices.length; i++) {
                         const textSlice = textSlices[i];
                         const msg = {
@@ -417,7 +417,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
                     let initialText = activeTextEditor.document.getText();
                     funcSendContent(initialText);
                 }
-                util_1.debugLog('finished sending csv content to webview');
+                (0, util_1.debugLog)('finished sending csv content to webview');
                 break;
             }
             case "msgBox": {
@@ -456,7 +456,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
     }, undefined, context.subscriptions);
     panel.onDidDispose(() => {
         var _a, _b;
-        util_1.debugLog(`dispose csv editor panel (webview)`);
+        (0, util_1.debugLog)(`dispose csv editor panel (webview)`);
         try {
             instanceManager.removeInstance(instance);
         }
@@ -480,7 +480,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
     if (activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeCol) {
         activeCol = activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length - 1;
     }
-    panel.webview.html = getHtml_1.createEditorHtml(panel.webview, context, config, {
+    panel.webview.html = (0, getHtml_1.createEditorHtml)(panel.webview, context, config, {
         isWatchingSourceFile: instance.supportsAutoReload,
         sourceFileCursorLineIndex: activeTextEditor.selection.active.line,
         sourceFileCursorColumnIndex: activeCol,
@@ -500,7 +500,7 @@ function applyContent(instance, newContent, saveSourceFile, openSourceFileAfterA
         var textRange = new vscode.Range(0, firstLine.range.start.character, document.lineCount - 1, lastLine.range.end.character);
         //don't apply if the content didn't change
         if (document.getText() === newContent) {
-            util_1.debugLog(`content didn't change`);
+            (0, util_1.debugLog)(`content didn't change`);
             return;
         }
         edit.replace(document.uri, textRange, newContent);
@@ -596,10 +596,10 @@ function createNewSourceFile(instance, newContent, openSourceFileAfterApply, sav
         edit.insert(newSourceFile, new vscode.Position(0, 0), newContent);
         vscode.workspace.applyEdit(edit).then(success => {
             if (!success) {
-                util_1.debugLog('could not created new source file because old was deleted');
+                (0, util_1.debugLog)('could not created new source file because old was deleted');
                 return;
             }
-            util_1.debugLog('created new source file because old was deleted');
+            (0, util_1.debugLog)('created new source file because old was deleted');
             if (openSourceFileAfterApply) {
                 vscode.window.showTextDocument(newFile);
             }

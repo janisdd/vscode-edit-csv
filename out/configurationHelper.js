@@ -22,6 +22,7 @@ const defaultConfig = {
     writeOption_escapeChar: '"',
     writeOption_hasHeader: "false",
     doubleClickColumnHandleForcedWith: 200,
+    doubleClickRowHandleForcedHeight: 106,
     openSourceFileAfterApply: false,
     selectTextAfterBeginEditCell: false,
     quoteAllFields: false,

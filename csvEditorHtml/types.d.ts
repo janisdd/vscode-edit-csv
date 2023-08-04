@@ -154,6 +154,11 @@ type EditCsvConfig = {
 	doubleClickColumnHandleForcedWith: number
 
 	/**
+	 * normally the rows are auto sized. If we click on the handle when it has auto size, its height is set to this value (in px). Useful if we have a very tall rows (wider than the screen and quickly want to shrink it). Also controls which size is displayed in the context menu for resizing rows (Default value gives you 5 rows with the default font size).
+	 */
+	doubleClickRowHandleForcedHeight: number
+
+	/**
 	 * true: opens the source file after apply, false: keep the editor displayed
 	 */
 	openSourceFileAfterApply: boolean

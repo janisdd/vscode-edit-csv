@@ -22,6 +22,7 @@ const defaultConfig: EditCsvConfig = {
 	writeOption_escapeChar: '"',
 	writeOption_hasHeader: "false",
 	doubleClickColumnHandleForcedWith: 200,
+	doubleClickRowHandleForcedHeight: 106, //this gives us 5 rows with the default font size
 	openSourceFileAfterApply: false,
 	selectTextAfterBeginEditCell: false,
 	quoteAllFields: false,

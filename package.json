@@ -391,7 +391,12 @@
 				"csv-edit.doubleClickColumnHandleForcedWith": {
 					"type": "number",
 					"default": "200",
-					"description": "normally the columns are auto sized, if we click on the handle when it has auto size then its with is set to this value (in px). Useful if we have a very wide column (wider than the screen and quickly want to shrink it). Also controls which size is displayed in the context menu for resizing columns."
+					"description": "normally the columns are auto sized. If we click on the handle when it has auto size, its width is set to this value (in px). Useful if we have a very wide column (wider than the screen and quickly want to shrink it). Also controls which size is displayed in the context menu for resizing columns."
+				},
+				"csv-edit.doubleClickRowHandleForcedHeight": {
+					"type": "number",
+					"default": 106,
+					"description": "normally the rows are auto sized. If we click on the handle when it has auto size, its height is set to this value (in px). Useful if we have a very tall rows (wider than the screen and quickly want to shrink it). Also controls which size is displayed in the context menu for resizing rows (Default value gives you 5 rows with the default font size)."
 				},
 				"csv-edit.openSourceFileAfterApply": {
 					"type": "boolean",

@@ -421,7 +421,7 @@ function reRenderTable(callback?: () => void) {
  * 
  * but after clicking force resize columns we want to enable it again...
  */
-function forceResizeColumns() {
+function forceAutoResizeColumns() {
 	if (!hot) return
 
 	//note that setting colWidths will disable the auto size column plugin (see Plugin AutoColumnSize.isEnabled)
@@ -448,6 +448,29 @@ function forceResizeColumns() {
 	}
 
 	setColSizeFunc()
+}
+
+function forceAutoResizeRows() {
+	if (!hot) return
+
+	let plugin = hot.getPlugin('manualRowResize')
+
+	//foreach skips over empty indices
+	plugin.manualRowHeights.forEach((height: number, rowIndex: number) => {
+		//from setManualSize method
+		var physicalColumn = hot!.runHooks('modifyRow', rowIndex);
+		delete plugin.manualRowHeights[physicalColumn]
+	})
+
+	//force a re-render
+	//@ts-ignore
+	hot.forceFullRender = true;
+	//@ts-ignore
+	hot.view.render(); // updates all
+	//@ts-ignore
+	hot.view.wt.wtOverlays.adjustElementsSize(true);
+
+	//we don't run before and after resize hooks... no idea what they do
 }
 
 
@@ -658,7 +681,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						return isReadonlyMode
 					}
 				},
-				'resize_header_cell': {
+				'resize_column_header_cell': {
 					name: `Resize column to ${initialConfig?.doubleClickColumnHandleForcedWith ?? 200}px`,
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
 
@@ -676,6 +699,34 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						applyColWidths()
 					}
 				},
+				'resize_row_header_cell': {
+					name: `Resize row to ${initialConfig?.doubleClickRowHandleForcedHeight ?? 106}px`,
+					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
+
+						if (!hot) return
+
+						let plugin = hot!.getPlugin('manualRowResize')
+
+						let desiredColWidth = initialConfig?.doubleClickRowHandleForcedHeight ?? 106
+
+						//also allow resizing multiple cols at once
+						for (let i = selection[0].start.row; i <= selection[0].end.row; i++) {
+							// let colWidth = hot!.getColWidth(i)
+							// allColWidths[i] = desiredColWidth
+							plugin.setManualSize(i, desiredColWidth)
+						}
+
+						//from the onMouseUp handler of the manualRowResize plugin
+						//@ts-ignore
+						hot.forceFullRender = true;
+						//@ts-ignore
+        		hot.view.render(); // updates all
+						//@ts-ignore
+        		hot.view.wt.wtOverlays.adjustElementsSize(true);
+						//we don't run before and after resize hooks... no idea what they do
+					}
+				},
+
 			}
 		} as ContextMenuSettings,
 		beforeColumnSort: function (currentSortConfig, destinationSortConfigs) {
@@ -756,6 +807,19 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 		// },
 
+		beforeRowResize: function(oldSize, newSize, isDoubleClick) {
+			//this has the same bug as beforeColumnResize where we don't get the actual row index
+			//because a prior handler (onBeforeRowResize which calculates calculateRowsHeight) returns the new size with get paased to this handler
+
+			if (oldSize === newSize) {
+				//e.g. we have a large column and the auto size is too large...
+				if (initialConfig) {
+					return initialConfig.doubleClickRowHandleForcedHeight
+				} else {
+					console.log(`initialConfig is falsy`)
+				}
+			}
+		},
 		//see https://github.com/handsontable/handsontable/issues/3328
 		//ONLY working because first argument is actually the old size, which is a bug
 		beforeColumnResize: function (oldSize, newSize, isDoubleClick) { //after change but before render

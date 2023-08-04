@@ -5,6 +5,8 @@
 # 0.7.7
 - trim cells can now be undone (not for header cells)
 - fixed issue #122 - add option customize text color
+- added feature #130 - add feature resize rows
+	- works the same as `doubleClickColumnHandleForcedWith` (auto resize is a bit better implemented)
 
 # 0.7.6
 - fixed issue #110 - Add feature to swap rows and columns
