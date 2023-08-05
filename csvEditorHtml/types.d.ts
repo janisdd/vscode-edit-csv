@@ -339,7 +339,12 @@ type EditCsvConfig = {
 	/**
 	 * the color used for text in the light theme  (some valid css string)
 	 */
-	lightThemeTextColor
+	lightThemeTextColor: string
+
+	/**
+	 * true: if a cell contains urls, the urls are displayed as urls and can be clicked on. false: all urls are rendered as normal text
+	 */
+	convertUrlsToTags: boolean
 
 }
 
@@ -693,3 +698,8 @@ type HotViewportOffsetInPx = {
 	left: number
 }
 
+type UrlInStringCoords = {
+	url: string
+	startIndex: number
+	endIndex: number
+}

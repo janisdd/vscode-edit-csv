@@ -40,6 +40,69 @@ function isCommentCell(value: string | null, csvReadConfig: CsvReadOptions) {
 	return false
 }
 
+function containAndExtractUrl(text: string): null | UrlInStringCoords[] {
+	urlRegex.lastIndex = 0
+	//NOT longer needed as we test in the outer functions for http(s):// ...
+	//as most cell values will not contain urls we can do a quick check before running the regex
+	// if (!urlRegex.test(text)) return null
+
+	urlRegex.lastIndex = 0
+	let matches = urlRegex.exec(text)
+	if (matches) {
+		let urls: UrlInStringCoords[] = []
+
+		while (matches) {
+			urls.push({
+				url: matches[0],
+				startIndex: matches.index,
+				endIndex: matches.index + matches[0].length
+			})
+			matches = urlRegex.exec(text)
+		}
+
+		return urls
+	}
+
+	return null
+}
+
+function createCellValueWithUrlLinks(text: string, urls: UrlInStringCoords[]): (string | HTMLElement)[] {
+
+	const aTags = urls.map(url => {
+		const a = document.createElement('a')
+		a.href = url.url
+		a.innerText = url.url
+		a.setAttribute('target', '_blank')
+		//not really needed anymore, see https://stackoverflow.com/questions/50709625/link-with-target-blank-and-rel-noopener-noreferrer-still-vulnerable
+		//but why not
+		a.setAttribute('rel', 'noopener noreferrer')
+		a.title = url.url
+		return a
+	})
+
+	let htmlParts: (string | HTMLElement)[] = []
+
+	let currIndex = 0
+	for (let i = 0; i < aTags.length; i++) {
+		const aTag = aTags[i];
+		const urlObj = urls[i]
+
+		if (currIndex < urlObj.startIndex) {
+			htmlParts.push(text.substring(currIndex, urlObj.startIndex))
+		}
+
+		htmlParts.push(aTag)
+
+		currIndex = urlObj.endIndex
+	}
+
+	if (currIndex < text.length) {
+		htmlParts.push(text.substring(currIndex))
+	}
+
+	return htmlParts
+}
+
 /**
  * ensures that all rows inside data have the same length
  * @param csvParseResult 
@@ -413,29 +476,29 @@ function pretendRemoveRowContextMenuActionClicked() {
 
 	// setTimeout(() => { //not needed active editor is closed immediately (dash insert is fixed even without this)
 
-		const currRowIndex = _getSelectedVisualRowIndex()
+	const currRowIndex = _getSelectedVisualRowIndex()
 
-		if (currRowIndex === null) return
-	
-		//copied from context menu remove row action
-		const selRanges = hot!.getSelectedRange()
-		// function normalizeSelection(selRanges) {
-		// 	return (0, _array.arrayMap)(selRanges, function (range) {
-		// 		return {
-		// 			start: range.getTopLeftCorner(),
-		// 			end: range.getBottomRightCorner()
-		// 		};
-		// 	});
-		// }
-		const normalizedSelection = selRanges 
+	if (currRowIndex === null) return
+
+	//copied from context menu remove row action
+	const selRanges = hot!.getSelectedRange()
+	// function normalizeSelection(selRanges) {
+	// 	return (0, _array.arrayMap)(selRanges, function (range) {
+	// 		return {
+	// 			start: range.getTopLeftCorner(),
+	// 			end: range.getBottomRightCorner()
+	// 		};
+	// 	});
+	// }
+	const normalizedSelection = selRanges
 		? selRanges.map(range => ({
 			start: (range as any).getTopLeftCorner(),
 			end: (range as any).getBottomRightCorner(),
 		}))
 		: [];
-	
-		//actual context menu also passes mouse event, but we don't need it here
-		hot!.getPlugin('contextMenu')?.executeCommand('remove_row', normalizedSelection)
+
+	//actual context menu also passes mouse event, but we don't need it here
+	hot!.getPlugin('contextMenu')?.executeCommand('remove_row', normalizedSelection)
 	// }, 0)
 
 }
@@ -486,33 +549,47 @@ function removeColumn(index: number) {
  * @param value 
  * @param cellProperties 
  */
-function commentValueRenderer(instance: Handsontable, td: HTMLTableDataCellElement, row: number, col: number, prop: any, value: string | null, cellProperties: any) {
-	//@ts-ignore
-	Handsontable.renderers.TextRenderer.apply(this, arguments);
+function commentValueAndUrlsRenderer(instance: Handsontable, td: HTMLTableDataCellElement, row: number, col: number, prop: any, value: string | null, cellProperties: any) {
 
-	// console.log(value)
+	let isCellWithUrls = initialConfig?.convertUrlsToTags
+		? value && (value.indexOf("http://") >= 0 || value.indexOf("https://") >= 0) // a faster check than regex
+		: false
 
-	if (value !== null && col === 0 && isCommentCell(value, defaultCsvReadOptions)) {
-		// td.classList.add('comment-row')
-		if (td && td.nextSibling) {
-			(td.nextSibling as HTMLElement).title = warningTooltipTextWhenCommentRowNotFirstCellIsUsed;
+	if (isCellWithUrls) {
+		const urls = containAndExtractUrl(value!)
+
+		if (urls !== null) {
+			const htmlParts = createCellValueWithUrlLinks(value!, urls)
+			Handsontable.dom.empty(td)
+			td.append(...htmlParts)
 		}
 
-		//make the whole row a comment
-		if (td && td.parentElement) {
-			td.parentElement.classList.add('comment-row')
+	} else {
+		//cell has no urls
+		//@ts-ignore
+		Handsontable.renderers.TextRenderer.apply(this, arguments);
+	}
+
+	if (highlightCsvComments) {
+		if (value !== null && col === 0 && isCommentCell(value, defaultCsvReadOptions)) {
+			// td.classList.add('comment-row')
+			if (td && td.nextSibling) {
+				(td.nextSibling as HTMLElement).title = warningTooltipTextWhenCommentRowNotFirstCellIsUsed;
+			}
+
+			//make the whole row a comment
+			if (td && td.parentElement) {
+				td.parentElement.classList.add('comment-row')
+			}
 		}
 	}
 
-	// if (cellProperties._isComment) {
-	// 	td.classList.add('comment-row')
-	// } else {
-	// 	// td.style.backgroundColor = ''
-	// }
-
+	if (isCellWithUrls) {
+		return td
+	}
 }
 
-(Handsontable.renderers as any).registerRenderer('commentValueRenderer', commentValueRenderer);
+(Handsontable.renderers as any).registerRenderer('commentValueAndUrlsRenderer', commentValueAndUrlsRenderer);
 
 // function invisiblesCellValueRenderer(instance: Handsontable, td: HTMLTableDataCellElement, row: number, col: number, prop: any, value: string | null, cellProperties: any) {
 // 	//@ts-ignore

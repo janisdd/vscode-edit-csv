@@ -10,6 +10,8 @@ note that the changelog is also present on the website when you click on the ver
 - fixed issue #122 - add option customize text color
 - added feature #130 - add feature resize rows
 	- works the same as `doubleClickColumnHandleForcedWith` (auto resize is a bit better implemented)
+- adds feature #109 - open urls in browser
+	- controled via `convertUrlsToTags` setting
 
 ## 1.3.6
 - (same as vs code extension v0.7.6)

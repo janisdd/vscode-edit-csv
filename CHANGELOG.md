@@ -7,6 +7,8 @@
 - fixed issue #122 - add option customize text color
 - added feature #130 - add feature resize rows
 	- works the same as `doubleClickColumnHandleForcedWith` (auto resize is a bit better implemented)
+- adds feature #109 - open urls in browser
+	- controled via `convertUrlsToTags` setting
 
 # 0.7.6
 - fixed issue #110 - Add feature to swap rows and columns

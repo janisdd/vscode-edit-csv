@@ -282,6 +282,12 @@ setupDropdownHandlers()
 
 /* main */
 
+//from https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch08s02.html
+//don't forget to set `urlRegex.lastIndex = 0` before using it
+// const urlRegex = /(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|$!:,.;]*[A-Z0-9+&@#\/%=~_|$]/gmi
+//ftp and file not working anyway
+const urlRegex = /(https?):\/\/[-A-Z0-9+&@#\/%?=~_|$!:,.;]*[A-Z0-9+&@#\/%=~_|$]/gmi
+
 //used to restore cell selection and scroll pos
 let previousSelectedCell: HotCellPos | null = null
 let previousViewportOffsets: HotViewportOffsetInPx | null = null

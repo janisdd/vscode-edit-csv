@@ -756,7 +756,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		cells: highlightCsvComments
 			? function (row, col) {
 				var cellProperties: GridSettings = {};
-				cellProperties.renderer = 'commentValueRenderer' //is registered in util
+				cellProperties.renderer = 'commentValueAndUrlsRenderer' //is registered in util
 				// cellProperties.renderer = 'invisiblesCellValueRenderer' //is registered in util
 
 				// if (row === undefined || row === null) return cellProperties
