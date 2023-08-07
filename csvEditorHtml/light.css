@@ -47,6 +47,17 @@ body.vscode-light {
 
 /* handson table styles */
 
+.vscode-light .ht_master a[data-link-is-openable="1"] {
+	cursor: default;
+	text-decoration: underline;
+	color: var(--text-color, #657b83);
+}
+
+.vscode-light .ht_master a[data-link-is-openable="1"].link-hovered.is-open-url-key-down {
+	color: var(--vscode-editorLink-activeForeground);
+	cursor: pointer;
+}
+
 .vscode-light .ht_master,
 .vscode-light .handsontable th {
 	color: var(--text-color, #657b83) !important;

@@ -79,6 +79,17 @@ body.vscode-dark {
 
 /* handson table styles */
 
+.vscode-dark .ht_master a[data-link-is-openable="1"] {
+	cursor: default;
+	text-decoration: underline;
+	color: var(--text-color, #d0d0d0);
+}
+
+.vscode-dark .ht_master a[data-link-is-openable="1"].link-hovered.is-open-url-key-down {
+	color: var(--vscode-editorLink-activeForeground);
+	cursor: pointer;
+}
+
 .vscode-dark .ht_master,
 .vscode-dark .handsontable th {
 	color: var(--text-color, #d0d0d0) !important;

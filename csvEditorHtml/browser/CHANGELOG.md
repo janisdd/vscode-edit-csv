@@ -4,14 +4,14 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
-## 1.3.7
-- (same as vs code extension v0.7.7)
+## 1.4.0
+- (same as vs code extension v0.8.0)
 - trim cells can now be undone (not for header cells)
 - fixed issue #122 - add option customize text color
 - added feature #130 - add feature resize rows
 	- works the same as `doubleClickColumnHandleForcedWith` (auto resize is a bit better implemented)
 - adds feature #109 - open urls in browser
-	- controled via `convertUrlsToTags` setting
+	- controled via `convertUrlsToLinkTags` setting
 
 ## 1.3.6
 - (same as vs code extension v0.7.6)

@@ -76,7 +76,8 @@ function createCellValueWithUrlLinks(text: string, urls: UrlInStringCoords[]): (
 		//not really needed anymore, see https://stackoverflow.com/questions/50709625/link-with-target-blank-and-rel-noopener-noreferrer-still-vulnerable
 		//but why not
 		a.setAttribute('rel', 'noopener noreferrer')
-		a.title = url.url
+		a.setAttribute(linkIsOpenableAttribute, '1')
+		a.title = `(alt + click) ${url.url}`
 		return a
 	})
 
@@ -90,6 +91,33 @@ function createCellValueWithUrlLinks(text: string, urls: UrlInStringCoords[]): (
 		if (currIndex < urlObj.startIndex) {
 			htmlParts.push(text.substring(currIndex, urlObj.startIndex))
 		}
+
+		aTag.addEventListener(`mouseover`, (e) => {
+			aTag.classList.add('link-hovered')
+			hoveredATag = aTag
+
+			if (e.altKey) {
+				//if the user presses alt before moving the mouse over the link ... the alt class is not added
+				aTag.classList.add(isOpenUrlKeyDownClass)
+			}
+		})
+		aTag.addEventListener(`mouseout`, (e) => {
+			aTag.classList.remove('link-hovered')
+			aTag.classList.remove(isOpenUrlKeyDownClass)
+			hoveredATag = null
+		})
+
+		aTag.addEventListener(`click`, (e) => {
+			if (e.altKey) {
+				//let the webview open the url
+				return
+			}
+
+			//normal click should select the cell or start editing
+			e.stopPropagation()
+			e.preventDefault()
+			return false
+		})
 
 		htmlParts.push(aTag)
 
@@ -551,7 +579,7 @@ function removeColumn(index: number) {
  */
 function commentValueAndUrlsRenderer(instance: Handsontable, td: HTMLTableDataCellElement, row: number, col: number, prop: any, value: string | null, cellProperties: any) {
 
-	let isCellWithUrls = initialConfig?.convertUrlsToTags
+	let isCellWithUrls = initialConfig?.convertUrlsToLinkTags
 		? value && (value.indexOf("http://") >= 0 || value.indexOf("https://") >= 0) // a faster check than regex
 		: false
 

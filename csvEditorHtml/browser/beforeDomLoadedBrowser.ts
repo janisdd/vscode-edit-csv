@@ -65,7 +65,7 @@ var initialConfig: EditCsvConfig | undefined = {
 	finalNewLine: 'sameAsSourceFile',
 	darkThemeTextColor: '#d0d0d0',
 	lightThemeTextColor: '#657b83',
-	convertUrlsToTags: true,
+	convertUrlsToLinkTags: true,
 }
 
 function __getById(id: string): HTMLElement {

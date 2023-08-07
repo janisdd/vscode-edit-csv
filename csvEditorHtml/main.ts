@@ -186,6 +186,13 @@ let isReadonlyMode = false
  */
 let hasFinalNewLine: boolean
 
+// 1 = true, 0 = false (or null)
+const linkIsOpenableAttribute = 'data-link-is-openable'
+const isOpenUrlKeyDownClass = `is-open-url-key-down`
+//needed because when the cursor is in a link we don't want to highlight the link yet
+//but when the user then presses the modifier key we want to highlight the link (without any mouse event)
+let hoveredATag: HTMLAnchorElement | null = null
+
 /**
  * stores the widths of the handsontable columns
  * THIS is always synced with the ui
@@ -399,6 +406,17 @@ function setupGlobalShortcutsInVs() {
 	Mousetrap.bindGlobal(['ctrl+shift+alt+-'], (e) => {
 		pretendRemoveRowContextMenuActionClicked()
 	})
+
+document.documentElement.addEventListener('keydown', (e) => {
+	if (e.altKey && hoveredATag) {
+		hoveredATag.classList.add(isOpenUrlKeyDownClass)
+	}
+})
+document.documentElement.addEventListener('keyup', (e) => {
+	if (hoveredATag) {
+		hoveredATag.classList.remove(isOpenUrlKeyDownClass)
+	}
+})
 
 	//---- some shortcuts are also in ui.ts where the handsontable instance is created...
 	//needed for core handsontable shortcuts e.g. that involve arrow keys

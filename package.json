@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.7.7",
+	"version": "0.8.0",
 	"license": "MIT",
 	"icon": "images/logo.png",
 	"publisher": "janisdd",
@@ -628,7 +628,7 @@
 					"default": "#657b83",
 					"description": "the color used for text in the light theme (some valid css string)"
 				},
-				"csv-edit.convertUrlsToTags": {
+				"csv-edit.convertUrlsToLinkTags": {
 					"type": "boolean",
 					"default": true,
 					"description": "true: if a cell contains url-like text, the urls are displayed as urls and can be clicked on. false: all urls are rendered as normal text"

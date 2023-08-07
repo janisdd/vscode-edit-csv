@@ -344,7 +344,7 @@ type EditCsvConfig = {
 	/**
 	 * true: if a cell contains urls, the urls are displayed as urls and can be clicked on. false: all urls are rendered as normal text
 	 */
-	convertUrlsToTags: boolean
+	convertUrlsToLinkTags: boolean
 
 }
 

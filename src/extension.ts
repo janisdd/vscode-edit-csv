@@ -567,6 +567,13 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 				break
 			}
 
+			//this only works for vs extension and also asks the user for permission...
+			// case 'openUrl': {
+			// 	//from https://github.com/microsoft/vscode/issues/9651
+			// 	vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(message.url))
+			// 	break
+			// }
+
 			default: notExhaustive(message, `Received unknown post message from extension: ${JSON.stringify(message)}`)
 		}
 
