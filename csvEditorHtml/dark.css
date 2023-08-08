@@ -1,7 +1,8 @@
 
 body.vscode-dark {
 	--text-color: #d0d0d0;
-
+	color: #d0d0d0;
+	
 	--button-icon-background: transparent;
 	--button-icon-hover-background: rgba(90, 93, 94, 0.31);
 }
@@ -86,7 +87,7 @@ body.vscode-dark {
 }
 
 .vscode-dark .ht_master a[data-link-is-openable="1"].link-hovered.is-open-url-key-down {
-	color: var(--vscode-editorLink-activeForeground);
+	color: var(--vscode-editorLink-activeForeground, #4e94ce); /* default for browser */
 	cursor: pointer;
 }
 
@@ -99,7 +100,7 @@ body.vscode-dark {
 /* Edit mode */
 .vscode-dark .handsontableInput {
 	background-color: #504f4f!important;
-	color: var(--text-color) !important;
+	color: var(--text-color, #d0d0d0) !important;
 }
 
 /* All headers */

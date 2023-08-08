@@ -1,5 +1,6 @@
 body.vscode-light {
 	--text-color: #657b83;
+	color: #657b83;
 
 	--button-icon-background: transparent;
 	--button-icon-hover-background: rgba(90, 93, 94, 0.31);
@@ -54,7 +55,7 @@ body.vscode-light {
 }
 
 .vscode-light .ht_master a[data-link-is-openable="1"].link-hovered.is-open-url-key-down {
-	color: var(--vscode-editorLink-activeForeground);
+	color: var(--vscode-editorLink-activeForeground, #0000ff); /* default for browser */
 	cursor: pointer;
 }
 

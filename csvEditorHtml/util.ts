@@ -77,7 +77,7 @@ function createCellValueWithUrlLinks(text: string, urls: UrlInStringCoords[]): (
 		//but why not
 		a.setAttribute('rel', 'noopener noreferrer')
 		a.setAttribute(linkIsOpenableAttribute, '1')
-		a.title = `(alt + click) ${url.url}`
+		a.title = `${getOpenLinkModifierTooltopPart()} ${url.url}` 
 		return a
 	})
 
@@ -96,7 +96,7 @@ function createCellValueWithUrlLinks(text: string, urls: UrlInStringCoords[]): (
 			aTag.classList.add('link-hovered')
 			hoveredATag = aTag
 
-			if (e.altKey) {
+			if (isOpenLinkModifierPressed(e)) {
 				//if the user presses alt before moving the mouse over the link ... the alt class is not added
 				aTag.classList.add(isOpenUrlKeyDownClass)
 			}
@@ -108,7 +108,7 @@ function createCellValueWithUrlLinks(text: string, urls: UrlInStringCoords[]): (
 		})
 
 		aTag.addEventListener(`click`, (e) => {
-			if (e.altKey) {
+			if (isOpenLinkModifierPressed(e)) {
 				//let the webview open the url
 				return
 			}
@@ -1734,3 +1734,52 @@ function getNextRowIfCommentsAreHidden(visualRowIndex: number): number {
 	return 0
 }
 
+function getOpenLinkModifierTooltopPart(): string {
+
+	if (isBrowser)  {
+
+		if (isMacOpenLinkModifierKey) {
+			return `(cmd + click)`
+		}
+
+		//windows: ctrl
+		//on linux browsers ctrl + click for open in new tab
+		return `(ctrl + click)`
+	}
+
+	//vs code extension
+
+	if (isMacOpenLinkModifierKey) {
+		// return `(alt + click)`
+		return `(cmd + click)`
+	}
+
+	return `(ctrl + click)`
+}
+
+function isOpenLinkModifierPressed(e:KeyboardEvent | MouseEvent) {
+
+	if (isBrowser)  {
+
+		//mac: meta (because alt seems to download links )
+		if (isMacOpenLinkModifierKey && e.metaKey) return true
+
+		//windows: ctrl
+		//on linux browsers ctrl + click for open in new tab
+		if (!isMacOpenLinkModifierKey && e.ctrlKey) return true
+	}
+
+	//vs code extension
+
+	//mac -> alt (because meta is used to select individual cells)
+	// if (isMacOpenLinkModifierKey && e.altKey) return true
+	//BETTER use meta key to be more consistent with vs code
+	//even though cmd is used to select individual cells 
+	//(and also alt + click does not work in browser because it tries to download links...)
+	if (isMacOpenLinkModifierKey && e.metaKey) return true
+
+	//windows/linux -> ctrl (which also select cells but alt is for focus menu, windows key is for windows menu)
+	if (!isMacOpenLinkModifierKey && e.ctrlKey) return true
+
+	return false
+}

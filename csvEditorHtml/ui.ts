@@ -1464,6 +1464,18 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 		} as any,
 
+		//@ts-ignore
+		beforeOnCellMouseDown: function (event: MouseEvent, coords, td: HTMLTableCellElement, _blockCalculations: any) {
+			
+			//if we want to open a link, prevent cell selection (only if we click on the link element)
+			if (isOpenLinkModifierPressed(event) && event.target && (event.target as HTMLAnchorElement).tagName.toLowerCase() === 'a') {
+				let attrValue = (event.target as HTMLAnchorElement).getAttribute(linkIsOpenableAttribute)
+				if (attrValue && attrValue === '1') {
+					event.stopImmediatePropagation()
+				}
+			}
+		}
+
 	})
 
 	{

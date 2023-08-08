@@ -610,12 +610,34 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 		activeCol =  activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length - 1
 	}
 
+	let platform: InitialVars['os']
+	switch (process.platform) {
+		case 'aix':
+		case 'freebsd':
+		case 'linux':
+		case 'openbsd':
+		case 'android':
+		case 'cygwin':
+		case 'sunos':
+			platform = 'linux'
+			break
+		case 'win32':
+			platform = 'win'
+			break
+		case 'darwin':
+			platform = 'mac'
+			break;
+		default:
+			platform = 'linux'
+	}
+
 	panel.webview.html = createEditorHtml(panel.webview, context, config, {
 		isWatchingSourceFile: instance.supportsAutoReload,
 		sourceFileCursorLineIndex: activeTextEditor.selection.active.line,
 		sourceFileCursorColumnIndex:  activeCol,
 		isCursorPosAfterLastColumn: activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeTextEditor.selection.active.character,
 		openTableAndSelectCellAtCursorPos: config.openTableAndSelectCellAtCursorPos,
+		os: platform
 	})
 
 }

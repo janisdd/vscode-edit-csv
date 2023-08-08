@@ -14,6 +14,7 @@ var initialVars: InitialVars = {
 	sourceFileCursorColumnIndex: null,
 	isCursorPosAfterLastColumn: false,
 	openTableAndSelectCellAtCursorPos: 'initialOnly_correctRowAlwaysFirstColumn',
+	os: 'web',
 }
 
 var initialConfig: EditCsvConfig | undefined = {

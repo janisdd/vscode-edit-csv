@@ -30,6 +30,12 @@ type InitialVars = {
 	 * if the table should be opened at the cursor position and select the corresponding csv cell
 	 */
 	openTableAndSelectCellAtCursorPos: EditCsvConfig['openTableAndSelectCellAtCursorPos']
+
+	/**
+	 * the detected os
+	 * used for e.g. key bindings (specifically open detected link in browser)
+	 */
+	os: 'win' | 'mac' | 'linux' | 'web'
 }
 
 /**

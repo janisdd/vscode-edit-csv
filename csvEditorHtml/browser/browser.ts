@@ -7,6 +7,8 @@ const iconv = window.iconv
 // import Swal from "sweetalert2"
 declare var Swal: any
 
+isBrowser = true
+
 interface Toaster {
 	new(content: string, type: "info" | "message" | "warning" | "error" | "done", timeoutInMs: number): Toaster
 	new(content: HTMLElement, type: "info" | "message" | "warning" | "error" | "done", timeoutInMs: number): Toaster
@@ -124,6 +126,7 @@ switch (detectedOs) {
 	}
 	default: notExhaustiveSwitch(detectedOs)
 }
+isMacOpenLinkModifierKey = detectedOs === 'mac'
 
 updateNewLineSelect()
 

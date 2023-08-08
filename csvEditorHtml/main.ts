@@ -7,6 +7,7 @@ const defaultInitialVars: InitialVars = {
 	sourceFileCursorColumnIndex: null,
 	isCursorPosAfterLastColumn: false,
 	openTableAndSelectCellAtCursorPos: 'initialOnly_correctRowAlwaysFirstColumn',
+	os: 'web',
 }
 
 declare var acquireVsCodeApi: any
@@ -192,6 +193,12 @@ const isOpenUrlKeyDownClass = `is-open-url-key-down`
 //needed because when the cursor is in a link we don't want to highlight the link yet
 //but when the user then presses the modifier key we want to highlight the link (without any mouse event)
 let hoveredATag: HTMLAnchorElement | null = null
+
+//not a const because we need to change it in the browser
+//only mac is special because it uses alt (vs code uses cmd but cmd will select individual cells in handsontable)
+//linux and windows use ctrl
+let isMacOpenLinkModifierKey = initialVars.os === 'mac'
+let isBrowser = false
 
 /**
  * stores the widths of the handsontable columns
@@ -408,7 +415,7 @@ function setupGlobalShortcutsInVs() {
 	})
 
 document.documentElement.addEventListener('keydown', (e) => {
-	if (e.altKey && hoveredATag) {
+	if (hoveredATag && isOpenLinkModifierPressed(e)) {
 		hoveredATag.classList.add(isOpenUrlKeyDownClass)
 	}
 })
