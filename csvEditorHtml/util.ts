@@ -77,7 +77,7 @@ function createCellValueWithUrlLinks(text: string, urls: UrlInStringCoords[]): (
 		//but why not
 		a.setAttribute('rel', 'noopener noreferrer')
 		a.setAttribute(linkIsOpenableAttribute, '1')
-		a.title = `${getOpenLinkModifierTooltopPart()} ${url.url}` 
+		a.title = `${getOpenLinkModifierTooltopPart()} ${url.url}`
 		return a
 	})
 
@@ -1669,18 +1669,21 @@ function setHotScrollPosition(hot: Handsontable, viewportOffsetInPx: HotViewport
 
 function storeHotSelectedCellAndScrollPosition(): void {
 	//preserve selected cell and scroll positions
-	if (hot) {
+	if (!hot) return
 
-		let hotSelection = hot.getSelected()
-		if (hotSelection && hotSelection.length > 0) {
-			previousSelectedCell = {
-				rowIndex: hotSelection[0][0],
-				colIndex: hotSelection[0][1]
-			}
+	let hotSelection = hot.getSelected()
+	if (hotSelection && hotSelection.length > 0) {
+		previousSelectedCell = {
+			rowIndex: hotSelection[0][0],
+			colIndex: hotSelection[0][1]
 		}
-
-		previousViewportOffsets = getHotScrollPosition(hot)
 	}
+
+	previousViewportOffsets = getHotScrollPosition(hot)
+
+	let manualRowResizePlugin = hot.getPlugin('manualRowResize')
+	previousManualRowHeights = manualRowResizePlugin.manualRowHeights
+	
 }
 
 /**
@@ -1736,7 +1739,7 @@ function getNextRowIfCommentsAreHidden(visualRowIndex: number): number {
 
 function getOpenLinkModifierTooltopPart(): string {
 
-	if (isBrowser)  {
+	if (isBrowser) {
 
 		if (isMacOpenLinkModifierKey) {
 			return `(cmd + click)`
@@ -1757,9 +1760,9 @@ function getOpenLinkModifierTooltopPart(): string {
 	return `(ctrl + click)`
 }
 
-function isOpenLinkModifierPressed(e:KeyboardEvent | MouseEvent) {
+function isOpenLinkModifierPressed(e: KeyboardEvent | MouseEvent) {
 
-	if (isBrowser)  {
+	if (isBrowser) {
 
 		//mac: meta (because alt seems to download links )
 		if (isMacOpenLinkModifierKey && e.metaKey) return true

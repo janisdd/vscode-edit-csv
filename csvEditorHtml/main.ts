@@ -302,9 +302,10 @@ setupDropdownHandlers()
 //ftp and file not working anyway
 const urlRegex = /(https?):\/\/[-A-Z0-9+&@#\/%?=~_|$!:,.;]*[A-Z0-9+&@#\/%=~_|$]/gmi
 
-//used to restore cell selection and scroll pos
+//used to restore cell selection and scroll pos (after data reset)
 let previousSelectedCell: HotCellPos | null = null
 let previousViewportOffsets: HotViewportOffsetInPx | null = null
+let previousManualRowHeights: number[] | null = null
 
 //set defaults when we are in browser
 setCsvReadOptionsInitial(defaultCsvReadOptions)

@@ -456,10 +456,11 @@ function forceAutoResizeRows() {
 	let plugin = hot.getPlugin('manualRowResize')
 
 	//foreach skips over empty indices
-	plugin.manualRowHeights.forEach((height: number, rowIndex: number) => {
+	//manualRowHeights already stores physicalRow indices...
+	plugin.manualRowHeights.forEach((height: number, physicalRowIndex: number) => {
 		//from setManualSize method
-		var physicalColumn = hot!.runHooks('modifyRow', rowIndex);
-		delete plugin.manualRowHeights[physicalColumn]
+		// var physicalRow = hot!.runHooks('modifyRow', rowIndex);
+		delete plugin.manualRowHeights[physicalRowIndex]
 	})
 
 	//force a re-render
@@ -720,9 +721,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						//@ts-ignore
 						hot.forceFullRender = true;
 						//@ts-ignore
-        		hot.view.render(); // updates all
+						hot.view.render(); // updates all
 						//@ts-ignore
-        		hot.view.wt.wtOverlays.adjustElementsSize(true);
+						hot.view.wt.wtOverlays.adjustElementsSize(true);
 						//we don't run before and after resize hooks... no idea what they do
 					}
 				},
@@ -807,7 +808,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 		// },
 
-		beforeRowResize: function(oldSize, newSize, isDoubleClick) {
+		beforeRowResize: function (oldSize, newSize, isDoubleClick) {
 			//this has the same bug as beforeColumnResize where we don't get the actual row index
 			//because a prior handler (onBeforeRowResize which calculates calculateRowsHeight) returns the new size with get paased to this handler
 
@@ -1466,7 +1467,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 		//@ts-ignore
 		beforeOnCellMouseDown: function (event: MouseEvent, coords, td: HTMLTableCellElement, _blockCalculations: any) {
-			
+
 			//if we want to open a link, prevent cell selection (only if we click on the link element)
 			if (isOpenLinkModifierPressed(event) && event.target && (event.target as HTMLAnchorElement).tagName.toLowerCase() === 'a') {
 				let attrValue = (event.target as HTMLAnchorElement).getAttribute(linkIsOpenableAttribute)
@@ -1487,6 +1488,22 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 			return (ignoreCommentCellWidths || commentsAreHidden) && isCommentCell(value, csvReadConfig)
 		}
+	}
+
+	let lastRowIndex = csvParseResult.data.length - 1
+	
+	if (previousManualRowHeights) {
+		let manualRowResizePlugin = hot.getPlugin('manualRowResize')
+		//foreach skips over empty indices
+		//manualRowHeights already stores physicalRow indices...
+		previousManualRowHeights.forEach((height: number, physicalRowIndex: number) => {
+			//rese data might have less rows than before
+			if (physicalRowIndex > lastRowIndex) return
+
+			//as the setManualSize function actually does nothin but convert to physical index and adding the height to the array, we can do this here manually
+			manualRowResizePlugin.manualRowHeights[physicalRowIndex] = height
+		})
+		previousManualRowHeights = null
 	}
 
 	//@ts-ignore
@@ -2012,7 +2029,7 @@ function transposeColumsAndRows() {
 		_updateHandsontableSettings({
 			data: transpose
 		}, false, false)
-		
+
 		onAnyChange()
 
 	}, 0)
@@ -2230,7 +2247,7 @@ function setupDropdownHandlers() {
 
 		let wrappers = document.querySelectorAll(`.btn-with-menu-wrapper`)
 		wrappers.forEach(wrapper => {
-			
+
 			//close all menus (in extra function because we might also need to change icons)
 			setToolMenuIsOpen(false)
 		})
