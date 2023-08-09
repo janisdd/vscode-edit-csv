@@ -93,6 +93,10 @@ let defaultCsvReadOptions: CsvReadOptions = {
 	header: false, //always use false to get an array of arrays
 	comments: '#',
 	delimiter: '', //auto detect
+	delimitersToGuess: [',', '\t', '|', ';',
+		String.fromCharCode(30), //Papa.RECORD_SEP // \u001e" // INFORMATION SEPARATOR TWO
+		String.fromCharCode(31), //Papa.UNIT_SEP // \u001f" // INFORMATION SEPARATOR ONE
+	],
 	newline: '', //auto detect
 	quoteChar: '"',
 	escapeChar: '"',
@@ -415,16 +419,16 @@ function setupGlobalShortcutsInVs() {
 		pretendRemoveRowContextMenuActionClicked()
 	})
 
-document.documentElement.addEventListener('keydown', (e) => {
-	if (hoveredATag && isOpenLinkModifierPressed(e)) {
-		hoveredATag.classList.add(isOpenUrlKeyDownClass)
-	}
-})
-document.documentElement.addEventListener('keyup', (e) => {
-	if (hoveredATag) {
-		hoveredATag.classList.remove(isOpenUrlKeyDownClass)
-	}
-})
+	document.documentElement.addEventListener('keydown', (e) => {
+		if (hoveredATag && isOpenLinkModifierPressed(e)) {
+			hoveredATag.classList.add(isOpenUrlKeyDownClass)
+		}
+	})
+	document.documentElement.addEventListener('keyup', (e) => {
+		if (hoveredATag) {
+			hoveredATag.classList.remove(isOpenUrlKeyDownClass)
+		}
+	})
 
 	//---- some shortcuts are also in ui.ts where the handsontable instance is created...
 	//needed for core handsontable shortcuts e.g. that involve arrow keys

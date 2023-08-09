@@ -101,6 +101,11 @@ type EditCsvConfig = {
 	readOption_delimiter: string
 
 	/**
+	 * the delimiters to guess automatically
+	 */
+	readOption_delimitersToGuess: string[]
+
+	/**
 	 * the string used as comment, empty string to thread every line as data line (no comments)
 	 */
 	readOption_comment: string
@@ -371,6 +376,8 @@ type CsvReadOptions = {
 	 * the delimiter, use '' for auto detect
 	 */
 	delimiter: string,
+
+	delimitersToGuess: string[],
 	/**
 	 * the new line string, use '' for auto detect
 	 */

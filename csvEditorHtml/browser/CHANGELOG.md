@@ -4,6 +4,11 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.4.1
+- (same as vs code extension v0.8.1)
+- fixed issue #132 - search hit are again highlighted when cells contain urls
+- maybe fixed issue #124 by - adding option to set delimiters to guess manually
+
 ## 1.4.0
 - (same as vs code extension v0.8.0)
 - trim cells can now be undone (not for header cells)

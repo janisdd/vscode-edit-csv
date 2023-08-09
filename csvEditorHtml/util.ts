@@ -895,10 +895,11 @@ function setupAndApplyInitialConfigPart1(initialConfig: EditCsvConfig | undefine
 	setCsvReadOptionsInitial({
 		...copyReadOptions,
 		delimiter: initialConfig.readOption_delimiter,
+		delimitersToGuess: initialConfig.readOption_delimitersToGuess,
 		comments: initialConfig.readOption_comment,
 		_hasHeader: _readOption_hasHeader,
 		escapeChar: initialConfig.readOption_escapeChar,
-		quoteChar: initialConfig.readOption_quoteChar
+		quoteChar: initialConfig.readOption_quoteChar,
 	})
 
 	const copyWriteOptions = {
@@ -1687,7 +1688,7 @@ function storeHotSelectedCellAndScrollPosition(): void {
 
 	let manualRowResizePlugin = hot.getPlugin('manualRowResize')
 	previousManualRowHeights = manualRowResizePlugin.manualRowHeights
-	
+
 }
 
 /**

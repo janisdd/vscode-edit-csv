@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+# 0.8.1
+- fixed issue #132 - search hit are again highlighted when cells contain urls
+- maybe fixed issue #124 by - adding option to set delimiters to guess manually
+
 # 0.8.0
 - trim cells can now be undone (not for header cells)
 - fixed issue #122 - add option customize text color

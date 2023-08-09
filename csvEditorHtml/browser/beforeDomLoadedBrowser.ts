@@ -28,6 +28,7 @@ var initialConfig: EditCsvConfig | undefined = {
 	readOption_quoteChar: '"',
 	readOption_escapeChar: '"',
 	readOption_delimiter: "",
+	readOption_delimitersToGuess: [",", "\t", "|", ";", "\u001e", "\u001f"],
 	readOption_hasHeader: "false",
 	writeOption_comment: "#",
 	writeOption_delimiter: "",

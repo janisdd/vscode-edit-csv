@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.8.0",
+	"version": "0.8.1",
 	"license": "MIT",
 	"icon": "images/logo.png",
 	"publisher": "janisdd",
@@ -335,6 +335,11 @@
 					"type": "string",
 					"default": "",
 					"description": "the delimiter to use, empty string to auto detect"
+				},
+				"csv-edit.readOption_delimitersToGuess": {
+					"type": "array",
+					"default": [",", "\t", "|", ";", "\u001e", "\u001f"],
+					"description": "the delimiters to guess automatically (in the given order)"
 				},
 				"csv-edit.readOption_comment": {
 					"type": "string",
