@@ -592,6 +592,10 @@ function commentValueAndUrlsRenderer(instance: Handsontable, td: HTMLTableDataCe
 			td.append(...htmlParts)
 		}
 
+		//this applied css classes to the cell
+		//@ts-ignore
+		Handsontable.renderers.BaseRenderer.apply(this, arguments);
+
 	} else {
 		//cell has no urls
 		//@ts-ignore
