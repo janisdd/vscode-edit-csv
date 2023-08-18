@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+# 0.8.2
+- fixed issue #133 - not working in browser with `code-server`
+
 # 0.8.1
 - fixed issue #132 - search hit are again highlighted when cells contain urls
 - maybe fixed issue #124 by - adding option to set delimiters to guess manually

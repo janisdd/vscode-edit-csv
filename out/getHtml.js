@@ -930,8 +930,10 @@ function createEditorHtml(webview, context, config, initialVars) {
 		<link rel="stylesheet" href="${fontAwesomeCss}">
 
 		<link rel="stylesheet" href="${mainCss}">
-		<link rel="stylesheet" href="${darkThemeCss}">
-		<link rel="stylesheet" href="${lightThemeCss}">
+		<!-- fixes issue #133, when we run it with 'code-server' -->
+		<!-- we need to add this because we want to modify some rules (variables) in it via js -->
+		<link rel="stylesheet" crossorigin="anonymous" href="${darkThemeCss}">
+		<link rel="stylesheet" crossorigin="anonymous" href="${lightThemeCss}">
 		<link rel="stylesheet" href="${hightContrastThemeCss}">
 		<link rel="stylesheet" href="${settingsOverwriteCss}">
 	</head>
