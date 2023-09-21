@@ -114,7 +114,7 @@ export class InstanceManager {
 
 		//key is the source uri ... but we might change that so use find
 		// const instance = this.instances[sourceUri.toString()]
-		const instance = this.getAllInstances().find(p => p.sourceUri === sourceUri)
+		const instance = this.getAllInstances().find(p => p.sourceUri.path == sourceUri.path)
 
 		if (!instance) return null
 
