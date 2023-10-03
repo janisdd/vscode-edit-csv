@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+# 0.8.3
+- merged PR #134 - fix instance comparison
+	- open editor, close source file, open source file again and try to open editor
+	- used to fail because the instance comparison was not correct
+
 # 0.8.2
 - fixed issue #133 - not working in browser with `code-server`
 
