@@ -24,6 +24,13 @@ export interface Instance {
 	document: vscode.TextDocument
 
 	/**
+	 * represents the csv text the table ui currently "thinks" is in the csv file
+	 * used to check if the file actually changed after a change event
+	 * document version does not work if the file is not tracked by vscode (always version 1)
+	 */
+	lastDocumentValue: string
+
+	/**
 	 * currently external files cannot be auto
 	 * false: the user must open the file so that vs code refreshes the file model and switch back to the table and manually refresh
 	 */
@@ -38,11 +45,6 @@ export interface Instance {
 	 * the original title for the tab
 	 */
 	originalTitle: string
-
-	/**
-	 * when the table saves the file we need to ignore the next change else the disk change will trigger the table to reload (losing undo, ...)
-	 */
-	ignoreNextChangeEvent: boolean
 
 }
 

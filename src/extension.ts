@@ -5,6 +5,7 @@ import { createEditorHtml } from './getHtml';
 import { InstanceManager, Instance, SomeInstance } from './instanceManager';
 import { getExtensionConfiguration, overwriteConfiguration } from './configurationHelper';
 import * as chokidar from "chokidar";
+import { RelativePattern } from 'vscode';
 
 
 // const debounceDocumentChangeInMs = 1000
@@ -89,7 +90,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const shouldOpenEditor = beforeEditCsvCheck(instanceManager)
-		
+
 		if (!shouldOpenEditor) return
 
 		//this is checked in beforeEditCsvCheck
@@ -352,76 +353,39 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	// NOTE that watching new files (untitled) is not supported by this is probably no issue...
 
-	if (isInCurrentWorkspace) {
+	let watcher: vscode.FileSystemWatcher | null = null
 
-		let watcher: vscode.FileSystemWatcher | null = null
+	if (config.shouldWatchCsvSourceFile) {
 
-		if (config.shouldWatchCsvSourceFile) {
-			//if the file is in the current workspace we the file model in vs code is always synced so is this (faster reads/cached)
-			watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, true)
+		//if the file is in the current workspace we the file model in vs code is always synced so is this (faster reads/cached)
+		// watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, true)
 
-			//not needed because on apply changes we create a new file if this is needed
-			watcher.onDidChange((e) => {
-				if (instance.ignoreNextChangeEvent) {
-					instance.ignoreNextChangeEvent = false
-					debugLog(`source file changed: ${e.fsPath}, ignored`)
-					return
-				}
+		watcher = vscode.workspace.createFileSystemWatcher(new RelativePattern(activeTextEditor.document.fileName, "*"), true, false, true)
 
-				debugLog(`source file changed: ${e.fsPath}`)
-				onSourceFileChanged(e.fsPath, instance)
-			})
-		}
+		//not needed because on apply changes we create a new file if this is needed
+		watcher.onDidChange((e) => {
+			//note this will eventually trigger the 'ready' event and resent the file content
+			//ONLY if the file content actually changed, not checked here
 
-		instance = {
-			kind: 'workspaceFile',
-			panel: null as any,
-			sourceUri: uri,
-			editorUri: uri.with({
-				scheme: editorUriScheme
-			}),
-			hasChanges: false,
-			originalTitle: title,
-			sourceFileWatcher: watcher,
-			document: activeTextEditor.document,
-			supportsAutoReload: true,
-			ignoreNextChangeEvent: false,
-		}
+			debugLog(`source file changed: ${e.fsPath}`)
+			onSourceFileChanged(e.fsPath, instance)
+		})
+	}
 
-	} else {
+	instance = {
+		kind: 'workspaceFile',
+		panel: null as any,
+		sourceUri: uri,
+		editorUri: uri.with({
+			scheme: editorUriScheme
+		}),
+		hasChanges: false,
+		originalTitle: title,
+		sourceFileWatcher: watcher,
+		document: activeTextEditor.document,
+		lastDocumentValue: ``, //empty so the first ready event will send the content (change from empty to actual content)
+		supportsAutoReload: true,
 
-		let watcher: chokidar.FSWatcher | null = null
-
-		if (config.shouldWatchCsvSourceFile) {
-			//the problem with this is that it is faster than the file model (in vs code) can sync the file...
-			watcher = chokidar.watch(activeTextEditor.document.fileName)
-
-			watcher.on('change', (path) => {
-
-				if (instance.ignoreNextChangeEvent) {
-					instance.ignoreNextChangeEvent = false
-					debugLog(`source file (external) changed: ${path}, ignored`)
-					return
-				}
-				debugLog(`source file (external) changed: ${path}`)
-				onSourceFileChanged(path, instance)
-			})
-		}
-
-		instance = {
-			kind: 'externalFile',
-			panel: null as any,
-			sourceUri: uri,
-			editorUri: uri.with({
-				scheme: editorUriScheme
-			}),
-			hasChanges: false,
-			originalTitle: title,
-			sourceFileWatcher: watcher,
-			document: activeTextEditor.document,
-			supportsAutoReload: false,
-			ignoreNextChangeEvent: false,
-		}
 	}
 
 	try {
@@ -431,9 +395,10 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 		if (instance.kind === 'workspaceFile') {
 			instance.sourceFileWatcher?.dispose()
-		} else {
-			instance.sourceFileWatcher?.close()
 		}
+		//  else {
+		// 	instance.sourceFileWatcher?.close()
+		// }
 
 		return
 	}
@@ -453,6 +418,14 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 				instance.hasChanges = false
 				setEditorHasChanges(instance, false)
+
+				let sendFakeChangeEventDetected = () => {
+					const msg: ReceivedMessageFromVsCode = {
+						command: "fakeChangedEvent",
+					}
+
+					panel.webview.postMessage(msg)
+				}
 
 				let funcSendContent = (initialText: string) => {
 					const textSlices = partitionString(initialText, 1024 * 1024) //<1MB less should be loaded in a blink
@@ -502,7 +475,16 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 					vscode.workspace.openTextDocument(instance.sourceUri)
 						.then(
 							document => {
-								funcSendContent(document.getText())
+
+								const content = document.getText()
+
+								if (instance.lastDocumentValue !== content) {
+									instance.lastDocumentValue = content
+									funcSendContent(document.getText())
+								} else {
+									sendFakeChangeEventDetected()
+								}
+
 							}, error => {
 								vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
 							}
@@ -515,7 +497,17 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 					vscode.workspace.openTextDocument(instance.sourceUri)
 						.then(
 							document => {
-								funcSendContent(document.getText())
+
+								const content = document.getText()
+
+								if (instance.lastDocumentValue !== content) {
+									instance.lastDocumentValue = content
+									funcSendContent(document.getText())
+
+								} else {
+									sendFakeChangeEventDetected()
+								}
+
 							}, error => {
 								vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
 							}
@@ -524,8 +516,16 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 				} else {
 					//fast path
 					//file is still open and synchronized
-					let initialText = activeTextEditor.document.getText()
-					funcSendContent(initialText)
+
+					const initialText = activeTextEditor.document.getText()
+
+					if (instance.lastDocumentValue !== initialText) {
+						instance.lastDocumentValue = initialText
+						funcSendContent(initialText)
+					} else {
+						sendFakeChangeEventDetected()
+					}
+
 				}
 
 				debugLog('finished sending csv content to webview')
@@ -602,12 +602,12 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	}, null, context.subscriptions)
 
-	
+
 
 	//because for col it is the cursor pos, it can be larger than the line length! (well, equall numbers)
 	let activeCol = activeTextEditor.selection.active.character
 	if (activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeCol) {
-		activeCol =  activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length - 1
+		activeCol = activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length - 1
 	}
 
 	let platform: InitialVars['os']
@@ -634,7 +634,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	panel.webview.html = createEditorHtml(panel.webview, context, config, {
 		isWatchingSourceFile: instance.supportsAutoReload,
 		sourceFileCursorLineIndex: activeTextEditor.selection.active.line,
-		sourceFileCursorColumnIndex:  activeCol,
+		sourceFileCursorColumnIndex: activeCol,
 		isCursorPosAfterLastColumn: activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeTextEditor.selection.active.character,
 		openTableAndSelectCellAtCursorPos: config.openTableAndSelectCellAtCursorPos,
 		os: platform
@@ -669,6 +669,12 @@ function applyContent(instance: Instance, newContent: string, saveSourceFile: bo
 			vscode.workspace.applyEdit(edit)
 				.then(
 					editsApplied => {
+
+						//set before actual save, in case user does not saves immediately
+						//the ui "thinks" this value is now in the file
+						//any next changes will be compared to this value
+						instance.lastDocumentValue = newContent
+
 						_afterEditsApplied(instance, document, editsApplied, saveSourceFile, openSourceFileAfterApply)
 					},
 					(reason) => {
@@ -728,7 +734,6 @@ function _afterEditsApplied(instance: Instance, document: vscode.TextDocument, e
 		}
 
 		if (saveSourceFile) {
-			instance.ignoreNextChangeEvent = true
 			document.save()
 				.then(
 					wasSaved => {
@@ -856,14 +861,16 @@ function setEditorHasChanges(instance: Instance, hasChanges: boolean) {
 
 function onSourceFileChanged(path: string, instance: Instance) {
 
-	if (!instance.supportsAutoReload) {
-		vscode.window.showWarningMessage(`The csv source file '${instance.document.fileName}' changed and it is not in the current workspace. Thus the content could not be automatically reloaded. Please open/display the file in vs code and switch back the to table. Then you need to manually reload the table with the reload button. Alternatively just close the table and reopen it.`, {
-			modal: false,
+	// if (!instance.supportsAutoReload) {
+	// 	vscode.window.showWarningMessage(`The csv source file '${instance.document.fileName}' changed and it is not in the current workspace. Thus the content could not be automatically reloaded. Please open/display the file in vs code and switch back the to table. Then you need to manually reload the table with the reload button. Alternatively just close the table and reopen it.`, {
+	// 		modal: false,
 
-		})
-		return
-	}
+	// 	})
+	// 	return
+	// }
 
+	//note this will eventually trigger the 'ready' event and resent the file content
+	//ONLY if the file content actually changed, not checked here
 	const msg: SourceFileChangedMessage = {
 		command: 'sourceFileChanged'
 	}
