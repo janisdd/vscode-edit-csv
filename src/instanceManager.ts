@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import type * as chokidar from "chokidar";
 
 export interface Instance {
 	/**
@@ -50,27 +49,19 @@ export interface Instance {
 	 */
 	originalTitle: string
 
-}
-
-export interface InstanceWorkspaceSourceFile extends Instance {
-	kind: 'workspaceFile'
-
 	/**
+	 * true: source csv file is in workspace,
+	 * false: not
+	 */
+	isInWorkspace: boolean
+
+/**
 	* used to watch the source file and notify the extension view
 	*/
 	sourceFileWatcher: vscode.FileSystemWatcher | null
 }
 
-export interface InstanceExternalFile extends Instance {
-	kind: 'externalFile'
-
-	/**
- * used to watch the source file and notify the extension view
- */
-	sourceFileWatcher: chokidar.FSWatcher | null
-}
-
-export type SomeInstance = InstanceWorkspaceSourceFile | InstanceExternalFile
+export type SomeInstance = Instance
 
 export interface InstanceStorage {
 	/**

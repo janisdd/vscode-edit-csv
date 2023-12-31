@@ -4,7 +4,6 @@ import { isCsvFile, getCurrentViewColumn, debugLog, partitionString } from './ut
 import { createEditorHtml } from './getHtml';
 import { InstanceManager, Instance, SomeInstance } from './instanceManager';
 import { getExtensionConfiguration, overwriteConfiguration } from './configurationHelper';
-import * as chokidar from "chokidar";
 import { RelativePattern } from 'vscode';
 
 
@@ -381,7 +380,6 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	}
 
 	instance = {
-		kind: 'workspaceFile',
 		panel: null as any,
 		sourceUri: uri,
 		editorUri: uri.with({
@@ -393,7 +391,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 		document: activeTextEditor.document,
 		lastDocumentValue: ``, //empty so the first ready event will send the content (change from empty to actual content)
 		supportsAutoReload: true,
-
+		isInWorkspace: isInCurrentWorkspace
 	}
 
 	try {
@@ -401,13 +399,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	} catch (error: any) {
 		vscode.window.showErrorMessage(`Could not create an editor instance, error: ${error.message}`)
 
-		if (instance.kind === 'workspaceFile') {
-			instance.sourceFileWatcher?.dispose()
-		}
-		//  else {
-		// 	instance.sourceFileWatcher?.close()
-		// }
-
+		instance.sourceFileWatcher?.dispose()
 		return
 	}
 
@@ -562,11 +554,8 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 		try {
 
-			if (instance.kind === 'workspaceFile') {
-				instance.sourceFileWatcher?.dispose()
-			} else {
-				instance.sourceFileWatcher?.close()
-			}
+			instance.sourceFileWatcher?.dispose()
+			
 		} catch (error: any) {
 			vscode.window.showErrorMessage(`Could not dispose source file watcher for file ${instance.document.uri.fsPath}, error: ${error.message}`);
 		}

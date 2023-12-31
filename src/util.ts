@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 export function debugLog(msg: any) {
-	console.log(msg)
+	// console.log(msg)
 }
 
 /**
