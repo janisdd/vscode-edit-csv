@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+# 0.8.4
+- fixed tools menu item background for light theme
+- improved source file change detection
+	- this should result in less "file changed" actions and preserving undo/redo stack (fixes issue #136)
+	- removed chokidar for change detection, fileSystemWatcher is now used even for files outside the workspace (fixes issue #75)
+	- increased minimum vscode version
+
 # 0.8.3
 - merged PR #134 - fix instance comparison
 	- open editor, close source file, open source file again and try to open editor
