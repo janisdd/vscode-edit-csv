@@ -1329,6 +1329,7 @@ h1,h2,h3,h4,h5 {
 	grid-template-columns: 1.5rem 1fr auto;
 	cursor: pointer;
 	color: var(--button-secondary-foreground);
+	background-color: var(--button-secondary-background);
 }
 
 .btn-with-menu-wrapper .menu .menu-item:hover {
