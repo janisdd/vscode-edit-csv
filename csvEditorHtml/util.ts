@@ -964,8 +964,6 @@ function setupAndApplyInitialConfigPart1(initialConfig: EditCsvConfig | undefine
 		if (!styleSheet.href?.toLowerCase().endsWith(`dark.css`) &&
 			!styleSheet.href?.toLowerCase().endsWith(`light.css`)) continue
 
-		console.log(`styleSheet.href`, styleSheet.href)
-
 		//iterate cssRules
 		for (let j = 0; j < styleSheet.cssRules.length; j++) {
 			const cssRule = styleSheet.cssRules[j]

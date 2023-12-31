@@ -24,8 +24,12 @@ export interface Instance {
 	document: vscode.TextDocument
 
 	/**
-	 * represents the csv text the table ui currently "thinks" is in the csv file
 	 * used to check if the file actually changed after a change event
+	 * updated when
+	 * - apply
+	 * - apply & save
+	 * - the file is changed & the content is changed (file content vs this)
+	 * 
 	 * document version does not work if the file is not tracked by vscode (always version 1)
 	 */
 	lastDocumentValue: string

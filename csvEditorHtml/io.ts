@@ -445,11 +445,6 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 			break
 		}
 
-		case 'fakeChangedEvent': {
-			stopReceiveCsvProgBar()
-			break
-		}
-
 		case "applyPress": {
 			postApplyContent(false)
 			break

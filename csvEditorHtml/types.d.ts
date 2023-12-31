@@ -475,15 +475,6 @@ type CsvUpdateMessage = {
 }
 
 /**
- * in the extension the check if the content really changed (we receive more change events than actual changes)
- * is done later, so the ready event (start to receive initial content) is send
- * this shows some loading ui with this we can hide it
- */
-type CsvFakeChangedEventMessage = {
-	command: 'fakeChangedEvent'
-}
-
-/**
  * the web view should call the handler of the apply button (emulate press)
  */
 type RequestApplyPressMessage = {
@@ -505,7 +496,7 @@ type SourceFileChangedMessage = {
 	command: 'sourceFileChanged'
 }
 
-type ReceivedMessageFromVsCode = CsvUpdateMessage | CsvFakeChangedEventMessage | RequestApplyPressMessage | RequestApplyAndSavePressMessage | RequestChangeFontSiteInPxMessage | SourceFileChangedMessage
+type ReceivedMessageFromVsCode = CsvUpdateMessage | RequestApplyPressMessage | RequestApplyAndSavePressMessage | RequestChangeFontSiteInPxMessage | SourceFileChangedMessage
 
 /**
  * send by the webview indicating that it has rendered and the webview has set up the listener to receive content

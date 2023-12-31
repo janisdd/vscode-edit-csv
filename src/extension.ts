@@ -367,8 +367,16 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 			//note this will eventually trigger the 'ready' event and resent the file content
 			//ONLY if the file content actually changed, not checked here
 
-			debugLog(`source file changed: ${e.fsPath}`)
-			onSourceFileChanged(e.fsPath, instance)
+			checkFileContentReallyChanged(activeTextEditor, instance).then(hasChanged => {
+
+				if (!hasChanged) {
+					debugLog(`fake source file changed event: ${e.fsPath}`)
+					return
+				}
+
+				debugLog(`source file changed: ${e.fsPath}`)
+				onSourceFileChanged(e.fsPath, instance)
+			})
 		})
 	}
 
@@ -419,14 +427,6 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 				instance.hasChanges = false
 				setEditorHasChanges(instance, false)
 
-				let sendFakeChangeEventDetected = () => {
-					const msg: ReceivedMessageFromVsCode = {
-						command: "fakeChangedEvent",
-					}
-
-					panel.webview.postMessage(msg)
-				}
-
 				let funcSendContent = (initialText: string) => {
 					const textSlices = partitionString(initialText, 1024 * 1024) //<1MB less should be loaded in a blink
 
@@ -450,24 +450,6 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 					//slow path
 					//external files are normally not synced so better read the file...
 
-					// vscode.workspace.fs.readFile(instance.sourceUri)
-					// 	.then(content => {
-
-					// 		console.log(`encoding`)
-					// 		//TODO get encoding????
-					// 		//see https://github.com/microsoft/vscode/issues/824
-					// const text = Buffer.from(content).toString('utf-8')
-					// 		funcSendContent(text)
-
-					// 	}, error => {
-					// 		vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
-					// 	})
-
-					//TODO
-					//THIS might not get the up-to-date state of the file on the disk
-					//but vs code api cannot get the file encoding (so that we could use vscode.workspace.fs.readFile)
-					//or allow us to force to updat the memory model in vs code of the file...
-
 					//see https://github.com/microsoft/vscode/issues/824
 					//see https://github.com/microsoft/vscode/issues/3025
 
@@ -478,12 +460,9 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 								const content = document.getText()
 
-								if (instance.lastDocumentValue !== content) {
-									instance.lastDocumentValue = content
-									funcSendContent(document.getText())
-								} else {
-									sendFakeChangeEventDetected()
-								}
+								//this is normally already set if the file really changed
+								instance.lastDocumentValue = content
+								funcSendContent(document.getText())
 
 							}, error => {
 								vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
@@ -500,13 +479,9 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 								const content = document.getText()
 
-								if (instance.lastDocumentValue !== content) {
-									instance.lastDocumentValue = content
-									funcSendContent(document.getText())
-
-								} else {
-									sendFakeChangeEventDetected()
-								}
+								//this is normally already set if the file really changed
+								instance.lastDocumentValue = content
+								funcSendContent(document.getText())
 
 							}, error => {
 								vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
@@ -519,13 +494,9 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 					const initialText = activeTextEditor.document.getText()
 
-					if (instance.lastDocumentValue !== initialText) {
-						instance.lastDocumentValue = initialText
-						funcSendContent(initialText)
-					} else {
-						sendFakeChangeEventDetected()
-					}
-
+					//this is normally already set if the file really changed
+					instance.lastDocumentValue = initialText
+					funcSendContent(initialText)
 				}
 
 				debugLog('finished sending csv content to webview')
@@ -875,6 +846,84 @@ function onSourceFileChanged(path: string, instance: Instance) {
 		command: 'sourceFileChanged'
 	}
 	instance.panel.webview.postMessage(msg)
+}
+
+function checkFileContentReallyChanged(activeTextEditor: vscode.TextEditor, instance: Instance): Promise<boolean> {
+
+	let promise = new Promise<boolean>((resolve, reject) => {
+
+		let isInCurrentWorkspace = activeTextEditor.document.uri.fsPath !== vscode.workspace.asRelativePath(activeTextEditor.document.uri.fsPath)
+
+		if (isInCurrentWorkspace === false) {
+			//slow path
+			//external files are normally not synced so better read the file...
+
+			//see https://github.com/microsoft/vscode/issues/824
+			//see https://github.com/microsoft/vscode/issues/3025
+
+			//in case we closed the file (we have an old view/model of the file) open it again
+			vscode.workspace.openTextDocument(instance.sourceUri)
+				.then(
+					document => {
+
+						const content = document.getText()
+
+						if (instance.lastDocumentValue !== content) {
+							instance.lastDocumentValue = content
+
+							resolve(true)
+						} else {
+							resolve(false)
+						}
+
+					}, error => {
+						vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`)
+						reject(error)
+					}
+				)
+
+		} else if (activeTextEditor.document.isClosed) {
+			//slow path
+			//not synchronized anymore...
+			//we need to get the real file content from disk
+			vscode.workspace.openTextDocument(instance.sourceUri)
+				.then(
+					document => {
+
+						const content = document.getText()
+
+						if (instance.lastDocumentValue !== content) {
+							instance.lastDocumentValue = content
+
+							resolve(true)
+						} else {
+							resolve(false)
+						}
+
+					}, error => {
+						vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`)
+						reject(error)
+					}
+				)
+
+		} else {
+			//fast path
+			//file is still open and synchronized
+
+			const initialText = activeTextEditor.document.getText()
+
+			if (instance.lastDocumentValue !== initialText) {
+				instance.lastDocumentValue = initialText
+
+				resolve(true)
+			} else {
+				resolve(false)
+			}
+		}
+
+	})
+
+	return promise
 }
 
 
