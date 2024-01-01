@@ -4,8 +4,6 @@ import { isCsvFile, getCurrentViewColumn, debugLog, partitionString } from './ut
 import { createEditorHtml } from './getHtml';
 import { InstanceManager, Instance, SomeInstance } from './instanceManager';
 import { getExtensionConfiguration, overwriteConfiguration } from './configurationHelper';
-import * as chokidar from "chokidar";
-
 
 // const debounceDocumentChangeInMs = 1000
 
@@ -390,21 +388,21 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	} else {
 
-		let watcher: chokidar.FSWatcher | null = null
+		let watcher: vscode.FileSystemWatcher | null = null
 
 		if (config.shouldWatchCsvSourceFile) {
 			//the problem with this is that it is faster than the file model (in vs code) can sync the file...
-			watcher = chokidar.watch(activeTextEditor.document.fileName)
+			watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(activeTextEditor.document.fileName, "*"), true, false, true)
 
-			watcher.on('change', (path) => {
-
+			watcher.onDidChange((e) => {
 				if (instance.ignoreNextChangeEvent) {
 					instance.ignoreNextChangeEvent = false
-					debugLog(`source file (external) changed: ${path}, ignored`)
+					debugLog(`source file changed: ${e.fsPath}, ignored`)
 					return
 				}
-				debugLog(`source file (external) changed: ${path}`)
-				onSourceFileChanged(path, instance)
+
+				debugLog(`source file changed: ${e.fsPath}`)
+				onSourceFileChanged(e.fsPath, instance)
 			})
 		}
 
@@ -429,11 +427,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	} catch (error: any) {
 		vscode.window.showErrorMessage(`Could not create an editor instance, error: ${error.message}`)
 
-		if (instance.kind === 'workspaceFile') {
-			instance.sourceFileWatcher?.dispose()
-		} else {
-			instance.sourceFileWatcher?.close()
-		}
+		instance.sourceFileWatcher?.dispose()
 
 		return
 	}
@@ -524,6 +518,8 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 				} else {
 					//fast path
 					//file is still open and synchronized
+					//sometimes the model is not updated fast enough after a change detection, thus we get old content
+					//however, if the user manually triggers the reload, then the model is already synced
 					let initialText = activeTextEditor.document.getText()
 					funcSendContent(initialText)
 				}
@@ -591,11 +587,8 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 		try {
 
-			if (instance.kind === 'workspaceFile') {
-				instance.sourceFileWatcher?.dispose()
-			} else {
-				instance.sourceFileWatcher?.close()
-			}
+			instance.sourceFileWatcher?.dispose()
+
 		} catch (error: any) {
 			vscode.window.showErrorMessage(`Could not dispose source file watcher for file ${instance.document.uri.fsPath}, error: ${error.message}`);
 		}
