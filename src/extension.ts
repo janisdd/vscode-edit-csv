@@ -850,12 +850,15 @@ function checkFileContentReallyChanged(activeTextEditor: vscode.TextEditor, inst
 			//see https://github.com/microsoft/vscode/issues/824
 			//see https://github.com/microsoft/vscode/issues/3025
 
-			//in case we closed the file (we have an old view/model of the file) open it again
-			vscode.workspace.openTextDocument(instance.sourceUri)
+		
+			//TODO encoding???
+			vscode.workspace.fs.readFile(instance.sourceUri)
 				.then(
-					document => {
+					buffer => {
+						const content = buffer.toString()
+						vscode.workspace.fs
 
-						const content = document.getText()
+						debugLog(`isInCurrentWorkspace === false: \n${content}`)
 
 						if (instance.lastDocumentValue !== content) {
 							instance.lastDocumentValue = content
@@ -864,12 +867,37 @@ function checkFileContentReallyChanged(activeTextEditor: vscode.TextEditor, inst
 						} else {
 							resolve(false)
 						}
-
 					}, error => {
 						vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`)
 						reject(error)
 					}
 				)
+
+				//this does not work on windows as the file model is not synced if the file is not active or at least open in vs code
+				//so we would get the old content here...
+
+			//in case we closed the file (we have an old view/model of the file) open it again
+			// vscode.workspace.openTextDocument(instance.sourceUri)
+			// 	.then(
+			// 		document => {
+
+			// 			const content = document.getText()
+
+			// 			debugLog(`isInCurrentWorkspace === false: \n${content}`)
+
+			// 			if (instance.lastDocumentValue !== content) {
+			// 				instance.lastDocumentValue = content
+
+			// 				resolve(true)
+			// 			} else {
+			// 				resolve(false)
+			// 			}
+
+			// 		}, error => {
+			// 			vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`)
+			// 			reject(error)
+			// 		}
+			// 	)
 
 		} else if (activeTextEditor.document.isClosed) {
 			//slow path
@@ -880,6 +908,8 @@ function checkFileContentReallyChanged(activeTextEditor: vscode.TextEditor, inst
 					document => {
 
 						const content = document.getText()
+
+						debugLog(`activeTextEditor.document.isClosed: \n${content}`)
 
 						if (instance.lastDocumentValue !== content) {
 							instance.lastDocumentValue = content
@@ -900,6 +930,8 @@ function checkFileContentReallyChanged(activeTextEditor: vscode.TextEditor, inst
 			//file is still open and synchronized
 
 			const initialText = activeTextEditor.document.getText()
+
+			debugLog(`else: \n${initialText}`)
 
 			if (instance.lastDocumentValue !== initialText) {
 				instance.lastDocumentValue = initialText
