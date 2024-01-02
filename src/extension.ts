@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from "path";
-import { isCsvFile, getCurrentViewColumn, debugLog, partitionString } from './util';
+import { isCsvFile, getCurrentViewColumn, debugLog, partitionString, debounce } from './util';
 import { createEditorHtml } from './getHtml';
 import { InstanceManager, Instance, SomeInstance } from './instanceManager';
 import { getExtensionConfiguration, overwriteConfiguration } from './configurationHelper';
@@ -100,68 +100,30 @@ export function activate(context: vscode.ExtensionContext) {
 	})
 
 
-	//@ts-ignore
-	// const askRefresh = function (instance: Instance) {
-	// 	const options = ['Yes', 'No']
-	// 	vscode.window.showInformationMessage('The source file changed or was saved. Would you like to overwrite your csv edits with the new content?',
-	// 		{
-	// 			modal: false,
-
-	// 		}, ...options)
-	// 		.then((picked) => {
-
-	// 			if (!picked) return
-
-	// 			picked = picked.toLowerCase()
-	// 			if (picked === 'no') return
-
-	// 			//update
-	// 			console.log('update');
-
-	// 			if (!vscode.window.activeTextEditor) {
-
-	// 				vscode.workspace.openTextDocument(instance.sourceUri)
-	// 					.then((document) => {
-
-	// 						const newContent = document.getText()
-	// 						instance.panel.webview.html = createEditorHtml(context, newContent)
-
-	// 					})
-
-	// 				return
-	// 			}
-
-	// 			const newContent = vscode.window.activeTextEditor.document.getText()
-
-	// 			//see https://github.com/Microsoft/vscode/issues/47534
-	// 			// const msg = {
-	// 			// 	command: 'csvUpdate',
-	// 			// 	csvContent: newContent
-	// 			// }
-	// 			// instance.panel.webview.postMessage(msg)
-
-	// 			instance.panel.webview.html = createEditorHtml(context, newContent)
-	// 		})
-	// }
-
 	//we could use this hook to check if the file was changed (outside of the editor) and show a message to the user
 	//but we would need to distinguish our own changes from external changes...
 
-	//this only works if the file is opened inside an editor (inside vs code) and visible (the current file)
-	//not working even if the file is in the current workspace (directoy), the file must be open and visible!
-	// vscode.workspace.onDidChangeTextDocument((args: vscode.TextDocumentChangeEvent) => {
-	// 	//see https://github.com/Microsoft/vscode/issues/50344
-	// 	//when dirty flag changes this is called
-	// 	// if (args.contentChanges.length === 0) {
-	// 	// 	return
-	// 	// }
-	// 	console.log(`onDidChangeTextDocument`, args)
+	// vscode.workspace.onDidChangeTextDocument((args) => {
+	// 	//TODO seems that the file models here always synced??
+
+		
+	// 	const instance = instanceManager.findInstanceBySourceUri(args.document.uri)
+	// 	if (!instance) return
+
+	// 	console.log(`onDidChangeTextDocument ${args.document.uri.toString()}`);
+
+	// 	vscode.workspace.openTextDocument(instance.sourceUri)
+	// 	.then(
+	// 		document => {
+	// 			let content = document.getText()
+	// 			content += ""
+	// 			console.log(`content`, content.split('\n')[0])
+	// 		}, error => {
+	// 			vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
+	// 		}
+	// 	)
+
 	// })
-
-	// 	if (!isCsvFile(args.document)) return //closed non-csv file ... we cannot have an editor for this document
-
-	// 	console.log(`CHANGE ${args.document.uri.toString()}`);
-	// }, debounceDocumentChangeInMs));
 
 	//when an unnamed file is saved the new file (new uri) is opened
 	//	when the extension calls save the new file is not displayed
@@ -184,11 +146,6 @@ export function activate(context: vscode.ExtensionContext) {
 		// vscode.window.showTextDocument(args.uri)
 	})
 
-	// vscode.workspace.onDidSaveTextDocument(debounce((args: vscode.TextDocument) => {
-	// }, debounceDocumentChangeInMs))
-	// vscode.workspace.onDidSaveTextDocument((args: vscode.TextDocument) => {
-	// console.log(`onDidSaveTextDocument ${args.uri.toString()}`);
-	// })
 
 
 	//when an unnamed csv file is closed and we have an editor for it then close the editor
@@ -350,25 +307,13 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	// NOTE that watching new files (untitled) is not supported by this is probably no issue...
 
-	if (isInCurrentWorkspace) {
+	let watcher: vscode.FileSystemWatcher | null = null
 
-		let watcher: vscode.FileSystemWatcher | null = null
+	if (isInCurrentWorkspace) {
 
 		if (config.shouldWatchCsvSourceFile) {
 			//if the file is in the current workspace we the file model in vs code is always synced so is this (faster reads/cached)
 			watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, true)
-
-			//not needed because on apply changes we create a new file if this is needed
-			watcher.onDidChange((e) => {
-				if (instance.ignoreNextChangeEvent) {
-					instance.ignoreNextChangeEvent = false
-					debugLog(`source file changed: ${e.fsPath}, ignored`)
-					return
-				}
-
-				debugLog(`source file changed: ${e.fsPath}`)
-				onSourceFileChanged(e.fsPath, instance)
-			})
 		}
 
 		instance = {
@@ -383,27 +328,16 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 			sourceFileWatcher: watcher,
 			document: activeTextEditor.document,
 			supportsAutoReload: true,
-			ignoreNextChangeEvent: false,
+			ignoreChangeEvents: false,
+			unsubscribeWatcher: null,
+			lastCommittedContent: ''
 		}
 
 	} else {
 
-		let watcher: vscode.FileSystemWatcher | null = null
-
 		if (config.shouldWatchCsvSourceFile) {
 			//the problem with this is that it is faster than the file model (in vs code) can sync the file...
 			watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(activeTextEditor.document.fileName, "*"), true, false, true)
-
-			watcher.onDidChange((e) => {
-				if (instance.ignoreNextChangeEvent) {
-					instance.ignoreNextChangeEvent = false
-					debugLog(`source file changed: ${e.fsPath}, ignored`)
-					return
-				}
-
-				debugLog(`source file changed: ${e.fsPath}`)
-				onSourceFileChanged(e.fsPath, instance)
-			})
 		}
 
 		instance = {
@@ -418,8 +352,20 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 			sourceFileWatcher: watcher,
 			document: activeTextEditor.document,
 			supportsAutoReload: false,
-			ignoreNextChangeEvent: false,
+			ignoreChangeEvents: false,
+			unsubscribeWatcher: null,
+			lastCommittedContent: ''
 		}
+	}
+
+	if (config.shouldWatchCsvSourceFile && instance.sourceFileWatcher) {
+		const debounced = debounce(onWatcherChangeDetecedHandler, 1000)
+		let unsubscribe = instance.sourceFileWatcher.onDidChange((e) => {
+			console.log(`debounce ${e.fsPath}`)
+			debounced(e, instance)
+		})
+
+		instance.unsubscribeWatcher = unsubscribe
 	}
 
 	try {
@@ -496,7 +442,10 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 					vscode.workspace.openTextDocument(instance.sourceUri)
 						.then(
 							document => {
-								funcSendContent(document.getText())
+								const content = document.getText()
+								instance.lastCommittedContent = content
+								// debugLog(`content send`, content.split('\n')[0])
+								funcSendContent(content)
 							}, error => {
 								vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
 							}
@@ -509,7 +458,10 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 					vscode.workspace.openTextDocument(instance.sourceUri)
 						.then(
 							document => {
-								funcSendContent(document.getText())
+								const content = document.getText()
+								instance.lastCommittedContent = content
+								// debugLog(`content send`, content.split('\n')[0])
+								funcSendContent(content)
 							}, error => {
 								vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
 							}
@@ -520,8 +472,10 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 					//file is still open and synchronized
 					//sometimes the model is not updated fast enough after a change detection, thus we get old content
 					//however, if the user manually triggers the reload, then the model is already synced
-					let initialText = activeTextEditor.document.getText()
-					funcSendContent(initialText)
+					const content = activeTextEditor.document.getText()
+					// debugLog(`content send`, content.split('\n')[0])
+					instance.lastCommittedContent = content
+					funcSendContent(content)
 				}
 
 				debugLog('finished sending csv content to webview')
@@ -662,6 +616,8 @@ function applyContent(instance: Instance, newContent: string, saveSourceFile: bo
 			vscode.workspace.applyEdit(edit)
 				.then(
 					editsApplied => {
+
+						instance.lastCommittedContent = newContent
 						_afterEditsApplied(instance, document, editsApplied, saveSourceFile, openSourceFileAfterApply)
 					},
 					(reason) => {
@@ -721,10 +677,22 @@ function _afterEditsApplied(instance: Instance, document: vscode.TextDocument, e
 		}
 
 		if (saveSourceFile) {
-			instance.ignoreNextChangeEvent = true
+
+			//this would trigger the watcher change detection and show reload dialog...
+			//prevent this by removing the handler
+			//setting a flag won't work because we sometimes get multiple change events and we don't know which is the last one
+
+			// instance.ignoreChangeEvents = true
 			document.save()
 				.then(
 					wasSaved => {
+
+						//really dirty but there seems to be no better way
+						//
+						// setTimeout(() => {
+						// 	instance.ignoreChangeEvents = false
+						// }, 500)
+
 						if (!wasSaved) {
 							console.warn(`Could not save csv file`)
 							vscode.window.showErrorMessage(`Could not save csv file`)
@@ -734,6 +702,9 @@ function _afterEditsApplied(instance: Instance, document: vscode.TextDocument, e
 						setEditorHasChanges(instance, false)
 					},
 					(reason) => {
+						// setTimeout(() => {
+						// 	instance.ignoreChangeEvents = false
+						// }, 500)
 						console.warn(`Error saving csv file`)
 						console.warn(reason); //will be null e.g. no permission denied when saved manually
 						vscode.window.showErrorMessage(`Error saving csv file`)
@@ -847,15 +818,53 @@ function setEditorHasChanges(instance: Instance, hasChanges: boolean) {
 	instance.panel.title = `${hasChanges ? '* ' : ''}${instance.originalTitle}`
 }
 
-function onSourceFileChanged(path: string, instance: Instance) {
+function onWatcherChangeDetecedHandler(e: vscode.Uri, instance: Instance) {
 
-	if (!instance.supportsAutoReload) {
-		vscode.window.showWarningMessage(`The csv source file '${instance.document.fileName}' changed and it is not in the current workspace. Thus the content could not be automatically reloaded. Please open/display the file in vs code and switch back the to table. Then you need to manually reload the table with the reload button. Alternatively just close the table and reopen it.`, {
-			modal: false,
-
-		})
+	if (instance.ignoreChangeEvents) {
+		debugLog(`source file changed: ${e.fsPath}, ignored`)
 		return
 	}
+
+	//instance.document.getText() is not enough if the file not opened in vs code
+	// const newContent = instance.document.getText()
+	// console.log(`newContent:`,newContent.split('\n')[0])
+
+	vscode.workspace.openTextDocument(instance.sourceUri)
+		.then(
+			document => {
+				let content = document.getText()
+				// debugLog(`content`, content.split('\n')[0])
+
+				if (content === instance.lastCommittedContent) {
+					debugLog(`content didn't change, fake change`)
+					return
+				}
+
+				debugLog(`source file changed: ${e.fsPath}`)
+				onSourceFileChanged(e.fsPath, instance)
+
+			}, error => {
+				vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
+			}
+		)
+	
+}
+
+function onSourceFileChanged(path: string, instance: Instance) {
+
+	//alway show change dialog
+	// if (!instance.supportsAutoReload) {
+	// 	vscode.window.showWarningMessage(`The csv source file '${instance.document.fileName}' has been changed and is not in the current workspace. As a result, the content could not be reloaded automatically. Please open/show the csv source file in vs code and switch back to the table. Then you have to reload the table manually with the reload button. Alternatively, close the table and open it again.`, {
+	// 		modal: false,
+	// 	})
+	// 	return
+	// }
+	
+
+	// vscode.window.showWarningMessage(`The csv source file '${instance.document.fileName}' was changed and could not be reloaded automatically. Please open/show the csv source file in vs code and switch back to the table. Then you have to reload the table manually with the reload button. Alternatively, close the table and open it again.`, {
+	// 	modal: false,
+	// })
+	// return
 
 	const msg: SourceFileChangedMessage = {
 		command: 'sourceFileChanged'

@@ -462,13 +462,15 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 
 		case 'sourceFileChanged': {
 
-			const hasAnyChanges = getHasAnyChangesUi()
+			//always show dialog because immediate reload has the possibility vs code has not yet synced the file
 
-			if (!hasAnyChanges && !isReadonlyMode) {
-				//just relaod the file because we have no changes anyway...
-				reloadFileFromDisk()
-				return
-			}
+			// const hasAnyChanges = getHasAnyChangesUi()
+
+			// if (!hasAnyChanges && !isReadonlyMode) {
+			// 	//just relaod the file because we have no changes anyway...
+			// 	reloadFileFromDisk()
+			// 	return
+			// }
 
 			toggleSourceFileChangedModalDiv(true)
 			break

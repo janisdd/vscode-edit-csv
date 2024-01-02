@@ -23,6 +23,14 @@ export interface Instance {
 	document: vscode.TextDocument
 
 	/**
+	 * the last known content of the file
+	 * 
+	 * we need this to check if the file content really changed
+	 * sometimes fake change events are triggered and then we compare the file contents
+	 */
+	lastCommittedContent: string
+
+	/**
 	 * currently external files cannot be auto
 	 * false: the user must open the file so that vs code refreshes the file model and switch back to the table and manually refresh
 	 */
@@ -41,26 +49,22 @@ export interface Instance {
 	/**
 	 * when the table saves the file we need to ignore the next change else the disk change will trigger the table to reload (losing undo, ...)
 	 */
-	ignoreNextChangeEvent: boolean
+	ignoreChangeEvents: boolean
 
+/**
+	* used to watch the source file and notify the extension view
+	*/
+	sourceFileWatcher: vscode.FileSystemWatcher | null
+
+	unsubscribeWatcher: vscode.Disposable | null
 }
 
 export interface InstanceWorkspaceSourceFile extends Instance {
 	kind: 'workspaceFile'
-
-	/**
-	* used to watch the source file and notify the extension view
-	*/
-	sourceFileWatcher: vscode.FileSystemWatcher | null
 }
 
 export interface InstanceExternalFile extends Instance {
 	kind: 'externalFile'
-
-	/**
- * used to watch the source file and notify the extension view
- */
-	sourceFileWatcher: vscode.FileSystemWatcher | null
 }
 
 export type SomeInstance = InstanceWorkspaceSourceFile | InstanceExternalFile
