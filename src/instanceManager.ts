@@ -115,23 +115,23 @@ export class InstanceManager {
 
 	public findInstanceBySourceUri(sourceUri: vscode.Uri): SomeInstance | null {
 
-		//key is the source uri ... but we might change that so use find
-		// const instance = this.instances[sourceUri.toString()]
-		const instance = this.getAllInstances().find(p => p.sourceUri.toString() == sourceUri.toString())
+		//key is the source uri
+		const instance = this.instances[sourceUri.toString()]
+		// const instance = this.getAllInstances().find(p => p.sourceUri.toString() == sourceUri.toString())
 
 		if (!instance) return null
 
 		return instance
 	}
 
-	public findInstanceByEditorUri(editorUri: vscode.Uri): SomeInstance | null {
+	// public findInstanceByEditorUri(editorUri: vscode.Uri): SomeInstance | null {
 
-		const instance = this.getAllInstances().find(p => p.editorUri === editorUri)
+	// 	const instance = this.getAllInstances().find(p => p.editorUri === editorUri)
 
-		if (!instance) return null
+	// 	if (!instance) return null
 
-		return instance
-	}
+	// 	return instance
+	// }
 
 	public hasActiveEditorInstance(): boolean {
 		const activeInstances = this.getAllInstances().filter(p => p.panel.active)

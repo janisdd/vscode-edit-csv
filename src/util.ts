@@ -24,7 +24,7 @@ export function limitSingleCharacterString(value: string): string {
 }
 
 //from https://davidwalsh.name/javascript-debounce-function
-export function debounce(func: Function, wait: number, immediate = false) {
+export function debounce<T extends Function>(func: T, wait: number, immediate = false): T {
 	var timeout: any;
 	return function (this: any) {
 		var context = this, args = arguments;
@@ -36,7 +36,7 @@ export function debounce(func: Function, wait: number, immediate = false) {
 		clearTimeout(timeout);
 		timeout = setTimeout(later, wait);
 		if (callNow) func.apply(context, args);
-	};
+	} as any
 }
 
 //inspired from https://github.com/jjuback/gc-excelviewer/blob/master/src/extension.ts

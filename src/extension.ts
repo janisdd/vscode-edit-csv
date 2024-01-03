@@ -102,28 +102,30 @@ export function activate(context: vscode.ExtensionContext) {
 
 	//we could use this hook to check if the file was changed (outside of the editor) and show a message to the user
 	//but we would need to distinguish our own changes from external changes...
+	
+	const debounced = debounce(onWatcherChangeDetecedHandler, 1000)
 
-	// vscode.workspace.onDidChangeTextDocument((args) => {
-	// 	//TODO seems that the file models here always synced??
+	const onDidChangeTextDocumentHandler = vscode.workspace.onDidChangeTextDocument((args) => {
+		//seems that the file models here always synced
 
-		
-	// 	const instance = instanceManager.findInstanceBySourceUri(args.document.uri)
-	// 	if (!instance) return
+		console.log(`onDidChangeTextDocument ${args.document.uri.toString()}`)
 
-	// 	console.log(`onDidChangeTextDocument ${args.document.uri.toString()}`);
+		debounced(args.document.uri, instanceManager)
 
-	// 	vscode.workspace.openTextDocument(instance.sourceUri)
-	// 	.then(
-	// 		document => {
-	// 			let content = document.getText()
-	// 			content += ""
-	// 			console.log(`content`, content.split('\n')[0])
-	// 		}, error => {
-	// 			vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
-	// 		}
-	// 	)
+		// console.log(`onDidChangeTextDocument ${args.document.uri.toString()}`);
 
-	// })
+		// vscode.workspace.openTextDocument(instance.sourceUri)
+		// .then(
+		// 	document => {
+		// 		let content = document.getText()
+		// 		content += ""
+		// 		console.log(`content`, content.split('\n')[0])
+		// 	}, error => {
+		// 		vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
+		// 	}
+		// )
+
+	})
 
 	//when an unnamed file is saved the new file (new uri) is opened
 	//	when the extension calls save the new file is not displayed
@@ -176,6 +178,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(gotoSourceCsvCommand)
 	context.subscriptions.push(applyCsvCommand)
 	context.subscriptions.push(applyAndSaveCsvCommand)
+	context.subscriptions.push(onDidChangeTextDocumentHandler)
 	context.subscriptions.push(onDidOpenTextDocumentHandler)
 	context.subscriptions.push(onDidCloseTextDocumentHandler)
 	context.subscriptions.push(onDidChangeConfigurationHandler)
@@ -359,13 +362,13 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	}
 
 	if (config.shouldWatchCsvSourceFile && instance.sourceFileWatcher) {
-		const debounced = debounce(onWatcherChangeDetecedHandler, 1000)
-		let unsubscribe = instance.sourceFileWatcher.onDidChange((e) => {
-			console.log(`debounce ${e.fsPath}`)
-			debounced(e, instance)
-		})
+		// const debounced = debounce(onWatcherChangeDetecedHandler, 1000)
+		// let unsubscribe = instance.sourceFileWatcher.onDidChange((e) => {
+		// 	console.log(`debounce ${e.fsPath}`)
+		// 	debounced(e, instance)
+		// })
 
-		instance.unsubscribeWatcher = unsubscribe
+		// instance.unsubscribeWatcher = unsubscribe
 	}
 
 	try {
@@ -818,12 +821,17 @@ function setEditorHasChanges(instance: Instance, hasChanges: boolean) {
 	instance.panel.title = `${hasChanges ? '* ' : ''}${instance.originalTitle}`
 }
 
-function onWatcherChangeDetecedHandler(e: vscode.Uri, instance: Instance) {
+function onWatcherChangeDetecedHandler(e: vscode.Uri, instanceManager: InstanceManager) {
+
+	const instance: Instance | null = instanceManager.findInstanceBySourceUri(e)
+	if (!instance) return
 
 	if (instance.ignoreChangeEvents) {
 		debugLog(`source file changed: ${e.fsPath}, ignored`)
 		return
 	}
+
+	
 
 	//instance.document.getText() is not enough if the file not opened in vs code
 	// const newContent = instance.document.getText()
@@ -833,7 +841,7 @@ function onWatcherChangeDetecedHandler(e: vscode.Uri, instance: Instance) {
 		.then(
 			document => {
 				let content = document.getText()
-				// debugLog(`content`, content.split('\n')[0])
+				debugLog(`content ${content.split('\n')[0]}`)
 
 				if (content === instance.lastCommittedContent) {
 					debugLog(`content didn't change, fake change`)
