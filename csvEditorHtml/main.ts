@@ -61,6 +61,7 @@ let handsontableOverlayScrollLeft: number = 0
 let _onTableScrollThrottled: ((this: HTMLDivElement, e: Event) => void) | null = null
 
 let hiddenPhysicalRowIndices: number[] = []
+let hiddenPhysicalColumnIndices: number[] = []
 
 let copyPasteRowLimit = 10_000_000
 let copyPasteColLimit = 10_000_000
@@ -209,11 +210,13 @@ let isBrowser = false
  * THIS is always synced with the ui
  * it allows us to modify the widths better e.g. restore widths...
  * 
+ * hidden columns use a very small (<1) width
+ * 
  * uses visual column indices!
  * 
  * inspired by https://github.com/YaroslavOvdii/fliplet-widget-data-source/blob/master/js/spreadsheet.js (also see https://github.com/Fliplet/fliplet-widget-data-source/pull/81/files)
  */
-let allColWidths: number[] = []
+let allColWidths: Array<number> = []
 //afterRender is called directly after we render the table but we might want to apply old col widths here
 let isInitialHotRender = true
 

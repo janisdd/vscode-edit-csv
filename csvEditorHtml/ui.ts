@@ -647,6 +647,30 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					name: '---------'
 				},
 				'alignment': {},
+				'hide_column': {
+					name: 'Hide column',
+					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
+						if (!hot) return
+						// if (!headerRowWithIndex) return
+						if (selection.length > 1) return
+
+						let targetCol = selection[0].start.col
+
+						const physicalColIndex = hot.toPhysicalColumn(targetCol)
+
+						hiddenPhysicalColumnIndices.push(physicalColIndex)
+
+						//after there is no place where the previous manual size is stored, so after showing the col again
+						//it will have auto size (for now)
+						const manualColumnResizePlugin = hot.getPlugin('manualColumnResize')
+						manualColumnResizePlugin.manualColumnWidths[physicalColIndex] = undefined
+
+						hot.render()
+					},
+					disabled: function () {
+						return isReadonlyMode //TODO when all columns are hidden?
+					}
+				},
 				'edit_header_cell': {
 					name: 'Edit header cell',
 					hidden: function () {
@@ -697,7 +721,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 							allColWidths[i] = desiredColWidth
 						}
 
-						applyColWidths()
+						applyColWidths(false)
 					}
 				},
 				'resize_row_header_cell': {
@@ -725,6 +749,33 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						//@ts-ignore
 						hot.view.wt.wtOverlays.adjustElementsSize(true);
 						//we don't run before and after resize hooks... no idea what they do
+					}
+				},
+				'unhide_all_column': {
+					name: 'Unhide all column',
+					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
+						if (!hot) return
+						
+
+						//we need to do more here because e.g. on remove col we update the settings and manually set the column widths
+						//this means that now the manually set widhts are used (which is still 0.000001 for hidden columns)
+						//so, the columns will not be shown again
+						//to fix this we need to get the auto calculated widths of the hidden columns and set them manually
+						//but only for the hidden columns, else we would reset the manually set widths of the visible columns
+
+						//the main problem with the col widths is, that we don't know if they are currently manual or automatic
+						//when removing a column we apply the previous widths, else all widths of all columns right of the removed column changed
+						let manualColumnResizePlugin = hot.getPlugin('manualColumnResize')
+						for (let i = 0; i < hiddenPhysicalColumnIndices.length; i++) {
+							const visualColIndex = hot.toVisualColumn(hiddenPhysicalColumnIndices[i])
+							manualColumnResizePlugin.clearManualSize(visualColIndex)
+						}
+
+						hiddenPhysicalColumnIndices = []
+						hot.render()
+					},
+					disabled: function () {
+						return hiddenPhysicalColumnIndices.length === 0
 					}
 				},
 
@@ -1247,6 +1298,31 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				}
 			}
 		},
+		afterGetColHeader: function (visualColumnIndex: number, _th: any) {
+			const th = _th as HTMLTableColElement
+
+			if (!th || !hot) return
+			console.log(`afterGetColHeader`, visualColumnIndex, `hiddenPhysicalColumnIndices`, hiddenPhysicalColumnIndices)
+
+			//is column hidden?
+			let physicalIndex = hot.toPhysicalColumn(visualColumnIndex)
+
+			if (hiddenPhysicalColumnIndices.indexOf(physicalIndex) === -1) {
+				th.classList.remove('hidden-col')
+
+				if (th.previousElementSibling) {
+					th.previousElementSibling.classList.remove('hidden-col-previous-col')
+				}
+
+			} else {
+				th.classList.add('hidden-col')
+
+				//css cannot select previous elements...add a separate class
+				if (th.previousElementSibling) {
+					th.previousElementSibling.classList.add('hidden-col-previous-col')
+				}
+			}
+		},
 		afterCreateCol: function (visualColIndex, amount, source?: string) {
 
 			if (!hot) return
@@ -1277,6 +1353,17 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			// updateFixedRowsCols()
 		},
 		afterRemoveCol: function (visualColIndex, amount, someting?: any, source?: string) {
+
+			//we need to modify some or all hiddenPhysicalColumnIndices...
+			if (!hot) return
+
+			for (let i = 0; i < hiddenPhysicalColumnIndices.length; i++) {
+				const hiddenPhysicalRowIndex = hiddenPhysicalColumnIndices[i];
+
+				if (hiddenPhysicalRowIndex >= visualColIndex) {
+					hiddenPhysicalColumnIndices[i] -= amount
+				}
+			}
 
 			let isFromUndoRedo = (source === `UndoRedo.undo` || source === `UndoRedo.redo`)
 			if (headerRowWithIndex && !isFromUndoRedo) { //undo redo is already handled
@@ -1340,72 +1427,205 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 			if (!hot) return
 
-			if (hiddenPhysicalRowIndices.length === 0) return
+			if (hiddenPhysicalRowIndices.length === 0 && hiddenPhysicalColumnIndices.length === 0) return
+
+			//this only deals with hidden rows/col
+			//wrapping is done elsewhere
+			//however, if the first/last row/col is hidden we need to manually do the wrapping, if the settings say so
+
+			//TODO must be tophysicalindex???????????????????????????????????
 
 			const lastPossibleRowIndex = hot.countRows() - 1
 			const lastPossibleColIndex = hot.countCols() - 1
 			const actualSelection = hot.getSelectedLast()
-			let columnIndexModifier = 0
+			let columnIndexModifier: 1 | -1 | 0 = 0
+			let rowIndexModifier: 1 | -1 | 0 = 0
+
+			const isFirstRowHidden = hiddenPhysicalRowIndices.indexOf(0) !== -1
+			const isLastRowHidden = hiddenPhysicalRowIndices.indexOf(lastPossibleRowIndex) !== -1
+
+			const isFirstColHidden = hiddenPhysicalColumnIndices.indexOf(0) !== -1
+			const isLastColHidden = hiddenPhysicalColumnIndices.indexOf(lastPossibleColIndex) !== -1
+
 			const isLastOrFirstRowHidden = hiddenPhysicalRowIndices.indexOf(lastPossibleRowIndex) !== -1
 				|| hiddenPhysicalRowIndices.indexOf(0) !== -1
 
-			let direction = 1 // or -1
+			const isLastOrFirstColHidden = hiddenPhysicalColumnIndices.indexOf(lastPossibleColIndex) !== -1
+				|| hiddenPhysicalColumnIndices.indexOf(0) !== -1
+
+			const wrapNavigationAfterFirstOrLastRow = initialConfig?.lastRowOrFirstRowNavigationBehavior === 'wrap' ? true : false
+			const wrapNavigationAfterFirstOrLastCol = initialConfig?.lastColumnOrFirstColumnNavigationBehavior === 'wrap' ? true : false
+
+			let directionRow: 1 | -1 = 1 
+			let directionCol: 1 | -1 = 1
 
 			if (actualSelection) {
+				//get row direction
 				const actualPhysicalIndex = hot.toPhysicalRow(actualSelection[0])
-				direction = actualPhysicalIndex < coords.row ? 1 : -1
+				//do not set this to 0 in case the user is in a hidden row
+				//  then +1/-1 will fix it
+				directionRow = actualPhysicalIndex < coords.row ? 1 : -1 
 
 				//direction is invalid if actualPhysicalIndex === 0 && coords.row === lastPossibleRowIndex 
 				//this is because the last row is hidden...
 
 				//move up but last row is hidden
 				if (isLastOrFirstRowHidden && coords.row === lastPossibleRowIndex && actualPhysicalIndex === 0) { //
-					direction = -1
+					directionRow = -1
 				}
 				//move down on last row but first row is hidden
 				else if (isLastOrFirstRowHidden && coords.row === 0 && actualPhysicalIndex === lastPossibleRowIndex) {
-					direction = 1
+					directionRow = 1
+				}
+
+				//get col direction
+				const actualPhysicalColIndex = hot.toPhysicalColumn(actualSelection[1])
+				//do not set this to 0 in case the user is in a hidden col
+				//  then +1/-1 will fix it
+				directionCol = actualPhysicalColIndex < coords.col ? 1 : -1
+			
+				//direction is invalid if actualPhysicalColIndex === 0 && coords.row === lastPossibleColIndex 
+				//this is because the last row is hidden...
+
+				//move left but last col is hidden
+				if (isLastOrFirstColHidden && coords.col === lastPossibleColIndex && actualPhysicalColIndex === 0) { //
+					directionCol = -1
+				}
+				//move right on last col but first col is hidden
+				else if (isLastOrFirstColHidden && coords.col === 0 && actualPhysicalColIndex === lastPossibleColIndex) {
+					directionCol = 1
 				}
 			}
+
+			const initialNavPos = {
+				row: coords.row,
+				col: coords.col
+			}
+
+			//TODO fix this!!! check all combinations with wrap/nowrap (first/last row/col)
+			//TODO also fix enter/tab navigation in combination
 
 			//maybe refactor to iterative?
 			const getNextRow: (a: number) => number = (visualRowIndex: number) => {
 
-				let visualRow = visualRowIndex;
+				let visualRow = visualRowIndex
 				//@ts-ignore
 				let physicalIndex = hot.toPhysicalRow(visualRowIndex)
 
 				if (visualRow > lastPossibleRowIndex) { //moved under the last row
-					columnIndexModifier = 1
-					return getNextRow(0)
+
+					//we only need to manually modify col when the first col is hidden
+					//because the normal wrapping handles all cases where the col is not hidden
+					if (wrapNavigationAfterFirstOrLastRow && isFirstRowHidden) {
+
+						//we move to right out of the last row --> normally next col (works)
+						//but if the last col is hidden, we need to move to the first col
+						if (isLastColHidden) {
+							columnIndexModifier = 1
+						}
+
+						return getNextRow(0)
+					}
+
+					//no wapping and last row is hidden --> do not move
+					return initialNavPos.row - directionRow
 				}
 
 				if (visualRow < 0) { //we moved above row 0
-					columnIndexModifier = -1
-					return getNextRow(lastPossibleRowIndex)
+					
+					if (wrapNavigationAfterFirstOrLastRow && isLastRowHidden) {
+
+						if (isFirstColHidden) {
+							columnIndexModifier = -1
+						}
+						return getNextRow(lastPossibleRowIndex)
+					}
+
+					//no wapping and first row is hidden --> do not move
+					return initialNavPos.row - directionRow
 				}
 
 				if (hiddenPhysicalRowIndices.indexOf(physicalIndex) !== -1) {
 					//row is hidden
-					return getNextRow(visualRow + direction)
+					return getNextRow(visualRow + directionRow)
 				}
 
 				return visualRow
 			}
 
+			//maybe refactor to iterative?
+			const getNextCol: (a: number) => number = (visualColIndex: number) => {
+
+				let visualIndex = visualColIndex;
+				//@ts-ignore
+				let physicalIndex = hot.toPhysicalColumn(visualColIndex)
+
+				if (visualIndex > lastPossibleColIndex) { //moved past the last col
+
+					if (wrapNavigationAfterFirstOrLastCol && isFirstColHidden) {
+
+						if (isLastRowHidden) {
+							rowIndexModifier = 1
+						}
+
+						return getNextCol(0)
+					}
+
+					//no wapping and last row is hidden --> do not move
+					return initialNavPos.col - directionCol
+				}
+
+				if (visualIndex < 0) { //we moved before col 0
+
+					if (wrapNavigationAfterFirstOrLastCol && isLastColHidden) {
+						
+						if (isFirstRowHidden) {
+							rowIndexModifier = -1
+						}
+
+						return getNextRow(lastPossibleColIndex)
+					}
+
+					//no wapping and first col is hidden --> do not move
+					return initialNavPos.col - directionCol
+				}
+
+				if (hiddenPhysicalColumnIndices.indexOf(physicalIndex) !== -1) {
+					//col is hidden
+					return getNextCol(visualIndex + directionCol)
+				}
+
+				return visualIndex
+			}
 
 			coords.row = getNextRow(coords.row)
 
-			if (lastHandsonMoveWas !== 'tab') {
-				coords.col = coords.col + (isLastOrFirstRowHidden ? columnIndexModifier : 0)
+			//when we move down/up and we have wrapping we might want to next left/right column
+			let desiredCol = coords.col + columnIndexModifier
+			if (columnIndexModifier !== 0 && columnIndexModifier !== directionCol) {
+				directionCol = columnIndexModifier //else we might go left and then right again...
 			}
+			coords.col = getNextCol(desiredCol)
+			coords.row = coords.row + rowIndexModifier
 
-			if (coords.col > lastPossibleColIndex) {
-				coords.col = 0
-			}
-			else if (coords.col < 0) {
-				coords.col = lastPossibleColIndex
-			}
+			// if (coords.row < 0) {
+			// 	coords.row = getNextRow(0 + directionRow)
+			// }
+			// if (coords.row > lastPossibleRowIndex && isFirstRowHidden) {
+			// 	coords.row = getNextRow(lastPossibleRowIndex + directionRow)
+			// }
+
+			// if (coords.col < 0) {
+			// 	coords.col = getNextCol(0 + directionCol)
+			// }
+			// if (coords.col > lastPossibleColIndex && isLastColHidden) {
+			// 	coords.col = getNextCol(lastPossibleColIndex + directionCol)
+			// }
+
+			//TODO enter?? tab/enter might be used to create new rows/cols...
+			// if (lastHandsonMoveWas !== 'tab') {
+			// 	coords.col = coords.col + (isLastOrFirstRowHidden ? columnIndexModifier : 0)
+			// }
 
 			lastHandsonMoveWas = null
 		},
@@ -1434,6 +1654,27 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			return defaultHeight
 		} as any,
 
+		//@ts-ignore
+		colWidths: function(visualColIndex: number) {
+			//see https://handsontable.com/docs/6.2.2/AutoColumnSize.html#getColumnWidth
+			let defaultWidth = 50
+
+			if (!hot) return undefined
+
+			const actualPhysicalIndex = hot.toPhysicalColumn(visualColIndex)
+
+			//some hack so that the renderer still respects the row... (also see http://embed.plnkr.co/lBmuxU/)
+			//this is needed else we render all hidden rows as blank spaces (we see a scrollbar but not rows/cells)
+			//but this means we will lose performance because hidden rows are still managed and rendered (even if not visible)
+			if (hiddenPhysicalColumnIndices.includes(actualPhysicalIndex)) {
+				//sub 1 height is treated by the virtual renderer as height 0??
+				//we better add some more zeros
+				return 0.000001
+			}
+
+			return undefined
+			// return defaultWidth
+		},
 		beforeKeyDown: function (event: KeyboardEvent) {
 
 			//we need this because when editing header cell the hot instance thinks some editor is active and would pass the inputs to the next cell...
@@ -1539,7 +1780,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	isInitialHotRender = false
 	if (allColWidths && allColWidths.length > 0) {
 		//apply old width
-		applyColWidths()
+		applyColWidths(true)
 	}
 
 	//make sure we see something (right size)...
@@ -1659,8 +1900,9 @@ function onResizeGrid() {
 
 /**
  * applies the stored col widths to the ui
+ * @param discardAutoSizedColumns if true, the auto sized columns will be discarded
  */
-function applyColWidths() {
+function applyColWidths(overwriteAutoSizedColumnWidths: boolean) {
 	if (!hot) return
 
 	//this is a bit messy but it works...??
@@ -1677,9 +1919,22 @@ function applyColWidths() {
 		allColWidths.push(colWidth)
 	}
 
+	let manualColumnResizePlugin = hot.getPlugin('manualColumnResize')
+	for (let i = 0; i < allColWidths.length; i++) {
+		const colWidth = allColWidths[i]
+
+		if (colWidth === undefined) {
+			manualColumnResizePlugin.clearManualSize(i)
+		} else {
+			if (overwriteAutoSizedColumnWidths) {
+				manualColumnResizePlugin.setManualSize(i, colWidth)
+			}
+		}
+	}
+
 	//note that setting colWidths will disable the auto size column plugin (see Plugin AutoColumnSize.isEnabled)
 	//it is enabled if (!colWidths)
-	_updateHandsontableSettings({ colWidths: allColWidths }, false, true)
+	// _updateHandsontableSettings({ colWidths: allColWidths }, false, true)
 	hot.getSettings().manualColumnResize = true
 	_updateHandsontableSettings({}, false, false)
 	// hot.getPlugin('autoColumnSize').enablePlugin() //done in _updateHandsontableSettings
@@ -2399,6 +2654,8 @@ function afterRemoveCol(visualColIndex: number, amount: number, isFromUndoRedo: 
 		//hot automatically re-renders after this
 	}
 
+	const manualColumnResizePlugin = hot.getPlugin('manualColumnResize')
+
 	const sortConfigs = hot.getPlugin('columnSorting').getSortConfig()
 
 	const sortedColumnIds = sortConfigs.map(p => hot!.toPhysicalColumn(p.column))
@@ -2419,8 +2676,10 @@ function afterRemoveCol(visualColIndex: number, amount: number, isFromUndoRedo: 
 	}
 
 	allColWidths.splice(visualColIndex, 1)
+	const physicalColIndex = hot.toPhysicalColumn(visualColIndex)
+	manualColumnResizePlugin.manualColumnWidths.splice(physicalColIndex, 1)
 	//critical might update settings
-	applyColWidths()
+	applyColWidths(false)
 
 	// syncColWidths() //covered by afterRender
 	onAnyChange()

@@ -367,6 +367,43 @@ tr.hidden-row-previous-row > th:after {
 	bottom: -4px;
 }
 
+.hidden-col {
+	/* display: none; */
+}
+
+/* css cannot  select previous selements... */
+.hidden-col-previous-col {
+	position: relative;
+	overflow: visible;
+}
+
+/* this is not visible...TODO ???? */
+th + th.hidden-col {
+}
+
+th.hidden-col + th {
+	position: relative;
+	overflow: visible;
+}
+
+th.hidden-col + th:before {
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+	content: '\f0d9';
+	position: absolute;
+	left: 0;
+	bottom: -3px;
+}
+
+th.hidden-col-previous-col:after {
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+	content: '\f0da';
+	position: absolute;
+	right: 0;
+	bottom: -3px;
+}
+
 .find-widget {
 	display: flex;
 	position: fixed;
