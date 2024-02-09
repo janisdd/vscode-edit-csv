@@ -1447,8 +1447,6 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//wrapping is done elsewhere
 			//however, if the first/last row/col is hidden we need to manually do the wrapping, if the settings say so
 
-			//TODO must be tophysicalindex???????????????????????????????????
-
 			const lastPossibleRowIndex = hot.countRows() - 1
 			const lastPossibleColIndex = hot.countCols() - 1
 
@@ -1456,11 +1454,12 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			let columnIndexModifier: 1 | -1 | 0 = 0 //needed in case columns are hidden and we manually have to apply wrapping
 			let rowIndexModifier: 1 | -1 | 0 = 0 //needed in case columns are hidden and we manually have to apply wrapping
 
-			const isFirstRowHidden = hiddenPhysicalRowIndicesSorted.indexOf(0) !== -1
-			const isLastRowHidden = hiddenPhysicalRowIndicesSorted.indexOf(lastPossibleRowIndex) !== -1
 
-			const isFirstColHidden = hiddenPhysicalColumnIndicesSorted.indexOf(0) !== -1
-			const isLastColHidden = hiddenPhysicalColumnIndicesSorted.indexOf(lastPossibleColIndex) !== -1
+			const isFirstRowHidden = hiddenPhysicalRowIndicesSorted.indexOf(hot.toPhysicalRow(0)) !== -1
+			const isLastRowHidden = hiddenPhysicalRowIndicesSorted.indexOf(hot.toPhysicalRow(lastPossibleRowIndex)) !== -1
+
+			const isFirstColHidden = hiddenPhysicalColumnIndicesSorted.indexOf(hot.toPhysicalColumn(0)) !== -1
+			const isLastColHidden = hiddenPhysicalColumnIndicesSorted.indexOf(hot.toPhysicalColumn(lastPossibleColIndex)) !== -1
 
 			const isLastOrFirstRowHidden = isFirstRowHidden || isLastRowHidden
 
@@ -1491,18 +1490,6 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				//does not work for 2 rows...
 				wasRowWrapped = Math.abs(actualPhysicalIndex - nextCoords.row) > 1
 
-				//direction is invalid if actualPhysicalIndex === 0 && coords.row === lastPossibleRowIndex 
-				//this is because the last row is hidden...
-
-				// //move up but last row is hidden
-				// if (isLastOrFirstRowHidden && coords.row === lastPossibleRowIndex && actualPhysicalIndex === 0) { //
-				// 	directionRow = -1
-				// }
-				// //move down on last row but first row is hidden
-				// else if (isLastOrFirstRowHidden && coords.row === 0 && actualPhysicalIndex === lastPossibleRowIndex) {
-				// 	directionRow = 1
-				// }
-
 				//get col direction
 				const actualPhysicalColIndex = actualSelection[1]
 				//do not set this to 0 in case the user is in a hidden col
@@ -1515,18 +1502,6 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 				//does not work for 2 columns...
 				wasColWrapped = Math.abs(actualPhysicalColIndex - nextCoords.col) > 1
-
-				//direction is invalid if actualPhysicalColIndex === 0 && coords.row === lastPossibleColIndex 
-				//this is because the last row is hidden...
-
-				// //move left but last col is hidden
-				// if (isLastOrFirstColHidden && coords.col === lastPossibleColIndex && actualPhysicalColIndex === 0) { //
-				// 	directionCol = -1
-				// }
-				// //move right on last col but first col is hidden
-				// else if (isLastOrFirstColHidden && coords.col === 0 && actualPhysicalColIndex === lastPossibleColIndex) {
-				// 	directionCol = 1
-				// }
 			}
 
 			const initialNavPos = {
@@ -1667,28 +1642,28 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				//row is properly set after this
 				nextCoords.row = getNextRow(nextCoords.row)
 
-				if (wrapNavigationAfterFirstOrLastCol === false && 
-					(directionRow === -1 && nextCoords.col === firstAndLastVisibleColumns?.first 
+				if (wrapNavigationAfterFirstOrLastCol === false &&
+					(directionRow === -1 && nextCoords.col === firstAndLastVisibleColumns?.first
 						|| directionRow === 1 && nextCoords.col === firstAndLastVisibleColumns?.last)
-					) {
+				) {
 					//do not wrap
 				}
 				else {
 					nextCoords.col += columnIndexModifier
 					directionCol = columnIndexModifier
-	
+
 					//col is properly if no cols are hidden
-					nextCoords.col = getNextCol(nextCoords.col)	
+					nextCoords.col = getNextCol(nextCoords.col)
 				}
-				
+
 			} else if (directionCol != 0) {
 				//col is properly set after this
 				nextCoords.col = getNextCol(nextCoords.col)
 
-				if (wrapNavigationAfterFirstOrLastRow === false && 
-					(directionCol === -1 && nextCoords.row === firstAndLastVisibleRows?.first 
+				if (wrapNavigationAfterFirstOrLastRow === false &&
+					(directionCol === -1 && nextCoords.row === firstAndLastVisibleRows?.first
 						|| directionCol === 1 && nextCoords.row === firstAndLastVisibleRows?.last)
-					) {
+				) {
 					//do not wrap
 				} else {
 					nextCoords.row += rowIndexModifier

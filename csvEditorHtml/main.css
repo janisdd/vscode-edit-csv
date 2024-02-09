@@ -383,7 +383,7 @@ th + th.hidden-col {
 
 th.hidden-col + th {
 	position: relative;
-	overflow: visible;
+	/* overflow: visible; */
 }
 
 th.hidden-col + th:before {
