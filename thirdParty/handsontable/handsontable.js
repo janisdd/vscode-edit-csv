@@ -23,8 +23,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Version: 6.5.1
- * Release date: 19/12/2018 (built at 15/04/2023 13:46:12)
+ * Version: 6.5.2
+ * Release date: 19/12/2018 (built at 09/02/2024 18:08:28)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -14339,12 +14339,15 @@ function Core(rootElement, userSettings) {
 
 
   this._getColWidthFromSettings = function (col) {
-    var cellProperties = instance.getCellMeta(0, col);
-    var width = cellProperties.width;
-
-    if (width === void 0 || width === priv.settings.width) {
-      width = cellProperties.colWidths;
-    }
+    // const cellProperties = instance.getCellMeta(0, col);
+    // let width = cellProperties.width;
+    //
+    // if (width === void 0 || width === priv.settings.width) {
+    //   width = cellProperties.colWidths;
+    // }
+    //we need to comment the above out because else we use cached values from cellProperties
+    //this means the settings function is only evaluated once
+    var width = priv.settings.colWidths;
 
     if (width !== void 0 && width !== null) {
       switch (_typeof(width)) {
@@ -29737,9 +29740,9 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "15/04/2023 13:46:12";
+Handsontable.buildDate = "09/02/2024 18:08:28";
 Handsontable.packageName = "handsontable";
-Handsontable.version = "6.5.1";
+Handsontable.version = "6.5.2";
 var baseVersion = "";
 
 if (baseVersion) {
@@ -43357,7 +43360,9 @@ function (_BasePlugin) {
   _createClass(AutoColumnSize, [{
     key: "isEnabled",
     value: function isEnabled() {
-      return this.hot.getSettings().autoColumnSize !== false && !this.hot.getSettings().colWidths;
+      // seems like a bug in handsontable, not even fixed in 14.1.0
+      // return this.hot.getSettings().autoColumnSize !== false && !this.hot.getSettings().colWidths;
+      return this.hot.getSettings().autoColumnSize === true || (0, _object.isObject)(this.hot.getSettings().autoColumnSize);
     }
     /**
      * Enables the plugin functionality for this Handsontable instance.
@@ -56809,7 +56814,9 @@ function (_BasePlugin) {
   }, {
     key: "setManualSize",
     value: function setManualSize(column, width) {
-      var newWidth = Math.max(width, 20);
+      // no max, as we want to use this also for hiding columns
+      // const newWidth = Math.max(width, 20);
+      var newWidth = width;
       /**
        *  We need to run col through modifyCol hook, in case the order of displayed columns is different than the order
        *  in data source. For instance, this order can be modified by manualColumnMove plugin.
