@@ -355,22 +355,38 @@ class FindWidget {
 			this.showOrHideSearchCancel(true)
 			this._enabledOrDisableFindWidgetInteraction(false)
 
-			// console.time('query')
+			console.time('full_search')
+			console.time('searchPlugin.queryAsync')
 
 			//when we increment to e.g. only update after 10% then the time will improve!
 			//@ts-ignore
 			this.lastFindResults = await searchPlugin.queryAsync(this.findWidgetInput.value, this.findWidgetQueryCancellationToken, this._onSearchProgress.bind(this), 5) //updat every 5 %
+
+			console.timeEnd('searchPlugin.queryAsync')
+
+			console.time('_getRealIndicesFromFindResult')
 			this._getRealIndicesFromFindResult()
+			console.timeEnd('_getRealIndicesFromFindResult')
 
 			//old sync way
 			//@ts-ignore
 			// this.lastFindResults = searchPlugin.query(this.findWidgetInput.value)
-			// console.timeEnd('query')
+			console.timeEnd('full_search')
 
 		} else {
+
+			console.time('full_search')
+
+			console.time('searchPlugin.query')
 			//@ts-ignore
 			this.lastFindResults = searchPlugin.query(pretendedText)
+			console.timeEnd('searchPlugin.query')
+
+			console.time('_getRealIndicesFromFindResult')
 			this._getRealIndicesFromFindResult()
+			console.timeEnd('_getRealIndicesFromFindResult')
+
+			console.timeEnd('full_search')
 		}
 
 		// console.log(`this.lastFindResults`, this.lastFindResults)
