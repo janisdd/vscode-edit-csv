@@ -495,6 +495,13 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		return
 	}
 
+	//reset hidden rows/col because we have a new table
+	hiddenPhysicalColumnIndicesSorted = []
+	hiddenPhysicalRowIndicesSorted = []
+	firstAndLastVisibleColumns = null
+	firstAndLastVisibleRows = null
+	showOrHideAllComments(true)
+
 	//this will also expand comment rows but we only use the first column value...
 	_normalizeDataArray(csvParseResult, csvReadConfig)
 	columnIsQuoted = csvParseResult.columnIsQuoted
@@ -516,7 +523,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	const initiallyHideComments = initialConfig ? initialConfig.initiallyHideComments : false
 
 	if (initiallyHideComments && typeof csvReadConfig.comments === 'string') {
-		hiddenPhysicalRowIndices = _getCommentIndices(csvParseResult.data, csvReadConfig)
+		hiddenPhysicalRowIndicesSorted = _getCommentIndices(csvParseResult.data, csvReadConfig)
+		//no need to map to physical indices because in the beginning they are the same
+		hiddenPhysicalRowIndicesSorted = hiddenPhysicalRowIndicesSorted.sort()
 	}
 
 	//enable all find connected stuff
@@ -658,7 +667,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 						const physicalColIndex = hot.toPhysicalColumn(targetCol)
 
-						hiddenPhysicalColumnIndices.push(physicalColIndex)
+						hiddenPhysicalColumnIndicesSorted.push(physicalColIndex)
+						hiddenPhysicalColumnIndicesSorted = hiddenPhysicalColumnIndicesSorted.sort()
+						firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
 
 						//after there is no place where the previous manual size is stored, so after showing the col again
 						//it will have auto size (for now)
@@ -755,7 +766,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					name: 'Unhide all column',
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
 						if (!hot) return
-						
+
 
 						//we need to do more here because e.g. on remove col we update the settings and manually set the column widths
 						//this means that now the manually set widhts are used (which is still 0.000001 for hidden columns)
@@ -766,16 +777,17 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						//the main problem with the col widths is, that we don't know if they are currently manual or automatic
 						//when removing a column we apply the previous widths, else all widths of all columns right of the removed column changed
 						let manualColumnResizePlugin = hot.getPlugin('manualColumnResize')
-						for (let i = 0; i < hiddenPhysicalColumnIndices.length; i++) {
-							const visualColIndex = hot.toVisualColumn(hiddenPhysicalColumnIndices[i])
+						for (let i = 0; i < hiddenPhysicalColumnIndicesSorted.length; i++) {
+							const visualColIndex = hot.toVisualColumn(hiddenPhysicalColumnIndicesSorted[i])
 							manualColumnResizePlugin.clearManualSize(visualColIndex)
 						}
 
-						hiddenPhysicalColumnIndices = []
+						hiddenPhysicalColumnIndicesSorted = []
+						firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
 						hot.render()
 					},
 					disabled: function () {
-						return hiddenPhysicalColumnIndices.length === 0
+						return hiddenPhysicalColumnIndicesSorted.length === 0
 					}
 				},
 
@@ -1282,7 +1294,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//is row hidden?
 			let physicalIndex = hot.toPhysicalRow(visualRowIndex)
 
-			if (hiddenPhysicalRowIndices.indexOf(physicalIndex) === -1) {
+			if (hiddenPhysicalRowIndicesSorted.indexOf(physicalIndex) === -1) {
 				tr.classList.remove('hidden-row')
 
 				if (tr.previousElementSibling) {
@@ -1302,12 +1314,12 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			const th = _th as HTMLTableColElement
 
 			if (!th || !hot) return
-			console.log(`afterGetColHeader`, visualColumnIndex, `hiddenPhysicalColumnIndices`, hiddenPhysicalColumnIndices)
+			console.log(`afterGetColHeader`, visualColumnIndex, `hiddenPhysicalColumnIndices`, hiddenPhysicalColumnIndicesSorted)
 
 			//is column hidden?
 			let physicalIndex = hot.toPhysicalColumn(visualColumnIndex)
 
-			if (hiddenPhysicalColumnIndices.indexOf(physicalIndex) === -1) {
+			if (hiddenPhysicalColumnIndicesSorted.indexOf(physicalIndex) === -1) {
 				th.classList.remove('hidden-col')
 
 				if (th.previousElementSibling) {
@@ -1357,13 +1369,14 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//we need to modify some or all hiddenPhysicalColumnIndices...
 			if (!hot) return
 
-			for (let i = 0; i < hiddenPhysicalColumnIndices.length; i++) {
-				const hiddenPhysicalRowIndex = hiddenPhysicalColumnIndices[i];
+			for (let i = 0; i < hiddenPhysicalColumnIndicesSorted.length; i++) {
+				const hiddenPhysicalRowIndex = hiddenPhysicalColumnIndicesSorted[i];
 
 				if (hiddenPhysicalRowIndex >= visualColIndex) {
-					hiddenPhysicalColumnIndices[i] -= amount
+					hiddenPhysicalColumnIndicesSorted[i] -= amount
 				}
 			}
+			firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
 
 			let isFromUndoRedo = (source === `UndoRedo.undo` || source === `UndoRedo.redo`)
 			if (headerRowWithIndex && !isFromUndoRedo) { //undo redo is already handled
@@ -1397,13 +1410,14 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//we need to modify some or all hiddenPhysicalRowIndices...
 			if (!hot) return
 
-			for (let i = 0; i < hiddenPhysicalRowIndices.length; i++) {
-				const hiddenPhysicalRowIndex = hiddenPhysicalRowIndices[i];
+			for (let i = 0; i < hiddenPhysicalRowIndicesSorted.length; i++) {
+				const hiddenPhysicalRowIndex = hiddenPhysicalRowIndicesSorted[i];
 
 				if (hiddenPhysicalRowIndex >= visualRowIndex) {
-					hiddenPhysicalRowIndices[i] -= amount
+					hiddenPhysicalRowIndicesSorted[i] -= amount
 				}
 			}
+			firstAndLastVisibleRows = getFirstAndLastVisibleRows()
 
 			//when we have a header row and the original index was 10 and now we have only 5 rows... change index to be the last row
 			//so that when we disable has header we insert it correctly
@@ -1423,11 +1437,11 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		//called when we select a row via row header
 		beforeSetRangeStartOnly: function (coords) {
 		},
-		beforeSetRangeStart: function (coords) {
+		beforeSetRangeStart: function (nextCoords) {
 
 			if (!hot) return
 
-			if (hiddenPhysicalRowIndices.length === 0 && hiddenPhysicalColumnIndices.length === 0) return
+			if (hiddenPhysicalRowIndicesSorted.length === 0 && hiddenPhysicalColumnIndicesSorted.length === 0) return
 
 			//this only deals with hidden rows/col
 			//wrapping is done elsewhere
@@ -1437,69 +1451,87 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 			const lastPossibleRowIndex = hot.countRows() - 1
 			const lastPossibleColIndex = hot.countCols() - 1
+
 			const actualSelection = hot.getSelectedLast()
-			let columnIndexModifier: 1 | -1 | 0 = 0
-			let rowIndexModifier: 1 | -1 | 0 = 0
+			let columnIndexModifier: 1 | -1 | 0 = 0 //needed in case columns are hidden and we manually have to apply wrapping
+			let rowIndexModifier: 1 | -1 | 0 = 0 //needed in case columns are hidden and we manually have to apply wrapping
 
-			const isFirstRowHidden = hiddenPhysicalRowIndices.indexOf(0) !== -1
-			const isLastRowHidden = hiddenPhysicalRowIndices.indexOf(lastPossibleRowIndex) !== -1
+			const isFirstRowHidden = hiddenPhysicalRowIndicesSorted.indexOf(0) !== -1
+			const isLastRowHidden = hiddenPhysicalRowIndicesSorted.indexOf(lastPossibleRowIndex) !== -1
 
-			const isFirstColHidden = hiddenPhysicalColumnIndices.indexOf(0) !== -1
-			const isLastColHidden = hiddenPhysicalColumnIndices.indexOf(lastPossibleColIndex) !== -1
+			const isFirstColHidden = hiddenPhysicalColumnIndicesSorted.indexOf(0) !== -1
+			const isLastColHidden = hiddenPhysicalColumnIndicesSorted.indexOf(lastPossibleColIndex) !== -1
 
-			const isLastOrFirstRowHidden = hiddenPhysicalRowIndices.indexOf(lastPossibleRowIndex) !== -1
-				|| hiddenPhysicalRowIndices.indexOf(0) !== -1
+			const isLastOrFirstRowHidden = isFirstRowHidden || isLastRowHidden
 
-			const isLastOrFirstColHidden = hiddenPhysicalColumnIndices.indexOf(lastPossibleColIndex) !== -1
-				|| hiddenPhysicalColumnIndices.indexOf(0) !== -1
+			const isLastOrFirstColHidden = isFirstColHidden || isLastColHidden
 
 			const wrapNavigationAfterFirstOrLastRow = initialConfig?.lastRowOrFirstRowNavigationBehavior === 'wrap' ? true : false
 			const wrapNavigationAfterFirstOrLastCol = initialConfig?.lastColumnOrFirstColumnNavigationBehavior === 'wrap' ? true : false
 
-			let directionRow: 1 | -1 = 1 
-			let directionCol: 1 | -1 = 1
+			let wasColWrapped = false
+			let wasRowWrapped = false
+
+			let directionRow: 1 | -1 | 0 = 0
+			let directionCol: 1 | -1 | 0 = 0
 
 			if (actualSelection) {
 				//get row direction
-				const actualPhysicalIndex = hot.toPhysicalRow(actualSelection[0])
+				//use visual index because selection is always visual index and coords too
+				//e.g. if row/col was moved it doesn't matter here
+				const actualPhysicalIndex = actualSelection[0]
 				//do not set this to 0 in case the user is in a hidden row
 				//  then +1/-1 will fix it
-				directionRow = actualPhysicalIndex < coords.row ? 1 : -1 
+				directionRow = actualPhysicalIndex < nextCoords.row
+					? 1
+					: actualPhysicalIndex > nextCoords.row
+						? -1
+						: 0
+
+				//does not work for 2 rows...
+				wasRowWrapped = Math.abs(actualPhysicalIndex - nextCoords.row) > 1
 
 				//direction is invalid if actualPhysicalIndex === 0 && coords.row === lastPossibleRowIndex 
 				//this is because the last row is hidden...
 
-				//move up but last row is hidden
-				if (isLastOrFirstRowHidden && coords.row === lastPossibleRowIndex && actualPhysicalIndex === 0) { //
-					directionRow = -1
-				}
-				//move down on last row but first row is hidden
-				else if (isLastOrFirstRowHidden && coords.row === 0 && actualPhysicalIndex === lastPossibleRowIndex) {
-					directionRow = 1
-				}
+				// //move up but last row is hidden
+				// if (isLastOrFirstRowHidden && coords.row === lastPossibleRowIndex && actualPhysicalIndex === 0) { //
+				// 	directionRow = -1
+				// }
+				// //move down on last row but first row is hidden
+				// else if (isLastOrFirstRowHidden && coords.row === 0 && actualPhysicalIndex === lastPossibleRowIndex) {
+				// 	directionRow = 1
+				// }
 
 				//get col direction
-				const actualPhysicalColIndex = hot.toPhysicalColumn(actualSelection[1])
+				const actualPhysicalColIndex = actualSelection[1]
 				//do not set this to 0 in case the user is in a hidden col
 				//  then +1/-1 will fix it
-				directionCol = actualPhysicalColIndex < coords.col ? 1 : -1
-			
+				directionCol = actualPhysicalColIndex < nextCoords.col
+					? 1
+					: actualPhysicalColIndex > nextCoords.col
+						? -1
+						: 0
+
+				//does not work for 2 columns...
+				wasColWrapped = Math.abs(actualPhysicalColIndex - nextCoords.col) > 1
+
 				//direction is invalid if actualPhysicalColIndex === 0 && coords.row === lastPossibleColIndex 
 				//this is because the last row is hidden...
 
-				//move left but last col is hidden
-				if (isLastOrFirstColHidden && coords.col === lastPossibleColIndex && actualPhysicalColIndex === 0) { //
-					directionCol = -1
-				}
-				//move right on last col but first col is hidden
-				else if (isLastOrFirstColHidden && coords.col === 0 && actualPhysicalColIndex === lastPossibleColIndex) {
-					directionCol = 1
-				}
+				// //move left but last col is hidden
+				// if (isLastOrFirstColHidden && coords.col === lastPossibleColIndex && actualPhysicalColIndex === 0) { //
+				// 	directionCol = -1
+				// }
+				// //move right on last col but first col is hidden
+				// else if (isLastOrFirstColHidden && coords.col === 0 && actualPhysicalColIndex === lastPossibleColIndex) {
+				// 	directionCol = 1
+				// }
 			}
 
 			const initialNavPos = {
-				row: coords.row,
-				col: coords.col
+				row: nextCoords.row,
+				col: nextCoords.col
 			}
 
 			//TODO fix this!!! check all combinations with wrap/nowrap (first/last row/col)
@@ -1512,16 +1544,18 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				//@ts-ignore
 				let physicalIndex = hot.toPhysicalRow(visualRowIndex)
 
-				if (visualRow > lastPossibleRowIndex) { //moved under the last row
+				if (visualRow > lastPossibleRowIndex) { //moved under the last row -> wrap?
 
 					//we only need to manually modify col when the first col is hidden
 					//because the normal wrapping handles all cases where the col is not hidden
-					if (wrapNavigationAfterFirstOrLastRow && isFirstRowHidden) {
+					if (wrapNavigationAfterFirstOrLastRow) {
 
-						//we move to right out of the last row --> normally next col (works)
-						//but if the last col is hidden, we need to move to the first col
-						if (isLastColHidden) {
+						//wrapping is not handled by handsontable because it thinks last row is there
+						if (directionRow === 1 && isLastRowHidden) {
 							columnIndexModifier = 1
+						}
+						else if (directionRow === -1 && isFirstRowHidden) {
+							columnIndexModifier = -1
 						}
 
 						return getNextRow(0)
@@ -1532,12 +1566,16 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				}
 
 				if (visualRow < 0) { //we moved above row 0
-					
-					if (wrapNavigationAfterFirstOrLastRow && isLastRowHidden) {
 
-						if (isFirstColHidden) {
+					if (wrapNavigationAfterFirstOrLastRow) {
+
+						if (directionRow === 1 && isLastRowHidden) {
+							columnIndexModifier = 1
+						}
+						else if (directionRow === -1 && isFirstRowHidden) {
 							columnIndexModifier = -1
 						}
+
 						return getNextRow(lastPossibleRowIndex)
 					}
 
@@ -1545,7 +1583,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					return initialNavPos.row - directionRow
 				}
 
-				if (hiddenPhysicalRowIndices.indexOf(physicalIndex) !== -1) {
+				if (hiddenPhysicalRowIndicesSorted.indexOf(physicalIndex) !== -1) {
 					//row is hidden
 					return getNextRow(visualRow + directionRow)
 				}
@@ -1562,10 +1600,14 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 				if (visualIndex > lastPossibleColIndex) { //moved past the last col
 
-					if (wrapNavigationAfterFirstOrLastCol && isFirstColHidden) {
+					if (wrapNavigationAfterFirstOrLastCol) {
 
-						if (isLastRowHidden) {
+						//wrapping is not handled by handsontable because it thinks last col is there
+						if (directionCol === 1 && isLastColHidden) {
 							rowIndexModifier = 1
+						}
+						else if (directionCol === -1 && isFirstColHidden) {
+							rowIndexModifier = -1
 						}
 
 						return getNextCol(0)
@@ -1577,20 +1619,24 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 				if (visualIndex < 0) { //we moved before col 0
 
-					if (wrapNavigationAfterFirstOrLastCol && isLastColHidden) {
-						
-						if (isFirstRowHidden) {
+					if (wrapNavigationAfterFirstOrLastCol) {
+
+						//wrapping is not handled by handsontable because it thinks last col is there
+						if (directionCol === 1 && isLastColHidden) {
+							rowIndexModifier = 1
+						}
+						else if (directionCol === -1 && isFirstColHidden) {
 							rowIndexModifier = -1
 						}
 
-						return getNextRow(lastPossibleColIndex)
+						return getNextCol(lastPossibleColIndex)
 					}
 
 					//no wapping and first col is hidden --> do not move
 					return initialNavPos.col - directionCol
 				}
 
-				if (hiddenPhysicalColumnIndices.indexOf(physicalIndex) !== -1) {
+				if (hiddenPhysicalColumnIndicesSorted.indexOf(physicalIndex) !== -1) {
 					//col is hidden
 					return getNextCol(visualIndex + directionCol)
 				}
@@ -1598,29 +1644,59 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				return visualIndex
 			}
 
-			coords.row = getNextRow(coords.row)
+			if (directionRow !== 0 && directionCol !== 0) {
+				//handsontable native wrapping happend
 
-			//when we move down/up and we have wrapping we might want to next left/right column
-			let desiredCol = coords.col + columnIndexModifier
-			if (columnIndexModifier !== 0 && columnIndexModifier !== directionCol) {
-				directionCol = columnIndexModifier //else we might go left and then right again...
+				if (wasColWrapped) {
+					directionCol = -directionCol as 1 | -1 | 0
+				}
+				if (wasRowWrapped) {
+					directionRow = -directionRow as 1 | -1 | 0
+				}
+
+				//this does not work 100% the same way as normal wrapping
+				//because there we can wrap columns when we hit right/left arrow for the rows
+				//this wraps, even if columns do not wrap (when up/down arrow is pressed)
+				//but this seems ok for now...
+				//only affects forst and last row/col
+				nextCoords.row = getNextRow(nextCoords.row)
+				nextCoords.col = getNextCol(nextCoords.col)
+
 			}
-			coords.col = getNextCol(desiredCol)
-			coords.row = coords.row + rowIndexModifier
+			else if (directionRow != 0) {
+				//row is properly set after this
+				nextCoords.row = getNextRow(nextCoords.row)
 
-			// if (coords.row < 0) {
-			// 	coords.row = getNextRow(0 + directionRow)
-			// }
-			// if (coords.row > lastPossibleRowIndex && isFirstRowHidden) {
-			// 	coords.row = getNextRow(lastPossibleRowIndex + directionRow)
-			// }
+				if (wrapNavigationAfterFirstOrLastCol === false && 
+					(directionRow === -1 && nextCoords.col === firstAndLastVisibleColumns?.first 
+						|| directionRow === 1 && nextCoords.col === firstAndLastVisibleColumns?.last)
+					) {
+					//do not wrap
+				}
+				else {
+					nextCoords.col += columnIndexModifier
+					directionCol = columnIndexModifier
+	
+					//col is properly if no cols are hidden
+					nextCoords.col = getNextCol(nextCoords.col)	
+				}
+				
+			} else if (directionCol != 0) {
+				//col is properly set after this
+				nextCoords.col = getNextCol(nextCoords.col)
 
-			// if (coords.col < 0) {
-			// 	coords.col = getNextCol(0 + directionCol)
-			// }
-			// if (coords.col > lastPossibleColIndex && isLastColHidden) {
-			// 	coords.col = getNextCol(lastPossibleColIndex + directionCol)
-			// }
+				if (wrapNavigationAfterFirstOrLastRow === false && 
+					(directionCol === -1 && nextCoords.row === firstAndLastVisibleRows?.first 
+						|| directionCol === 1 && nextCoords.row === firstAndLastVisibleRows?.last)
+					) {
+					//do not wrap
+				} else {
+					nextCoords.row += rowIndexModifier
+					directionRow = rowIndexModifier //in case next row is also hidden and dirRow is 0
+					//col is properly if no cols are hidden
+					nextCoords.row = getNextRow(nextCoords.row)
+				}
+			}
 
 			//TODO enter?? tab/enter might be used to create new rows/cols...
 			// if (lastHandsonMoveWas !== 'tab') {
@@ -1645,7 +1721,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//some hack so that the renderer still respects the row... (also see http://embed.plnkr.co/lBmuxU/)
 			//this is needed else we render all hidden rows as blank spaces (we see a scrollbar but not rows/cells)
 			//but this means we will lose performance because hidden rows are still managed and rendered (even if not visible)
-			if (hiddenPhysicalRowIndices.includes(actualPhysicalIndex)) {
+			if (hiddenPhysicalRowIndicesSorted.includes(actualPhysicalIndex)) {
 				//sub 1 height is treated by the virtual renderer as height 0??
 				//we better add some more zeros
 				return 0.000001
@@ -1655,7 +1731,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		} as any,
 
 		//@ts-ignore
-		colWidths: function(visualColIndex: number) {
+		colWidths: function (visualColIndex: number) {
 			//see https://handsontable.com/docs/6.2.2/AutoColumnSize.html#getColumnWidth
 			let defaultWidth = 50
 
@@ -1666,7 +1742,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//some hack so that the renderer still respects the row... (also see http://embed.plnkr.co/lBmuxU/)
 			//this is needed else we render all hidden rows as blank spaces (we see a scrollbar but not rows/cells)
 			//but this means we will lose performance because hidden rows are still managed and rendered (even if not visible)
-			if (hiddenPhysicalColumnIndices.includes(actualPhysicalIndex)) {
+			if (hiddenPhysicalColumnIndicesSorted.includes(actualPhysicalIndex)) {
 				//sub 1 height is treated by the virtual renderer as height 0??
 				//we better add some more zeros
 				return 0.000001
@@ -1720,6 +1796,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 	})
 
+	firstAndLastVisibleRows = getFirstAndLastVisibleRows()
+	firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
+
 	{
 		//this is enough (to set it once [after hot creation], because plugins are only disabled but never destroyed)
 		let autoColumnSizePlugin = hot.getPlugin('autoColumnSize')
@@ -1732,7 +1811,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	}
 
 	let lastRowIndex = csvParseResult.data.length - 1
-	
+
 	if (previousManualRowHeights) {
 		let manualRowResizePlugin = hot.getPlugin('manualRowResize')
 		//foreach skips over empty indices
@@ -2296,17 +2375,19 @@ function showOrHideAllComments(show: boolean) {
 		showCommentsBtn.style.display = 'none'
 		hideCommentsBtn.style.display = ''
 
-		hiddenPhysicalRowIndices = []
+		hiddenPhysicalRowIndicesSorted = []
 	}
 	else {
 		showCommentsBtn.style.display = ''
 		hideCommentsBtn.style.display = 'none'
 
 		if (hot) {
-			hiddenPhysicalRowIndices = _getCommentIndices(getData(), defaultCsvReadOptions)
-			hiddenPhysicalRowIndices = hiddenPhysicalRowIndices.map(p => hot!.toPhysicalRow(p))
+			hiddenPhysicalRowIndicesSorted = _getCommentIndices(getData(), defaultCsvReadOptions)
+			hiddenPhysicalRowIndicesSorted = hiddenPhysicalRowIndicesSorted.map(p => hot!.toPhysicalRow(p))
+			hiddenPhysicalRowIndicesSorted = hiddenPhysicalRowIndicesSorted.sort()
 		}
 	}
+	firstAndLastVisibleRows = getFirstAndLastVisibleRows()
 
 	if (!hot) return
 
@@ -2708,13 +2789,14 @@ function afterCreateRow(visualRowIndex: number, amount: number) {
 	//critical because we could update hot settings here
 	//we need to modify some or all hiddenPhysicalRowIndices...
 
-	for (let i = 0; i < hiddenPhysicalRowIndices.length; i++) {
-		const hiddenPhysicalRowIndex = hiddenPhysicalRowIndices[i];
+	for (let i = 0; i < hiddenPhysicalRowIndicesSorted.length; i++) {
+		const hiddenPhysicalRowIndex = hiddenPhysicalRowIndicesSorted[i];
 
 		if (hiddenPhysicalRowIndex >= visualRowIndex) {
-			hiddenPhysicalRowIndices[i] += amount
+			hiddenPhysicalRowIndicesSorted[i] += amount
 		}
 	}
+	firstAndLastVisibleRows = getFirstAndLastVisibleRows()
 	onAnyChange()
 	//dont' call this as it corrupts hot index mappings (because all other hooks need to finish first before we update hot settings)
 	//also it's not needed as handsontable already handles this internally

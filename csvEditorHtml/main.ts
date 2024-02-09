@@ -60,8 +60,12 @@ let editHeaderCellTextInputLeftOffsetInPx: number = 0
 let handsontableOverlayScrollLeft: number = 0
 let _onTableScrollThrottled: ((this: HTMLDivElement, e: Event) => void) | null = null
 
-let hiddenPhysicalRowIndices: number[] = []
-let hiddenPhysicalColumnIndices: number[] = []
+//IF THESE are changed, also change firstAndLastVisibleRows, firstAndLastVisibleColumns for faster lookup
+let hiddenPhysicalRowIndicesSorted: number[] = []
+let hiddenPhysicalColumnIndicesSorted: number[] = []
+
+let firstAndLastVisibleRows: {first: number, last: number} | null = null
+let firstAndLastVisibleColumns: {first: number, last: number} | null = null
 
 let copyPasteRowLimit = 10_000_000
 let copyPasteColLimit = 10_000_000

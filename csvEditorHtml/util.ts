@@ -1528,7 +1528,7 @@ function calcHotCellToSelectFromCurosPos(
 				//we don't need to change the row index because only indices after the header row are changed
 
 				//TODO not working ... one to much??
-				if (hiddenPhysicalRowIndices.length > 0) {
+				if (hiddenPhysicalRowIndicesSorted.length > 0) {
 					//we hide comment rows... select the next row after the hidden comment row
 					csvRowToSelect = getNextRowIfCommentsAreHidden(csvHeaderRowIndex + 1)
 					//-1 because we remove the header cell from indices...
@@ -1701,7 +1701,7 @@ function getNextRowIfCommentsAreHidden(visualRowIndex: number): number {
 	if (!hot) return visualRowIndex
 
 	//comments are visible as normal rows
-	if (hiddenPhysicalRowIndices.length === 0) return visualRowIndex
+	if (hiddenPhysicalRowIndicesSorted.length === 0) return visualRowIndex
 
 	const lastPossibleRowIndex = hot.countRows() - 1
 
@@ -1711,7 +1711,7 @@ function getNextRowIfCommentsAreHidden(visualRowIndex: number): number {
 		//@ts-ignore
 		let physicalIndex = hot.toPhysicalRow(i)
 
-		let isRowCommentAndHidden = hiddenPhysicalRowIndices.indexOf(physicalIndex) !== -1
+		let isRowCommentAndHidden = hiddenPhysicalRowIndicesSorted.indexOf(physicalIndex) !== -1
 
 		if (isRowCommentAndHidden) {
 			//search next row
@@ -1727,7 +1727,7 @@ function getNextRowIfCommentsAreHidden(visualRowIndex: number): number {
 
 		//@ts-ignore
 		let physicalIndex = hot.toPhysicalRow(i)
-		let isRowCommentAndHidden = hiddenPhysicalRowIndices.indexOf(physicalIndex) !== -1
+		let isRowCommentAndHidden = hiddenPhysicalRowIndicesSorted.indexOf(physicalIndex) !== -1
 
 		if (isRowCommentAndHidden) {
 			//search next row
@@ -1790,4 +1790,78 @@ function isOpenLinkModifierPressed(e: KeyboardEvent | MouseEvent) {
 	if (!isMacOpenLinkModifierKey && e.ctrlKey) return true
 
 	return false
+}
+
+function getFirstAndLastVisibleColumns(): {first: number, last: number} {
+
+	if (!hot) return {first: 0, last: 0}
+
+	let firstVisibleCol = 0
+	let lastVisibleCol = 0
+	const lastPossibleColIndex = hot.countCols() - 1
+
+	//get first 
+	for (let index = 0; index <= lastPossibleColIndex; index++) {
+
+		let physicalColIndex = hot.toPhysicalColumn(index)
+
+		let isColHidden = hiddenPhysicalColumnIndicesSorted.indexOf(physicalColIndex) !== -1
+
+		if (!isColHidden) {
+			firstVisibleCol = index
+			break
+		}
+	}
+
+	//get last
+	for (let index = lastPossibleColIndex; index >= 0; index--) {
+
+		let physicalColIndex = hot.toPhysicalColumn(index)
+
+		let isColHidden = hiddenPhysicalColumnIndicesSorted.indexOf(physicalColIndex) !== -1
+
+		if (!isColHidden) {
+			lastVisibleCol = index
+			break
+		}
+	}
+
+	return {first: firstVisibleCol, last: lastVisibleCol}
+}
+
+function getFirstAndLastVisibleRows(): {first: number, last: number} {
+
+	if (!hot) return {first: 0, last: 0}
+
+	let firstVisibleRow = 0
+	let lastVisibleRow = 0
+	const lastPossibleRowIndex = hot.countRows() - 1
+
+	//get first 
+	for (let index = 0; index <= lastPossibleRowIndex; index++) {
+
+		let physicalRowIndex = hot.toPhysicalRow(index)
+
+		let isRowHidden = hiddenPhysicalRowIndicesSorted.indexOf(physicalRowIndex) !== -1
+
+		if (!isRowHidden) {
+			firstVisibleRow = index
+			break
+		}
+	}
+
+	//get last
+	for (let index = lastPossibleRowIndex; index >= 0; index--) {
+
+		let physicalRowIndex = hot.toPhysicalRow(index)
+
+		let isRowHidden = hiddenPhysicalRowIndicesSorted.indexOf(physicalRowIndex) !== -1
+
+		if (!isRowHidden) {
+			lastVisibleRow = index
+			break
+		}
+	}
+
+	return {first: firstVisibleRow, last: lastVisibleRow}
 }
