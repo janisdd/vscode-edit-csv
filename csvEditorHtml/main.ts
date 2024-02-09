@@ -215,9 +215,12 @@ let isBrowser = false
  * THIS is always synced with the ui
  * it allows us to modify the widths better e.g. restore widths...
  * 
- * hidden columns use a very small (<1) width
+ * hidden columns use a very small (<1) width in the "manualColumnResize" these withs are set to undefined
  * 
  * uses visual column indices!
+ * 
+ * this is also in sync with the "manualColumnResize" plugin
+ *   this is because we use the plugin to set the actual widths!!!
  * 
  * inspired by https://github.com/YaroslavOvdii/fliplet-widget-data-source/blob/master/js/spreadsheet.js (also see https://github.com/Fliplet/fliplet-widget-data-source/pull/81/files)
  */

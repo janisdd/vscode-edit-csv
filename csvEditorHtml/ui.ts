@@ -426,28 +426,40 @@ function forceAutoResizeColumns() {
 
 	//note that setting colWidths will disable the auto size column plugin (see Plugin AutoColumnSize.isEnabled)
 	//it is enabled if (!colWidths)
-	let plugin = hot.getPlugin('autoColumnSize')
+	let autoColumnSizePlugin = hot.getPlugin('autoColumnSize')
+	let manualColumnResizePlugin = hot.getPlugin('manualColumnResize')
 
 	let setColSizeFunc = () => {
 		if (!hot) return
-		hot.getSettings().manualColumnResize = false //this prevents setting manual col size?
-		_updateHandsontableSettings({ colWidths: plugin.widths }, false, true)
-		hot.getSettings().manualColumnResize = true
-		_updateHandsontableSettings({}, false, false) //change to manualColumnResize is only applied after updating setting?
+
+		//we could have hidden columns... these have a width < 1
+
+		for (let i = 0; i < allColWidths.length; i++) {
+			const colWidth = allColWidths[i]
+
+			//hidden column, do not change width
+			if (colWidth < 1) continue
+			manualColumnResizePlugin.clearManualSize(i) //clearing, this will apply the auto size from the plugin
+		}
+
+		// hot.getSettings().manualColumnResize = false //this prevents setting manual col size?
+		// _updateHandsontableSettings({ colWidths: autoColumnSizePlugin.widths }, false, true)
+		// hot.getSettings().manualColumnResize = true
+		// _updateHandsontableSettings({}, false, false) //change to manualColumnResize is only applied after updating setting?
+
 		// plugin.enablePlugin() //done in _updateHandsontableSettings
 	}
 
-	if (plugin.widths.length === 0) {
-		plugin.enablePlugin()
+	if (autoColumnSizePlugin.widths.length === 0) {
+		autoColumnSizePlugin.enablePlugin()
 
-		reRenderTable(setColSizeFunc)
 		// hot.render() //this is needed else calculate will not get widths
 		//apparently render sets the column widths in the plugin if it's enabled?
 		// plugin.calculateAllColumnsWidth()
-		return
 	}
 
 	setColSizeFunc()
+	reRenderTable(setColSizeFunc)
 }
 
 function forceAutoResizeRows() {
