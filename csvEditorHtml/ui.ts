@@ -656,25 +656,27 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					name: '---------'
 				},
 				'alignment': {},
-				'hide_column': {
-					name: 'Hide column',
+				'hide_columns': {
+					name: 'Hide columns',
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
 						if (!hot) return
 						// if (!headerRowWithIndex) return
 						if (selection.length > 1) return
 
-						let targetCol = selection[0].start.col
+						let _selection = selection[0]
 
-						const physicalColIndex = hot.toPhysicalColumn(targetCol)
+						for (let targetCol = _selection.start.col; targetCol <= _selection.end.col; targetCol++) {
 
-						hiddenPhysicalColumnIndicesSorted.push(physicalColIndex)
+							const physicalColIndex = hot.toPhysicalColumn(targetCol)
+							hiddenPhysicalColumnIndicesSorted.push(physicalColIndex)
+
+							//after there is no place where the previous manual size is stored, so after showing the col again
+							//it will have auto size (for now)
+							const manualColumnResizePlugin = hot.getPlugin('manualColumnResize')
+							manualColumnResizePlugin.manualColumnWidths[physicalColIndex] = undefined
+						}
 						hiddenPhysicalColumnIndicesSorted = hiddenPhysicalColumnIndicesSorted.sort()
 						firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
-
-						//after there is no place where the previous manual size is stored, so after showing the col again
-						//it will have auto size (for now)
-						const manualColumnResizePlugin = hot.getPlugin('manualColumnResize')
-						manualColumnResizePlugin.manualColumnWidths[physicalColIndex] = undefined
 
 						hot.render()
 					},
@@ -748,18 +750,29 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					name: `Resize column to ${initialConfig?.doubleClickColumnHandleForcedWith ?? 200}px`,
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
 
-						//should be up-to-date but to be sure
-						syncColWidths()
+						let plugin = hot!.getPlugin('manualColumnResize')
 
 						let desiredColWidth = initialConfig?.doubleClickColumnHandleForcedWith ?? 200
 
 						//also allow resizing multiple cols at once
 						for (let i = selection[0].start.col; i <= selection[0].end.col; i++) {
 							// let colWidth = hot!.getColWidth(i)
-							allColWidths[i] = desiredColWidth
+							// allColWidths[i] = desiredColWidth
+							plugin.setManualSize(i, desiredColWidth)
 						}
 
-						applyColWidths(false)
+						//from the onMouseUp handler of the manualRowResize plugin
+						//@ts-ignore
+						hot.forceFullRender = true;
+						//@ts-ignore
+						hot.view.render(); // updates all
+						//@ts-ignore
+						hot.view.wt.wtOverlays.adjustElementsSize(true);
+						//we don't run before and after resize hooks... no idea what they do
+
+						//should be up-to-date but to be sure
+						// syncColWidths()
+						// applyColWidths(false)
 					}
 				},
 				'unhide_all_column': {
@@ -1320,7 +1333,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			const th = _th as HTMLTableColElement
 
 			if (!th || !hot) return
-			console.log(`afterGetColHeader`, visualColumnIndex, `hiddenPhysicalColumnIndices`, hiddenPhysicalColumnIndicesSorted)
+			// console.log(`afterGetColHeader`, visualColumnIndex, `hiddenPhysicalColumnIndices`, hiddenPhysicalColumnIndicesSorted)
 
 			//is column hidden?
 			let physicalIndex = hot.toPhysicalColumn(visualColumnIndex)
