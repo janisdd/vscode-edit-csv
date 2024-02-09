@@ -717,24 +717,6 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						return isReadonlyMode
 					}
 				},
-				'resize_column_header_cell': {
-					name: `Resize column to ${initialConfig?.doubleClickColumnHandleForcedWith ?? 200}px`,
-					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
-
-						//should be up-to-date but to be sure
-						syncColWidths()
-
-						let desiredColWidth = initialConfig?.doubleClickColumnHandleForcedWith ?? 200
-
-						//also allow resizing multiple cols at once
-						for (let i = selection[0].start.col; i <= selection[0].end.col; i++) {
-							// let colWidth = hot!.getColWidth(i)
-							allColWidths[i] = desiredColWidth
-						}
-
-						applyColWidths(false)
-					}
-				},
 				'resize_row_header_cell': {
 					name: `Resize row to ${initialConfig?.doubleClickRowHandleForcedHeight ?? 106}px`,
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
@@ -760,6 +742,24 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						//@ts-ignore
 						hot.view.wt.wtOverlays.adjustElementsSize(true);
 						//we don't run before and after resize hooks... no idea what they do
+					}
+				},
+				'resize_column_header_cell': {
+					name: `Resize column to ${initialConfig?.doubleClickColumnHandleForcedWith ?? 200}px`,
+					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
+
+						//should be up-to-date but to be sure
+						syncColWidths()
+
+						let desiredColWidth = initialConfig?.doubleClickColumnHandleForcedWith ?? 200
+
+						//also allow resizing multiple cols at once
+						for (let i = selection[0].start.col; i <= selection[0].end.col; i++) {
+							// let colWidth = hot!.getColWidth(i)
+							allColWidths[i] = desiredColWidth
+						}
+
+						applyColWidths(false)
 					}
 				},
 				'unhide_all_column': {
@@ -1560,6 +1560,11 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 				if (hiddenPhysicalRowIndicesSorted.indexOf(physicalIndex) !== -1) {
 					//row is hidden
+
+					if (directionRow === 0) {
+						//infinity loop if we do not move
+						return visualRow
+					}
 					return getNextRow(visualRow + directionRow)
 				}
 
@@ -1569,11 +1574,11 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//maybe refactor to iterative?
 			const getNextCol: (a: number) => number = (visualColIndex: number) => {
 
-				let visualIndex = visualColIndex;
+				let visualCol = visualColIndex;
 				//@ts-ignore
 				let physicalIndex = hot.toPhysicalColumn(visualColIndex)
 
-				if (visualIndex > lastPossibleColIndex) { //moved past the last col
+				if (visualCol > lastPossibleColIndex) { //moved past the last col
 
 					if (wrapNavigationAfterFirstOrLastCol) {
 
@@ -1592,7 +1597,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					return initialNavPos.col - directionCol
 				}
 
-				if (visualIndex < 0) { //we moved before col 0
+				if (visualCol < 0) { //we moved before col 0
 
 					if (wrapNavigationAfterFirstOrLastCol) {
 
@@ -1613,10 +1618,16 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 				if (hiddenPhysicalColumnIndicesSorted.indexOf(physicalIndex) !== -1) {
 					//col is hidden
-					return getNextCol(visualIndex + directionCol)
+
+					if (directionCol === 0) {
+						//infinity loop if we do not move
+						return visualCol
+					}
+
+					return getNextCol(visualCol + directionCol)
 				}
 
-				return visualIndex
+				return visualCol
 			}
 
 			if (directionRow !== 0 && directionCol !== 0) {
