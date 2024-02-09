@@ -23,8 +23,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Version: 6.5.2
- * Release date: 19/12/2018 (built at 09/02/2024 18:08:28)
+ * Version: 6.5.3
+ * Release date: 19/12/2018 (built at 09/02/2024 19:38:37)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -12306,7 +12306,11 @@ function Core(rootElement, userSettings) {
     this.view = new _tableView.default(this);
     editorManager = _editorManager.default.getInstance(instance, priv, selection, datamap);
     this.forceFullRender = true; // used when data was changed
+    // true: pause keyDown handlers, false: normal
+    // this is faster than listen/unlisten and doesn't trigger hooks
+    // this can also be set before this file's `onKeyDown` continues execution (to intercept key events)
 
+    this._isListeningPaused = false;
     instance.runHooks('init');
     this.view.render();
 
@@ -12716,6 +12720,25 @@ function Core(rootElement, userSettings) {
 
   this.isListening = function () {
     return activeGuid === instance.guid;
+  };
+  /**
+   * returns if the listening for `keyDown` events is paused
+   * extra layer between isListening
+   * @returns {boolean|*}
+   */
+
+
+  this.isListeningPaused = function () {
+    return instance._isListeningPaused;
+  };
+  /**
+   * sets the listening for keyDown events to paused
+   * @param paused
+   */
+
+
+  this.setListeningPaused = function (paused) {
+    instance._isListeningPaused = paused;
   };
   /**
    * Destroys the current editor, render the table and prepares the editor of the newly selected cell.
@@ -29740,9 +29763,9 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "09/02/2024 18:08:28";
+Handsontable.buildDate = "09/02/2024 19:38:37";
 Handsontable.packageName = "handsontable";
-Handsontable.version = "6.5.2";
+Handsontable.version = "6.5.3";
 var baseVersion = "";
 
 if (baseVersion) {
@@ -39762,7 +39785,11 @@ function EditorManager(instance, priv, selection) {
       return;
     }
 
-    instance.runHooks('beforeKeyDown', event);
+    instance.runHooks('beforeKeyDown', event); // could be changed inside `beforeKeyDown`
+
+    if (instance.isListeningPaused()) {
+      return;
+    }
 
     if (event.keyCode === 27 || event.keyCode === 13) {
       // esc | enter

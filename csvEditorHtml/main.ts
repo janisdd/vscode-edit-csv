@@ -208,6 +208,7 @@ let hoveredATag: HTMLAnchorElement | null = null
 //only mac is special because it uses alt (vs code uses cmd but cmd will select individual cells in handsontable)
 //linux and windows use ctrl
 let isMacOpenLinkModifierKey = initialVars.os === 'mac'
+let isMacOS = initialVars.os === `mac`
 let isBrowser = false
 
 /**

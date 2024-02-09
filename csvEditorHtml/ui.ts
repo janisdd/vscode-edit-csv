@@ -1795,6 +1795,33 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				insertColRight()
 			}
 
+			//last step is to prevent all unwanted shortcuts that would be eaten by handsontable
+			//we need to use code here, because, e.g., on a differently mapped keyboard the key is different 
+			if (
+				(!isMacOS && //mac uses `ctrl+x` for focusing editors
+					((event.altKey && event.code === `Digit1`)
+						|| (event.altKey && event.code === `Digit2`)
+						|| (event.altKey && event.code === `Digit3`)
+						|| (event.altKey && event.code === `Digit4`)
+						|| (event.altKey && event.code === `Digit5`)
+						|| (event.altKey && event.code === `Digit6`)
+						|| (event.altKey && event.code === `Digit7`)
+						|| (event.altKey && event.code === `Digit8`)
+						|| (event.altKey && event.code === `Digit9`))
+				)
+				|| (event.ctrlKey && event.key === `Tab`)
+				|| (event.ctrlKey && event.shiftKey && event.key === `Tab`)
+			) {
+				// event.stopImmediatePropagation()
+				//@ts-ignore
+				hot?.setListeningPaused(true)
+				setTimeout(() => {
+					//@ts-ignore
+					hot?.setListeningPaused(false)
+				}, 0)
+				return
+			}
+
 		} as any,
 
 		//@ts-ignore
