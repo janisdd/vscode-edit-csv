@@ -64,6 +64,7 @@ let _onTableScrollThrottled: ((this: HTMLDivElement, e: Event) => void) | null =
 let hiddenPhysicalRowIndicesSorted: number[] = []
 let hiddenPhysicalColumnIndicesSorted: number[] = []
 
+//visual indices
 let firstAndLastVisibleRows: {first: number, last: number} | null = null
 let firstAndLastVisibleColumns: {first: number, last: number} | null = null
 

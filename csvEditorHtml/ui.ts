@@ -980,7 +980,10 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//see https://handsontable.com/docs/3.0.0/Core.html#getSelected
 			//[startRow, startCol, endRow, endCol].
 			const selected = selection[0]
-			if (selected[0] !== selected[2] || selected[0] !== rowCount - 1) return _default
+
+			const isLastRowSelected = selected[0] === firstAndLastVisibleRows?.last
+
+			if (selected[0] !== selected[2] || !isLastRowSelected) return _default
 
 			if (event.key.toLowerCase() === 'enter' && event.shiftKey === false) {
 				addRow(false)
@@ -1012,7 +1015,10 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//see https://handsontable.com/docs/3.0.0/Core.html#getSelected
 			//[startRow, startCol, endRow, endCol]
 			const selected = selection[0]
-			if (selected[1] !== selected[3] || selected[1] !== colCount - 1) return _default
+
+			const isLastColSelected = selected[1] === firstAndLastVisibleColumns?.last
+
+			if (selected[1] !== selected[3] || !isLastColSelected) return _default
 
 			if (event.key.toLowerCase() === 'tab' && event.shiftKey === false) {
 				addColumn(false)
@@ -1358,6 +1364,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				columnIsQuoted.splice(visualColIndex, 0, ...Array(amount).fill(newColumnQuoteInformationIsQuoted))
 			}
 
+			firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
+
 			// syncColWidths() //covered by afterRender
 			onAnyChange()
 			//dont' call this as it corrupts hot index mappings (because all other hooks need to finish first before we update hot settings)
@@ -1401,6 +1409,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//added below
 			//critical because we could update hot settings here
 			pre_afterCreateRow(visualRowIndex, amount)
+
+			//done in pre_afterCreateRow
+			// firstAndLastVisibleRows = getFirstAndLastVisibleRows()
 
 			//don't do this as we are inside a hook and the next listerners will change the indices and when we call
 			//hot.updateSettings (inside this func) the plugin internal states are changed and the indices/mappings are corrupted
@@ -1508,9 +1519,6 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				row: nextCoords.row,
 				col: nextCoords.col
 			}
-
-			//TODO fix this!!! check all combinations with wrap/nowrap (first/last row/col)
-			//TODO also fix enter/tab navigation in combination
 
 			//maybe refactor to iterative?
 			const getNextRow: (a: number) => number = (visualRowIndex: number) => {
@@ -1683,11 +1691,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					nextCoords.row = getNextRow(nextCoords.row)
 				}
 			}
-
-			//TODO enter?? tab/enter might be used to create new rows/cols...
-			// if (lastHandsonMoveWas !== 'tab') {
-			// 	coords.col = coords.col + (isLastOrFirstRowHidden ? columnIndexModifier : 0)
-			// }
+			//tab and enter moves work fine
 
 			lastHandsonMoveWas = null
 		},

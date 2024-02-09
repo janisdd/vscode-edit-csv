@@ -333,6 +333,8 @@ function addRow(selectNewRow = true) {
 	hot.alter('insert_row', numRows) //inserted data contains null but papaparse correctly unparses it as ''
 	// hot.populateFromArray(numRows, 0, [headerCells.map(p => '')])
 
+	firstAndLastVisibleRows = getFirstAndLastVisibleRows()
+
 	if (selectNewRow) {
 		hot.selectCell(numRows, 0)
 	}
