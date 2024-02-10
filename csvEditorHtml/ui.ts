@@ -1000,8 +1000,6 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 			if (selection.length > 1) return _default
 
-			const rowCount = hot.countRows()
-
 			//see https://handsontable.com/docs/3.0.0/Core.html#getSelected
 			//[startRow, startCol, endRow, endCol].
 			const selected = selection[0]
@@ -1034,8 +1032,6 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			if (!selection || selection.length === 0) return _default
 
 			if (selection.length > 1) return _default
-
-			const colCount = hot.countCols()
 
 			//see https://handsontable.com/docs/3.0.0/Core.html#getSelected
 			//[startRow, startCol, endRow, endCol]
@@ -1497,9 +1493,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			const isFirstColHidden = hiddenPhysicalColumnIndicesSorted.indexOf(hot.toPhysicalColumn(0)) !== -1
 			const isLastColHidden = hiddenPhysicalColumnIndicesSorted.indexOf(hot.toPhysicalColumn(lastPossibleColIndex)) !== -1
 
-			const isLastOrFirstRowHidden = isFirstRowHidden || isLastRowHidden
-
-			const isLastOrFirstColHidden = isFirstColHidden || isLastColHidden
+			// const isLastOrFirstRowHidden = isFirstRowHidden || isLastRowHidden
+			// const isLastOrFirstColHidden = isFirstColHidden || isLastColHidden
 
 			const wrapNavigationAfterFirstOrLastRow = initialConfig?.lastRowOrFirstRowNavigationBehavior === 'wrap' ? true : false
 			const wrapNavigationAfterFirstOrLastCol = initialConfig?.lastColumnOrFirstColumnNavigationBehavior === 'wrap' ? true : false
@@ -1748,7 +1743,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		//@ts-ignore
 		colWidths: function (visualColIndex: number) {
 			//see https://handsontable.com/docs/6.2.2/AutoColumnSize.html#getColumnWidth
-			let defaultWidth = 50
+			// let defaultWidth = 50
 
 			if (!hot) return undefined
 
@@ -1796,18 +1791,17 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			}
 
 			//last step is to prevent all unwanted shortcuts that would be eaten by handsontable
-			//we need to use code here, because, e.g., on a differently mapped keyboard the key is different 
 			if (
-				(!isMacOS && //mac uses `ctrl+x` for focusing editors
-					((event.altKey && event.code === `Digit1`)
-						|| (event.altKey && event.code === `Digit2`)
-						|| (event.altKey && event.code === `Digit3`)
-						|| (event.altKey && event.code === `Digit4`)
-						|| (event.altKey && event.code === `Digit5`)
-						|| (event.altKey && event.code === `Digit6`)
-						|| (event.altKey && event.code === `Digit7`)
-						|| (event.altKey && event.code === `Digit8`)
-						|| (event.altKey && event.code === `Digit9`))
+				(!isMacOS && event.altKey && //mac uses `ctrl+x` for focusing editors
+					(event.key === `1`
+						|| event.key === `2`
+						|| event.key === `3`
+						|| event.key === `4`
+						|| event.key === `5`
+						|| event.key === `6`
+						|| event.key === `7`
+						|| event.key === `8`
+						|| event.key === `9`)
 				)
 				|| (event.ctrlKey && event.key === `Tab`)
 				|| (event.ctrlKey && event.shiftKey && event.key === `Tab`)

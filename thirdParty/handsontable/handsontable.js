@@ -24,7 +24,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  * Version: 6.5.3
- * Release date: 19/12/2018 (built at 09/02/2024 19:38:37)
+ * Release date: 19/12/2018 (built at 10/02/2024 10:04:52)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -12719,7 +12719,7 @@ function Core(rootElement, userSettings) {
 
 
   this.isListening = function () {
-    return activeGuid === instance.guid;
+    return activeGuid === instance.guid && !instance.isListeningPaused();
   };
   /**
    * returns if the listening for `keyDown` events is paused
@@ -29763,7 +29763,7 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "09/02/2024 19:38:37";
+Handsontable.buildDate = "10/02/2024 10:04:52";
 Handsontable.packageName = "handsontable";
 Handsontable.version = "6.5.3";
 var baseVersion = "";
