@@ -109,7 +109,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const onDidChangeTextDocumentHandler = vscode.workspace.onDidChangeTextDocument((args) => {
 		//seems that the file models here always synced
 
-		console.log(`onDidChangeTextDocument ${args.document.uri.toString()}`)
+		debugLog(`onDidChangeTextDocument ${args.document.uri.toString()}`)
 
 		debounced(args.document.uri, instanceManager)
 
@@ -368,7 +368,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 		//subsequent changes will fire `onDidChangeTextDocument` again, because in the handler here we call `openTextDocument` which probably attaches the internal watcher again
 		const debounced = debounce(onWatcherChangeDetecedHandler, 1000)
 		let unsubscribe = instance.sourceFileWatcher.onDidChange((e) => {
-			console.log(`debounce sourceFileWatcher ${e.fsPath}`)
+			debugLog(`debounce sourceFileWatcher ${e.fsPath}`)
 			debounced(e, instanceManager)
 		})
 

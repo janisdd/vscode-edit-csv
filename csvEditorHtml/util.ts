@@ -966,7 +966,7 @@ function setupAndApplyInitialConfigPart1(initialConfig: EditCsvConfig | undefine
 		if (!styleSheet.href?.toLowerCase().endsWith(`dark.css`) &&
 			!styleSheet.href?.toLowerCase().endsWith(`light.css`)) continue
 
-		console.log(`styleSheet.href`, styleSheet.href)
+		// console.log(`styleSheet.href: ${styleSheet.href}`)
 
 		//iterate cssRules
 		for (let j = 0; j < styleSheet.cssRules.length; j++) {
@@ -1578,7 +1578,17 @@ function scrollToSelectedCell(hot: Handsontable, cellToSelect: HotCellPos) {
 		let firstVisibleRow = autoRowSizePlugin.getFirstVisibleRow()
 		let lastVisibleRow = autoRowSizePlugin.getLastVisibleRow()
 		let visibleRowCount = lastVisibleRow - firstVisibleRow + 1
-		viewportTopRowToShow = lastVisibleRow - Math.floor(visibleRowCount / 2)
+		//e.g. top row: 50, bot row: 100 --> middle: bot row - (100-50)/2 = 100 - 25 = 75
+		// then move 75 to the top and then is 125 the bottom row --> 100 is the middle 
+		// (because when selecting cell it scrolls into view, probably nearest, so 100 is bottom row)
+		//but if we don't need to scroll, calculate a wrong top row...
+		// viewportTopRowToShow = lastVisibleRow - Math.floor(visibleRowCount / 2)
+		viewportTopRowToShow = cellToSelect.rowIndex - Math.floor(visibleRowCount / 2)
+
+		if (viewportTopRowToShow < 0) {
+			//don't scroll, cell is already visible
+			viewportTopRowToShow = 0
+		}
 
 		let maxRowCount = hot.countRows()
 		viewportTopRowToShow = Math.max(0, Math.min(viewportTopRowToShow, maxRowCount - 1))
