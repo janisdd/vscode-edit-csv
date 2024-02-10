@@ -105,6 +105,7 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	const debounced = debounce(onWatcherChangeDetecedHandler, 1000)
 
+	//this only works if if the file is opened in vs code
 	const onDidChangeTextDocumentHandler = vscode.workspace.onDidChangeTextDocument((args) => {
 		//seems that the file models here always synced
 
@@ -362,13 +363,16 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	}
 
 	if (config.shouldWatchCsvSourceFile && instance.sourceFileWatcher) {
-		// const debounced = debounce(onWatcherChangeDetecedHandler, 1000)
-		// let unsubscribe = instance.sourceFileWatcher.onDidChange((e) => {
-		// 	console.log(`debounce ${e.fsPath}`)
-		// 	debounced(e, instance)
-		// })
+		//turns our we need the watcher because onDidChangeTextDocument does not fire when the file is closed in vs code?
+		//check with: open csv source file -> open table -> close source file -> edit source file outside vs code -> `onDidChangeTextDocument` fired?
+		//subsequent changes will fire `onDidChangeTextDocument` again, because in the handler here we call `openTextDocument` which probably attaches the internal watcher again
+		const debounced = debounce(onWatcherChangeDetecedHandler, 1000)
+		let unsubscribe = instance.sourceFileWatcher.onDidChange((e) => {
+			console.log(`debounce sourceFileWatcher ${e.fsPath}`)
+			debounced(e, instanceManager)
+		})
 
-		// instance.unsubscribeWatcher = unsubscribe
+		instance.unsubscribeWatcher = unsubscribe
 	}
 
 	try {
@@ -376,6 +380,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	} catch (error: any) {
 		vscode.window.showErrorMessage(`Could not create an editor instance, error: ${error.message}`)
 
+		instance.unsubscribeWatcher?.dispose()
 		instance.sourceFileWatcher?.dispose()
 
 		return
@@ -544,6 +549,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 		try {
 
+			instance.unsubscribeWatcher?.dispose()
 			instance.sourceFileWatcher?.dispose()
 
 		} catch (error: any) {

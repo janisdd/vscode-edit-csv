@@ -23,7 +23,7 @@ export interface Instance {
 	document: vscode.TextDocument
 
 	/**
-	 * the last known content of the file
+	 * the last known content of the file (set by this extension on save)
 	 * 
 	 * we need this to check if the file content really changed
 	 * sometimes fake change events are triggered and then we compare the file contents
