@@ -4,6 +4,11 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.5.0
+- (same as vs code extension v0.9.0)
+- fixed issue #140 - add feature to hide columns
+- fixed issue #31, #139 - `ctrl+tab`, `ctrl+shift+tab`, `alt+1`, ..., `alt+9` (on linux/windows) is not longer consumed by handsontable
+
 ## 1.4.1
 - (same as vs code extension v0.8.1)
 - fixed issue #132 - search hit are again highlighted when cells contain urls

@@ -1587,7 +1587,7 @@ function scrollToSelectedCell(hot: Handsontable, cellToSelect: HotCellPos) {
 
 		if (viewportTopRowToShow < 0) {
 			//don't scroll, cell is already visible
-			viewportTopRowToShow = 0
+			viewportTopRowToShow = firstVisibleRow
 		}
 
 		let maxRowCount = hot.countRows()

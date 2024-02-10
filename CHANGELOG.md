@@ -2,7 +2,8 @@
 
 ## [Unreleased]
 
-# 0.8.4
+# 0.9.0
+- fixed annoying issue where initial scroll position was set incorrectly (when the row was in the first half)
 - fixed issue #140 - add feature to hide columns
 - fixed issue #31, #139 - `ctrl+tab`, `ctrl+shift+tab`, `alt+1`, ..., `alt+9` (on linux/windows) is not longer consumed by handsontable
 - fixes issue #75 - watch files outside of workspace for changes
