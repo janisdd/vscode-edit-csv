@@ -109,7 +109,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const onDidChangeTextDocumentHandler = vscode.workspace.onDidChangeTextDocument((args) => {
 		//seems that the file models here always synced
 
-		debugLog(`onDidChangeTextDocument ${args.document.uri.toString()}`)
+		// debugLog(`onDidChangeTextDocument ${args.document.uri.toString()}`)
 
 		debounced(args.document.uri, instanceManager)
 
@@ -331,7 +331,6 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 			originalTitle: title,
 			sourceFileWatcher: watcher,
 			document: activeTextEditor.document,
-			supportsAutoReload: true,
 			ignoreChangeEvents: false,
 			unsubscribeWatcher: null,
 			lastCommittedContent: ''
@@ -355,7 +354,6 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 			originalTitle: title,
 			sourceFileWatcher: watcher,
 			document: activeTextEditor.document,
-			supportsAutoReload: false,
 			ignoreChangeEvents: false,
 			unsubscribeWatcher: null,
 			lastCommittedContent: ''
@@ -588,7 +586,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	}
 
 	panel.webview.html = createEditorHtml(panel.webview, context, config, {
-		isWatchingSourceFile: instance.supportsAutoReload,
+		isWatchingSourceFile: instance.sourceFileWatcher ? true : false,
 		sourceFileCursorLineIndex: activeTextEditor.selection.active.line,
 		sourceFileCursorColumnIndex:  activeCol,
 		isCursorPosAfterLastColumn: activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeTextEditor.selection.active.character,
@@ -832,7 +830,8 @@ function onWatcherChangeDetecedHandler(e: vscode.Uri, instanceManager: InstanceM
 	const instance: Instance | null = instanceManager.findInstanceBySourceUri(e)
 	if (!instance) return
 
-	if (instance.ignoreChangeEvents) {
+	//maybe the user configured to not watch the file
+	if (instance.ignoreChangeEvents || instance.sourceFileWatcher === null) {
 		debugLog(`source file changed: ${e.fsPath}, ignored`)
 		return
 	}

@@ -31,12 +31,6 @@ export interface Instance {
 	lastCommittedContent: string
 
 	/**
-	 * currently external files cannot be auto
-	 * false: the user must open the file so that vs code refreshes the file model and switch back to the table and manually refresh
-	 */
-	supportsAutoReload: boolean
-
-	/**
 	 * true: edit has unsaved changes, false: not
 	 */
 	hasChanges: boolean

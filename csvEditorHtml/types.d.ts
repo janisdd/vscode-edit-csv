@@ -5,7 +5,7 @@
 type InitialVars = {
 	/**
 	 * true: the extension is watching the source file for changes
-	 * false: not (e.g. file is not in the workspace or something other)
+	 * false: not (e.g. user disabled the feature in the settings)
 	 */
 	isWatchingSourceFile: boolean
 	/**
