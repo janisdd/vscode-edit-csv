@@ -202,6 +202,3 @@ You can also open `csvEditorHtml/index.html` in your favorite browser and play a
 ## License
 
 Code: MIT
-
-Logo: CC BY NC 3.0 by Janis Dähne
-

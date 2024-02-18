@@ -242,7 +242,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 										</div>
 
 										<div id="source-file-unwatched-indicator" class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline" style="float: right;margin-right: 5px;"
-											data-tooltip="The csv source file cannot be automatically reloaded if the file on disk is changed (because it's not in the current workspace). You will get notified if the file is changed but then you need to open/display the source csv file in vs code and manually refresh the table (refresh button). Alternatively just close this table and reopen it.">
+											data-tooltip="The csv source file is not monitored for changes. You will not be notified if the source file is changed by vs code or an external program. To manually reload the contents of the source file, use the 'manual refresh button' at the top.">
 											<span>
 												<i class="fas fa-eye"></i>
 											</span>
@@ -784,7 +784,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 						<li>The unsaved changes indicator is display on any change (never cleared until you apply the changes, even if you revert manually)</li>
 						<li>When you see the unsaved changes indicator right after the table was loaded then some rows were expanded (to ensure all rows have the same length)</li>
 						<li>You can right-click on the table to get a context menu</li>
-						<li>Hidden rows are also exported</li>
+						<li>Hidden rows/columns are also exported</li>
 						<li>Comment rows will export only the first cell/column. If you use a cell other than the first for comments the cell color will indicate this. </li>
 						<li>If you edit an unnamed (csv) file and close it then the editor will be closed too (unsaved changes will
 							be lost)!</li>
@@ -818,9 +818,9 @@ function createEditorHtml(webview, context, config, initialVars) {
 				<h3 class="title is-3">Reset data and apply read options</h3>
 
 				<p>
-					Are you sure you want to overwrite the table with the initial content of the file? <br />
-					This will use the initial data (when you opened the csv editor) and discard all changes applied to the table! <br />
-					Note that this will not reread or reload the csv file content (a snapshot of the file was stored in memory when you opened the csv editor)!
+					Are you sure that you want to overwrite the table with the initial content (snapshot) of the source file? <br />
+					This will use the original data (when opening the CSV editor) and discard all changes applied to the table! <br />
+					Please note that the content of the csv file will not be read or loaded again (a snapshot of the file was stored in memory when the csv editor was opened)!
 				</p>
 
 				<div style="margin-top: 1em">
@@ -851,10 +851,10 @@ function createEditorHtml(webview, context, config, initialVars) {
 				<h3 class="title is-3">Reload file content and discard changes</h3>
 
 				<p>
-					Are you sure you want to read the source file again? <br />
-					All changes to the table will be discarded! <br />
+					Are you sure you want to read the source file again?<br />
+					All changes to the table will be discarded!<br />
 					<br />
-					<i>This will also update the snapshot of the file that is used for the reset data feature.</i>
+					<i>This also updates the snapshot of the file that is used for the 'reset data' function.</i>
 				</p>
 
 				<div style="margin-top: 1em">
@@ -885,11 +885,12 @@ function createEditorHtml(webview, context, config, initialVars) {
 				<h3 class="title is-3">Source file changed</h3>
 
 				<p>
-					The source file changed, thus the table is not up-to-date. <br />
-					You can reload the file content which will discard all changes to the table! <br /><br />
-					Or you can ignore the changes. <br />
+					The source file has been changed, so the table is no longer up-to-date.<br />
+					You can reload the contents of the file, which will discard all changes to the table!<br />
 					<br />
-					<i>This will also update the snapshot of the file that is used for the reset data feature.</i>
+					Or you can ignore the changes.<br />
+					<br />
+					<i>This will also update the snapshot of the file that is used for the 'reset data' feature.</i>
 				</p>
 
 				<div style="margin-top: 1em">
