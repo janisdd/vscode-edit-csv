@@ -3,7 +3,6 @@
 ## [Unreleased]
 
 # 0.9.0
-- changed logo
 - fixed annoying issue where initial scroll position was set incorrectly (when the row was in the first half)
 - fixed issue #140 - add feature to hide columns
 - fixed issue #31, #139 - `ctrl+tab`, `ctrl+shift+tab`, `alt+1`, ..., `alt+9` (on linux/windows) is not longer consumed by handsontable
@@ -11,9 +10,10 @@
 	- removed `chikidar` as dependency, vs can now watch all files
 	- because the timing when a change is detected and when file model (vs code) is updated is not the same across platforms, we have to use vs code's own file change events
 		- `onDidChangeTextDocument` behaves the same way for all platforms but is always fired after the file was changed (on every key stroke)
-		- however, we still need a file system watcher because when the user closes the soruce file, no `onDidChangeTextDocument` event is fired anymore (until `openTextDocument` is called again)
+		- however, we still need a file system watcher because when the user closes the source file, no `onDidChangeTextDocument` event is fired anymore (until `openTextDocument` is called again)
 		- to detect if the file was really changed we have to compare the file content with the last known content (so we have a full copy of the file content in memory)
 			- this is because we need to know if the change was triggered by this extension or by another program (if last known content == current content then the change was not triggered by this extension)
+- changed logo
 
 # 0.8.3
 - merged PR #134 - fix instance comparison
