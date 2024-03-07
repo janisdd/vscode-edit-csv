@@ -29,7 +29,19 @@ if (typeof initialConfig === 'undefined') {
 	var initialVars = {
 		...defaultInitialVars
 	}
+} else {
+
+	// some fixes, was sometimes a string because if package.json
+	if (typeof initialConfig.doubleClickColumnHandleForcedWith === 'string') {
+		initialConfig.doubleClickColumnHandleForcedWith = parseInt(initialConfig.doubleClickColumnHandleForcedWith)
+		if (isNaN(initialConfig.doubleClickColumnHandleForcedWith)) {
+			initialConfig.doubleClickColumnHandleForcedWith = 200
+		}
+	}
+
 }
+
+
 
 const csv: typeof import('papaparse') = (window as any).Papa
 //handsontable instance
