@@ -4,6 +4,11 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.5.1
+- (same as vs code extension v0.9.1)
+- fixed issue #146 - doubleClickRowHandleForcedHeight was a string (package config must be a number)
+- fixed issue #144 - tools menu item background was the same as foreground color
+
 ## 1.5.0
 - (same as vs code extension v0.9.0)
 - changed logo

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+# 0.9.1
+- fixed issue #146 - doubleClickRowHandleForcedHeight was a string (package config must be a number)
+- fixed issue #144 - tools menu item background was the same as foreground color
+
 # 0.9.0
 - fixed annoying issue where initial scroll position was set incorrectly (when the row was in the first half)
 - fixed issue #140 - add feature to hide columns
