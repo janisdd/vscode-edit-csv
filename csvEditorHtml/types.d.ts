@@ -106,6 +106,11 @@ type EditCsvConfig = {
 	readOption_delimitersToGuess: string[]
 
 	/**
+	 * an alternative string to use as new line for reading, empty to use the editor default
+	 */
+	readOption_alternativeNewLine: string
+
+	/**
 	 * the string used as comment, empty string to thread every line as data line (no comments)
 	 */
 	readOption_comment: string
@@ -143,6 +148,11 @@ type EditCsvConfig = {
 	 * the delimiter to use, empty string to auto detect
 	 */
 	writeOption_delimiter: string
+
+	/**
+	 * an alternative string to use as new line for writing, empty to use the editor default
+	 */
+	writeOption_alternativeNewLine: string
 
 	/**
 	 * the string used as comment, empty string to exclude comments
@@ -380,8 +390,13 @@ type CsvReadOptions = {
 	delimitersToGuess: string[],
 	/**
 	 * the new line string, use '' for auto detect
+	 * the real new line string (for os files)
 	 */
 	newline: string,
+	/**
+	 * the new line string to use instead of the real new line string, '' to use the real new line string {@link CsvReadOptions.newline}
+	 */
+	alternativeNewline: string
 	/**
 	 * the quote string
 	 */
@@ -426,6 +441,10 @@ type CsvWriteOptions = {
 	 * or same as input
 	 */
 	newline: '\n' | '\r\n' | string
+		/**
+	 * the new line string to use instead of the real new line string, '' to use the real new line string {@link CsvWriteOptions.newline}
+	 */
+		alternativeNewline: string
 	/**
 	 * the quote string
 	 */

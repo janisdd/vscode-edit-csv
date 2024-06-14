@@ -16,6 +16,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 
 	hasFinalNewLine = content.endsWith('\n')
 
+	debugger
 	//comments are parses as normal text, only one cell is added
 	const parseResult = csv.parse(content, {
 		...csvReadOptions,
@@ -40,6 +41,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 		retainQuoteInformation: true, //we keep true here and decide if we use it whe nwe output data
 		calcLineIndexToCsvLineIndexMapping: initialVars.sourceFileCursorLineIndex !== null ? true : false,
 		calcColumnIndexToCsvColumnIndexMapping: initialVars.sourceFileCursorColumnIndex !== null ? true : false,
+		newline: csvReadOptions.alternativeNewline ? csvReadOptions.alternativeNewline : undefined //TODO papaparse only supports \r\n and \n (we need to change it)
 	} as any)
 
 	if (parseResult.errors.length === 1 && parseResult.errors[0].type === 'Delimiter' && parseResult.errors[0].code === 'UndetectableDelimiter') {

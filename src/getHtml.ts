@@ -26,8 +26,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	// let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
 	let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js')
 	// let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js')
-	let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js')
-	// let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
+	// let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js')
+	let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
 
 	const mousetrapJs = _getResourcePath('thirdParty/mousetrap/mousetrap.min.js')
 	const mousetrapBindGlobalJs = _getResourcePath('thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js')
@@ -356,6 +356,23 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 												</div>
 											</div>
 
+										<!-- alternative new line -->
+										<div class="flexed">
+											<div class="field">
+												<label>
+													<span>Alt new line</span>
+													<span class="tooltip"
+														data-tooltip="Alternative new line string to use">
+														<i class="fas fa-question-circle"></i>
+													</span>
+												</label>
+												<input id="alternative-new-line-string-read" class="input vscode-text-field" type="text" placeholder="auto" oninput="setAlternativeNewLineRead()" />
+											</div>
+				
+											<div class="field mar-left-half">
+											</div>
+										</div>
+
 											<div>
 												<vscode-button appearance="secondary" class="" style="height: 36px; margin-top: 1rem;" onclick="toggleAskReadAgainModal(true)">
 													<span style="width: 14rem">Reset data and apply read options</span>
@@ -443,6 +460,23 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 												</label>
 												<!--<vscode-text-field id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()" />-->
 												<input id="escape-char-string-write" class="input vscode-text-field" type="text" oninput="setEscapeCharStringWrite()" />
+											</div>
+										</div>
+
+										<!-- alternative new line -->
+										<div class="flexed">
+											<div class="field">
+												<label>
+													<span>Alt new line</span>
+													<span class="tooltip"
+														data-tooltip="Alternative new line string to use">
+														<i class="fas fa-question-circle"></i>
+													</span>
+												</label>
+												<input id="alternative-new-line-string-write" class="input vscode-text-field" type="text" placeholder="auto" oninput="setAlternativeNewLineWrite()" />
+											</div>
+				
+											<div class="field mar-left-half">
 											</div>
 										</div>
 					

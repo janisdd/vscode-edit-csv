@@ -298,6 +298,11 @@ function setReadDelimiter(delimiter: string) {
 	defaultCsvReadOptions.delimiter = delimiter
 }
 
+function setAlternativeNewLineRead() {
+	const el = _getById('alternative-new-line-string-read') as HTMLInputElement
+	defaultCsvReadOptions.alternativeNewline = el.value
+}
+
 /* --- write options --- */
 
 
@@ -335,6 +340,12 @@ function setEscapeCharStringWrite() {
 function setQuoteAllFieldsWrite() {
 	const el = _getById('quote-all-fields-write') as HTMLInputElement
 	defaultCsvWriteOptions.quoteAllFields = el.checked
+}
+
+
+function setAlternativeNewLineWrite() {
+	const el = _getById('alternative-new-line-string-write') as HTMLInputElement
+	defaultCsvWriteOptions.alternativeNewline = el.value
 }
 
 /**
@@ -574,7 +585,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			// 	: `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
 		} as any,
 		afterChange: onAnyChange, //only called when cell value changed (e.g. not when col/row removed)
-		fillHandle: false,
+		fillHandle: true,
 		undo: true,
 		colHeaders: defaultColHeaderFuncBound as any,
 		currentColClassName: 'foo', //actually used to overwrite highlighting

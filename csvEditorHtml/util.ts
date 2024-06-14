@@ -696,6 +696,9 @@ function setCsvReadOptionsInitial(options: CsvReadOptions) {
 
 	const el6 = _getById('escape-char-string') as HTMLInputElement
 	el6.value = defaultCsvReadOptions.escapeChar
+
+	const el7 = _getById('alternative-new-line-string-read') as HTMLInputElement
+	el7.value = defaultCsvReadOptions.alternativeNewline
 }
 
 /**
@@ -729,6 +732,9 @@ function setCsvWriteOptionsInitial(options: CsvWriteOptions) {
 
 	const el6 = _getById('quote-all-fields-write') as HTMLInputElement
 	el6.checked = defaultCsvWriteOptions.quoteAllFields
+
+	const el7 = _getById('alternative-new-line-string-write') as HTMLInputElement
+	el7.value = defaultCsvWriteOptions.alternativeNewline
 }
 
 /**
@@ -902,6 +908,7 @@ function setupAndApplyInitialConfigPart1(initialConfig: EditCsvConfig | undefine
 		_hasHeader: _readOption_hasHeader,
 		escapeChar: initialConfig.readOption_escapeChar,
 		quoteChar: initialConfig.readOption_quoteChar,
+		alternativeNewline: initialConfig.readOption_alternativeNewLine,
 	})
 
 	const copyWriteOptions = {
@@ -918,6 +925,7 @@ function setupAndApplyInitialConfigPart1(initialConfig: EditCsvConfig | undefine
 		quoteAllFields: initialConfig.quoteAllFields,
 		retainQuoteInformation: initialConfig.retainQuoteInformation,
 		quoteEmptyOrNullFields: initialConfig.quoteEmptyOrNullFields === 'true' ? true : false,
+		alternativeNewline: initialConfig.writeOption_alternativeNewLine,
 	})
 
 	switch (initialConfig.optionsBarAppearance) {

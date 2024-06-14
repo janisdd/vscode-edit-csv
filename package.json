@@ -348,6 +348,11 @@
 					],
 					"description": "the delimiters to guess automatically (in the given order)"
 				},
+				"csv-edit.readOption_alternativeNewLine": {
+					"type": "string",
+					"default": "",
+					"description": "an alternative string to use as new line for reading, empty to use the editor default"
+				},
 				"csv-edit.readOption_comment": {
 					"type": "string",
 					"default": "#",
@@ -382,6 +387,11 @@
 					"type": "string",
 					"default": "",
 					"description": "the delimiter to use, empty string to auto detect"
+				},
+				"csv-edit.writeOption_alternativeNewLine": {
+					"type": "string",
+					"default": "",
+					"description": "an alternative string to use as new line for writing, empty to use the editor default"
 				},
 				"csv-edit.writeOption_comment": {
 					"type": "string",

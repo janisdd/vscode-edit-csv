@@ -116,6 +116,7 @@ let defaultCsvReadOptions: CsvReadOptions = {
 		String.fromCharCode(31), //Papa.UNIT_SEP // \u001f" // INFORMATION SEPARATOR ONE
 	],
 	newline: '', //auto detect
+	alternativeNewline: '', // use real newlines
 	quoteChar: '"',
 	escapeChar: '"',
 	skipEmptyLines: true,
@@ -130,6 +131,7 @@ let defaultCsvWriteOptions: CsvWriteOptions = {
 	comments: '#',
 	delimiter: '', //'' = use from input, will be set from empty to string when exporting (or earlier)
 	newline: '', //set by editor
+	alternativeNewline: '', // use real newlines
 	quoteChar: '"',
 	escapeChar: '"',
 	quoteAllFields: false,

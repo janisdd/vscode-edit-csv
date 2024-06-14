@@ -26,8 +26,8 @@ function createEditorHtml(webview, context, config, initialVars) {
     // let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
     let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js');
     // let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js')
-    let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js');
-    // let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
+    // let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js')
+    let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js');
     const mousetrapJs = _getResourcePath('thirdParty/mousetrap/mousetrap.min.js');
     const mousetrapBindGlobalJs = _getResourcePath('thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js');
     const bigJs = _getResourcePath('thirdParty/big.js/big.min.js');
@@ -64,7 +64,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 		<div class="search-input-wrapper">
 			<vscode-text-field id="find-widget-input" placeholder="Find..." class="input" title="Enter to start search">
-			<span slot="end" style="width: 81px";>
+			<span slot="end" style="width: 81px">
 					<!-- search options -->
 				<div class="flexed find-options">
 					<vscode-button appearance="icon" id="find-window-option-match-case" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionMatchCase()" title="Match case">
@@ -346,6 +346,23 @@ function createEditorHtml(webview, context, config, initialVars) {
 												</div>
 											</div>
 
+										<!-- alternative new line -->
+										<div class="flexed">
+											<div class="field">
+												<label>
+													<span>Alt new line</span>
+													<span class="tooltip"
+														data-tooltip="Alternative new line string to use">
+														<i class="fas fa-question-circle"></i>
+													</span>
+												</label>
+												<input id="alternative-new-line-string-read" class="input vscode-text-field" type="text" placeholder="auto" oninput="setAlternativeNewLineRead()" />
+											</div>
+				
+											<div class="field mar-left-half">
+											</div>
+										</div>
+
 											<div>
 												<vscode-button appearance="secondary" class="" style="height: 36px; margin-top: 1rem;" onclick="toggleAskReadAgainModal(true)">
 													<span style="width: 14rem">Reset data and apply read options</span>
@@ -433,6 +450,23 @@ function createEditorHtml(webview, context, config, initialVars) {
 												</label>
 												<!--<vscode-text-field id="escape-char-string-write" class="input" type="text" oninput="setEscapeCharStringWrite()" />-->
 												<input id="escape-char-string-write" class="input vscode-text-field" type="text" oninput="setEscapeCharStringWrite()" />
+											</div>
+										</div>
+
+										<!-- alternative new line -->
+										<div class="flexed">
+											<div class="field">
+												<label>
+													<span>Alt new line</span>
+													<span class="tooltip"
+														data-tooltip="Alternative new line string to use">
+														<i class="fas fa-question-circle"></i>
+													</span>
+												</label>
+												<input id="alternative-new-line-string-write" class="input vscode-text-field" type="text" placeholder="auto" oninput="setAlternativeNewLineWrite()" />
+											</div>
+				
+											<div class="field mar-left-half">
 											</div>
 										</div>
 					
