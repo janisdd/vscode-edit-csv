@@ -55,6 +55,7 @@ const defaultConfig: EditCsvConfig = {
 	darkThemeTextColor: '#d0d0d0',
 	lightThemeTextColor: '#657b83',
 	convertUrlsToLinkTags: true,
+	autoFill: true,
 }
 
 /**
