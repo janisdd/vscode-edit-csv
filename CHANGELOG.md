@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+# 0.9.2
+
+- fixed issue #147: add feature to automatically reload data if the source csv file changes
+
+
 # 0.9.1
 - fixed issue #146 - doubleClickRowHandleForcedHeight was a string (package config must be a number)
 - fixed issue #144 - tools menu item background was the same as foreground color

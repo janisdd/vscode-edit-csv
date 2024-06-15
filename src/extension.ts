@@ -315,7 +315,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	if (isInCurrentWorkspace) {
 
-		if (config.shouldWatchCsvSourceFile) {
+		if (config.shouldWatchCsvSourceFile !== 'no') {
 			//if the file is in the current workspace we the file model in vs code is always synced so is this (faster reads/cached)
 			watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, true)
 		}
@@ -338,7 +338,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	} else {
 
-		if (config.shouldWatchCsvSourceFile) {
+		if (config.shouldWatchCsvSourceFile !== 'no') {
 			//the problem with this is that it is faster than the file model (in vs code) can sync the file...
 			watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(activeTextEditor.document.fileName, "*"), true, false, true)
 		}
@@ -360,7 +360,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 		}
 	}
 
-	if (config.shouldWatchCsvSourceFile && instance.sourceFileWatcher) {
+	if (config.shouldWatchCsvSourceFile !== 'no' && instance.sourceFileWatcher) {
 		//turns our we need the watcher because onDidChangeTextDocument does not fire when the file is closed in vs code?
 		//check with: open csv source file -> open table -> close source file -> edit source file outside vs code -> `onDidChangeTextDocument` fired?
 		//subsequent changes will fire `onDidChangeTextDocument` again, because in the handler here we call `openTextDocument` which probably attaches the internal watcher again

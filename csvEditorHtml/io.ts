@@ -472,7 +472,27 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 			// 	return
 			// }
 
-			toggleSourceFileChangedModalDiv(true)
+			if (initialConfig) {
+
+				switch (initialConfig.shouldWatchCsvSourceFile) {
+					case 'no': {
+						break
+					}
+
+					case 'yesAndAutoReload': {
+						reloadFileFromDisk()
+						break
+					}
+					
+					case 'yesAndNotify': 
+					default: {
+						toggleSourceFileChangedModalDiv(true)
+						break
+					}
+				
+				}
+			}
+
 			break
 		}
 

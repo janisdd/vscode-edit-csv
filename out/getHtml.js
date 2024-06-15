@@ -64,7 +64,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 		<div class="search-input-wrapper">
 			<vscode-text-field id="find-widget-input" placeholder="Find..." class="input" title="Enter to start search">
-			<span slot="end" style="width: 81px";>
+			<span slot="end" style="width: 81px">
 					<!-- search options -->
 				<div class="flexed find-options">
 					<vscode-button appearance="icon" id="find-window-option-match-case" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionMatchCase()" title="Match case">
@@ -242,7 +242,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 										</div>
 
 										<div id="source-file-unwatched-indicator" class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline" style="float: right;margin-right: 5px;"
-											data-tooltip="The csv source file is not monitored for changes. You will not be notified if the source file is changed by vs code or an external program. To manually reload the contents of the source file, use the 'manual refresh button' at the top.">
+											data-tooltip="The csv source file is not monitored for changes. Changes to the source file are ignored if the source file is changed by vs code or an external programme. To manually reload the contents of the source file, use the 'manual refresh button'.">
 											<span>
 												<i class="fas fa-eye"></i>
 											</span>

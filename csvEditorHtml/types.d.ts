@@ -4,8 +4,8 @@
  */
 type InitialVars = {
 	/**
-	 * true: the extension is watching the source file for changes
-	 * false: not (e.g. user disabled the feature in the settings)
+	 * if the source csv file should be watched for changes (only to set the ui)
+	 * the state is determined by {@link EditCsvConfig.shouldWatchCsvSourceFile}
 	 */
 	isWatchingSourceFile: boolean
 	/**
@@ -249,9 +249,14 @@ type EditCsvConfig = {
 	showColumnHeaderNamesWithLettersLikeExcel: boolean //we use the bloaty name because we want to find (via search) this with something like "excel" or "letters"
 
 	/**
-	 * true: the source csv file is watched for changes. If changes happen the user is notified (maybe the table is automatically reloaded when the table has no changes). false: not watched the source csv file
+	 * if the source csv file should be watched for changes
+	 * 
+	 * no: do not watch the source csv file for changes
+	 * yesAndNotify: the source csv file is watched for changes and you will be notified if the source file is changed
+	 * yesAndAutoReload: the source csv file is watched for changes and new data is automatically loaded, overwriting existing changes (no undo!)
+	 * 
 	 */
-	shouldWatchCsvSourceFile: boolean
+	shouldWatchCsvSourceFile: 'no' | 'yesAndNotify' | 'yesAndAutoReload'
 
 	/**
 	 * the appearance of the side panel

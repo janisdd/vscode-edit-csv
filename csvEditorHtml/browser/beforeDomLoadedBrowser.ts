@@ -52,7 +52,7 @@ var initialConfig: EditCsvConfig | undefined = {
 	initiallyFixedColumnsLeft: 0,
 	fontSizeInPx: 16,
 	showColumnHeaderNamesWithLettersLikeExcel: false,
-	shouldWatchCsvSourceFile: true,
+	shouldWatchCsvSourceFile: 'yesAndNotify',
 	sidePanelAppearance: 'expanded',
 	initialNumbersStyle: 'en',
 	insertRowBehavior: 'keepRowKeepColumn',

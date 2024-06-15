@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit csv",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.9.1",
+	"version": "0.9.2",
 	"license": "MIT",
 	"icon": "images/logo.png",
 	"publisher": "janisdd",
@@ -494,9 +494,19 @@
 					"description": "true: show column names with letters e.g. A, B, ..., Z (like Excel), false: use numbers for column names e.g. 1, 2, ..."
 				},
 				"csv-edit.shouldWatchCsvSourceFile": {
-					"type": "boolean",
-					"default": true,
-					"description": "true: the source csv file is watched for changes. If changes happen the user is notified (maybe the table is automatically reloaded when the table has no changes). false: not watched the source csv file"
+					"type": "string",
+					"default": "yesAndNotify",
+					"description": "if the source csv file should be watched for changes",
+					"enum": [
+						"no",
+						"yesAndNotify",
+						"yesAndAutoReload"
+					],
+					"enumDescriptions": [
+						"do not watch the source csv file for changes",
+						"the source csv file is watched for changes and you will be notified if the source file is changed",
+						"the source csv file is watched for changes and new data is automatically loaded, overwriting existing changes (no undo!)"
+					]
 				},
 				"csv-edit.sidePanelAppearance": {
 					"type": "string",
