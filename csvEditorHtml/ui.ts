@@ -789,8 +789,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						// applyColWidths(false)
 					}
 				},
-				'unhide_all_column': {
-					name: 'Unhide all column',
+				'unhide_all_columns': {
+					name: 'Unhide all columns',
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
 						if (!hot) return
 
