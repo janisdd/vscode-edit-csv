@@ -55,7 +55,7 @@ const defaultConfig = {
     darkThemeTextColor: '#d0d0d0',
     lightThemeTextColor: '#657b83',
     convertUrlsToLinkTags: true,
-    autoFill: true,
+    dragToAutoFill: true,
 };
 /**
  * returns the configuration for this extension

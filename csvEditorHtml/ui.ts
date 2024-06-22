@@ -574,7 +574,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			// 	: `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
 		} as any,
 		afterChange: onAnyChange, //only called when cell value changed (e.g. not when col/row removed)
-		fillHandle: initialConfig?.autoFill ? {
+		fillHandle: initialConfig?.dragToAutoFill ? {
 			autoInsertRow: false,
 		} : undefined,
 		undo: true,

@@ -365,7 +365,7 @@ type EditCsvConfig = {
 	/**
 	 * true: adds a drag handle to cells in order to easily drag and copy data, false: no drag handle is shown
 	 */
-	autoFill: boolean
+	dragToAutoFill: boolean
 
 }
 

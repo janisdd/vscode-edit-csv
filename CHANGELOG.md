@@ -6,7 +6,7 @@
 
 - fixed issue #147: add feature to automatically reload data if the source csv file changes
 - fixed issue #152: support drag and paste like excel
-  - enabled `autoFill`/`fillHandle` option
+  - enabled `dragToAutoFill`/`fillHandle` option
   - only supports copying same sequences `1,2,3` will copy `1,2,3` again not `4,5,6`
 
 
