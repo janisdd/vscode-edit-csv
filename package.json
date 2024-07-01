@@ -656,9 +656,18 @@
 					"description": "true: if a cell contains url-like text, the urls are displayed as urls and can be clicked on. false: all urls are rendered as normal text"
 				},
 				"csv-edit.dragToAutoFill": {
-					"type": "boolean",
-					"default": false,
-					"description": "true: adds a drag handle to cells in order to easily drag and copy data, false: no drag handle is shown"
+					"type": "string",
+					"default": "none",
+					"description": "Determines whether a handle is displayed on the cell to automatically fill the content",
+					"enum": [
+						"none",
+						"copyOnly"
+					],
+					"enumDescriptions": [
+						"Disables drag to auto fill",
+						"Adds a drag handle for copying data"
+					]
+					
 				}
 			}
 		}

@@ -363,9 +363,11 @@ type EditCsvConfig = {
 	convertUrlsToLinkTags: boolean
 
 	/**
-	 * true: adds a drag handle to cells in order to easily drag and copy data, false: no drag handle is shown
+	 * Determines whether a handle is displayed on the cell to automatically fill the content
+	 * none: Disables drag to auto fill
+	 * copyOnly: Adds a drag handle for copying data
 	 */
-	dragToAutoFill: boolean
+	dragToAutoFill: "none" | "copyOnly"
 
 }
 
