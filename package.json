@@ -667,7 +667,22 @@
 						"Disables drag to auto fill",
 						"Adds a drag handle for copying data"
 					]
-					
+				},
+				"csv-edit.initiallyHiddenColumnNames": {
+					"type": "array",
+					"description": "Specifies the column names that are to be hidden initially (the first row is used, ignoring comment rows)",
+					"items": {
+						"type": "string",
+						"description": "the name of the column to be hidden initially"
+					}
+				},
+				"csv-edit.initiallyHiddenColumnNumbers": {
+					"type": "array",
+					"description": "Specifies the columns (by number) that are to be hidden initially",
+					"items": {
+						"type": "number",
+						"description": "the number (1-based) of the column to be hidden initiall,"
+					}
 				}
 			}
 		}

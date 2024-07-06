@@ -69,6 +69,8 @@ var initialConfig: EditCsvConfig | undefined = {
 	lightThemeTextColor: '#657b83',
 	convertUrlsToLinkTags: true,
 	dragToAutoFill: "none",
+	initiallyHiddenColumnNames: [],
+	initiallyHiddenColumnNumbers: [],
 }
 
 function __getById(id: string): HTMLElement {

@@ -518,6 +518,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	_normalizeDataArray(csvParseResult, csvReadConfig)
 	columnIsQuoted = csvParseResult.columnIsQuoted
 
+	//if first rows are comments, use the next real data row
+	_resolveInitiallyHiddenColumns(csvParseResult, csvReadConfig)
+
 	//reset header row
 	headerRowWithIndex = null
 
@@ -671,7 +674,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				},
 				'alignment': {},
 				'hide_columns': {
-					name: 'Hide columns',
+					name: 'Hide column(s)',
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
 						if (!hot) return
 						// if (!headerRowWithIndex) return
@@ -679,20 +682,13 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 						let _selection = selection[0]
 
+						let columnIndicesToHide: number[] = []
+
 						for (let targetCol = _selection.start.col; targetCol <= _selection.end.col; targetCol++) {
-
-							const physicalColIndex = hot.toPhysicalColumn(targetCol)
-							hiddenPhysicalColumnIndicesSorted.push(physicalColIndex)
-
-							//after there is no place where the previous manual size is stored, so after showing the col again
-							//it will have auto size (for now)
-							const manualColumnResizePlugin = hot.getPlugin('manualColumnResize')
-							manualColumnResizePlugin.manualColumnWidths[physicalColIndex] = undefined
+							columnIndicesToHide.push(targetCol)
 						}
-						hiddenPhysicalColumnIndicesSorted = hiddenPhysicalColumnIndicesSorted.sort()
-						firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
-
-						hot.render()
+						
+						_hideColumnByIndices(columnIndicesToHide)
 					},
 					disabled: function () {
 						return isReadonlyMode //TODO when all columns are hidden?
@@ -792,26 +788,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				'unhide_all_columns': {
 					name: 'Unhide all columns',
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
-						if (!hot) return
-
-
-						//we need to do more here because e.g. on remove col we update the settings and manually set the column widths
-						//this means that now the manually set widhts are used (which is still 0.000001 for hidden columns)
-						//so, the columns will not be shown again
-						//to fix this we need to get the auto calculated widths of the hidden columns and set them manually
-						//but only for the hidden columns, else we would reset the manually set widths of the visible columns
-
-						//the main problem with the col widths is, that we don't know if they are currently manual or automatic
-						//when removing a column we apply the previous widths, else all widths of all columns right of the removed column changed
-						let manualColumnResizePlugin = hot.getPlugin('manualColumnResize')
-						for (let i = 0; i < hiddenPhysicalColumnIndicesSorted.length; i++) {
-							const visualColIndex = hot.toVisualColumn(hiddenPhysicalColumnIndicesSorted[i])
-							manualColumnResizePlugin.clearManualSize(visualColIndex)
-						}
-
-						hiddenPhysicalColumnIndicesSorted = []
-						firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
-						hot.render()
+						_unhideAllColumns()
 					},
 					disabled: function () {
 						return hiddenPhysicalColumnIndicesSorted.length === 0
@@ -1907,6 +1884,11 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	afterHandsontableCreated(hot!)
 
 	setupScrollListeners()
+
+	//before re selecting, so auto select next possible cell works if hidden col?
+	if (initiallyHiddenColumnIndices.length > 0) {
+		_hideColumnByIndices(initiallyHiddenColumnIndices)
+	}
 
 	if (hot) {
 

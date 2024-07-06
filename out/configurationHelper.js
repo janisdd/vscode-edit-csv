@@ -56,6 +56,8 @@ const defaultConfig = {
     lightThemeTextColor: '#657b83',
     convertUrlsToLinkTags: true,
     dragToAutoFill: "none",
+    initiallyHiddenColumnNames: [],
+    initiallyHiddenColumnNumbers: [],
 };
 /**
  * returns the configuration for this extension

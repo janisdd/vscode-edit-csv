@@ -192,6 +192,132 @@ function _normalizeDataArray(csvParseResult: ExtendedCsvParseResult, csvReadConf
 
 }
 
+function _resolveInitiallyHiddenColumns(csvParseResult: ExtendedCsvParseResult, csvReadConfig: CsvReadOptions) {
+
+
+	let firstRealRow: string[] | null = null
+
+	for (let i = 0; i < csvParseResult.data.length; i++) {
+		const row = csvParseResult.data[i];
+
+		//first real row (not a comment)
+		if (isCommentCell(row[0], csvReadConfig) === false) {
+			firstRealRow = row
+			break
+		}
+	}
+
+	initiallyHiddenColumnIndices = []
+	if (firstRealRow === null || !initialConfig) return
+
+	//names and indices might map to the same column
+	let initiallyHiddenColumnIndicesSet = new Set<number>()
+
+	let _initiallyHiddenColumnNames = initialConfig.initiallyHiddenColumnNames ?? []
+	let _initiallyHiddenColumnNumbers = initialConfig.initiallyHiddenColumnNumbers ?? []
+
+	if (_initiallyHiddenColumnNames.length === 0 && _initiallyHiddenColumnNumbers.length === 0) return
+
+	//we could have the same name multiple times in the array
+	let colNameToIndicesMap = new Map<string, number[]>()
+
+	for (let i = 0; i < firstRealRow.length; i++) {
+		const cell = firstRealRow[i]
+
+		let indicesList = colNameToIndicesMap.get(cell)
+
+		if (indicesList === undefined) {
+			indicesList = []
+			colNameToIndicesMap.set(cell, indicesList)
+		}
+
+		indicesList.push(i)
+	}
+
+	for (let i = 0; i < _initiallyHiddenColumnNames.length; i++) {
+		const colName = _initiallyHiddenColumnNames[i]
+
+		if (!colNameToIndicesMap.has(colName)) continue
+
+		let indicesToHide = colNameToIndicesMap.get(colName)
+		if (indicesToHide) {
+			indicesToHide.forEach(index => initiallyHiddenColumnIndicesSet.add(index))
+		}
+	}
+
+	for (let i = 0; i < _initiallyHiddenColumnNumbers.length; i++) {
+		let maybeColNumber = _initiallyHiddenColumnNumbers[i] as number | string //vs code does not enforce numbers, only shows an error
+
+		if (typeof maybeColNumber === 'string') {
+
+			let check = parseInt(maybeColNumber)
+
+			if (isNaN(check)) continue
+
+			maybeColNumber = check
+		}
+
+		let colIndex = maybeColNumber - 1 //1 based
+
+		if (colIndex >= 0) {
+			initiallyHiddenColumnIndicesSet.add(colIndex)
+		}
+	}
+
+	initiallyHiddenColumnIndices = Array.from(initiallyHiddenColumnIndicesSet)
+
+	if (initiallyHiddenColumnIndices.length === firstRealRow.length) {
+		//we can't hide all columns
+		console.warn(`initially hidden columns: all columns are hidden, this is not allowed`)
+		initiallyHiddenColumnIndices = []
+	}
+
+	// console.log(`initiallyHiddenColumnIndices: ${initiallyHiddenColumnIndices}`)
+}
+
+function _hideColumnByIndices(columnIndices: number[]) {
+	if (!hot) return
+
+	for (let i = 0; i < columnIndices.length; i++) {
+		const targetColIndex = columnIndices[i]
+		
+		const physicalColIndex = hot.toPhysicalColumn(targetColIndex)
+		hiddenPhysicalColumnIndicesSorted.push(physicalColIndex)
+
+		//after there is no place where the previous manual size is stored, so after showing the col again
+		//it will have auto size (for now)
+		const manualColumnResizePlugin = hot.getPlugin('manualColumnResize')
+		manualColumnResizePlugin.manualColumnWidths[physicalColIndex] = undefined
+	}
+
+	hiddenPhysicalColumnIndicesSorted = hiddenPhysicalColumnIndicesSorted.sort()
+	firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
+
+	hot.render()
+}
+
+function _unhideAllColumns() {
+	if (!hot) return
+
+	//we need to do more here because e.g. on remove col we update the settings and manually set the column widths
+	//this means that now the manually set widhts are used (which is still 0.000001 for hidden columns)
+	//so, the columns will not be shown again
+	//to fix this we need to get the auto calculated widths of the hidden columns and set them manually
+	//but only for the hidden columns, else we would reset the manually set widths of the visible columns
+
+	//the main problem with the col widths is, that we don't know if they are currently manual or automatic
+	//when removing a column we apply the previous widths, else all widths of all columns right of the removed column changed
+	let manualColumnResizePlugin = hot.getPlugin('manualColumnResize')
+	for (let i = 0; i < hiddenPhysicalColumnIndicesSorted.length; i++) {
+		const visualColIndex = hot.toVisualColumn(hiddenPhysicalColumnIndicesSorted[i])
+		manualColumnResizePlugin.clearManualSize(visualColIndex)
+	}
+
+	hiddenPhysicalColumnIndicesSorted = []
+	firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
+	hot.render()
+}
+
 // /**
 //  * if we find a comment row merge the cells into one row (else we would need to display additional columns for them)
 //  * also for export multiple cells in a comment row is bad because we might need to escape the cells because of spaces... e.g. #"  test  ", aaa

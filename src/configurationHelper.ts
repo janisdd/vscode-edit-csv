@@ -56,6 +56,8 @@ const defaultConfig: EditCsvConfig = {
 	lightThemeTextColor: '#657b83',
 	convertUrlsToLinkTags: true,
 	dragToAutoFill: "none",
+	initiallyHiddenColumnNames: [],
+	initiallyHiddenColumnNumbers: [],
 }
 
 /**

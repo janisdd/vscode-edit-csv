@@ -189,6 +189,12 @@ let isFirstHasHeaderChangedEvent = true
 let initialColumnWidth: number = 0
 
 /**
+ * we use {@link EditCsvConfig.initiallyHiddenColumns} to set this
+ * names must first be resolved to indices
+ */
+let initiallyHiddenColumnIndices: number[] = []
+
+/**
  * this is only needed if we want to display header rows but we have only 1 row...
  * handsontable always needs at least one row so we cannot remove the first row and use it as header
  * so we store here that we want to set the first row as header row immediately after we have at least 2 rows

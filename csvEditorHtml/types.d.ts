@@ -369,6 +369,19 @@ type EditCsvConfig = {
 	 */
 	dragToAutoFill: "none" | "copyOnly"
 
+	/**
+	 * Specifies the column names that are to be hidden initially (the first row is used, ignoring comment rows)
+	 */
+	initiallyHiddenColumnNames: string[]
+
+	/**
+	 * Specifies the number of column names that are to be hidden initially
+	 * vs code does not conver the number strings to real numbers....
+	 * 
+	 * we use numbers not indices because the columns show numbers not indices
+	 */
+	initiallyHiddenColumnNumbers: string[]
+
 }
 
 /* --- frontend settings --- */
