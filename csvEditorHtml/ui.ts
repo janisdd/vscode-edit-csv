@@ -1892,6 +1892,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 	if (hot) {
 
+		let autoFillPlugin = hot.getPlugin('autofill')
+		autoFillPlugin.setFillFunction(customAutoFillFunc)
+
 		if (previousSelectedCell === null || previousViewportOffsets === null) {
 			//the whole set select cell takes for 100k rows ~1.5s
 			// console.time('setSelectedCell')

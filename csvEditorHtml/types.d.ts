@@ -673,6 +673,10 @@ type ExtendedCsvParseResult = {
 type NumbersStyle = {
 	key: 'en' | 'non-en'
 	regex: RegExp
+	/**
+	 * same as regex but must match whole string
+	 */
+	regexStartToEnd: RegExp
 	thousandSeparator: RegExp
 	/**
 	 * the idea is to replace the thousand separators with the empty string (we normally also allow a single whitespace as separator)... else:

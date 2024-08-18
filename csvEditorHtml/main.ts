@@ -1,4 +1,9 @@
 /// <reference path="findWidget.ts" />
+// import type { linear} from "regression";
+
+type RegressionLib = {
+	linear: typeof linear
+}
 
 
 const defaultInitialVars: InitialVars = {
@@ -13,6 +18,7 @@ const defaultInitialVars: InitialVars = {
 declare var acquireVsCodeApi: any
 declare var initialContent: string
 declare var initialConfig: EditCsvConfig | undefined
+declare var regression: RegressionLib
 
 declare var initialVars: InitialVars
 

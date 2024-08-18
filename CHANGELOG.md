@@ -4,6 +4,9 @@
 
 # 0.9.2
 
+- added feature #157 - hide columns initially, added options
+  - `initiallyHiddenColumnNumbers` to hide columns based on its number
+  - `initiallyHiddenColumnNames` to hide columns based on its name (first non-comment row)
 - fixed issue #147: add feature to automatically reload data if the source csv file changes
 - fixed issue #152: support drag and paste like excel
   - enabled `dragToAutoFill`/`fillHandle` option
