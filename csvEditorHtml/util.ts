@@ -2007,12 +2007,25 @@ function getFirstAndLastVisibleRows(): { first: number, last: number } {
 }
 
 
-// const onlyIntRegex = /^\d+$/
-// const onlyFloatRegex = /^\d+.\d+$/
+
+
+
+
+// ------------------------------ auto fill stuff ------------------------------
+
+
+
+
 
 const intRegex = /\d+/g
 const floatRegexEn = /\d+\.\d+/g
 const floatRegexNonEn = /\d+\,\d+/g
+
+// currently only english months are supported
+const monthRegex = /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)$/gi
+const monthRegexFull = /^(january|february|march|april|may|june|july|august|september|october|november|december)$/gi
+const monthFullNames = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
+const monthShortNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
 
 
 /**
@@ -2051,13 +2064,32 @@ type GroupInterpolationInfo_ContainsNumber = {
 }
 
 /**
+ * real interpolation because only number
+ */
+type GroupInterpolationInfo_MonthName = {
+	type: 'month'
+
+	/**
+	 * the original month string
+	 */
+	monthString: string
+	monthIndex: number
+	isFullName: boolean
+	isUpperCase: boolean
+}
+
+/**
  * will be copied only
  */
 type GroupInterpolationInfo_Unknown = {
 	type: 'unknown'
 }
 
-type GroupInterpolationInfo = GroupInterpolationInfo_Number | GroupInterpolationInfo_ContainsNumber | GroupInterpolationInfo_Unknown
+type GroupInterpolationInfo =
+	| GroupInterpolationInfo_Number
+	| GroupInterpolationInfo_ContainsNumber
+	| GroupInterpolationInfo_MonthName
+	| GroupInterpolationInfo_Unknown
 
 /**
  * 
@@ -2083,7 +2115,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 	// if we have mixed data (not just plain numbers, then it's text)
 	// if it's text
 	//    if it's a date -> interpolate dates
-	//    if it's a month (or starting characters of a month) -> interpolate months and use the same length of characters
+	//    if it's a month (or starting characters of a month) -> interpolate months and use the same length of characters (we only interpolate 3 or all letters for performance!)
 	// if it's text that also contains numbers -> it's a group
 	//   groups are interpolated differently e.g. we select 3 cells then ever (x+3) cells are used for interpolation -> we have 3 groups
 	//     e.g. 1 a, 2 b, 3 c -> 2 a, 3 b, 4 c -> 3 a, 4 b, 5 c 
@@ -2099,11 +2131,32 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 	// EXCEPTION if we have multiple only ints is sequence -> interpolate normal for the sequence
 	//  1 2 a 5 6 -> interpolate (1, 2) as sequence, copy a, interpolate (5, 6) as sequence
 
+	//the following date formats are supported:
+	// supported separators: . / - (examples use only -)
+	// 2024-01-01 (YYYY-MM-DD)
+	// 2024-1-01 (YYYY-M-DD)
+	// 2024-01-1 (YYYY-MM-D)
+	// 2024-1-1 (YYYY-M-D)
+
+	// 01-01-2024 (DD-MM-YYYY)
+	// 01-1-2024 (DD-M-YYYY)
+	// 1-01-2024 (D-MM-YYYY)
+	// 1-1-2024 (D-M-YYYY)
+
+	//the following months are supported:
+	// at least 3 letters of the months are needed
+	// currently only enlish months are supported
+	// the different in month indices must be the same in the selected data, else we copy
+	// jan, mar, may (diff 2)
+	// jan, mar apr (different diff) -> copy
+	// the other props (uppercase, ...) are individual for every entry
+
+
+
 	//style from stats ui
 	let numbersStyleToUse = getNumbersStyleFromUi()
 
 	//TODO months, dates
-	//TODO copy to top direction
 
 	let groupInterpolationInfos: GroupInterpolationInfo[] = []
 
@@ -2124,6 +2177,9 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 			let startsWithNumber = matches.length > 0 && matches[0].index === 0
 			let endsWithNumber = matches.length > 0 && matches[matches.length - 1].index + matches[matches.length - 1].length === cellText.length
 			let onlyNumber = startsWithNumber && endsWithNumber && matches.length === 1
+
+			const monthNames = Array.from(cellText.matchAll(monthRegex))
+			const monthNamesFull = Array.from(cellText.matchAll(monthRegexFull))
 
 			if (onlyNumber) {
 
@@ -2157,6 +2213,48 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 				}
 
 				groupInterpolationInfos.push(groupInterpolationInfo_Int)
+
+			} else if (monthNames.length === 1 || monthNamesFull.length === 1) {
+
+				//can be a month or just a part of another word that is not a month!
+				// for performance we only interpolate 3 or all letters of months
+				// (else we would need to check whole words, search for whitespaces, ...)
+
+				let info: GroupInterpolationInfo
+				let monthIndex = -1
+				let isFullName: boolean
+				let isUpperCase: boolean = cellText[0] !== cellText[0].toLowerCase()
+
+				if (monthNamesFull.length === 1) {
+					//full match
+					monthIndex = monthFullNames.indexOf(cellText.toLowerCase())
+					isFullName = true
+				}
+				else {
+					//only 3 letters
+					monthIndex = monthShortNames.indexOf(cellText.toLowerCase())
+					isFullName = false
+				}
+
+				if (monthIndex !== -1) {
+					info = {
+						type: 'month',
+						monthString: cellText,
+						monthIndex,
+						isFullName,
+						isUpperCase,
+					} satisfies GroupInterpolationInfo_MonthName
+				}
+				else {
+					console.warn(`Could not find month index for interpolation, defaulting to copying`)
+
+					info = {
+						type: 'unknown'
+					} satisfies GroupInterpolationInfo_Unknown
+				}
+
+				groupInterpolationInfos.push(info)
+
 			} else {
 				//normal data
 
@@ -2178,99 +2276,188 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 	let currentSequence: string[] = []
 	let dataIndexToInterpolationSequenceIndex: number[] = []
 
-	for (let _i = 0; _i < groupInterpolationInfos.length; _i++) {
-		const el = groupInterpolationInfos[_i]
-
-		if (el.type === `int`) {
-			currentSequence.push(_data[_i])
-			dataIndexToInterpolationSequenceIndex[_i] = interpolationSequenceStrings.length
-
-		} else if (el.type === `containsInt`) {
-			//we only interpolate +1/-1 here
-
-			if (currentSequence.length > 0) {
-				interpolationSequenceStrings.push(currentSequence)
-				currentSequence = []
-			}
-
-			dataIndexToInterpolationSequenceIndex[_i] = interpolationSequenceStrings.length
-
-			//every contains int cell has it's own interpolation sequence
-			currentSequence.push(el.numberString)
-			interpolationSequenceStrings.push(currentSequence)
-			currentSequence = []
-
-		} else {
-			// not int
-
-			dataIndexToInterpolationSequenceIndex[_i] = -1
-
-			if (currentSequence.length > 0) {
-				interpolationSequenceStrings.push(currentSequence)
-				currentSequence = []
-			}
-		}
-	}
-
-	if (currentSequence.length > 0) {
-		interpolationSequenceStrings.push(currentSequence)
-	}
-
 	const interpolationSequenceModels = []
 	const interpolationLastXVal: Array<number> = []
 
-	// create the interpolation models for number groups
-	for (let i = 0; i < interpolationSequenceStrings.length; i++) {
-		const sequenceStrings = interpolationSequenceStrings[i]
+	{
+		for (let _i = 0; _i < groupInterpolationInfos.length; _i++) {
+			const el = groupInterpolationInfos[_i]
 
-		let ints = sequenceStrings.map((p, index) => {
+			if (el.type === `int`) {
+				currentSequence.push(_data[_i])
+				dataIndexToInterpolationSequenceIndex[_i] = interpolationSequenceStrings.length
 
-			let canonicalNumberString = getFirstCanonicalNumberStringInCell(p, numbersStyleToUse)
-			if (canonicalNumberString === null) {
-				console.warn(`Could not get canonical number string for interpolation at selection index: ${index}, defaulting to 0`)
-				return 0
-			}
+			} else if (el.type === `containsInt`) {
+				//we only interpolate +1/-1 here
 
-			//TODO big int
-			// let _num = Big(firstCanonicalNumberStringInCell)
-			return parseInt(p)
-		})
+				if (currentSequence.length > 0) {
+					interpolationSequenceStrings.push(currentSequence)
+					currentSequence = []
+				}
 
-		// special case, we want to increase +1
-		let isSimpleIncrement = false
-		if (ints.length === 1) {
+				dataIndexToInterpolationSequenceIndex[_i] = interpolationSequenceStrings.length
 
-			if (isNormalDirection) {
-				ints.push(ints[0] + 1)
+				//every contains int cell has it's own interpolation sequence
+				currentSequence.push(el.numberString)
+				interpolationSequenceStrings.push(currentSequence)
+				currentSequence = []
+
 			} else {
-				//add to front because we will reverse!
-				// ints.unshift(ints[0] - 1)
-				ints.push(ints[0] - 1)
+				// not int
+
+				dataIndexToInterpolationSequenceIndex[_i] = -1
+
+				if (currentSequence.length > 0) {
+					interpolationSequenceStrings.push(currentSequence)
+					currentSequence = []
+				}
+			}
+		}
+
+		if (currentSequence.length > 0) {
+			interpolationSequenceStrings.push(currentSequence)
+		}
+
+		// create the interpolation models for number groups
+		for (let i = 0; i < interpolationSequenceStrings.length; i++) {
+			const sequenceStrings = interpolationSequenceStrings[i]
+
+			let ints = sequenceStrings.map((p, index) => {
+
+				let canonicalNumberString = getFirstCanonicalNumberStringInCell(p, numbersStyleToUse)
+				if (canonicalNumberString === null) {
+					console.warn(`Could not get canonical number string for interpolation at selection index: ${index}, defaulting to 0`)
+					return 0
+				}
+
+				//TODO big int
+				// let _num = Big(firstCanonicalNumberStringInCell)
+				return parseInt(p)
+			})
+
+			// special case, we want to increase +1
+			let isSimpleIncrement = false
+			if (ints.length === 1) {
+
+				if (isNormalDirection) {
+					ints.push(ints[0] + 1)
+				} else {
+					//add to front because we will reverse!
+					// ints.unshift(ints[0] - 1)
+					ints.push(ints[0] - 1)
+				}
+
+				isSimpleIncrement = true
 			}
 
-			isSimpleIncrement = true
+			let dataPoints = ints.map((val, index) => [index + 1, val])
+			let model = regression.linear(dataPoints)
+			interpolationSequenceModels.push(model)
+
+			if (isSimpleIncrement) {
+				//we added a "fake" el to get linear interpolation (a line)
+				interpolationLastXVal.push(dataPoints[dataPoints.length - 2][0])
+			} else {
+				interpolationLastXVal.push(dataPoints[dataPoints.length - 1][0])
+			}
 		}
 
-		// if (!isNormalDirection) {
-		// 	ints = ints.reverse()
-		// }
-
-		let dataPoints = ints.map((val, index) => [index + 1, val])
-		let model = regression.linear(dataPoints)
-		interpolationSequenceModels.push(model)
-
-		if (isSimpleIncrement) {
-			//we added a "fake" el to get linear interpolation (a line)
-			interpolationLastXVal.push(dataPoints[dataPoints.length - 2][0])
-		} else {
-			interpolationLastXVal.push(dataPoints[dataPoints.length - 1][0])
-		}
 	}
 
 	let interpolationIndices = Array.from({ length: interpolationSequenceStrings.length }, (_, i) => {
 		return interpolationLastXVal[i]
 	})
-	//grouped data
+
+	//same for month indices
+	const interpolationMonthIndices: Array<number[]> = [] //better use month indices instead of strings
+	let currentSequenceMonthIndices: number[] = []
+	let curentSequenceMonthGroupIndices: number[] = []
+
+	let dataIndexToInterpolationSequenceIndexMonths: number[] = []
+	let interpolationIndexToDataGroupIndex: Array<number[]> = [] //entries are curentSequenceMonthGroupIndices
+
+	//just a plain number to add
+	const interpolationSequenceModelsMonths: number[] = []
+	const monthInterpolationIndices: number[] = [] //we start with these indices for interpolation
+
+	{
+		for (let _i = 0; _i < groupInterpolationInfos.length; _i++) {
+			const el = groupInterpolationInfos[_i]
+
+			if (el.type === `month`) {
+				currentSequenceMonthIndices.push(el.monthIndex)
+				curentSequenceMonthGroupIndices.push(_i)
+
+				dataIndexToInterpolationSequenceIndexMonths[_i] = interpolationMonthIndices.length
+
+			} else {
+				// not int
+
+				dataIndexToInterpolationSequenceIndexMonths[_i] = -1
+
+
+				if (currentSequenceMonthIndices.length > 0) {
+					interpolationMonthIndices.push(currentSequenceMonthIndices)
+					currentSequenceMonthIndices = []
+
+					interpolationIndexToDataGroupIndex.push(curentSequenceMonthGroupIndices)
+					curentSequenceMonthGroupIndices = []
+				}
+			}
+		}
+
+		if (currentSequenceMonthIndices.length > 0) {
+			interpolationMonthIndices.push(currentSequenceMonthIndices)
+
+			interpolationIndexToDataGroupIndex.push(curentSequenceMonthGroupIndices)
+		}
+
+		for (let i = 0; i < interpolationMonthIndices.length; i++) {
+			const monthIndexSequence = interpolationMonthIndices[i]
+
+			let delta: number
+
+			//make sure all deltas are the same
+			if (monthIndexSequence.length === 1) {
+				// will be +1
+				delta = 1
+			} else {
+				delta = monthIndexSequence[1] - monthIndexSequence[0]
+			}
+
+			let allDeltasAreTheSame = true
+
+			for (let j = 1; j < monthIndexSequence.length; j++) {
+				if (monthIndexSequence[j] - monthIndexSequence[j - 1] !== delta) {
+					allDeltasAreTheSame = false
+					break
+				}
+			}
+
+			if (!allDeltasAreTheSame) {
+
+				const groupIndicesThatContributedToThisGroup = interpolationIndexToDataGroupIndex[i]
+
+				for (let k = 0; k < groupIndicesThatContributedToThisGroup.length; k++) {
+					const groupIndex = groupIndicesThatContributedToThisGroup[k]
+
+					//default to just copy
+					groupInterpolationInfos[groupIndex] = {
+						type: 'unknown',
+					} satisfies GroupInterpolationInfo_Unknown
+
+				}
+
+				continue
+			}
+
+			interpolationSequenceModelsMonths.push(delta % 12)
+			monthInterpolationIndices.push(monthIndexSequence[monthIndexSequence.length - 1])
+		}
+
+	}
+
+	// create output
 	for (let i = 0; i < targetCount; i++) {
 
 		//data.length === groupInterpolationInfos.length
@@ -2304,6 +2491,37 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 				break
 			}
 
+			case "month": {
+
+				let sequenceIndex = dataIndexToInterpolationSequenceIndexMonths[relativI]
+				let delta = interpolationSequenceModelsMonths[sequenceIndex]
+				
+				let currMonthIndex = monthInterpolationIndices[sequenceIndex]
+
+				let isFullName = groupInterpolationInfo.isFullName
+				let isUpperCase = groupInterpolationInfo.isUpperCase
+
+				let newMonthIndex = currMonthIndex + delta
+
+				if (newMonthIndex < 0) {
+					newMonthIndex = 12 + newMonthIndex
+				}
+	
+
+				let nextMonthIndex = newMonthIndex % 12
+				let nextMonth = isFullName ? monthFullNames[nextMonthIndex] : monthShortNames[nextMonthIndex]
+
+				if (isUpperCase) {
+					//make first letter uppercase
+					nextMonth = nextMonth[0].toUpperCase() + nextMonth.substring(1)
+				}
+
+				monthInterpolationIndices[sequenceIndex] = nextMonthIndex
+
+				interpolatedDataAsString.push(nextMonth)
+				break
+			}
+
 			case "unknown": {
 				//just copy
 				interpolatedDataAsString.push(_data[relativI])
@@ -2318,6 +2536,12 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 
 	if (!isNormalDirection) {
 		interpolatedDataAsString.reverse()
+	}
+
+	//just a smal sanity check
+	if (interpolatedDataAsString.some(p => typeof p !== 'string')) {
+		//something went wrong -> default
+		return []
 	}
 
 	console.log(`customAutoFillFunc`, interpolatedDataAsString, targetCount)
