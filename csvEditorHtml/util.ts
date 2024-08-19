@@ -2016,10 +2016,21 @@ const floatRegexNonEn = /\d+\,\d+/g
 
 
 /**
+ * real interpolation because only number
+ */
+type GroupInterpolationInfo_Number = {
+	type: 'int'
+	/**
+	 * TODO use lib number for large numbers
+	 */
+	numberToUse: number
+}
+
+/**
  * no real interpolation but only +1 for every copy
  */
-type GroupInterpolationInfo_Int = {
-	type: 'int'
+type GroupInterpolationInfo_ContainsNumber = {
+	type: 'containsInt'
 	/**
 	 * 0-based index of the number to interpolate (used for substring)
 	 */
@@ -2033,6 +2044,10 @@ type GroupInterpolationInfo_Int = {
 	 * TODO use lib number for large numbers
 	 */
 	numberToUse: number
+	/**
+	 * the original number string
+	 */
+	numberString: string
 }
 
 /**
@@ -2042,7 +2057,7 @@ type GroupInterpolationInfo_Unknown = {
 	type: 'unknown'
 }
 
-type GroupInterpolationInfo = GroupInterpolationInfo_Int | GroupInterpolationInfo_Unknown
+type GroupInterpolationInfo = GroupInterpolationInfo_Number | GroupInterpolationInfo_ContainsNumber | GroupInterpolationInfo_Unknown
 
 /**
  * 
@@ -2057,6 +2072,11 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 	//TODO targetCount
 	//TODO somehow wrong offset... maybe just copy to third party?? and marke fork?
 	console.log(`isNormalDirection`, isNormalDirection)
+
+
+	if (!isNormalDirection) {
+		_data = [..._data].reverse()
+	}
 
 	//here are some obersevations from excel auto fill:
 	// if all data are numbers (ints/floats) -> interpolate normal
@@ -2085,22 +2105,10 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 	//TODO months, dates
 	//TODO copy to top direction
 
-	let allNumbers = true
 	let groupInterpolationInfos: GroupInterpolationInfo[] = []
 
 	for (let i = 0; i < _data.length; i++) {
 		const cellText = _data[i]
-
-		//check if int
-
-		if (numbersStyleToUse.regexStartToEnd.test(cellText)) {
-			//int/float
-			//TODO support large numbers !!! (we have a lib for this)
-			//int ~ float, so this is ok for float interpolation(?)
-		}
-		else {
-			allNumbers = false
-		}
 
 		//other
 		//however, if we have mixed data, it's automatically grouped data, so do this anyway
@@ -2114,26 +2122,38 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 
 			const matches = Array.from(cellText.matchAll(intRegex))
 			let startsWithNumber = matches.length > 0 && matches[0].index === 0
-			let endsWithNumber = matches.length > 0 && matches[matches.length - 1].index + matches[matches.length - 1].length === cellText.length - 1
+			let endsWithNumber = matches.length > 0 && matches[matches.length - 1].index + matches[matches.length - 1].length === cellText.length
+			let onlyNumber = startsWithNumber && endsWithNumber && matches.length === 1
 
-			if (startsWithNumber) {
+			if (onlyNumber) {
 
-				let groupInterpolationInfo_Int: GroupInterpolationInfo_Int = {
+				let groupInterpolationInfo_Int: GroupInterpolationInfo_Number = {
 					type: 'int',
-					startIndexNumber: matches[0].index,
-					endIndexNumber: matches[matches.length - 1].index + matches[matches.length - 1].length,
 					numberToUse: parseInt(matches[0][0]) //TODO support large numbers !!! (we have a lib for this)
+				}
+
+				groupInterpolationInfos.push(groupInterpolationInfo_Int)
+
+			} else if (startsWithNumber) {
+
+				let groupInterpolationInfo_Int: GroupInterpolationInfo_ContainsNumber = {
+					type: 'containsInt',
+					startIndexNumber: matches[0].index,
+					endIndexNumber: matches[0].index + matches[0].length,
+					numberToUse: parseInt(matches[0][0]), //TODO support large numbers !!! (we have a lib for this)
+					numberString: matches[0][0]
 				}
 
 				groupInterpolationInfos.push(groupInterpolationInfo_Int)
 
 			} else if (endsWithNumber) {
 
-				let groupInterpolationInfo_Int: GroupInterpolationInfo_Int = {
-					type: 'int',
+				let groupInterpolationInfo_Int: GroupInterpolationInfo_ContainsNumber = {
+					type: 'containsInt',
 					startIndexNumber: matches[matches.length - 1].index,
 					endIndexNumber: matches[matches.length - 1].index + matches[matches.length - 1].length,
-					numberToUse: parseInt(matches[matches.length - 1][0]) //TODO support large numbers !!! (we have a lib for this)
+					numberToUse: parseInt(matches[matches.length - 1][0]), //TODO support large numbers !!! (we have a lib for this)
+					numberString: matches[matches.length - 1][0]
 				}
 
 				groupInterpolationInfos.push(groupInterpolationInfo_Int)
@@ -2152,14 +2172,62 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 
 	let interpolatedDataAsString: string[] = []
 
-	if (allNumbers) {
-		//special case -> ints
+	//if we have numbers in consecutive cells -> they form a sequence for interpolation
+	//we can have multiple sequences in the same column
+	const interpolationSequenceStrings: Array<string[]> = []
+	let currentSequence: string[] = []
+	let dataIndexToInterpolationSequenceIndex: number[] = []
 
-		let ints = _data.map((p, index) => {
+	for (let _i = 0; _i < groupInterpolationInfos.length; _i++) {
+		const el = groupInterpolationInfos[_i]
+
+		if (el.type === `int`) {
+			currentSequence.push(_data[_i])
+			dataIndexToInterpolationSequenceIndex[_i] = interpolationSequenceStrings.length
+
+		} else if (el.type === `containsInt`) {
+			//we only interpolate +1/-1 here
+
+			if (currentSequence.length > 0) {
+				interpolationSequenceStrings.push(currentSequence)
+				currentSequence = []
+			}
+
+			dataIndexToInterpolationSequenceIndex[_i] = interpolationSequenceStrings.length
+
+			//every contains int cell has it's own interpolation sequence
+			currentSequence.push(el.numberString)
+			interpolationSequenceStrings.push(currentSequence)
+			currentSequence = []
+
+		} else {
+			// not int
+
+			dataIndexToInterpolationSequenceIndex[_i] = -1
+
+			if (currentSequence.length > 0) {
+				interpolationSequenceStrings.push(currentSequence)
+				currentSequence = []
+			}
+		}
+	}
+
+	if (currentSequence.length > 0) {
+		interpolationSequenceStrings.push(currentSequence)
+	}
+
+	const interpolationSequenceModels = []
+	const interpolationLastXVal: Array<number> = []
+
+	// create the interpolation models for number groups
+	for (let i = 0; i < interpolationSequenceStrings.length; i++) {
+		const sequenceStrings = interpolationSequenceStrings[i]
+
+		let ints = sequenceStrings.map((p, index) => {
 
 			let canonicalNumberString = getFirstCanonicalNumberStringInCell(p, numbersStyleToUse)
 			if (canonicalNumberString === null) {
-				postVsWarning(`Could not get canonical number string for interpolation at selection index: ${index}, defaulting to 0`)
+				console.warn(`Could not get canonical number string for interpolation at selection index: ${index}, defaulting to 0`)
 				return 0
 			}
 
@@ -2168,109 +2236,88 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 			return parseInt(p)
 		})
 
-		if (!isNormalDirection) {
-			ints = ints.reverse()
-		}
+		// special case, we want to increase +1
+		let isSimpleIncrement = false
+		if (ints.length === 1) {
 
-		let dataPoints = _data.map((p, index) => [index + 1, ints[index]])
-		let model = regression.linear(dataPoints)
-		let lastXVal = dataPoints[dataPoints.length - 1][0]
-		let predictedVals = Array.from({ length: targetCount }, (_, i) => model.predict(lastXVal + i + 1))
-		interpolatedDataAsString = predictedVals.map(p => p[1].toString())
-
-		//special for numbers
-		if (!isNormalDirection) {
-			interpolatedDataAsString = interpolatedDataAsString.reverse()
-		}
-	} else {
-
-		//if we have numbers in consecutive cells -> they form a sequence for interpolation
-		//we can have multiple sequences in the same column
-		const interpolationSequenceStrings: Array<string[]> = []
-		let currentSequence: string[] = []
-		let dataIndexToInterpolationSequenceIndex: number[] = []
-
-		for (let _i = 0; _i < groupInterpolationInfos.length; _i++) {
-			const el = groupInterpolationInfos[_i]
-
-			if (el.type === `int`) {
-				currentSequence.push(_data[_i])
-				dataIndexToInterpolationSequenceIndex[_i] = interpolationSequenceStrings.length
+			if (isNormalDirection) {
+				ints.push(ints[0] + 1)
 			} else {
-				// not int
-				if (currentSequence.length > 0) {
-					interpolationSequenceStrings.push(currentSequence)
-					currentSequence = []
-				}
-			}
-		}
-
-		if (currentSequence.length > 0) {
-			interpolationSequenceStrings.push(currentSequence)
-		}
-
-		const interpolationSequenceModels = []
-		const interpolationLastXVal: Array<number> = []
-
-		for (let i = 0; i < interpolationSequenceStrings.length; i++) {
-			const sequenceStrings = interpolationSequenceStrings[i]
-
-			let ints = sequenceStrings.map((p, index) => {
-
-				let canonicalNumberString = getFirstCanonicalNumberStringInCell(p, numbersStyleToUse)
-				if (canonicalNumberString === null) {
-					console.warn(`Could not get canonical number string for interpolation at selection index: ${index}, defaulting to 0`)
-					return 0
-				}
-
-				//TODO big int
-				// let _num = Big(firstCanonicalNumberStringInCell)
-				return parseInt(p)
-			})
-
-			if (!isNormalDirection) {
-				ints = ints.reverse()
+				//add to front because we will reverse!
+				// ints.unshift(ints[0] - 1)
+				ints.push(ints[0] - 1)
 			}
 
-			let dataPoints = sequenceStrings.map((p, index) => [index + 1, ints[index]])
-			let model = regression.linear(dataPoints)
-			interpolationSequenceModels.push(model)
+			isSimpleIncrement = true
+		}
+
+		// if (!isNormalDirection) {
+		// 	ints = ints.reverse()
+		// }
+
+		let dataPoints = ints.map((val, index) => [index + 1, val])
+		let model = regression.linear(dataPoints)
+		interpolationSequenceModels.push(model)
+
+		if (isSimpleIncrement) {
+			//we added a "fake" el to get linear interpolation (a line)
+			interpolationLastXVal.push(dataPoints[dataPoints.length - 2][0])
+		} else {
 			interpolationLastXVal.push(dataPoints[dataPoints.length - 1][0])
 		}
+	}
 
-		let interpolationIndices = Array.from({ length: interpolationSequenceStrings.length }, (_, i) => {
-			return interpolationLastXVal[i]
-		})
-		//grouped data
-		for (let i = 0; i < targetCount; i++) {
+	let interpolationIndices = Array.from({ length: interpolationSequenceStrings.length }, (_, i) => {
+		return interpolationLastXVal[i]
+	})
+	//grouped data
+	for (let i = 0; i < targetCount; i++) {
 
-			//data.length === groupInterpolationInfos.length
-			let relativI = i % _data.length
+		//data.length === groupInterpolationInfos.length
+		let relativI = i % _data.length
 
-			let groupInterpolationInfo = groupInterpolationInfos[relativI]
+		let groupInterpolationInfo = groupInterpolationInfos[relativI]
 
-			switch (groupInterpolationInfo.type) {
-				case "int": {
-					let sequenceIndex = dataIndexToInterpolationSequenceIndex[relativI]
-					let model = interpolationSequenceModels[sequenceIndex]
-					let nextXVal = ++interpolationIndices[sequenceIndex]
-					let predictedVal = model.predict(nextXVal)
-					interpolatedDataAsString.push(predictedVal[1].toString())
-					break
-				}
-
-				case "unknown": {
-					//just copy
-					interpolatedDataAsString.push(_data[relativI])
-					break
-				}
-
-				default:
-					notExhaustiveSwitch(groupInterpolationInfo)
+		switch (groupInterpolationInfo.type) {
+			case "int": {
+				let sequenceIndex = dataIndexToInterpolationSequenceIndex[relativI]
+				let model = interpolationSequenceModels[sequenceIndex]
+				//always +1 regardless of the direction (because we reverse the data points for the model)
+				let nextXVal = ++interpolationIndices[sequenceIndex]
+				let predictedVal = model.predict(nextXVal)
+				interpolatedDataAsString.push(predictedVal[1].toString())
+				break
 			}
 
+			case "containsInt": {
+
+				let sequenceIndex = dataIndexToInterpolationSequenceIndex[relativI]
+				let model = interpolationSequenceModels[sequenceIndex]
+				//always +1 regardless of the direction (because we reverse the data points for the model)
+				let nextXVal = ++interpolationIndices[sequenceIndex]
+				let predictedVal = model.predict(nextXVal)
+
+				// the cell contained more than just the number -> recreate the cell with the number replaced
+				let cellText = _data[relativI]
+				let newCellText = cellText.substring(0, groupInterpolationInfo.startIndexNumber) + predictedVal[1].toString() + cellText.substring(groupInterpolationInfo.endIndexNumber)
+				interpolatedDataAsString.push(newCellText)
+				break
+			}
+
+			case "unknown": {
+				//just copy
+				interpolatedDataAsString.push(_data[relativI])
+				break
+			}
+
+			default:
+				notExhaustiveSwitch(groupInterpolationInfo)
 		}
 
+	}
+
+	if (!isNormalDirection) {
+		interpolatedDataAsString.reverse()
 	}
 
 	console.log(`customAutoFillFunc`, interpolatedDataAsString, targetCount)
