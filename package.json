@@ -717,6 +717,7 @@
 		"@types/vscode": "1.70.0",
 		"bulma-toast": "2.0.3",
 		"chardet": "1.2.1",
+		"dayjs": "1.11.13",
 		"fs-extra": "9.0.1",
 		"glob": "7.1.6",
 		"iconv-lite": "0.6.2",

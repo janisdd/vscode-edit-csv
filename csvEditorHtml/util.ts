@@ -1,4 +1,7 @@
 
+// / <reference path="../node_modules/dayjs/index.d.ts" />
+declare const dayjs: any
+
 /**
  * returns the html element with the given id
  * if not found throws and returns null
@@ -2017,15 +2020,65 @@ function getFirstAndLastVisibleRows(): { first: number, last: number } {
 
 
 
+//TODO -x
 const intRegex = /\d+/g
 const floatRegexEn = /\d+\.\d+/g
 const floatRegexNonEn = /\d+\,\d+/g
 
 // currently only english months are supported
-const monthRegex = /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)$/gi
+const monthRegexLen3 = /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)$/gi
 const monthRegexFull = /^(january|february|march|april|may|june|july|august|september|october|november|december)$/gi
 const monthFullNames = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december']
 const monthShortNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+
+type KnownDateFormat = {
+	regex: RegExp
+}
+
+const allKnownSeparatorRegex = /[\-\/\.]/g // - / .
+
+//as key we always use the `-` separator but we also support `/` and `.` as separators
+const allKnownDateFormats = new Map<string, KnownDateFormat>()
+allKnownDateFormats.set(`YYYY-MM-DD`, {
+	regex: /^(\d{4})[\-\/\.](\d{2})[\-\/\.](\d{2})$/g,
+})
+allKnownDateFormats.set(`YYYY-M-DD`, {
+	regex: /^(\d{4})[\-\/\.](\d{1})[\-\/\.](\d{2})$/g,
+})
+allKnownDateFormats.set(`YYYY-MM-D`, {
+	regex: /^(\d{4})[\-\/\.](\d{2})[\-\/\.](\d{1})$/g,
+})
+allKnownDateFormats.set(`YYYY-M-D`, {
+	regex: /^(\d{4})[\-\/\.](\d{1})[\-\/\.](\d{1})$/g,
+})
+allKnownDateFormats.set(`DD-MM-YYYY`, {
+	regex: /^(\d{2})[\-\/\.](\d{2})[\-\/\.](\d{4})$/g,
+})
+allKnownDateFormats.set(`DD-M-YYYY`, {
+	regex: /^(\d{2})[\-\/\.](\d{1})[\-\/\.](\d{4})$/g,
+})
+allKnownDateFormats.set(`D-MM-YYYY`, {
+	regex: /^(\d{1})[\-\/\.](\d{2})[\-\/\.](\d{4})$/g,
+})
+allKnownDateFormats.set(`D-M-YYYY`, {
+	regex: /^(\d{1})[\-\/\.](\d{1})[\-\/\.](\d{4})$/g,
+})
+
+allKnownDateFormats.set(`DD-MM-YY`, {
+	regex: /^(\d{2})[\-\/\.](\d{2})[\-\/\.](\d{2})$/g,
+})
+allKnownDateFormats.set(`DD-M-YY`, {
+	regex: /^(\d{2})[\-\/\.](\d{1})[\-\/\.](\d{2})$/g,
+})
+allKnownDateFormats.set(`D-MM-YY`, {
+	regex: /^(\d{1})[\-\/\.](\d{2})[\-\/\.](\d{2})$/g,
+})
+allKnownDateFormats.set(`D-M-YY`, {
+	regex: /^(\d{1})[\-\/\.](\d{1})[\-\/\.](\d{2})$/g,
+})
+
+//this has always 31 days!
+const referenceDateWithMaxDays = dayjs('2024-01-01', 'YYYY-MM-DD', true)
 
 
 /**
@@ -2078,6 +2131,14 @@ type GroupInterpolationInfo_MonthName = {
 	isUpperCase: boolean
 }
 
+type GroupInterpolationInfo_Date = {
+	type: 'date'
+	originalDate: dayjs.Dayjs
+	separator1String: string
+	separator2String: string
+	displayFormat: string
+}
+
 /**
  * will be copied only
  */
@@ -2089,6 +2150,7 @@ type GroupInterpolationInfo =
 	| GroupInterpolationInfo_Number
 	| GroupInterpolationInfo_ContainsNumber
 	| GroupInterpolationInfo_MonthName
+	| GroupInterpolationInfo_Date
 	| GroupInterpolationInfo_Unknown
 
 /**
@@ -2143,6 +2205,11 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 	// 1-01-2024 (D-MM-YYYY)
 	// 1-1-2024 (D-M-YYYY)
 
+	// 01-01-2024 (DD-MM-YY)
+	// 01-1-2024 (DD-M-YY)
+	// 1-01-2024 (D-MM-YY)
+	// 1-1-2024 (D-M-YY)
+
 	//the following months are supported:
 	// at least 3 letters of the months are needed
 	// currently only enlish months are supported
@@ -2171,104 +2238,158 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 		//grouped data
 
 		{
+			let checkOtherCases = true
 			//check if starts or ends with number (ints only)
 
 			const matches = Array.from(cellText.matchAll(intRegex))
-			let startsWithNumber = matches.length > 0 && matches[0].index === 0
-			let endsWithNumber = matches.length > 0 && matches[matches.length - 1].index + matches[matches.length - 1].length === cellText.length
+
+			let firstMatch = matches.length > 0 ? matches[0] : null
+			let startsWithNumber = matches.length > 0 && firstMatch && firstMatch.index === 0
+			let lastMatch = matches.length > 0 ? matches[matches.length - 1] : null
+			let endsWithNumber = matches.length > 0 && lastMatch && lastMatch.index! + lastMatch[0].length === cellText.length
 			let onlyNumber = startsWithNumber && endsWithNumber && matches.length === 1
 
-			const monthNames = Array.from(cellText.matchAll(monthRegex))
-			const monthNamesFull = Array.from(cellText.matchAll(monthRegexFull))
 
-			if (onlyNumber) {
+			if (onlyNumber && firstMatch) {
 
 				let groupInterpolationInfo_Int: GroupInterpolationInfo_Number = {
 					type: 'int',
-					numberToUse: parseInt(matches[0][0]) //TODO support large numbers !!! (we have a lib for this)
+					numberToUse: parseInt(firstMatch[0]) //TODO support large numbers !!! (we have a lib for this)
 				}
 
 				groupInterpolationInfos.push(groupInterpolationInfo_Int)
+				checkOtherCases = false
 
-			} else if (startsWithNumber) {
+			} else if (startsWithNumber && endsWithNumber) {
+				//check date
+				// fast check if it could be a date because we check a lot of regexes
 
-				let groupInterpolationInfo_Int: GroupInterpolationInfo_ContainsNumber = {
-					type: 'containsInt',
-					startIndexNumber: matches[0].index,
-					endIndexNumber: matches[0].index + matches[0].length,
-					numberToUse: parseInt(matches[0][0]), //TODO support large numbers !!! (we have a lib for this)
-					numberString: matches[0][0]
+				for (const [format, knownFormat] of allKnownDateFormats) {
+
+					//TODO only use first?
+					const dateMatches = Array.from(cellText.matchAll(knownFormat.regex))
+
+					if (dateMatches.length === 0) continue
+
+					// format = `YYYY-MM-DD`
+					let dateMatch = dateMatches[0] // e.g. 2024.01.01
+					let dateMatchString = dateMatch[0]
+
+					//figure out separator
+					const separatorMatches = Array.from(dateMatchString.matchAll(allKnownSeparatorRegex))
+
+					if (separatorMatches.length !== 2) continue
+
+					let separator1 = separatorMatches[0][0]
+					let separator2 = separatorMatches[1][0]
+
+					let displayFormat = format.replace(`-`, separator1).replace(`-`, separator2)
+
+					let originalDate = dayjs(dateMatchString, displayFormat, true)
+
+					if (originalDate.isValid() === false) continue
+
+					let groupInterpolationInfo_Date: GroupInterpolationInfo_Date = {
+						type: 'date',
+						originalDate,
+						displayFormat: displayFormat,
+						separator1String: separator1,
+						separator2String: separator2,
+					}
+
+					groupInterpolationInfos.push(groupInterpolationInfo_Date)
+					checkOtherCases = false
+					break //we found a date
 				}
 
-				groupInterpolationInfos.push(groupInterpolationInfo_Int)
-
-			} else if (endsWithNumber) {
-
-				let groupInterpolationInfo_Int: GroupInterpolationInfo_ContainsNumber = {
-					type: 'containsInt',
-					startIndexNumber: matches[matches.length - 1].index,
-					endIndexNumber: matches[matches.length - 1].index + matches[matches.length - 1].length,
-					numberToUse: parseInt(matches[matches.length - 1][0]), //TODO support large numbers !!! (we have a lib for this)
-					numberString: matches[matches.length - 1][0]
-				}
-
-				groupInterpolationInfos.push(groupInterpolationInfo_Int)
-
-			} else if (monthNames.length === 1 || monthNamesFull.length === 1) {
-
-				//can be a month or just a part of another word that is not a month!
-				// for performance we only interpolate 3 or all letters of months
-				// (else we would need to check whole words, search for whitespaces, ...)
-
-				let info: GroupInterpolationInfo
-				let monthIndex = -1
-				let isFullName: boolean
-				let isUpperCase: boolean = cellText[0] !== cellText[0].toLowerCase()
-
-				if (monthNamesFull.length === 1) {
-					//full match
-					monthIndex = monthFullNames.indexOf(cellText.toLowerCase())
-					isFullName = true
-				}
-				else {
-					//only 3 letters
-					monthIndex = monthShortNames.indexOf(cellText.toLowerCase())
-					isFullName = false
-				}
-
-				if (monthIndex !== -1) {
-					info = {
-						type: 'month',
-						monthString: cellText,
-						monthIndex,
-						isFullName,
-						isUpperCase,
-					} satisfies GroupInterpolationInfo_MonthName
-				}
-				else {
-					console.warn(`Could not find month index for interpolation, defaulting to copying`)
-
-					info = {
-						type: 'unknown'
-					} satisfies GroupInterpolationInfo_Unknown
-				}
-
-				groupInterpolationInfos.push(info)
-
-			} else {
-				//normal data
-
-				let groupInterpolationInfo_Unknown: GroupInterpolationInfo_Unknown = {
-					type: 'unknown'
-				}
-
-				groupInterpolationInfos.push(groupInterpolationInfo_Unknown)
 			}
+
+			const monthNames = Array.from(cellText.matchAll(monthRegexLen3))
+			const monthNamesFull = Array.from(cellText.matchAll(monthRegexFull))
+
+			if (checkOtherCases) {
+
+				if (startsWithNumber && firstMatch) {
+
+					let groupInterpolationInfo_Int: GroupInterpolationInfo_ContainsNumber = {
+						type: 'containsInt',
+						startIndexNumber: firstMatch.index!,
+						endIndexNumber: firstMatch.index! + firstMatch[0].length,
+						numberToUse: parseInt(firstMatch[0]), //TODO support large numbers !!! (we have a lib for this)
+						numberString: firstMatch[0]
+					}
+
+					groupInterpolationInfos.push(groupInterpolationInfo_Int)
+
+				} else if (endsWithNumber && lastMatch) {
+
+					let groupInterpolationInfo_Int: GroupInterpolationInfo_ContainsNumber = {
+						type: 'containsInt',
+						startIndexNumber: lastMatch.index!,
+						endIndexNumber: lastMatch.index! + lastMatch[0].length,
+						numberToUse: parseInt(lastMatch[0]), //TODO support large numbers !!! (we have a lib for this)
+						numberString: lastMatch[0]
+					}
+
+					groupInterpolationInfos.push(groupInterpolationInfo_Int)
+
+				} else if (monthNames.length === 1 || monthNamesFull.length === 1) {
+
+					//can be a month or just a part of another word that is not a month!
+					// for performance we only interpolate 3 or all letters of months
+					// (else we would need to check whole words, search for whitespaces, ...)
+
+					let info: GroupInterpolationInfo
+					let monthIndex = -1
+					let isFullName: boolean
+					let isUpperCase: boolean = cellText[0] !== cellText[0].toLowerCase()
+
+					if (monthNamesFull.length === 1) {
+						//full match
+						monthIndex = monthFullNames.indexOf(cellText.toLowerCase())
+						isFullName = true
+					}
+					else {
+						//only 3 letters
+						monthIndex = monthShortNames.indexOf(cellText.toLowerCase())
+						isFullName = false
+					}
+
+					if (monthIndex !== -1) {
+						info = {
+							type: 'month',
+							monthString: cellText,
+							monthIndex,
+							isFullName,
+							isUpperCase,
+						} satisfies GroupInterpolationInfo_MonthName
+					}
+					else {
+						console.warn(`Could not find month index for interpolation, defaulting to copying`)
+
+						info = {
+							type: 'unknown'
+						} satisfies GroupInterpolationInfo_Unknown
+					}
+
+					groupInterpolationInfos.push(info)
+
+				} else {
+					//normal data, just copy
+
+					let groupInterpolationInfo_Unknown: GroupInterpolationInfo_Unknown = {
+						type: 'unknown'
+					}
+
+					groupInterpolationInfos.push(groupInterpolationInfo_Unknown)
+				}
+			}
+
 		}
 
 	}
 
-	let interpolatedDataAsString: string[] = []
+	//--- interpolation data for numbers
 
 	//if we have numbers in consecutive cells -> they form a sequence for interpolation
 	//we can have multiple sequences in the same column
@@ -2368,13 +2489,14 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 		return interpolationLastXVal[i]
 	})
 
-	//same for month indices
+	//--- interpolation data for month indices
+
 	const interpolationMonthIndices: Array<number[]> = [] //better use month indices instead of strings
 	let currentSequenceMonthIndices: number[] = []
 	let curentSequenceMonthGroupIndices: number[] = []
 
 	let dataIndexToInterpolationSequenceIndexMonths: number[] = []
-	let interpolationIndexToDataGroupIndex: Array<number[]> = [] //entries are curentSequenceMonthGroupIndices
+	let interpolationIndexToDataGroupIndexMonths: Array<number[]> = [] //entries are curentSequenceMonthGroupIndices
 
 	//just a plain number to add
 	const interpolationSequenceModelsMonths: number[] = []
@@ -2391,7 +2513,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 				dataIndexToInterpolationSequenceIndexMonths[_i] = interpolationMonthIndices.length
 
 			} else {
-				// not int
+				// not month
 
 				dataIndexToInterpolationSequenceIndexMonths[_i] = -1
 
@@ -2400,7 +2522,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 					interpolationMonthIndices.push(currentSequenceMonthIndices)
 					currentSequenceMonthIndices = []
 
-					interpolationIndexToDataGroupIndex.push(curentSequenceMonthGroupIndices)
+					interpolationIndexToDataGroupIndexMonths.push(curentSequenceMonthGroupIndices)
 					curentSequenceMonthGroupIndices = []
 				}
 			}
@@ -2409,7 +2531,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 		if (currentSequenceMonthIndices.length > 0) {
 			interpolationMonthIndices.push(currentSequenceMonthIndices)
 
-			interpolationIndexToDataGroupIndex.push(curentSequenceMonthGroupIndices)
+			interpolationIndexToDataGroupIndexMonths.push(curentSequenceMonthGroupIndices)
 		}
 
 		for (let i = 0; i < interpolationMonthIndices.length; i++) {
@@ -2420,7 +2542,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 			//make sure all deltas are the same
 			if (monthIndexSequence.length === 1) {
 				// will be +1
-				delta = 1
+				delta = isNormalDirection ? 1 : -1
 			} else {
 				delta = monthIndexSequence[1] - monthIndexSequence[0]
 			}
@@ -2436,7 +2558,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 
 			if (!allDeltasAreTheSame) {
 
-				const groupIndicesThatContributedToThisGroup = interpolationIndexToDataGroupIndex[i]
+				const groupIndicesThatContributedToThisGroup = interpolationIndexToDataGroupIndexMonths[i]
 
 				for (let k = 0; k < groupIndicesThatContributedToThisGroup.length; k++) {
 					const groupIndex = groupIndicesThatContributedToThisGroup[k]
@@ -2456,6 +2578,170 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 		}
 
 	}
+
+	//--- interpolation data for dates
+
+	//consecutive dates form a sequence for interpolation (a group)
+
+	const interpolationDatesData: Array<GroupInterpolationInfo_Date["originalDate"][]> = [] //better use month indices instead of strings
+	let currentSequenceDatesData: GroupInterpolationInfo_Date["originalDate"][] = []
+	let curentSequenceDateGroupData: GroupInterpolationInfo_Date["originalDate"][] = []
+
+	let dataIndexToInterpolationSequenceIndexDates: number[] = []
+	let interpolationIndexToDataGroupIndexDates: Array<number[]> = [] //entries are curentSequenceMonthGroupIndices
+
+	//just a plain numbers to add
+	const interpolationSequenceModelsDates: Array<[diffDays: number, diffMonths: number, diffYears: number]> = []
+	const dateInterpolationStart: GroupInterpolationInfo_Date["originalDate"][] = [] //we start with these dates for interpolation
+
+	{
+
+		for (let _i = 0; _i < groupInterpolationInfos.length; _i++) {
+			const el = groupInterpolationInfos[_i]
+
+			if (el.type === `date`) {
+				currentSequenceDatesData.push(el.originalDate)
+				curentSequenceDateGroupData.push(_i)
+
+				dataIndexToInterpolationSequenceIndexDates[_i] = interpolationDatesData.length
+
+			} else {
+				// not int
+
+				dataIndexToInterpolationSequenceIndexDates[_i] = -1
+
+
+				if (currentSequenceDatesData.length > 0) {
+					interpolationDatesData.push(currentSequenceDatesData)
+					currentSequenceDatesData = []
+
+					interpolationIndexToDataGroupIndexDates.push(curentSequenceDateGroupData)
+					curentSequenceDateGroupData = []
+				}
+			}
+		}
+
+		if (currentSequenceDatesData.length > 0) {
+			interpolationDatesData.push(currentSequenceDatesData)
+
+			interpolationIndexToDataGroupIndexDates.push(curentSequenceDateGroupData)
+		}
+
+		for (let i = 0; i < interpolationDatesData.length; i++) {
+			const interpolationDateGroup = interpolationDatesData[i]
+
+			let deltas: typeof interpolationSequenceModelsDates[number] = [0, 0, 0]
+
+			//make sure all deltas are the same in the current group
+			if (interpolationDateGroup.length === 1) {
+				// special case when we only have 1 date -> increment by 1 day
+				// will be +1 for days
+				deltas = [isNormalDirection ? 1 : -1, 0, 0]
+			} else {
+
+				// we have the following cases for 2 dates (all others must have the same deltas or pattern)
+				// days are same e.g. 20.02.2024 -> 20.03.2024 -> keep the day -> 20.04.2024 (add the diff in months)
+				// days and months are the same e.g. 20.02.2024 -> 20.02.2025 -> keep the day and month -> 20.02.2026 (add the diff in years)
+				// if days are different -> always add the diff in days as a constant
+
+				let prevEl = interpolationDateGroup[0]
+				let el = interpolationDateGroup[1]
+
+				let diffInDays = el.date() - prevEl.date()
+				let diffInMonths = el.month() - prevEl.month()
+				let diffInYears = el.year() - prevEl.year()
+
+				if (diffInDays === 0 && diffInMonths === 0) {
+
+					deltas = [0, 0, diffInYears]
+				}
+				else if (diffInDays === 0) {
+
+					deltas = [0, diffInMonths, diffInYears]
+				}
+				else {
+					//diff in days is != 0
+
+					let deltaInDays = el.diff(prevEl, 'day')
+					deltas = [deltaInDays, 0, 0]
+				}
+			}
+
+			let allDeltasAreTheSame = [true, true, true]
+
+			// 2 because we already checked the first 2
+			for (let j = 2; j < interpolationDateGroup.length; j++) {
+
+				let prevEl = interpolationDateGroup[j - 1]
+				let el = interpolationDateGroup[j]
+
+				let diffInDays = el.date() - prevEl.date()
+				let diffInMonths = el.month() - prevEl.month()
+				let diffInYears = el.year() - prevEl.year()
+
+				if (deltas[0] === 0 && deltas[1] === 0 && diffInDays == 0 && diffInMonths === 0) {
+
+					if (diffInYears !== deltas[2]) {
+						allDeltasAreTheSame[2] = false
+					}
+				}
+				else if (deltas[0] === 0 && diffInDays == 0) {
+
+					if (diffInYears !== deltas[2]) {
+						allDeltasAreTheSame[2] = false
+					}
+
+					if (diffInMonths !== deltas[1]) {
+						allDeltasAreTheSame[1] = false
+					}
+				}
+				else {
+					//diff in days is != 0
+
+					let deltaInDays = el.diff(prevEl, 'day')
+
+					if (deltaInDays !== deltas[0]) {
+						allDeltasAreTheSame[0] = false
+					}
+				}
+			}
+
+			//if all deltas are different -> copy
+			if (allDeltasAreTheSame.some(p => p === false)) {
+
+				const groupIndicesThatContributedToThisGroup = interpolationIndexToDataGroupIndexDates[i]
+
+				for (let k = 0; k < groupIndicesThatContributedToThisGroup.length; k++) {
+					const groupIndex = groupIndicesThatContributedToThisGroup[k]
+
+					//default to just copy
+					groupInterpolationInfos[groupIndex] = {
+						type: 'unknown',
+					} satisfies GroupInterpolationInfo_Unknown
+
+				}
+
+				continue
+			}
+
+			//currently we are strict, all deltas must be the same
+			// //reset deltas that are not the same
+			// for (let k = 0; k < allDeltasAreTheSame.length; k++) {
+			// 	const isTheSame = allDeltasAreTheSame[k]
+
+			// 	if (!isTheSame) {
+			// 		deltas[k] = 0
+			// 	}
+			// }
+
+			interpolationSequenceModelsDates.push(deltas)
+			//the last date is the start for the next interpolation
+			dateInterpolationStart.push(interpolationDateGroup[interpolationDateGroup.length - 1])
+		}
+
+	}
+
+	let interpolatedDataAsString: string[] = []
 
 	// create output
 	for (let i = 0; i < targetCount; i++) {
@@ -2495,7 +2781,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 
 				let sequenceIndex = dataIndexToInterpolationSequenceIndexMonths[relativI]
 				let delta = interpolationSequenceModelsMonths[sequenceIndex]
-				
+
 				let currMonthIndex = monthInterpolationIndices[sequenceIndex]
 
 				let isFullName = groupInterpolationInfo.isFullName
@@ -2506,7 +2792,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 				if (newMonthIndex < 0) {
 					newMonthIndex = 12 + newMonthIndex
 				}
-	
+
 
 				let nextMonthIndex = newMonthIndex % 12
 				let nextMonth = isFullName ? monthFullNames[nextMonthIndex] : monthShortNames[nextMonthIndex]
@@ -2519,6 +2805,29 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 				monthInterpolationIndices[sequenceIndex] = nextMonthIndex
 
 				interpolatedDataAsString.push(nextMonth)
+				break
+			}
+
+			case "date": {
+
+				let sequenceIndex = dataIndexToInterpolationSequenceIndexDates[relativI]
+				let delta = interpolationSequenceModelsDates[sequenceIndex]
+
+				let currStartDate = dateInterpolationStart[sequenceIndex]
+
+				let nextDate = currStartDate.add(delta[0], 'day').add(delta[1], 'month').add(delta[2], 'year') as typeof currStartDate
+
+				if (nextDate.isValid() === false) {
+					//could get invalid date
+					interpolatedDataAsString.push("INVALID DATE")
+				} else {
+
+					dateInterpolationStart[sequenceIndex] = nextDate
+					let dateString = nextDate.format(groupInterpolationInfo.displayFormat)
+					interpolatedDataAsString.push(dateString)
+
+				}
+
 				break
 			}
 

@@ -5,6 +5,8 @@ type RegressionLib = {
 	linear: typeof linear
 }
 
+//@ts-ignore
+dayjs.extend(dayjs_plugin_customParseFormat);
 
 const defaultInitialVars: InitialVars = {
 	isWatchingSourceFile: false,

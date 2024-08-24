@@ -672,6 +672,8 @@ declare namespace Handsontable {
       handleDraggedCells: number;
       mouseDownOnCellCorner: boolean;
       mouseDragOutside: boolean;
+      //func can return null in case of any error, then the default behavior is used
+      setFillFunction: (func: null | ((data: string[], targetCount: number, isNormalDirection: boolean) => (string[] | null))) => void;
     }
 
     interface BindRowsWithHeaders extends Base {
@@ -787,6 +789,7 @@ declare namespace Handsontable {
       pasteMode: PasteModeType;
       rowsLimit: number;
       focusableElement: FocusableWrapper;
+
       pasteSeparatorMode: "normal" | "onlyKeepRowSeparators" | "onlyKeepColumnSeparators" | "ignoreAllSeparators"
       pasteRowJoinSeparator: string | '\n';
       pasteColumnJoinSeparator: string| '\t';

@@ -24,10 +24,12 @@ function createEditorHtml(webview, context, config, initialVars) {
     const _getResourcePath = getResourcePath.bind(undefined, webview, context);
     let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.min.css');
     // let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
-    let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js');
-    // let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js')
+    // let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js')
+    let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js');
     let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js');
     // let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
+    let regressionJS = _getResourcePath('node_modules/regression/dist/regression.js');
+    // let regressionJS = _getResourcePath('node_modules/regression/dist/regression.min.js')
     const mousetrapJs = _getResourcePath('thirdParty/mousetrap/mousetrap.min.js');
     const mousetrapBindGlobalJs = _getResourcePath('thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js');
     const bigJs = _getResourcePath('thirdParty/big.js/big.min.js');
@@ -49,6 +51,8 @@ function createEditorHtml(webview, context, config, initialVars) {
     const mainJs = _getResourcePath('csvEditorHtml/out/main.js');
     const beforeDomLoadedJs = _getResourcePath('csvEditorHtml/out/beforeDomLoaded.js');
     const toolkit = _getResourcePath('node_modules/@vscode/webview-ui-toolkit/dist/toolkit.min.js');
+    const dayJS = _getResourcePath('node_modules/dayjs/dayjs.min.js');
+    const dayJSPlugins1 = _getResourcePath('node_modules/dayjs/plugin/customParseFormat.js');
     //use blocks so vs code adds folding
     let findWidgetHtml = ``;
     {
@@ -959,6 +963,9 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 
 	<script async type="module" src="${toolkit}"></script>
+	<script src="${regressionJS}"></script>
+	<script src="${dayJS}"></script>
+	<script src="${dayJSPlugins1}"></script>
 	<script src="${handsontableJs}"></script>
 	<script src="${papaparseJs}"></script>
 	<script src="${mousetrapJs}"></script>
