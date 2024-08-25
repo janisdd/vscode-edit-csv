@@ -68,7 +68,7 @@ var initialConfig: EditCsvConfig | undefined = {
 	darkThemeTextColor: '#d0d0d0',
 	lightThemeTextColor: '#657b83',
 	convertUrlsToLinkTags: true,
-	dragToAutoFill: "none",
+	dragToAutoFill: "excelLike",
 	initiallyHiddenColumnNames: [],
 	initiallyHiddenColumnNumbers: [],
 }

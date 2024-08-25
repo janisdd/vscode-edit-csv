@@ -1,7 +1,4 @@
 
-// / <reference path="../node_modules/dayjs/index.d.ts" />
-declare const dayjs: any
-
 /**
  * returns the html element with the given id
  * if not found throws and returns null
@@ -1468,6 +1465,8 @@ function formatBigJsNumber(bigJsNumber: typeof b, numbersStyleToUse: NumbersStyl
 			notExhaustiveSwitch(numbersStyleToUse.key)
 	}
 
+	//uses toFixed internally
+	// see https://github.com/MikeMcl/toFormat/blob/master/toFormat.js
 	//@ts-ignore
 	return bigJsNumber.toFormat()
 }
@@ -2077,26 +2076,21 @@ allKnownDateFormats.set(`D-M-YY`, {
 	regex: /^(\d{1})[\-\/\.](\d{1})[\-\/\.](\d{2})$/g,
 })
 
-//this has always 31 days!
-const referenceDateWithMaxDays = dayjs('2024-01-01', 'YYYY-MM-DD', true)
-
 
 /**
  * real interpolation because only number
  */
 type GroupInterpolationInfo_Number = {
 	type: 'int'
-	/**
-	 * TODO use lib number for large numbers
-	 */
-	numberToUse: number
+	//not needed, we just check that the string matches a regex and then use the string from the selected data
+	// numberToUse: number
 }
 
 /**
  * no real interpolation but only +1 for every copy
  */
 type GroupInterpolationInfo_ContainsNumber = {
-	type: 'containsInt'
+	type: 'containsInt' //big js handles ints and floats
 	/**
 	 * 0-based index of the number to interpolate (used for substring)
 	 */
@@ -2106,10 +2100,7 @@ type GroupInterpolationInfo_ContainsNumber = {
 	 */
 	endIndexNumber: number
 
-	/**
-	 * TODO use lib number for large numbers
-	 */
-	numberToUse: number
+	// numberToUse: number
 	/**
 	 * the original number string
 	 */
@@ -2133,7 +2124,7 @@ type GroupInterpolationInfo_MonthName = {
 
 type GroupInterpolationInfo_Date = {
 	type: 'date'
-	originalDate: dayjs.Dayjs
+	originalDate: Dayjs
 	separator1String: string
 	separator2String: string
 	displayFormat: string
@@ -2163,11 +2154,6 @@ type GroupInterpolationInfo =
  * @returns an array of interpolated strings
  */
 function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirection: boolean): string[] {
-	//TODO targetCount
-	//TODO somehow wrong offset... maybe just copy to third party?? and marke fork?
-	console.log(`isNormalDirection`, isNormalDirection)
-
-
 	if (!isNormalDirection) {
 		_data = [..._data].reverse()
 	}
@@ -2218,12 +2204,8 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 	// jan, mar apr (different diff) -> copy
 	// the other props (uppercase, ...) are individual for every entry
 
-
-
 	//style from stats ui
 	let numbersStyleToUse = getNumbersStyleFromUi()
-
-	//TODO months, dates
 
 	let groupInterpolationInfos: GroupInterpolationInfo[] = []
 
@@ -2241,26 +2223,48 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 			let checkOtherCases = true
 			//check if starts or ends with number (ints only)
 
-			const matches = Array.from(cellText.matchAll(intRegex))
+			const matchesInt = Array.from(cellText.matchAll(intRegex))
 
-			let firstMatch = matches.length > 0 ? matches[0] : null
-			let startsWithNumber = matches.length > 0 && firstMatch && firstMatch.index === 0
-			let lastMatch = matches.length > 0 ? matches[matches.length - 1] : null
-			let endsWithNumber = matches.length > 0 && lastMatch && lastMatch.index! + lastMatch[0].length === cellText.length
-			let onlyNumber = startsWithNumber && endsWithNumber && matches.length === 1
+			let firstMatchInt = matchesInt.length > 0 ? matchesInt[0] : null
+			let startsWithNumberInt = matchesInt.length > 0 && firstMatchInt && firstMatchInt.index === 0
+			let lastMatchInt = matchesInt.length > 0 ? matchesInt[matchesInt.length - 1] : null
+			let endsWithNumberInt = matchesInt.length > 0 && lastMatchInt && lastMatchInt.index! + lastMatchInt[0].length === cellText.length
+			let onlyNumberInt = startsWithNumberInt && endsWithNumberInt && matchesInt.length === 1
+
+			let matchesFloat: RegExpMatchArray[] = []
+
+			if (numbersStyleToUse.key === 'en') {
+				matchesFloat = Array.from(cellText.matchAll(floatRegexEn))
+			} else {
+				matchesFloat = Array.from(cellText.matchAll(floatRegexNonEn))
+			}
+
+			let firstMatchFloat = matchesFloat.length > 0 ? matchesFloat[0] : null
+			let startsWithNumberFloat = matchesFloat.length > 0 && firstMatchFloat && firstMatchFloat.index === 0
+			let lastMatchFloat = matchesFloat.length > 0 ? matchesFloat[matchesFloat.length - 1] : null
+			let endsWithNumberFloat = matchesFloat.length > 0 && lastMatchFloat && lastMatchFloat.index! + lastMatchFloat[0].length === cellText.length
+			let onlyNumberFloat = startsWithNumberFloat && endsWithNumberFloat && matchesFloat.length === 1
 
 
-			if (onlyNumber && firstMatch) {
+			if (onlyNumberFloat) {
 
 				let groupInterpolationInfo_Int: GroupInterpolationInfo_Number = {
-					type: 'int',
-					numberToUse: parseInt(firstMatch[0]) //TODO support large numbers !!! (we have a lib for this)
+					type: 'int', //big js handles ints and floats
 				}
 
 				groupInterpolationInfos.push(groupInterpolationInfo_Int)
 				checkOtherCases = false
 
-			} else if (startsWithNumber && endsWithNumber) {
+			} else if (onlyNumberInt) {
+
+				let groupInterpolationInfo_Int: GroupInterpolationInfo_Number = {
+					type: 'int',
+				}
+
+				groupInterpolationInfos.push(groupInterpolationInfo_Int)
+				checkOtherCases = false
+
+			} else if (startsWithNumberInt && endsWithNumberInt) {
 				//check date
 				// fast check if it could be a date because we check a lot of regexes
 
@@ -2309,29 +2313,49 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 
 			if (checkOtherCases) {
 
-				if (startsWithNumber && firstMatch) {
+				if (startsWithNumberFloat && firstMatchFloat) {
 
-					let groupInterpolationInfo_Int: GroupInterpolationInfo_ContainsNumber = {
+					let groupInterpolationInfo_ContainsNumber: GroupInterpolationInfo_ContainsNumber = {
 						type: 'containsInt',
-						startIndexNumber: firstMatch.index!,
-						endIndexNumber: firstMatch.index! + firstMatch[0].length,
-						numberToUse: parseInt(firstMatch[0]), //TODO support large numbers !!! (we have a lib for this)
-						numberString: firstMatch[0]
+						startIndexNumber: firstMatchFloat.index!,
+						endIndexNumber: firstMatchFloat.index! + firstMatchFloat[0].length,
+						numberString: firstMatchFloat[0]
 					}
 
-					groupInterpolationInfos.push(groupInterpolationInfo_Int)
+					groupInterpolationInfos.push(groupInterpolationInfo_ContainsNumber)
 
-				} else if (endsWithNumber && lastMatch) {
+				} else if (endsWithNumberFloat && lastMatchFloat) {
 
-					let groupInterpolationInfo_Int: GroupInterpolationInfo_ContainsNumber = {
+					let groupInterpolationInfo_ContainsNumber: GroupInterpolationInfo_ContainsNumber = {
 						type: 'containsInt',
-						startIndexNumber: lastMatch.index!,
-						endIndexNumber: lastMatch.index! + lastMatch[0].length,
-						numberToUse: parseInt(lastMatch[0]), //TODO support large numbers !!! (we have a lib for this)
-						numberString: lastMatch[0]
+						startIndexNumber: lastMatchFloat.index!,
+						endIndexNumber: lastMatchFloat.index! + lastMatchFloat[0].length,
+						numberString: lastMatchFloat[0]
 					}
 
-					groupInterpolationInfos.push(groupInterpolationInfo_Int)
+					groupInterpolationInfos.push(groupInterpolationInfo_ContainsNumber)
+
+				} else if (startsWithNumberInt && firstMatchInt) {
+
+					let groupInterpolationInfo_ContainsNumber: GroupInterpolationInfo_ContainsNumber = {
+						type: 'containsInt',
+						startIndexNumber: firstMatchInt.index!,
+						endIndexNumber: firstMatchInt.index! + firstMatchInt[0].length,
+						numberString: firstMatchInt[0]
+					}
+
+					groupInterpolationInfos.push(groupInterpolationInfo_ContainsNumber)
+
+				} else if (endsWithNumberInt && lastMatchInt) {
+
+					let groupInterpolationInfo_ContainsNumber: GroupInterpolationInfo_ContainsNumber = {
+						type: 'containsInt',
+						startIndexNumber: lastMatchInt.index!,
+						endIndexNumber: lastMatchInt.index! + lastMatchInt[0].length,
+						numberString: lastMatchInt[0]
+					}
+
+					groupInterpolationInfos.push(groupInterpolationInfo_ContainsNumber)
 
 				} else if (monthNames.length === 1 || monthNamesFull.length === 1) {
 
@@ -2391,6 +2415,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 
 	//--- interpolation data for numbers
 
+	const bigZero = Big(0)
 	//if we have numbers in consecutive cells -> they form a sequence for interpolation
 	//we can have multiple sequences in the same column
 	const interpolationSequenceStrings: Array<string[]> = []
@@ -2398,7 +2423,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 	let dataIndexToInterpolationSequenceIndex: number[] = []
 
 	const interpolationSequenceModels = []
-	const interpolationLastXVal: Array<number> = []
+	const interpolationLastXVal: Array<typeof bigZero> = []
 
 	{
 		for (let _i = 0; _i < groupInterpolationInfos.length; _i++) {
@@ -2409,7 +2434,8 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 				dataIndexToInterpolationSequenceIndex[_i] = interpolationSequenceStrings.length
 
 			} else if (el.type === `containsInt`) {
-				//we only interpolate +1/-1 here
+				//we only interpolate +1/-1 here so every contains int type is it's own sequence/group
+				//same as excel
 
 				if (currentSequence.length > 0) {
 					interpolationSequenceStrings.push(currentSequence)
@@ -2448,12 +2474,19 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 				let canonicalNumberString = getFirstCanonicalNumberStringInCell(p, numbersStyleToUse)
 				if (canonicalNumberString === null) {
 					console.warn(`Could not get canonical number string for interpolation at selection index: ${index}, defaulting to 0`)
-					return 0
+					return bigZero
 				}
 
-				//TODO big int
-				// let _num = Big(firstCanonicalNumberStringInCell)
-				return parseInt(p)
+				let num: typeof bigZero
+
+				try {
+					num = Big(canonicalNumberString)
+				} catch (error) {
+					console.warn(`Could not parse canonical number string for interpolation at selection index: ${index}, defaulting to 0`)
+					return bigZero
+				}
+
+				return num
 			})
 
 			// special case, we want to increase +1
@@ -2461,18 +2494,18 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 			if (ints.length === 1) {
 
 				if (isNormalDirection) {
-					ints.push(ints[0] + 1)
+					ints.push(ints[0].add(1))
 				} else {
 					//add to front because we will reverse!
 					// ints.unshift(ints[0] - 1)
-					ints.push(ints[0] - 1)
+					ints.push(ints[0].sub(1))
 				}
 
 				isSimpleIncrement = true
 			}
 
-			let dataPoints = ints.map((val, index) => [index + 1, val])
-			let model = regression.linear(dataPoints)
+			let dataPoints = ints.map((val, index) => [Big(index + 1), val])
+			let model = regression.linearBig(dataPoints)
 			interpolationSequenceModels.push(model)
 
 			if (isSimpleIncrement) {
@@ -2585,7 +2618,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 
 	const interpolationDatesData: Array<GroupInterpolationInfo_Date["originalDate"][]> = [] //better use month indices instead of strings
 	let currentSequenceDatesData: GroupInterpolationInfo_Date["originalDate"][] = []
-	let curentSequenceDateGroupData: GroupInterpolationInfo_Date["originalDate"][] = []
+	let curentSequenceDateGroupData: number[] = []
 
 	let dataIndexToInterpolationSequenceIndexDates: number[] = []
 	let interpolationIndexToDataGroupIndexDates: Array<number[]> = [] //entries are curentSequenceMonthGroupIndices
@@ -2743,6 +2776,9 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 
 	let interpolatedDataAsString: string[] = []
 
+	console.debug(`auto fill numbersStyleToUse`, numbersStyleToUse)
+	console.debug(`auto fill groupInterpolationInfos`, groupInterpolationInfos)
+
 	// create output
 	for (let i = 0; i < targetCount; i++) {
 
@@ -2756,9 +2792,12 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 				let sequenceIndex = dataIndexToInterpolationSequenceIndex[relativI]
 				let model = interpolationSequenceModels[sequenceIndex]
 				//always +1 regardless of the direction (because we reverse the data points for the model)
-				let nextXVal = ++interpolationIndices[sequenceIndex]
+				interpolationIndices[sequenceIndex] = interpolationIndices[sequenceIndex].add(1)
+				let nextXVal = interpolationIndices[sequenceIndex]
+
 				let predictedVal = model.predict(nextXVal)
-				interpolatedDataAsString.push(predictedVal[1].toString())
+				let numString = formatBigJsNumber(predictedVal[1], numbersStyleToUse)
+				interpolatedDataAsString.push(numString)
 				break
 			}
 
@@ -2767,12 +2806,14 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 				let sequenceIndex = dataIndexToInterpolationSequenceIndex[relativI]
 				let model = interpolationSequenceModels[sequenceIndex]
 				//always +1 regardless of the direction (because we reverse the data points for the model)
-				let nextXVal = ++interpolationIndices[sequenceIndex]
+				interpolationIndices[sequenceIndex] = interpolationIndices[sequenceIndex].add(1)
+				let nextXVal = interpolationIndices[sequenceIndex]
 				let predictedVal = model.predict(nextXVal)
 
 				// the cell contained more than just the number -> recreate the cell with the number replaced
 				let cellText = _data[relativI]
-				let newCellText = cellText.substring(0, groupInterpolationInfo.startIndexNumber) + predictedVal[1].toString() + cellText.substring(groupInterpolationInfo.endIndexNumber)
+				let numString = formatBigJsNumber(predictedVal[1], numbersStyleToUse)
+				let newCellText = cellText.substring(0, groupInterpolationInfo.startIndexNumber) + numString + cellText.substring(groupInterpolationInfo.endIndexNumber)
 				interpolatedDataAsString.push(newCellText)
 				break
 			}
@@ -2853,7 +2894,6 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 		return []
 	}
 
-	console.log(`customAutoFillFunc`, interpolatedDataAsString, targetCount)
-	//TODO
+	console.debug(`auto fill data`, interpolatedDataAsString)
 	return interpolatedDataAsString
 }

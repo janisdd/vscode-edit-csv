@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+# 0.10.0
+
+- added `excelLike` option to `dragToAutoFill` setting
+  - this is now the default
+
 # 0.9.2
 
 - added feature #157 - hide columns initially, added options

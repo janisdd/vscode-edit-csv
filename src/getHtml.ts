@@ -29,8 +29,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js')
 	// let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
 
-	let regressionJS = _getResourcePath('node_modules/regression/dist/regression.js')
-	// let regressionJS = _getResourcePath('node_modules/regression/dist/regression.min.js')
+	let regressionJS = _getResourcePath('thirdParty/regression/regression.min.umd.js')
 
 	const mousetrapJs = _getResourcePath('thirdParty/mousetrap/mousetrap.min.js')
 	const mousetrapBindGlobalJs = _getResourcePath('thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js')
@@ -980,7 +979,6 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 
 	<script async type="module" src="${toolkit}"></script>
-	<script src="${regressionJS}"></script>
 	<script src="${dayJS}"></script>
 	<script src="${dayJSPlugins1}"></script>
 	<script src="${handsontableJs}"></script>
@@ -989,6 +987,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	<script src="${mousetrapBindGlobalJs}"></script>
 	<script src="${bigJs}"></script>
 	<script src="${bigJsToFormat}"></script>
+	<script src="${regressionJS}"></script>
 
 	<script src="${progressJs}"></script>
 	<script src="${findWidgetJs}"></script>

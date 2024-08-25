@@ -91,6 +91,26 @@ When you click on `apply`
 
 As you can see this **does not** scale very well with **large csv files** (needs to be stringified and stored the whole time)
 
+## Drag to Auto Fill
+
+Starting from version `0.10.0` the setting `dragToAutoFill` defaults to `excelLike`.
+
+The other values are `none` and `copyOnly`.
+
+`none` is used to disable auto fill.
+
+Setting `dragToAutoFill` to `copyOnly` will copy the selected cell values over and over again.
+Example: `1,b,3` and you drag the handle 6 cells further will give `1,b,3,1,b,3` as auto fill values.
+As you can see, there is no interpolation, the selected sequence is copied over and over.
+
+The default setting `excelLike` will mimic the excel behavior for auto fill values.
+
+It will *just work* most of the time, however, there could be some edge cases.
+
+Generally, the following values can be auto filled: numbers, month names and dates.
+
+For a full explanation on how the auto fill actually works, scroll down to the [explanation](#excel-like-auto-fill-behavior)
+
 ## Extension Settings
 
 There are some settings for this plugin. Open the VS Code Settings and search for `csv-edit`
@@ -151,8 +171,11 @@ There is one things missing...
 - for grid/table element: [handsontable](https://github.com/handsontable/handsontable)
 - for ui: [vs code webview-ui-toolkit](https://github.com/microsoft/vscode-webview-ui-toolkit), [fontawesome](https://github.com/FortAwesome/Font-Awesome)
 - for shortcuts: [mousetrap](https://github.com/ccampbell/mousetrap)
+- for big numbers: [big.js](https://github.com/MikeMcl/big.js)
 - for auto fill
   - [regression-js](https://github.com/Tom-Alexander/regression-js)
+  - [day.js](https://day.js.org/en/) for date handling
+  - (big.js for numbers)
 
 *see `thirdParty` folders*
 
@@ -204,3 +227,124 @@ You can also open `csvEditorHtml/index.html` in your favorite browser and play a
 ## License
 
 Code: MIT
+
+### Excel like Auto Fill Behavior
+
+I tried my best to replicate excel auto fill from observations...
+
+The selected values are grouped into consecutive sequences if possible.
+These groups are then used to determining the interpolations.
+
+e.g. `2,4,a` will create the groups `2,4` and `a`.
+Then `2,4` is used to interpolate the next values (`6,8,10,...`),
+while `a` ist just copies over and over
+
+e.g. `2,4,a,01.01.2024,03.01.2024` will create the groups `2,4`, `a` and `01.01.2024, 03.01.2024`
+
+Again, `2,4` is used to interpolate the next numbers,
+`a` is just copied
+`01.01.2024,03.01.2024` is used to interpolate the next dates `05.01.2024, 07.01.2024, 09.01.2024, ...`
+
+
+Creating groups allows to still interpolate, even if heterogenous data is selected.
+
+However, consecutive sequences must have the same *delta* in order to be a proper sequence.
+
+For numbers, linear regression can always fit a line but for month names and dates no *model* is used.
+
+This means if distance between 3 month names in the sequences is different, auto fill will fallback to just copying the sequence over and over again.
+Example: `jan,feb,apr` with the distances/deltas of `1,2`. If the deltas are different then it's not clear what the next value should be.
+
+Example: `jan,feb,mar` with the distances/deltas of `1,1`. All deltas are the same, so we can continue with this delta and always add `1` month.
+
+This is also true for dates when the distance in days is used.
+
+Below you will find a flow char explaining the steps taken in greater detail.
+
+#### Numbers
+
+The cell text is a number.
+
+For numbers (floats) the language settings matter, e.g. 3.45 or 3,45
+For auto filling numbers the setting `numbers style` from the table ui is taken. It can be found when you open the stats panel on the left (by clicking the arrow next to `add row`).
+
+If you work primarily with one number style, you can change the default via the extension setting `initialNumbersStyle`.
+
+Auto filling numbers uses [linear regression](https://en.wikipedia.org/wiki/Linear_regression) to determine the values to fill (Excel also uses linear regression).
+
+
+### Contains Number
+
+This is different from normals numbers because here the cell text must only contain a number.
+
+Only `+1/-1` interpolation is performed here.
+
+
+#### Dates
+
+For dates the following formats are supported/known:
+
+- `YYYY-MM-DD`
+- `YYYY-M-DD`
+- `YYYY-MM-D`
+- `YYYY-M-D`
+- `DD-MM-YYYY`
+- `DD-M-YYYY`
+- `D-MM-YYYY`
+- `D-M-YYYY`
+- `DD-MM-YY`
+- `DD-M-YY`
+- `D-MM-YY`
+- `D-M-YY`
+
+where `YY/YYYY` stands for the year, e.g. 24/2024, `M/MM` stands for the month, e.g. 5/05 and `D/DD` stands for the day, e.g. 5/05
+
+The separator `-` can actually be one of the following: `- / .`
+
+**Yes**, there is no `MM-DD-YYYY` format!
+
+
+For the interpolation only the first two selected dates are used (to determine the delta).
+
+Then the diff in `days`, `months` and `years` is calculated, ignoring the other parts of the date.
+e.g. the diff/delta in days for `25.05.2024` - `26.07.2024` is still only 1 `day`
+
+when the diff in `days` is 0 and diff in `months` is 0, use the diff in years for interpolation
+this ensures days and months will stay the same: `25.05.2024, 25.05.2026` -> `25.05.2028`
+
+when only the diff in `days` is 0, use the diff in month and days for interpolation
+e.g. `25.05.2024, 25.07.2026` -> `25.09.2028`
+
+in any other case use the diff in `days` but this time respecting all parts of the date as delta for interpolation
+e.g. `01.01.2024, 02.02.2024` gives a delta of 32 `days`
+and the next date will be `05.03.2024`
+
+if there are more than 2 dates in the group sequence then they must have the same diff/delta.
+if thath is not the case, default to just copying the dates as sequence over and over
+
+
+#### Month Names
+
+For month names only english names are supported: `january|february|march|april|may|june|july|august|september|october|november|december`
+Also the first 3 letters can be used as month names: `jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec`
+
+In order to auto fill month names, the month name must be the only text in the cell.
+
+#### Differences to Excel
+
+When only 1 cell is selected, interpolation increases
+
+- `+1/-1` for numbers
+- next/previous month name
+- `+1/-1` day for dates
+
+where excel will just copy the value
+
+There might be other differences...
+
+
+#### Auto Fill Flowchart
+
+If it's too small, open it from `docs/autoFillDiagram.jpg`
+
+![alt text](docs/autoFillDiagram.jpg)
