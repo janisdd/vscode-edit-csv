@@ -228,6 +228,8 @@ You can also open `csvEditorHtml/index.html` in your favorite browser and play a
 
 Code: MIT
 
+---
+
 ### Excel like Auto Fill Behavior
 
 I tried my best to replicate excel auto fill from observations...
@@ -275,9 +277,11 @@ Auto filling numbers uses [linear regression](https://en.wikipedia.org/wiki/Line
 
 ### Contains Number
 
-This is different from normals numbers because here the cell text must only contain a number.
+This is different from normals numbers because here the cell text must start or end with a number (or both).
 
-Only `+1/-1` interpolation is performed here.
+In this case the interpolation is only `+1/-1`.
+
+if there is a number at the start of the cell, this takes precedence.
 
 
 #### Dates

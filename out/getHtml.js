@@ -47,6 +47,7 @@ function createEditorHtml(webview, context, config, initialVars) {
     const ioJs = _getResourcePath('csvEditorHtml/out/io.js');
     const uiJs = _getResourcePath('csvEditorHtml/out/ui.js');
     const utilJs = _getResourcePath('csvEditorHtml/out/util.js');
+    const autoFillJs = _getResourcePath('csvEditorHtml/out/autoFill.js');
     const mainJs = _getResourcePath('csvEditorHtml/out/main.js');
     const beforeDomLoadedJs = _getResourcePath('csvEditorHtml/out/beforeDomLoaded.js');
     const toolkit = _getResourcePath('node_modules/@vscode/webview-ui-toolkit/dist/toolkit.min.js');
@@ -975,6 +976,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 	<script src="${progressJs}"></script>
 	<script src="${findWidgetJs}"></script>
 	<script src="${ioJs}"></script>
+	<script src="${autoFillJs}"></script>
 	<script src="${utilJs}"></script>
 	<script src="${uiJs}"></script>
 	<script src="${mainJs}"></script>

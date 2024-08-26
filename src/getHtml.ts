@@ -53,6 +53,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	const ioJs = _getResourcePath('csvEditorHtml/out/io.js')
 	const uiJs = _getResourcePath('csvEditorHtml/out/ui.js')
 	const utilJs = _getResourcePath('csvEditorHtml/out/util.js')
+	const autoFillJs = _getResourcePath('csvEditorHtml/out/autoFill.js')
 	const mainJs = _getResourcePath('csvEditorHtml/out/main.js')
 
 	const beforeDomLoadedJs = _getResourcePath('csvEditorHtml/out/beforeDomLoaded.js')
@@ -992,6 +993,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	<script src="${progressJs}"></script>
 	<script src="${findWidgetJs}"></script>
 	<script src="${ioJs}"></script>
+	<script src="${autoFillJs}"></script>
 	<script src="${utilJs}"></script>
 	<script src="${uiJs}"></script>
 	<script src="${mainJs}"></script>
