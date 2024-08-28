@@ -667,7 +667,7 @@
 					"enumDescriptions": [
 						"Disables drag to auto fill",
 						"Adds a drag handle for copying data",
-						"Adds a drag handle for filling data like excel (numbers, months, dates). Defaults to copying if nothing can be interpolated."
+						"Adds a drag handle for filling data like excel (numbers, months, dates). Defaults to copying if nothing can be interpolated. You can hold down the Alt key to use copying instead of interpolation."
 					]
 				},
 				"csv-edit.initiallyHiddenColumnNames": {
@@ -695,7 +695,8 @@
 		"compile": "tsc -p ./ && tsc -p ./csvEditorHtml/tsconfig.json",
 		"watch": "tsc -watch -p ./",
 		"package": "vsce package",
-		"test": "npm run compile && node ./node_modules/vscode/bin/test",
+		"test": "npm run compile && vscode-test",
+		"testFe": "vitest run --config csvEditorHtml/test/vitest.config.ts",
 		"test2": "echo 'to run the tests compile and then go to the debug tab and start Extension Tests'",
 		"lint": "npx tslint -p . && npx tslint -p ./csvEditorHtml/tsconfig.json",
 		"promptUp": "node ./promtUploadbuild.js",
@@ -712,10 +713,13 @@
 		"@types/jsdom": "11.0.4",
 		"@types/mocha": "2.2.48",
 		"@types/mousetrap": "1.6.3",
-		"@types/node": "8.10.25",
+		"@types/node": "18.11.9",
 		"@types/papaparse": "4.5.6",
 		"@types/readline-sync": "1.4.3",
 		"@types/vscode": "1.70.0",
+		"@vitest/browser": "2.0.5",
+		"@vscode/test-cli": "0.0.10",
+		"@vscode/test-electron": "2.4.1",
 		"bulma-toast": "2.0.3",
 		"chardet": "1.2.1",
 		"dayjs": "1.11.13",
@@ -724,11 +728,12 @@
 		"iconv-lite": "0.6.2",
 		"jsdom": "16.7.0",
 		"mocha": "9.2.2",
+		"playwright": "1.46.1",
 		"readline-sync": "1.4.10",
 		"sweetalert2": "9.17.2",
 		"toaster-js": "2.2.3",
 		"tslint": "5.8.0",
 		"typescript": "5.0.4",
-		"vscode-test": "1.3.0"
+		"vitest": "2.0.5"
 	}
 }

@@ -134,7 +134,13 @@ type GroupInterpolationInfo =
  *   for copy only, this can be ignored!
  * @returns an array of interpolated strings
  */
-function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirection: boolean): string[] {
+function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirection: boolean, mouseupEvent: MouseEvent): string[] {
+
+	if (mouseupEvent.altKey) {
+		// fallback to just copying
+		return []
+	}
+
 	if (!isNormalDirection) {
 		_data = [..._data].reverse()
 	}

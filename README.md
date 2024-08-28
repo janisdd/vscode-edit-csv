@@ -334,6 +334,11 @@ Also the first 3 letters can be used as month names: `jan|feb|mar|apr|may|jun|ju
 
 In order to auto fill month names, the month name must be the only text in the cell.
 
+
+#### Shortcut for just coyping
+
+Similar to excel, you can just hold the alt `alt` before finish dragging in order to just copy the cell values. This won't do any interpolation.
+
 #### Differences to Excel
 
 When only 1 cell is selected, interpolation increases

@@ -24,7 +24,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  * Version: 6.5.4
- * Release date: 19/12/2018 (built at 24/08/2024 20:04:28)
+ * Release date: 19/12/2018 (built at 26/08/2024 20:17:54)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29763,7 +29763,7 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "24/08/2024 20:04:28";
+Handsontable.buildDate = "26/08/2024 20:17:54";
 Handsontable.packageName = "handsontable";
 Handsontable.version = "6.5.4";
 var baseVersion = "";
@@ -44051,7 +44051,7 @@ function (_BasePlugin) {
      * the function used to fill data
      *
      * if a function is set, the returned fill data must be of size targetCount!
-     * @type {null | (data: string[], targetCount: number, isNormalDirection: bool) => string[]}
+     * @type {null | (data: string[], targetCount: number, isNormalDirection: bool, mouseupEvent: MouseEvent) => string[]}
      */
 
     _this.fillFunc = null;
@@ -44188,6 +44188,7 @@ function (_BasePlugin) {
      * Try to apply fill values to the area in fill border, omitting the selection border.
      *
      * @private
+     * @param {MouseEvent} event `mouseup` event properties.
      * @returns {Boolean} reports if fill was applied.
      *
      * @fires Hooks#modifyAutofillRange
@@ -44196,7 +44197,7 @@ function (_BasePlugin) {
 
   }, {
     key: "fillIn",
-    value: function fillIn() {
+    value: function fillIn(event) {
       if (this.hot.selection.highlight.getFill().isEmpty()) {
         return false;
       }
@@ -44246,7 +44247,7 @@ function (_BasePlugin) {
                 _fillData.push(selectionData[_row][_col]);
               }
 
-              var _preFillData = this._fillSingleLine(_fillData, dragLength, isNormalDirection);
+              var _preFillData = this._fillSingleLine(_fillData, dragLength, isNormalDirection, event);
 
               if (_preFillData) {
                 if (_preFillData.length === dragLength) {
@@ -44285,7 +44286,7 @@ function (_BasePlugin) {
                 _fillData2.push(selectionData[_row3][_col2]);
               }
 
-              var _preFillData2 = this._fillSingleLine(_fillData2, dragLength, isNormalDirection);
+              var _preFillData2 = this._fillSingleLine(_fillData2, dragLength, isNormalDirection, event);
 
               if (_preFillData2) {
                 if (_preFillData2.length === dragLength) {
@@ -44357,9 +44358,9 @@ function (_BasePlugin) {
 
   }, {
     key: "_fillSingleLine",
-    value: function _fillSingleLine(data, targetCount, isNormalDirection) {
+    value: function _fillSingleLine(data, targetCount, isNormalDirection, event) {
       if (!this.fillFunc) return data;
-      var fillData = this.fillFunc(data, targetCount, isNormalDirection);
+      var fillData = this.fillFunc(data, targetCount, isNormalDirection, event);
 
       if (!fillData || !Array.isArray(fillData) || fillData.length !== targetCount) {
         return null;
@@ -44616,8 +44617,8 @@ function (_BasePlugin) {
     value: function registerEvents() {
       var _this4 = this;
 
-      this.eventManager.addEventListener(document.documentElement, 'mouseup', function () {
-        return _this4.onMouseUp();
+      this.eventManager.addEventListener(document.documentElement, 'mouseup', function (event) {
+        return _this4.onMouseUp(event);
       });
       this.eventManager.addEventListener(document.documentElement, 'mousemove', function (event) {
         return _this4.onMouseMove(event);
@@ -44670,14 +44671,15 @@ function (_BasePlugin) {
      * On mouse up listener.
      *
      * @private
+     * @param {MouseEvent} event `mouseup` event properties.
      */
 
   }, {
     key: "onMouseUp",
-    value: function onMouseUp() {
+    value: function onMouseUp(event) {
       if (this.handleDraggedCells) {
         if (this.handleDraggedCells > 1) {
-          this.fillIn();
+          this.fillIn(event);
         }
 
         this.handleDraggedCells = 0;
