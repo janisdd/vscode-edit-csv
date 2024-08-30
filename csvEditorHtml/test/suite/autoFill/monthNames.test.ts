@@ -1,232 +1,6 @@
 import { expect, test, suite } from 'vitest'
+import { AutoFillTestData, AutoFillTestSuit } from "./setup";
 
-type AutoFillTestSuit = {
-	name: string
-	tests: AutoFillTestData[]
-}
-
-type AutoFillTestData = {
-	name: string
-	data: string[]
-	targetCount: number
-	/**
-	 * true: is down or right, false: is up or left (reverse)
-	 */
-	isNormalDirection: boolean
-	expected: string[]
-}
-
-//TODO const are not added to window, functions are
-const knownNumberStylesMap: KnownNumberStylesMap = {
-	"en": {
-		key: 'en',
-		/**
-		 * this allows:
-		 * 0(000)
-		 * 0(000).0(000)
-		 * .0(000)
-		 * all repeated with - in front (negative numbers)
-		 * all repeated with e0(000) | e+0(000) | e-0(000)
-		 */
-		regex: /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/,
-		regexStartToEnd: /^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/,
-		thousandSeparator: /(\,| )/gm,
-		thousandSeparatorReplaceRegex: /((\,| )\d{3})+/gm
-	},
-	"non-en": {
-		key: 'non-en',
-		/**
-		 * this allows:
-		 * 0(000)
-		 * 0(000),0(000)
-		 * ,0(000)
-		 * all repeated with - in front (negative numbers)
-		 * all repeated with e0(000) | e+0(000) | e-0(000)
-		 */
-		regex: /-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?/,
-		regexStartToEnd: /^-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?$/,
-		thousandSeparator: /(\.| )/gm,
-		thousandSeparatorReplaceRegex: /((\.| )\d{3})+/gm
-	}
-}
-
-function getNumbersStyleFromUi(): NumbersStyle {
-	return knownNumberStylesMap['en']
-}
-window.getNumbersStyleFromUi = getNumbersStyleFromUi
-
-//add toFormat to big numbers
-//@ts-ignore
-toFormat(Big)
-
-// special test
-test('holding alt will copy only (uses handsontable default auto fill func)', async function () {
-	let result = customAutoFillFunc(['1', '2', '3'], 1, true, { altKey: true } as MouseEvent)
-	expect(result).toEqual([])
-})
-
-let tests_copyOnly: AutoFillTestData[] = [
-	{
-		name: 'only 1 target count with different data',
-		data: ['4', 'b', '8'],
-		targetCount: 1,
-		isNormalDirection: true,
-		expected: ['5']
-	},
-	{
-		name: 'only 2 target count with different data',
-		data: ['4', 'b', '8'],
-		targetCount: 2,
-		isNormalDirection: true,
-		expected: ['5', 'b']
-	},
-	{
-		name: 'only 3 target count with different data',
-		data: ['4', 'b', '8'],
-		targetCount: 3,
-		isNormalDirection: true,
-		expected: ['5', 'b', '9'],
-	},
-	{
-		name: '1 more target count than data',
-		data: ['4', 'b', '8'],
-		targetCount: 4,
-		isNormalDirection: true,
-		expected: ['5', 'b', '9', '6'],
-	},
-	{
-		name: '2 more target count than data',
-		data: ['4', 'b', '8'],
-		targetCount: 5,
-		isNormalDirection: true,
-		expected: ['5', 'b', '9', '6', 'b'],
-	},
-	{
-		name: '3 more target count than data',
-		data: ['4', 'b', '8'],
-		targetCount: 6,
-		isNormalDirection: true,
-		expected: ['5', 'b', '9', '6', 'b', '10'],
-	},
-	{
-		name: '1 more target count than data (wrap around 2x)',
-		data: ['4', 'b', '8'],
-		targetCount: 7,
-		isNormalDirection: true,
-		expected: ['5', 'b', '9', '6', 'b', '10', '7'],
-	},
-	{
-		name: '2 more target count than data (wrap around 2x)',
-		data: ['4', 'b', '8'],
-		targetCount: 8,
-		isNormalDirection: true,
-		expected: ['5', 'b', '9', '6', 'b', '10', '7', 'b'],
-	},
-	{
-		name: '3 more target count than data (wrap around 2x)',
-		data: ['4', 'b', '8'],
-		targetCount: 9,
-		isNormalDirection: true,
-		expected: ['5', 'b', '9', '6', 'b', '10', '7', 'b', '11'],
-	},
-
-	//--- other direction
-
-	{
-		name: 'only 1 target count with different data (other direction)',
-		data: ['4', 'b', '8'],
-		targetCount: 1,
-		isNormalDirection: false,
-		expected: ['7']
-	},
-	{
-		name: 'only 2 target count with different data  (other direction)',
-		data: ['4', 'b', '8'],
-		targetCount: 2,
-		isNormalDirection: false,
-		expected: ['7', 'b'].reverse(),
-	},
-	{
-		name: 'only 3 target count with different data  (other direction)',
-		data: ['4', 'b', '8'],
-		targetCount: 3,
-		isNormalDirection: false,
-		expected: ['7', 'b', '3'].reverse(),
-	},
-	{
-		name: '1 more target count than data  (other direction)',
-		data: ['4', 'b', '8'],
-		targetCount: 4,
-		isNormalDirection: false,
-		expected: ['7', 'b', '3', '6'].reverse(),
-	},
-	{
-		name: '2 more target count than data  (other direction)',
-		data: ['4', 'b', '8'],
-		targetCount: 5,
-		isNormalDirection: false,
-		expected: ['7', 'b', '3', '6', 'b'].reverse(),
-	},
-	{
-		name: '3 more target count than data  (other direction)',
-		data: ['4', 'b', '8'],
-		targetCount: 6,
-		isNormalDirection: false,
-		expected: ['7', 'b', '3', '6', 'b', '2'].reverse(),
-	},
-	{
-		name: '1 more target count than data (wrap around 2x)  (other direction)',
-		data: ['4', 'b', '8'],
-		targetCount: 7,
-		isNormalDirection: false,
-		expected: ['7', 'b', '3', '6', 'b', '2', '5'].reverse(),
-	},
-	{
-		name: '2 more target count than data (wrap around 2x)  (other direction)',
-		data: ['4', 'b', '8'],
-		targetCount: 8,
-		isNormalDirection: false,
-		expected: ['7', 'b', '3', '6', 'b', '2', '5', 'b'].reverse(),
-	},
-	{
-		name: '3 more target count than data (wrap around 2x)  (other direction)',
-		data: ['4', 'b', '8'],
-		targetCount: 9,
-		isNormalDirection: false,
-		expected: ['7', 'b', '3', '6', 'b', '2', '5', 'b', '1'].reverse(),
-	},
-]
-
-
-let tests_numbersInts: AutoFillTestData[] = [
-	{
-		name: 'normal direction',
-		data: ['1', '2', '3'],
-		targetCount: 1,
-		isNormalDirection: true,
-		expected: ['4']
-	}
-]
-
-let tests_numbersFloats: AutoFillTestData[] = [
-	{
-		name: 'normal direction',
-		data: ['1', '2', '3'],
-		targetCount: 1,
-		isNormalDirection: true,
-		expected: ['4']
-	}
-]
-
-let tests_containsBumbersInts: AutoFillTestData[] = [
-	{
-		name: 'normal direction',
-		data: ['1', '2', '3'],
-		targetCount: 1,
-		isNormalDirection: true,
-		expected: ['4']
-	}
-]
 
 let tests_monthNames: AutoFillTestData[] = [
 	{
@@ -258,11 +32,11 @@ let tests_monthNames: AutoFillTestData[] = [
 		expected: ['may']
 	},
 	{
-		name: 'may to jun',
+		name: 'may to jun (special because may has only 3 letters -> full name)',
 		data: ['may'],
 		targetCount: 1,
 		isNormalDirection: true,
-		expected: ['jun']
+		expected: ['june']
 	},
 	{
 		name: 'jun to jul',
@@ -370,7 +144,7 @@ let tests_monthNames: AutoFillTestData[] = [
 		data: ['Feb', 'apr'],
 		targetCount: 13,
 		isNormalDirection: true,
-		expected: ['Jun', 'aug', 'Oct', 'dec', 'Feb', 'apr', 'Jun', 'Aug', 'oct', 'Dec', 'feb', 'Apr', 'jun']
+		expected: ['Jun', 'aug', 'Oct', 'dec', 'Feb', 'apr', 'Jun', 'aug', 'Oct', 'dec', 'Feb', 'apr', 'Jun']
 	},
 	{
 		name: 'feb, apr -> delta 2 upper case next',
@@ -390,161 +164,161 @@ let tests_monthNames: AutoFillTestData[] = [
 	//--- other direction
 
 	{
-		name: 'jan delta 1',
+		name: 'jan delta 1 (other dir)',
 		data: ['jan'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['dec']
 	},
 	{
-		name: 'feb delta 1',
+		name: 'feb delta 1 (other dir)',
 		data: ['feb'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['jan']
 	},
 	{
-		name: 'mar delta 1',
+		name: 'mar delta 1 (other dir)',
 		data: ['mar'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['feb']
 	},
 	{
-		name: 'apr delta 1',
+		name: 'apr delta 1 (other dir)',
 		data: ['apr'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['mar']
 	},
 	{
-		name: 'may delta 1',
+		name: 'may delta 1 (special case because may has only 3 letters -> use full name) (other dir)',
 		data: ['may'],
 		targetCount: 1,
 		isNormalDirection: false,
-		expected: ['apr']
+		expected: ['april']
 	},
 	{
-		name: 'jun delta 1',
+		name: 'jun delta 1 (other dir)',
 		data: ['jun'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['may']
 	},
 	{
-		name: 'jul delta 1',
+		name: 'jul delta 1 (other dir)',
 		data: ['jul'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['jun']
 	},
 	{
-		name: 'aug delta 1',
+		name: 'aug delta 1 (other dir)',
 		data: ['aug'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['jul']
 	},
 	{
-		name: 'sep delta 1',
+		name: 'sep delta 1 (other dir)',
 		data: ['sep'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['aug']
 	},
 	{
-		name: 'oct delta 1',
+		name: 'oct delta 1 (other dir)',
 		data: ['oct'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['sep']
 	},
 	{
-		name: 'nov delta 1',
+		name: 'nov delta 1 (other dir)',
 		data: ['nov'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['oct']
 	},
 	{
-		name: 'dec delta 1',
+		name: 'dec delta 1 (other dir)',
 		data: ['dec'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['nov']
 	},
 	{
-		name: 'jan target count 2',
+		name: 'jan target count 2 (other dir)',
 		data: ['jan'],
 		targetCount: 2,
 		isNormalDirection: false,
-		expected: ['dec', 'nov']
+		expected: ['dec', 'nov'].reverse()
 	},
 	{
-		name: 'jan target count 3',
+		name: 'jan target count 3 (other dir)',
 		data: ['jan'],
 		targetCount: 3,
 		isNormalDirection: false,
-		expected: ['dec', 'nov', 'oct']
+		expected: ['dec', 'nov', 'oct'].reverse()
 	},
 	{
-		name: 'jan target count 13 (wrap around)',
+		name: 'jan target count 13 (wrap around) (other dir)',
 		data: ['jan'],
 		targetCount: 13,
 		isNormalDirection: false,
-		expected: ['dec', 'nov', 'oct', 'sep', 'aug', 'jul', 'jun', 'may', 'apr', 'mar', 'feb', 'jan', 'dec']
+		expected: ['dec', 'nov', 'oct', 'sep', 'aug', 'jul', 'jun', 'may', 'apr', 'mar', 'feb', 'jan', 'dec'].reverse()
 	},
 	//--- delta > 1
 	{
-		name: 'jan, mar -> delta 2',
+		name: 'jan, mar -> delta 2, target count 1 (other dir)',
 		data: ['jan', 'mar'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['nov']
 	},
 	{
-		name: 'jan, mar -> delta 2',
+		name: 'jan, mar -> delta 2, target count 13 (other dir)',
 		data: ['jan', 'mar'],
 		targetCount: 13,
 		isNormalDirection: false,
-		expected: ['nov', 'sep', 'jul', 'may', 'mar', 'jan', 'nov', 'sep', 'jul', 'may', 'mar', 'jan', 'nov']
+		expected: ['nov', 'sep', 'jul', 'may', 'mar', 'jan', 'nov', 'sep', 'jul', 'may', 'mar', 'jan', 'nov'].reverse()
 	},
 	{
-		name: 'feb, apr -> delta 2',
+		name: 'feb, apr -> delta 2 (other dir)',
 		data: ['feb', 'apr'],
 		targetCount: 13,
 		isNormalDirection: false,
-		expected: ['dec', 'oct', 'aug', 'jun', 'apr', 'feb', 'dec', 'oct', 'aug', 'jun', 'apr', 'feb', 'dec']
+		expected: ['dec', 'oct', 'aug', 'jun', 'apr', 'feb', 'dec', 'oct', 'aug', 'jun', 'apr', 'feb', 'dec'].reverse()
 	},
 	{
-		name: 'feb, apr -> delta 5 (no divider of 12)',
+		name: 'feb, apr -> delta 5 (no divider of 12) (other dir)',
 		data: ['jan', 'jun'],
 		targetCount: 5,
 		isNormalDirection: false,
-		expected: ['aug', 'mar', 'oct', 'may', 'dec']
+		expected: ['aug', 'mar', 'oct', 'may', 'dec'].reverse()
 	},
 
 	// upper case information
 	{
-		name: 'feb, apr -> delta 2 upper case first',
+		name: 'feb, apr -> delta 2 upper case first (other dir)',
 		data: ['Feb', 'apr'],
 		targetCount: 13,
 		isNormalDirection: true,
-		expected: ['Nov', 'sep', 'Jul', 'may', 'Mar', 'jan', 'Nov', 'sep', 'Jul', 'May', 'mar', 'Jan', 'nov']
+		expected: ['Jun', 'aug', 'Oct', 'dec', 'Feb', 'apr', 'Jun', 'aug', 'Oct', 'dec', 'Feb', 'apr', 'Jun']
 	},
 	{
-		name: 'feb, apr -> delta 2 upper case next',
+		name: 'feb, apr -> delta 2 upper case next (other dir)',
 		data: ['feb', 'Apr'],
 		targetCount: 13,
 		isNormalDirection: true,
-		expected: ['dec', 'Oct', 'aug', 'Jun', 'apr', 'Feb', 'dec', 'Oct', 'aug', 'Jun', 'apr', 'Feb', 'dec']
+		expected: ['jun', 'Aug', 'oct', 'Dec', 'feb', 'Apr', 'jun', 'Aug', 'oct', 'Dec', 'feb', 'Apr', 'jun']
 	},
 	{
-		name: 'feb, apr -> delta 5 (no divider of 12) upper case all',
+		name: 'feb, apr -> delta 5 (no divider of 12) upper case all (other dir)',
 		data: ['Jan', 'Jun'],
 		targetCount: 5,
 		isNormalDirection: true,
-		expected: ['Aug', 'Mar', 'Oct', 'May', 'Dec']
+		expected: ['Nov', 'Apr', 'Sep', 'Feb', 'Jul']
 	},
 ]
 
@@ -690,211 +464,186 @@ let tests_monthNamesFull: AutoFillTestData[] = [
 		data: ['February', 'april'],
 		targetCount: 13,
 		isNormalDirection: true,
-		expected: ['June', 'august', 'October', 'december', 'February', 'april', 'June', 'August', 'october', 'December', 'february', 'april', 'june']
+		expected: ['June', 'august', 'October', 'december', 'February', 'april', 'June', 'august', 'October', 'december', 'February', 'april', 'June']
 	},
 	{
 		name: 'february, april -> delta 2 upper case next',
-		data: ['february', 'april'],
+		data: ['february', 'April'],
 		targetCount: 13,
 		isNormalDirection: true,
-		expected: ['june', 'August', 'october', 'December', 'february', 'april', 'june', 'August', 'october', 'December', 'february', 'april', 'june']
+		expected: ['june', 'August', 'october', 'December', 'february', 'April', 'june', 'August', 'october', 'December', 'february', 'April', 'june']
 	},
 	{
 		name: 'february, april -> delta 5 (no divider of 12) upper case all',
 		data: ['January', 'June'],
 		targetCount: 5,
 		isNormalDirection: true,
-		expected: ['November', 'april', 'September', 'February', 'July']
+		expected: ['November', 'April', 'September', 'February', 'July']
 	},
 
 	//--- other direction
 
 	{
-		name: 'january delta 1',
+		name: 'january delta 1 (other dir)',
 		data: ['january'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['december']
 	},
 	{
-		name: 'february delta 1',
+		name: 'february delta 1 (other dir)',
 		data: ['february'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['january']
 	},
 	{
-		name: 'march delta 1',
+		name: 'march delta 1 (other dir)',
 		data: ['march'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['february']
 	},
 	{
-		name: 'april delta 1',
+		name: 'april delta 1 (other dir)',
 		data: ['april'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['march']
 	},
 	{
-		name: 'may delta 1',
+		name: 'may delta 1 (other dir)',
 		data: ['may'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['april']
 	},
 	{
-		name: 'june delta 1',
+		name: 'june delta 1 (other dir)',
 		data: ['june'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['may']
 	},
 	{
-		name: 'july delta 1',
+		name: 'july delta 1 (other dir)',
 		data: ['july'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['june']
 	},
 	{
-		name: 'august delta 1',
+		name: 'august delta 1 (other dir)',
 		data: ['august'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['july']
 	},
 	{
-		name: 'september delta 1',
+		name: 'september delta 1 (other dir)',
 		data: ['september'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['august']
 	},
 	{
-		name: 'october delta 1',
+		name: 'october delta 1 (other dir)',
 		data: ['october'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['september']
 	},
 	{
-		name: 'november delta 1',
+		name: 'november delta 1 (other dir)',
 		data: ['november'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['october']
 	},
 	{
-		name: 'december delta 1',
+		name: 'december delta 1 (other dir)',
 		data: ['december'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['november']
 	},
 	{
-		name: 'january target count 2',
+		name: 'january target count 2 (other dir)',
 		data: ['january'],
 		targetCount: 2,
 		isNormalDirection: false,
-		expected: ['december', 'november']
+		expected: ['december', 'november'].reverse()
 	},
 	{
-		name: 'january target count 3',
+		name: 'january target count 3 (other dir)',
 		data: ['january'],
 		targetCount: 3,
 		isNormalDirection: false,
-		expected: ['december', 'november', 'october']
+		expected: ['december', 'november', 'october'].reverse()
 	},
 	{
-		name: 'january target count 13 (wrap around)',
+		name: 'january target count 13 (wrap around) (other dir)',
 		data: ['january'],
 		targetCount: 13,
 		isNormalDirection: false,
-		expected: ['december', 'november', 'october', 'september', 'august', 'july', 'june', 'may', 'april', 'march', 'february', 'january', 'december']
+		expected: ['december', 'november', 'october', 'september', 'august', 'july', 'june', 'may', 'april', 'march', 'february', 'january', 'december'].reverse()
 	},
 	//--- delta > 1
 	{
-		name: 'january, march -> delta 2',
+		name: 'january, march -> delta 2 (other dir)',
 		data: ['january', 'march'],
 		targetCount: 1,
 		isNormalDirection: false,
 		expected: ['november']
 	},
 	{
-		name: 'january, march -> delta 2',
+		name: 'january, march -> delta 2 (other dir)',
 		data: ['january', 'march'],
 		targetCount: 13,
 		isNormalDirection: false,
-		expected: ['november', 'september', 'july', 'may', 'march', 'january', 'november', 'september', 'july', 'may', 'march', 'january', 'november']
+		expected: ['november', 'september', 'july', 'may', 'march', 'january', 'november', 'september', 'july', 'may', 'march', 'january', 'november'].reverse()
 	},
 	{
-		name: 'february, april -> delta 2',
+		name: 'february, april -> delta 2 (other dir)',
 		data: ['february', 'april'],
 		targetCount: 13,
 		isNormalDirection: false,
-		expected: ['december', 'october', 'august', 'june', 'april', 'february', 'december', 'october', 'august', 'june', 'april', 'february', 'december']
+		expected: ['december', 'october', 'august', 'june', 'april', 'february', 'december', 'october', 'august', 'june', 'april', 'february', 'december'].reverse()
 	},
 	{
-		name: 'february, april -> delta 5 (no divider of 12)',
+		name: 'february, april -> delta 5 (no divider of 12) (other dir)',
 		data: ['january', 'june'],
 		targetCount: 5,
 		isNormalDirection: false,
-		expected: ['august', 'march', 'october', 'may', 'december']
+		expected: ['august', 'march', 'october', 'may', 'december'].reverse()
 	},
 
 	// upper case information
 	{
-		name: 'february, april -> delta 2 upper case first',
+		name: 'february, april -> delta 2 upper case first (other dir)',
 		data: ['February', 'april'],
 		targetCount: 13,
-		isNormalDirection: true,
-		expected: ['November', 'september', 'July', 'may', 'Mar', 'january', 'November', 'september', 'July', 'May', 'march', 'January', 'november']
+		isNormalDirection: false,
+		expected: ['december', 'October', 'august', 'June', 'april', 'February', 'december', 'October', 'august', 'June', 'april', 'February', 'december'].reverse()
 	},
 	{
-		name: 'february, april -> delta 2 upper case next',
-		data: ['february', 'april'],
+		name: 'february, April (full) -> delta 2 upper case next (other dir)',
+		data: ['february', 'April'],
 		targetCount: 13,
-		isNormalDirection: true,
-		expected: ['december', 'October', 'august', 'June', 'april', 'February', 'december', 'October', 'august', 'June', 'april', 'February', 'december']
+		isNormalDirection: false,
+		expected: ['December', 'october', 'August', 'june', 'April', 'february', 'December', 'october', 'August', 'june', 'April', 'february', 'December'].reverse()
 	},
 	{
-		name: 'february, april -> delta 5 (no divider of 12) upper case all',
+		name: 'february, april -> delta 5 (no divider of 12) upper case all (other dir)',
 		data: ['January', 'June'],
 		targetCount: 5,
-		isNormalDirection: true,
-		expected: ['August', 'Mar', 'October', 'May', 'December']
+		isNormalDirection: false,
+		expected: ['August', 'March', 'October', 'May', 'December'].reverse()
 	},
 ]
-
-let tests_dates: AutoFillTestData[] = [
-	{
-		name: 'normal direction',
-		data: ['1', '2', '3'],
-		targetCount: 1,
-		isNormalDirection: true,
-		expected: ['4']
-	}
-]
-
-//TODO different groups
-//TODO contains float??
 
 
 let allTests: AutoFillTestSuit[] = [
-	{
-		name: 'copy only tests',
-		tests: tests_copyOnly
-	},
-	{
-		name: 'numbers (ints) tests',
-		tests: tests_numbersInts
-	},
-	{
-		name: 'numbers (floats) tests',
-		tests: tests_numbersFloats
-	},
 	{
 		name: 'month names tests',
 		tests: tests_monthNames
@@ -903,10 +652,6 @@ let allTests: AutoFillTestSuit[] = [
 		name: 'month names full tests',
 		tests: tests_monthNamesFull
 	},
-	{
-		name: 'dates tests',
-		tests: tests_dates
-	}
 ]
 
 for (let i = 0; i < allTests.length; i++) {
@@ -916,8 +661,6 @@ for (let i = 0; i < allTests.length; i++) {
 
 		for (let j = 0; j < testSuit.tests.length; j++) {
 			const testCase = testSuit.tests[j]
-
-			
 
 			test(testCase.name, () => {
 				let result = customAutoFillFunc(
@@ -932,7 +675,5 @@ for (let i = 0; i < allTests.length; i++) {
 		}
 
 	})
-
-	if (i === 0) break
 
 }

@@ -1428,7 +1428,39 @@ function setNumbersStyleUi(numbersStyleToUse: EditCsvConfig["initialNumbersStyle
  */
 function getNumbersStyleFromUi(): NumbersStyle {
 
-
+	let knownNumberStylesMap: KnownNumberStylesMap = {
+		"en": {
+			key: 'en',
+			/**
+			 * this allows:
+			 * 0(000)
+			 * 0(000).0(000)
+			 * .0(000)
+			 * all repeated with - in front (negative numbers)
+			 * all repeated with e0(000) | e+0(000) | e-0(000)
+			 */
+			regex: /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/,
+			regexStartToEnd: /^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/,
+			thousandSeparator: /(\,| )/gm,
+			thousandSeparatorReplaceRegex: /((\,| )\d{3})+/gm
+		},
+		"non-en": {
+			key: 'non-en',
+			/**
+			 * this allows:
+			 * 0(000)
+			 * 0(000),0(000)
+			 * ,0(000)
+			 * all repeated with - in front (negative numbers)
+			 * all repeated with e0(000) | e+0(000) | e-0(000)
+			 */
+			regex: /-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?/,
+			regexStartToEnd: /^-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?$/,
+			thousandSeparator: /(\.| )/gm,
+			thousandSeparatorReplaceRegex: /((\.| )\d{3})+/gm
+		}
+	}
+	
 	if (numbersStyleEnRadio.checked) return knownNumberStylesMap['en']
 
 	if (numbersStyleNonEnRadio.checked) return knownNumberStylesMap['non-en']

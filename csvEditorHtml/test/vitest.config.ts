@@ -38,6 +38,18 @@ export default defineConfig({
           src: './csvEditorHtml/autoFill.ts',
           type: 'text/javascript',
         },
+        {
+          content: `
+          window.numbersStyleEnRadio = {
+            checked: true
+          }
+          //add toFormat to big numbers
+          toFormat(Big)
+          `,
+          type: 'text/javascript',
+        },
+
+        
       ],
     },
     include: ['csvEditorHtml/test/**/*.test.ts'],
