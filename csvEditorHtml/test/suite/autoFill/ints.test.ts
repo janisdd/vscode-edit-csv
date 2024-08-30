@@ -73,7 +73,7 @@ let tests_onlyIntsLinearRegression: AutoFillTestData[] = [
 
 let allTests: AutoFillTestSuit[] = [
 	{
-		name: 'only ints linear regression',
+		name: 'test only ints linear regression',
 		tests: tests_onlyIntsLinearRegression
 	},
 ]

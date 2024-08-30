@@ -925,7 +925,6 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 					newMonthIndex = 12 + newMonthIndex
 				}
 
-
 				let nextMonthIndex = newMonthIndex % 12
 				let nextMonth = isFullName ? monthFullNames[nextMonthIndex] : monthShortNames[nextMonthIndex]
 

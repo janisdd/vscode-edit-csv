@@ -2,7 +2,7 @@ import { expect, test, suite } from 'vitest'
 import { AutoFillTestData, AutoFillTestSuit } from './setup'
 
 
-let tests_onlyIntsLinearRegression: AutoFillTestData[] = [
+let tests_onlyFloatsLinearRegression: AutoFillTestData[] = [
 	{
 		name: 'increment by 1, 1 cell, 1 target count',
 		data: ['1.3'],
@@ -63,8 +63,8 @@ let tests_onlyIntsLinearRegression: AutoFillTestData[] = [
 
 let allTests: AutoFillTestSuit[] = [
 	{
-		name: 'only ints linear regression',
-		tests: tests_onlyIntsLinearRegression
+		name: 'test only floats linear regression',
+		tests: tests_onlyFloatsLinearRegression
 	},
 ]
 

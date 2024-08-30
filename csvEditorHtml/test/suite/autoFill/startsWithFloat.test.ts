@@ -220,21 +220,21 @@ let tests_containsNumbersInts_StartsWithNumber_multiCells: AutoFillTestData[] = 
 
 let tests_containsNumbersInts_StartsWithNumber_special: AutoFillTestData[] = [
 	{
-		name: 'starts with float precision test 1 (big properly configured, at least 20 fract digits)',
+		name: 'starts with float precision test 1 (big properly configured, at least 20 fract digits [only important devision, sqrt, pow])',
 		data: ['1.01234567890123456789 xyz abc'],
 		targetCount: 1,
 		isNormalDirection: true,
 		expected: ['2.01234567890123456789 xyz abc']
 	},
 	{
-		name: 'starts with float precision test -1  (big properly configured, at least 20 fract digits)',
+		name: 'starts with float precision test -1  (big properly configured, at least 20 fract digits [only important devision, sqrt, pow])',
 		data: ['-1.01234567890123456789 xyz abc'],
 		targetCount: 1,
 		isNormalDirection: true,
 		expected: ['-0.01234567890123456789 xyz abc']
 	},
 	{
-		name: 'starts with float large values test 5  (big properly configured, at least 20 fract digits)',
+		name: 'starts with float large values test 5  (big properly configured, at least 20 fract digits [only important devision, sqrt, pow])',
 		//unsigned long: 4,294,967,295 -> 4294967295 -> just a bit more
 		data: ['5294967295.01234567890123456789 xyz abc'],
 		targetCount: 1,
@@ -242,7 +242,7 @@ let tests_containsNumbersInts_StartsWithNumber_special: AutoFillTestData[] = [
 		expected: ['5294967296.01234567890123456789 xyz abc']
 	},
 	{
-		name: 'starts with float large values test -5  (big properly configured, at least 20 fract digits)',
+		name: 'starts with float large values test -5  (big properly configured, at least 20 fract digits [only important devision, sqrt, pow])',
 		//unsigned long: 4,294,967,295 -> 4294967295
 		data: ['-5294967295.01234567890123456789 xyz abc'],
 		targetCount: 1,
@@ -251,14 +251,14 @@ let tests_containsNumbersInts_StartsWithNumber_special: AutoFillTestData[] = [
 	},
 
 	{
-		name: 'starts with float precision test 1  (big properly configured, at least 20 fract digits)',
+		name: 'starts with float precision test 1  (big properly configured, at least 20 fract digits [only important devision, sqrt, pow])',
 		data: ['1.0123456789012345678913333333334000000000000000000000000000000000000000000000000000000000004564560198 xyz abc'],
 		targetCount: 1,
 		isNormalDirection: true,
 		expected: ['2.0123456789012345678913333333334000000000000000000000000000000000000000000000000000000000004564560198 xyz abc']
 	},
 	{
-		name: 'starts with float precision test 1  (big properly configured, at least 20 fract digits)',
+		name: 'starts with float precision test 1  (big properly configured, at least 20 fract digits [only important devision, sqrt, pow])',
 		//100 digits . 100 digits
 		data: ['1123456789012345678913333333334000000000000000000000000000000000000000000000000000000000004564560198.1123456789012345678913333333334000000000000000000000000000000000000000000000000000000000004564560198 xyz abc'],
 		targetCount: 1,
