@@ -232,7 +232,6 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 			let endsWithNumberFloat = matchesFloat.length > 0 && lastMatchFloat && lastMatchFloat.index! + lastMatchFloat[0].length === cellText.length
 			let onlyNumberFloat = startsWithNumberFloat && endsWithNumberFloat && matchesFloat.length === 1
 
-
 			if (onlyNumberFloat) {
 
 				let groupInterpolationInfo_Int: GroupInterpolationInfo_Number = {
@@ -274,7 +273,12 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 					let separator1 = separatorMatches[0][0]
 					let separator2 = separatorMatches[1][0]
 
-					let displayFormat = format.replace(`-`, separator1).replace(`-`, separator2)
+					let dashIndex1 = format.indexOf('-')
+					let dashIndex2 = format.indexOf('-', dashIndex1 + 1)
+
+					// let displayFormat = format.replace(`-`, separator1).replace(`-`, separator2) //this does not work if we repalce - with - and then the second replace will replace the first...
+					let displayFormat = format.substring(0, dashIndex1) + separator1 + format.substring(dashIndex1 + 1, dashIndex2) + separator2 + format.substring(dashIndex2 + 1)
+					
 
 					let originalDate = dayjs(dateMatchString, displayFormat, true)
 

@@ -45,6 +45,8 @@ export default defineConfig({
           }
           //add toFormat to big numbers
           toFormat(Big)
+          //for custom formatted dates
+          dayjs.extend(dayjs_plugin_customParseFormat);
           `,
           type: 'text/javascript',
         },
