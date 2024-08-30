@@ -524,7 +524,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 			} else {
 				// not contains int
 
-				dataIndexToInterpolationSequenceIndexNumbers[_i] = -1
+				dataIndexToInterpolationSequenceIndexContainsNumber[_i] = -1
 
 				if (currentSequenceContainsNumberIndices.length > 0) {
 					interpolationContainsNumberSequenceIndices.push(currentSequenceContainsNumberIndices)
@@ -951,6 +951,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 
 				if (nextDate.isValid() === false) {
 					//could get invalid date
+					//it seems that if we start with a valid date, then adding some value will always return a valid date??
 					interpolatedDataAsString.push("INVALID DATE")
 				} else {
 
