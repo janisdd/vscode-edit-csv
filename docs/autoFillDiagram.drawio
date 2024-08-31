@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 Edg/128.0.0.0" version="24.7.7">
   <diagram name="Seite-1" id="wg6lSaadqCS5R6qeMQtF">
-    <mxGraphModel dx="1340" dy="1037" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="3000" math="0" shadow="0">
+    <mxGraphModel dx="1016" dy="745" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="3000" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -116,7 +116,7 @@
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-18" value="type: contains int" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="755" y="500" width="100" height="65" as="geometry" />
         </mxCell>
-        <mxCell id="V1h_MBBhY-OGtaXYAKEi-19" value="type: int/float" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+        <mxCell id="V1h_MBBhY-OGtaXYAKEi-19" value="type: int/float&lt;div&gt;(float takes precedence)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="270" y="515" width="100" height="65" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-20" target="V1h_MBBhY-OGtaXYAKEi-41" edge="1">
@@ -229,35 +229,38 @@
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-59" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-51" target="V1h_MBBhY-OGtaXYAKEi-56" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
+        <mxCell id="QTwHzahEvGftHiBAt5Vj-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="V1h_MBBhY-OGtaXYAKEi-51" target="QTwHzahEvGftHiBAt5Vj-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-51" value="process cell types" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="270" y="950" width="100" height="50" as="geometry" />
+          <mxGeometry x="270" y="950" width="110" height="50" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-70" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-54" target="V1h_MBBhY-OGtaXYAKEi-60" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="V1h_MBBhY-OGtaXYAKEi-54" value="loop type int&lt;div&gt;and type contains int&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="150" y="1070" width="130" height="50" as="geometry" />
+        <mxCell id="V1h_MBBhY-OGtaXYAKEi-54" value="loop type int/float" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="150" y="1050" width="130" height="50" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-76" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-55" target="V1h_MBBhY-OGtaXYAKEi-75" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-55" value="loop type month name" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="495" y="1070" width="130" height="50" as="geometry" />
+          <mxGeometry x="495" y="1050" width="130" height="50" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-94" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-56" target="V1h_MBBhY-OGtaXYAKEi-92" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-56" value="loop type date" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="1100" y="1060" width="130" height="50" as="geometry" />
+          <mxGeometry x="1100" y="1050" width="130" height="50" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-71" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-60" target="V1h_MBBhY-OGtaXYAKEi-64" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="V1h_MBBhY-OGtaXYAKEi-60" value="create groups&amp;nbsp;of consecutive ints" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="150" y="1140" width="130" height="50" as="geometry" />
+        <mxCell id="V1h_MBBhY-OGtaXYAKEi-60" value="create groups&amp;nbsp;of consecutive ints/floats" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="150" y="1130" width="130" height="50" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-62" value="create an interpolation model to predict next values (same as excel)" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="270" y="1510" width="130" height="70" as="geometry" />
+          <mxGeometry x="270" y="1540" width="130" height="70" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-66" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-63" target="V1h_MBBhY-OGtaXYAKEi-65" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -276,19 +279,19 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-63" value="group contains only 1 entry?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" parent="1" vertex="1">
-          <mxGeometry x="162.5" y="1340" width="105" height="105" as="geometry" />
+          <mxGeometry x="162.5" y="1370" width="105" height="105" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-64" value="create a group for every type contains int entry&lt;div&gt;(every entry is alone in it&#39;s group)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="150" y="1220" width="130" height="80" as="geometry" />
+          <mxGeometry x="150" y="1210" width="130" height="80" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-65" value="interpolation +1/-1&lt;br&gt;(based on dragged direction)" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="40" y="1510" width="130" height="70" as="geometry" />
+          <mxGeometry x="40" y="1540" width="130" height="70" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-72" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-64" target="V1h_MBBhY-OGtaXYAKEi-63" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-73" value="convert all months into indices (0 to 11)" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="495" y="1230" width="130" height="50" as="geometry" />
+          <mxGeometry x="495" y="1210" width="130" height="50" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-81" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-74" target="V1h_MBBhY-OGtaXYAKEi-80" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -299,22 +302,22 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-74" value="group contains only 1 entry?" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" parent="1" vertex="1">
-          <mxGeometry x="507.5" y="1340" width="105" height="105" as="geometry" />
+          <mxGeometry x="507.5" y="1367.5" width="105" height="105" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-77" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-75" target="V1h_MBBhY-OGtaXYAKEi-73" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-75" value="create groups&amp;nbsp;of consecutive type months entires" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="495" y="1150" width="130" height="50" as="geometry" />
+          <mxGeometry x="495" y="1130" width="130" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="V1h_MBBhY-OGtaXYAKEi-78" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-73" target="V1h_MBBhY-OGtaXYAKEi-74" edge="1">
+        <mxCell id="V1h_MBBhY-OGtaXYAKEi-78" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-73" target="QTwHzahEvGftHiBAt5Vj-7" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-80" value="interpolation +1/-1&lt;br&gt;(based on dragged direction)" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="495" y="1510" width="130" height="70" as="geometry" />
+          <mxGeometry x="495" y="1537.5" width="130" height="70" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-83" value="interpolation +/- (delta mod 12)&lt;br&gt;(based on dragged direction)" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="692.5" y="1510" width="175" height="70" as="geometry" />
+          <mxGeometry x="692.5" y="1537.5" width="175" height="70" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-87" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-84" target="V1h_MBBhY-OGtaXYAKEi-83" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -333,7 +336,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-84" value="delta/difference&amp;nbsp;&lt;div&gt;between all months&amp;nbsp;&lt;/div&gt;&lt;div&gt;in this group&amp;nbsp;&lt;/div&gt;&lt;div&gt;are the same?&lt;/div&gt;" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" parent="1" vertex="1">
-          <mxGeometry x="705" y="1332.5" width="150" height="120" as="geometry" />
+          <mxGeometry x="705" y="1360" width="150" height="120" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-85" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-74" target="V1h_MBBhY-OGtaXYAKEi-84" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -344,10 +347,10 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-89" value="default to just copy" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="890" y="1510" width="130" height="70" as="geometry" />
+          <mxGeometry x="890" y="1537.5" width="130" height="70" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-92" value="create groups&amp;nbsp;of consecutive type date entires" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="1100" y="1190" width="130" height="50" as="geometry" />
+          <mxGeometry x="1100" y="1130" width="130" height="50" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-97" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-95" target="V1h_MBBhY-OGtaXYAKEi-96" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -378,7 +381,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-101" value="use first 2 dates in group to calculate deltas" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
-          <mxGeometry x="1330" y="1357.5" width="130" height="50" as="geometry" />
+          <mxGeometry x="1355" y="1357.5" width="130" height="50" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-111" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-106" target="V1h_MBBhY-OGtaXYAKEi-107" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -439,7 +442,7 @@
             <mxPoint x="13" y="-1" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="V1h_MBBhY-OGtaXYAKEi-121" value="interpolate&lt;br&gt;+/- diff in months&lt;div&gt;+/- diff in years&lt;br&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+        <mxCell id="V1h_MBBhY-OGtaXYAKEi-121" value="interpolate&lt;br&gt;+/- diff in months" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="1390" y="1880" width="140" height="50" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-129" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-125" target="V1h_MBBhY-OGtaXYAKEi-126" edge="1">
@@ -472,7 +475,7 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="V1h_MBBhY-OGtaXYAKEi-132" value="check that the&amp;nbsp;&lt;div&gt;interpolations are the&amp;nbsp;&lt;/div&gt;&lt;div&gt;same for every&amp;nbsp;&lt;/div&gt;&lt;div&gt;next two date pairs&amp;nbsp;&lt;/div&gt;&lt;div&gt;in the group&lt;/div&gt;" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" parent="1" vertex="1">
+        <mxCell id="V1h_MBBhY-OGtaXYAKEi-132" value="check that the&amp;nbsp;&lt;div&gt;deltas are the&amp;nbsp;&lt;/div&gt;&lt;div&gt;same for every&amp;nbsp;&lt;/div&gt;&lt;div&gt;next two date pairs&amp;nbsp;&lt;/div&gt;&lt;div&gt;in the group&lt;/div&gt;" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" parent="1" vertex="1">
           <mxGeometry x="1375" y="1990" width="170" height="130" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-133" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-114" target="V1h_MBBhY-OGtaXYAKEi-132" edge="1">
@@ -498,11 +501,32 @@
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-143" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="V1h_MBBhY-OGtaXYAKEi-139" target="V1h_MBBhY-OGtaXYAKEi-142" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="V1h_MBBhY-OGtaXYAKEi-139" value="keep interpolation" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+        <mxCell id="V1h_MBBhY-OGtaXYAKEi-139" value="use initial/first date&lt;div&gt;and add (deltas * times interpolated)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="1390" y="2170" width="140" height="50" as="geometry" />
         </mxCell>
         <mxCell id="V1h_MBBhY-OGtaXYAKEi-142" value="if we get an invalid date during interpolation,&lt;div&gt;use &quot;INVALID DATE&quot; as cell value&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
           <mxGeometry x="1390" y="2260" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="QTwHzahEvGftHiBAt5Vj-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="QTwHzahEvGftHiBAt5Vj-1" target="QTwHzahEvGftHiBAt5Vj-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QTwHzahEvGftHiBAt5Vj-1" value="loop&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;type contains int&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="820" y="1050" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="QTwHzahEvGftHiBAt5Vj-4" value="[this is basically the same as month after they are converted to indices, only the mod 12 is missing here&lt;span style=&quot;background-color: initial;&quot;&gt;]&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="820" y="1210" width="130" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="QTwHzahEvGftHiBAt5Vj-7" value="use first 2 entries in group to calculate deltas" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="495" y="1280" width="130" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="QTwHzahEvGftHiBAt5Vj-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="QTwHzahEvGftHiBAt5Vj-7" target="V1h_MBBhY-OGtaXYAKEi-74">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QTwHzahEvGftHiBAt5Vj-9" value="(this is to avoid getting stuck if we would get invalid dates like [30.02.])" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1580" y="2140" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="QTwHzahEvGftHiBAt5Vj-10" value="dayjs should always end up with valid dates (after adding units) when the starting date was valid" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1580" y="2220" width="140" height="70" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

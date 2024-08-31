@@ -279,9 +279,16 @@ Auto filling numbers uses [linear regression](https://en.wikipedia.org/wiki/Line
 
 This is different from normals numbers because here the cell text must start or end with a number (or both).
 
-In this case the interpolation is only `+1/-1`.
+In this case the interpolation is only a constant delta.
+The delta is determined by the first two cell values in the selection
 
-if there is a number at the start of the cell, this takes precedence.
+e.g. `2. test, 4. test` will calculate a delta of `2`, so the next value will be `6. test`
+
+If there are different deltas in the selected cells, auto fill will default to copy only
+
+e.g. `2. test, 4. test, 5. test` will calculate a delta of `2`, so the next values will be `2. test, 4. test, 5. test, 2. test, ...`
+
+If there is a number at the start and end of the cell, this number in the beginning takes precedence.
 
 
 #### Dates
@@ -316,8 +323,8 @@ e.g. the diff/delta in days for `25.05.2024` - `26.07.2024` is still only 1 `day
 when the diff in `days` is 0 and diff in `months` is 0, use the diff in years for interpolation
 this ensures days and months will stay the same: `25.05.2024, 25.05.2026` -> `25.05.2028`
 
-when only the diff in `days` is 0, use the diff in month and days for interpolation
-e.g. `25.05.2024, 25.07.2026` -> `25.09.2028`
+when only the diff in `days` is 0, use the diff in month for interpolation
+e.g. `25.05.2024, 25.07.2026` -> `25.09.2028` (delta in months: 26)
 
 in any other case use the diff in `days` but this time respecting all parts of the date as delta for interpolation
 e.g. `01.01.2024, 02.02.2024` gives a delta of 32 `days`
@@ -326,6 +333,7 @@ and the next date will be `05.03.2024`
 if there are more than 2 dates in the group sequence then they must have the same diff/delta.
 if thath is not the case, default to just copying the dates as sequence over and over
 
+When the interpolation would give an invalid date like `30.02.20` then `dayjs` will coerce the date into a valid date (here `28.02.20`).
 
 #### Month Names
 
