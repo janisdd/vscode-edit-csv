@@ -447,20 +447,43 @@ let test_dates_deltas: AutoFillTestData[] = [
 	
 	//--- special
 	{
-		//TODO this works but we get -11 months??
-		name: 'date 01.01.2020, 11.01.2021, (0 year delta) deltas: [0, 1, 0]', //TODO [0, 1, 1]?? excel only uses month here
+		name: 'date 11.12.2020, 11.01.2021, (0 year delta) deltas: [0, 1, 0]',
 		data: ['11.12.2020', '11.01.2021'],
 		targetCount: 2,
 		isNormalDirection: true,
 		expected: ['11.02.2021', '11.03.2021']
 	},
 	{
-		name: 'date 01.01.2020, (0 year delta) deltas: [0, 1, 0]',
+		name: 'date 30.12.2020, (0 year delta) deltas: [0, 1, 0]',
 		data: ['30.12.2020', '30.01.2021'],
 		targetCount: 3,
 		isNormalDirection: true,
-		expected: ['30.01.2021', '28.02.2021', '28.03.2021']
+		expected: ['28.02.2021', '30.03.2021', '30.04.2021']
 	},
+	{
+		name: 'date 30.12.2020, (0 year delta) deltas: [0, 13, 0]',
+		data: ['30.12.2020', '30.01.2022'],
+		targetCount: 3,
+		isNormalDirection: true,
+		expected: ['28.02.2023', '30.03.2024', '30.04.2025']
+	},
+	{
+		name: 'date 30.06.2020, (0 year delta) deltas: [0, 11, 0]',
+		data: ['30.06.2020', '30.05.2021'],
+		targetCount: 3,
+		isNormalDirection: true,
+		expected: ['30.04.2022', '30.03.2023', '29.02.2024']
+	},
+	{
+		name: 'date 30.06.20, (0 year delta) deltas: [0, 23, 0]',
+		data: ['30.06.20', '30.05.22'],
+		targetCount: 3,
+		isNormalDirection: true,
+		expected: ['30.04.24', '30.03.26', '29.02.28']
+	},
+	
+
+
 ]
 
 let test_dates_defaultToCopy: AutoFillTestData[] = [
@@ -475,35 +498,35 @@ let test_dates_defaultToCopy: AutoFillTestData[] = [
 
 let test_dates_invalid: AutoFillTestData[] = [
 	{
-		name: 'invalid date interpolation -> gets coerced to valid date (different to excel)',
+		name: 'invalid date interpolation -> gets coerced to valid date (by dayjs)',
 		data: ['30.11.2020', '30.12.2020'],
 		targetCount: 3,
 		isNormalDirection: true,
-		expected: ['30.01.2021', '28.02.2021', '28.03.2021']
+		expected: ['30.01.2021', '28.02.2021', '30.03.2021']
 	},
 	{
-		name: 'date interpolation only value in cell 1',
+		name: 'date interpolation only value in cell 1, starts with int',
 		data: ['30.11.2020 30.11.2020'],
 		targetCount: 2,
 		isNormalDirection: true,
-		expected: ['30.11.2020 30.11.2020', '30.11.2020 30.11.2020']
+		expected: ['31.11.2020 30.11.2020', '32.11.2020 30.11.2020']
 	},
 	{
-		name: 'date interpolation only value in cell 2',
+		name: 'datem text, but date starts with int',
 		data: ['30.11.2020 abc'],
 		targetCount: 2,
 		isNormalDirection: true,
-		expected: ['30.11.2020 abc', '30.11.2020 abc']
+		expected: ['31.11.2020 abc', '32.11.2020 abc']
 	},
 	{
-		name: 'date interpolation only value in cell 2',
+		name: 'text, date, but date starts with int',
 		data: ['abc 30.11.2020'],
 		targetCount: 2,
 		isNormalDirection: true,
-		expected: ['abc 30.11.2020', 'abc 30.11.2020']
+		expected: ['abc 30.11.2021', 'abc 30.11.2022']
 	},
 	{
-		name: 'date interpolation only value in cell 2',
+		name: 'text, date, text, but date starts with int',
 		data: ['abc 30.11.2020 abc'],
 		targetCount: 2,
 		isNormalDirection: true,
@@ -518,11 +541,11 @@ let test_dates_invalid: AutoFillTestData[] = [
 		expected: ['2 30.11.2020 abc', '3 30.11.2020 abc']
 	},
 	{
-		name: 'ends with int and contains date',
+		name: 'date text int, but date starts with int',
 		data: ['30.11.2020 abc 1'],
 		targetCount: 2,
 		isNormalDirection: true,
-		expected: ['30.11.2020 abc 2', '30.11.2020 abc 3']
+		expected: ['31.11.2020 abc 1', '32.11.2020 abc 1']
 	},
 	{
 		name: 'starts with float and contains date',
@@ -530,13 +553,6 @@ let test_dates_invalid: AutoFillTestData[] = [
 		targetCount: 2,
 		isNormalDirection: true,
 		expected: ['2.5 30.11.2020 abc', '3.5 30.11.2020 abc']
-	},
-	{
-		name: 'ends with float and contains date',
-		data: ['30.11.2020 abc 1'],
-		targetCount: 2,
-		isNormalDirection: true,
-		expected: ['30.11.2020 abc 2.5', '30.11.2020 abc 3.5']
 	},
 ]
 

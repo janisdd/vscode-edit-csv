@@ -259,7 +259,8 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 					//TODO only use first?
 					const dateMatches = Array.from(cellText.matchAll(knownFormat.regex))
 
-					if (dateMatches.length === 0) continue
+					// if (dateMatches.length === 0) continue
+					if (dateMatches.length != 1) continue
 
 					// format = `YYYY-MM-DD`
 					let dateMatch = dateMatches[0] // e.g. 2024.01.01
@@ -278,7 +279,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 
 					// let displayFormat = format.replace(`-`, separator1).replace(`-`, separator2) //this does not work if we repalce - with - and then the second replace will replace the first...
 					let displayFormat = format.substring(0, dashIndex1) + separator1 + format.substring(dashIndex1 + 1, dashIndex2) + separator2 + format.substring(dashIndex2 + 1)
-					
+
 
 					let originalDate = dayjs(dateMatchString, displayFormat, true)
 
@@ -715,6 +716,11 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 	//just a plain numbers to add
 	const interpolationSequenceModelsDates: Array<[diffDays: number, diffMonths: number, diffYears: number]> = []
 	const dateInterpolationStart: GroupInterpolationInfo_Date["originalDate"][] = [] //we start with these dates for interpolation
+	//we always use the same starting date for interpolation because
+	//when get get an invalid date e.g. 31.02.2024 dayjs coerces it to 28.02.2024
+	//and then we add the delta to 28.02.2024 and get a wrong date...
+	//if we use the original date and add (delta * interpolation count) we get the correct date
+	const dateInterpolationCounts: number[] = [] //the counts how often we have to add the delta
 
 	{
 
@@ -778,8 +784,10 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 					deltas = [0, 0, diffInYears]
 				}
 				else if (diffInDays === 0) {
+					//if we have e.g. 30.12.20 -> 30.01.21 we only want a delta of 1 month...
+					let deltaInMonths = el.diff(prevEl, 'month')
 
-					deltas = [0, diffInMonths, diffInYears]
+					deltas = [0, deltaInMonths, 0]
 				}
 				else {
 					//diff in days is != 0
@@ -859,6 +867,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 			interpolationSequenceModelsDates.push(deltas)
 			//the last date is the start for the next interpolation
 			dateInterpolationStart.push(interpolationDateGroup[interpolationDateGroup.length - 1])
+			dateInterpolationCounts.push(0)
 		}
 
 	}
@@ -905,7 +914,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 				interpolatedDataAsString.push(newCellText)
 
 				containsNumberInterpolationIndices[sequenceIndex] = predictedVal
-				
+
 				break
 			}
 
@@ -945,8 +954,15 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 				let delta = interpolationSequenceModelsDates[sequenceIndex]
 
 				let currStartDate = dateInterpolationStart[sequenceIndex]
+				let currCount = dateInterpolationCounts[sequenceIndex]
 
-				let nextDate = currStartDate.add(delta[0], 'day').add(delta[1], 'month').add(delta[2], 'year') as typeof currStartDate
+				let nextCount = currCount + 1
+				
+				// let nextDate = currStartDate.add(delta[0], 'day').add(delta[1], 'month').add(delta[2], 'year') as typeof currStartDate
+				let nextDate = currStartDate
+					.add(delta[0] * nextCount, 'day')
+					.add(delta[1] * nextCount, 'month')
+					.add(delta[2] * nextCount, 'year') as typeof currStartDate
 
 				if (nextDate.isValid() === false) {
 					//could get invalid date
@@ -954,7 +970,8 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 					interpolatedDataAsString.push("INVALID DATE")
 				} else {
 
-					dateInterpolationStart[sequenceIndex] = nextDate
+					// dateInterpolationStart[sequenceIndex] = nextDate
+					dateInterpolationCounts[sequenceIndex] = nextCount
 					let dateString = nextDate.format(groupInterpolationInfo.displayFormat)
 					interpolatedDataAsString.push(dateString)
 
