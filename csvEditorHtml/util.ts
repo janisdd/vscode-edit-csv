@@ -280,7 +280,7 @@ function _hideColumnByIndices(columnIndices: number[]) {
 
 	for (let i = 0; i < columnIndices.length; i++) {
 		const targetColIndex = columnIndices[i]
-		
+
 		const physicalColIndex = hot.toPhysicalColumn(targetColIndex)
 		hiddenPhysicalColumnIndicesSorted.push(physicalColIndex)
 
@@ -1374,6 +1374,7 @@ const knownNumberStylesMap: KnownNumberStylesMap = {
 		 * all repeated with e0(000) | e+0(000) | e-0(000)
 		 */
 		regex: /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/,
+		regexStartToEnd: /^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/,
 		thousandSeparator: /(\,| )/gm,
 		thousandSeparatorReplaceRegex: /((\,| )\d{3})+/gm
 	},
@@ -1388,6 +1389,7 @@ const knownNumberStylesMap: KnownNumberStylesMap = {
 		 * all repeated with e0(000) | e+0(000) | e-0(000)
 		 */
 		regex: /-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?/,
+		regexStartToEnd: /^-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?$/,
 		thousandSeparator: /(\.| )/gm,
 		thousandSeparatorReplaceRegex: /((\.| )\d{3})+/gm
 	}
@@ -1426,7 +1428,39 @@ function setNumbersStyleUi(numbersStyleToUse: EditCsvConfig["initialNumbersStyle
  */
 function getNumbersStyleFromUi(): NumbersStyle {
 
-
+	let knownNumberStylesMap: KnownNumberStylesMap = {
+		"en": {
+			key: 'en',
+			/**
+			 * this allows:
+			 * 0(000)
+			 * 0(000).0(000)
+			 * .0(000)
+			 * all repeated with - in front (negative numbers)
+			 * all repeated with e0(000) | e+0(000) | e-0(000)
+			 */
+			regex: /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/,
+			regexStartToEnd: /^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/,
+			thousandSeparator: /(\,| )/gm,
+			thousandSeparatorReplaceRegex: /((\,| )\d{3})+/gm
+		},
+		"non-en": {
+			key: 'non-en',
+			/**
+			 * this allows:
+			 * 0(000)
+			 * 0(000),0(000)
+			 * ,0(000)
+			 * all repeated with - in front (negative numbers)
+			 * all repeated with e0(000) | e+0(000) | e-0(000)
+			 */
+			regex: /-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?/,
+			regexStartToEnd: /^-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?$/,
+			thousandSeparator: /(\.| )/gm,
+			thousandSeparatorReplaceRegex: /((\.| )\d{3})+/gm
+		}
+	}
+	
 	if (numbersStyleEnRadio.checked) return knownNumberStylesMap['en']
 
 	if (numbersStyleNonEnRadio.checked) return knownNumberStylesMap['non-en']
@@ -1463,6 +1497,8 @@ function formatBigJsNumber(bigJsNumber: typeof b, numbersStyleToUse: NumbersStyl
 			notExhaustiveSwitch(numbersStyleToUse.key)
 	}
 
+	//uses toFixed internally
+	// see https://github.com/MikeMcl/toFormat/blob/master/toFormat.js
 	//@ts-ignore
 	return bigJsNumber.toFormat()
 }
@@ -1930,9 +1966,9 @@ function isOpenLinkModifierPressed(e: KeyboardEvent | MouseEvent) {
 	return false
 }
 
-function getFirstAndLastVisibleColumns(): {first: number, last: number} {
+function getFirstAndLastVisibleColumns(): { first: number, last: number } {
 
-	if (!hot) return {first: 0, last: 0}
+	if (!hot) return { first: 0, last: 0 }
 
 	let firstVisibleCol = 0
 	let lastVisibleCol = 0
@@ -1964,12 +2000,12 @@ function getFirstAndLastVisibleColumns(): {first: number, last: number} {
 		}
 	}
 
-	return {first: firstVisibleCol, last: lastVisibleCol}
+	return { first: firstVisibleCol, last: lastVisibleCol }
 }
 
-function getFirstAndLastVisibleRows(): {first: number, last: number} {
+function getFirstAndLastVisibleRows(): { first: number, last: number } {
 
-	if (!hot) return {first: 0, last: 0}
+	if (!hot) return { first: 0, last: 0 }
 
 	let firstVisibleRow = 0
 	let lastVisibleRow = 0
@@ -2001,5 +2037,5 @@ function getFirstAndLastVisibleRows(): {first: number, last: number} {
 		}
 	}
 
-	return {first: firstVisibleRow, last: lastVisibleRow}
+	return { first: firstVisibleRow, last: lastVisibleRow }
 }

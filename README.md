@@ -110,6 +110,26 @@ See https://code.visualstudio.com/docs/languages/overview#_adding-a-file-extensi
 If the link is down: Search for `files.associations` in the vs code settings. Then add an entry for `*.xyz` to `csv`.  
 Now the file is treated as a csv file and is recognized by the extension
 
+## Drag to Auto Fill
+
+Starting from version `0.10.0` the setting `dragToAutoFill` defaults to `excelLike`.
+
+The other values are `none` and `copyOnly`.
+
+`none` is used to disable auto fill.
+
+Setting `dragToAutoFill` to `copyOnly` will copy the selected cell values over and over again.
+Example: `1,b,3` and you drag the handle 6 cells further will give `1,b,3,1,b,3` as auto fill values.
+As you can see, there is no interpolation, the selected sequence is copied again and again.
+
+The default setting `excelLike` imitates the Excel behaviour for automatic fill values.
+
+In most cases it will work *just fine*, but there may be some special cases.
+
+In general, the following values can be filled in automatically: Numbers, month names and dates.
+
+You can find a complete explanation of how automatic filling works in `docs/autoFillBehavior.md`.
+
 ## Known Issues
 
 - `apply and save` an unnamed file will close the editor
@@ -151,6 +171,11 @@ There is one things missing...
 - for grid/table element: [handsontable](https://github.com/handsontable/handsontable)
 - for ui: [vs code webview-ui-toolkit](https://github.com/microsoft/vscode-webview-ui-toolkit), [fontawesome](https://github.com/FortAwesome/Font-Awesome)
 - for shortcuts: [mousetrap](https://github.com/ccampbell/mousetrap)
+- for big numbers: [big.js](https://github.com/MikeMcl/big.js)
+- for auto fill
+  - [regression-js](https://github.com/Tom-Alexander/regression-js)
+  - [day.js](https://day.js.org/en/) for date handling
+  - (big.js for numbers)
 
 *see `thirdParty` folders*
 

@@ -366,8 +366,9 @@ type EditCsvConfig = {
 	 * Determines whether a handle is displayed on the cell to automatically fill the content
 	 * none: Disables drag to auto fill
 	 * copyOnly: Adds a drag handle for copying data
+	 * excelLike: Adds a drag handle for filling data like excel (numbers, months, dates). Defaults to copying if nothing can be interpolated.
 	 */
-	dragToAutoFill: "none" | "copyOnly"
+	dragToAutoFill: "none" | "copyOnly" | "excelLike"
 
 	/**
 	 * Specifies the column names that are to be hidden initially (the first row is used, ignoring comment rows)
@@ -673,6 +674,10 @@ type ExtendedCsvParseResult = {
 type NumbersStyle = {
 	key: 'en' | 'non-en'
 	regex: RegExp
+	/**
+	 * same as regex but must match whole string
+	 */
+	regexStartToEnd: RegExp
 	thousandSeparator: RegExp
 	/**
 	 * the idea is to replace the thousand separators with the empty string (we normally also allow a single whitespace as separator)... else:

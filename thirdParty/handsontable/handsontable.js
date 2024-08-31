@@ -23,8 +23,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Version: 6.5.3
- * Release date: 19/12/2018 (built at 10/02/2024 10:04:52)
+ * Version: 6.5.4
+ * Release date: 19/12/2018 (built at 26/08/2024 20:17:54)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29763,9 +29763,9 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "10/02/2024 10:04:52";
+Handsontable.buildDate = "26/08/2024 20:17:54";
 Handsontable.packageName = "handsontable";
-Handsontable.version = "6.5.3";
+Handsontable.version = "6.5.4";
 var baseVersion = "";
 
 if (baseVersion) {
@@ -44048,6 +44048,14 @@ function (_BasePlugin) {
 
     _this.addingStarted = false;
     /**
+     * the function used to fill data
+     *
+     * if a function is set, the returned fill data must be of size targetCount!
+     * @type {null | (data: string[], targetCount: number, isNormalDirection: bool, mouseupEvent: MouseEvent) => string[]}
+     */
+
+    _this.fillFunc = null;
+    /**
      * Specifies if there was mouse down on the cell corner.
      *
      * @private
@@ -44151,6 +44159,16 @@ function (_BasePlugin) {
       _get(_getPrototypeOf(Autofill.prototype), "disablePlugin", this).call(this);
     }
     /**
+     * sets the function to fill data
+     * @param fillFunc
+     */
+
+  }, {
+    key: "setFillFunction",
+    value: function setFillFunction(fillFunc) {
+      this.fillFunc = fillFunc;
+    }
+    /**
      * Gets selection data
      *
      * @private
@@ -44170,6 +44188,7 @@ function (_BasePlugin) {
      * Try to apply fill values to the area in fill border, omitting the selection border.
      *
      * @private
+     * @param {MouseEvent} event `mouseup` event properties.
      * @returns {Boolean} reports if fill was applied.
      *
      * @fires Hooks#modifyAutofillRange
@@ -44178,7 +44197,7 @@ function (_BasePlugin) {
 
   }, {
     key: "fillIn",
-    value: function fillIn() {
+    value: function fillIn(event) {
       if (this.hot.selection.highlight.getFill().isEmpty()) {
         return false;
       }
@@ -44194,38 +44213,130 @@ function (_BasePlugin) {
           endOfDragCoords = _getDragDirectionAndR.endOfDragCoords;
 
       if (startOfDragCoords && startOfDragCoords.row > -1 && startOfDragCoords.col > -1) {
-        var selectionData = this.getSelectionData();
+        var selectionData = this.getSelectionData(); // shallow copy does not work because array of arrays...
+
+        var selectionDataCopy = this.getSelectionData();
         this.hot.runHooks('beforeAutofill', startOfDragCoords, endOfDragCoords, selectionData);
         var deltas = (0, _utils.getDeltas)(startOfDragCoords, endOfDragCoords, selectionData, directionOfDrag);
         var fillData = selectionData;
+        var isFillColumn = directionOfDrag === 'down' || directionOfDrag === 'up';
+        var autoFillFailed = false; // normal is top to bottom or left to right
+        // however, the user can also drag to top or to left (not normal), this is important for interpolation
+        // for copy only, this can be ignored!
 
-        if (['up', 'left'].indexOf(directionOfDrag) > -1) {
-          fillData = [];
-          var dragLength = null;
-          var fillOffset = null;
+        var isNormalDirection = directionOfDrag === 'down' || directionOfDrag === 'right';
+        var dragLength = 0;
 
-          if (directionOfDrag === 'up') {
-            dragLength = endOfDragCoords.row - startOfDragCoords.row + 1;
-            fillOffset = dragLength % selectionData.length;
+        if (this.fillFunc) {
+          // if not custom fill, just use the selection data
+          // without custom fill, we don't want to modify fillData or selectionData (else populateFromArray doesn't work)
+          if (isFillColumn) {
+            dragLength = endOfDragCoords.row - startOfDragCoords.row + 1; // fill columns (vertical)
 
-            for (var i = 0; i < dragLength; i++) {
-              fillData.push(selectionData[(i + (selectionData.length - fillOffset)) % selectionData.length]);
+            var len = selectionData.length;
+            var numColumns = selectionData[0].length; // every column data as an array
+
+            while (dragLength > fillData.length) {
+              fillData.push(Array(numColumns).fill(''));
+            }
+
+            for (var _col = 0; _col < numColumns; _col++) {
+              var _fillData = [];
+
+              for (var _row = 0; _row < len; _row++) {
+                _fillData.push(selectionData[_row][_col]);
+              }
+
+              var _preFillData = this._fillSingleLine(_fillData, dragLength, isNormalDirection, event);
+
+              if (_preFillData) {
+                if (_preFillData.length === dragLength) {
+                  if (fillData.length > dragLength) {
+                    // remove entries that are not needed from the ending
+                    fillData.splice(dragLength);
+                  }
+                } // auto fill data is less than we selected
+
+
+                for (var _row2 = 0; _row2 < dragLength; _row2++) {
+                  fillData[_row2][_col] = _preFillData[_row2];
+                }
+              } else {
+                autoFillFailed = true;
+              }
             }
           } else {
+            // fill rows (horizontal)
             dragLength = endOfDragCoords.col - startOfDragCoords.col + 1;
-            fillOffset = dragLength % selectionData[0].length;
+            var _len = selectionData[0].length;
+            var numRows = selectionData.length; // every row data as an array
 
-            for (var _i = 0; _i < selectionData.length; _i++) {
-              fillData.push([]);
+            if (dragLength > _len) {
+              for (var i = 0; i < numRows; i++) {
+                var _fillData$i;
 
-              for (var j = 0; j < dragLength; j++) {
-                fillData[_i].push(selectionData[_i][(j + (selectionData[_i].length - fillOffset)) % selectionData[_i].length]);
+                (_fillData$i = fillData[i]).push.apply(_fillData$i, _toConsumableArray(Array(dragLength - _len).fill('')));
+              }
+            }
+
+            for (var _row3 = 0; _row3 < numRows; _row3++) {
+              var _fillData2 = [];
+
+              for (var _col2 = 0; _col2 < _len; _col2++) {
+                _fillData2.push(selectionData[_row3][_col2]);
+              }
+
+              var _preFillData2 = this._fillSingleLine(_fillData2, dragLength, isNormalDirection, event);
+
+              if (_preFillData2) {
+                if (_preFillData2.length === dragLength) {
+                  // just use fill data
+                  fillData[_row3] = _preFillData2;
+                } else {
+                  // auto fill data is less than we selected
+                  for (var _col3 = 0; _col3 < dragLength; _col3++) {
+                    fillData[_row3][_col3] = _preFillData2[_col3];
+                  }
+                }
+              } else {
+                autoFillFailed = true;
               }
             }
           }
         }
 
-        this.hot.populateFromArray(startOfDragCoords.row, startOfDragCoords.col, fillData, endOfDragCoords.row, endOfDragCoords.col, "".concat(this.pluginName, ".fill"), null, directionOfDrag, deltas);
+        if (autoFillFailed) {
+          // do normal fill (copy)
+          fillData = selectionDataCopy;
+          selectionData = _toConsumableArray(selectionDataCopy);
+        } // this seems to work because fillData = selectionData and we modified it in place
+
+
+        if (['up', 'left'].indexOf(directionOfDrag) > -1) {
+          fillData = [];
+          var fillOffset = null;
+
+          if (directionOfDrag === 'up') {
+            fillOffset = dragLength % selectionData.length;
+
+            for (var _i = 0; _i < dragLength; _i++) {
+              fillData.push(selectionData[(_i + (selectionData.length - fillOffset)) % selectionData.length]);
+            }
+          } else {
+            fillOffset = dragLength % selectionData[0].length;
+
+            for (var _i2 = 0; _i2 < selectionData.length; _i2++) {
+              fillData.push([]);
+
+              for (var j = 0; j < dragLength; j++) {
+                fillData[_i2].push(selectionData[_i2][(j + (selectionData[_i2].length - fillOffset)) % selectionData[_i2].length]);
+              }
+            }
+          }
+        }
+
+        this.hot.populateFromArray(startOfDragCoords.row, startOfDragCoords.col, fillData, endOfDragCoords.row, endOfDragCoords.col, "".concat(this.pluginName, ".fill"), null, directionOfDrag, deltas // only important if cell value is numeric
+        );
         this.setSelection(cornersOfSelectionAndDragAreas);
       } else {
         // reset to avoid some range bug
@@ -44233,6 +44344,29 @@ function (_BasePlugin) {
       }
 
       return true;
+    }
+    /**
+     *
+     * @param {Array<any>} data
+     * @param {number} targetCount
+     * @param {boolean} isNormalDirection normal is top to bottom or left to right
+     *   however, the user can also drag to top or to left (not normal), this is important for interpolation
+     *   for copy only, this can be ignored!
+     * @private
+     * @return {Array<any>} filled line data
+     */
+
+  }, {
+    key: "_fillSingleLine",
+    value: function _fillSingleLine(data, targetCount, isNormalDirection, event) {
+      if (!this.fillFunc) return data;
+      var fillData = this.fillFunc(data, targetCount, isNormalDirection, event);
+
+      if (!fillData || !Array.isArray(fillData) || fillData.length !== targetCount) {
+        return null;
+      }
+
+      return fillData;
     }
     /**
      * Reduces the selection area if the handle was dragged outside of the table or on headers.
@@ -44483,8 +44617,8 @@ function (_BasePlugin) {
     value: function registerEvents() {
       var _this4 = this;
 
-      this.eventManager.addEventListener(document.documentElement, 'mouseup', function () {
-        return _this4.onMouseUp();
+      this.eventManager.addEventListener(document.documentElement, 'mouseup', function (event) {
+        return _this4.onMouseUp(event);
       });
       this.eventManager.addEventListener(document.documentElement, 'mousemove', function (event) {
         return _this4.onMouseMove(event);
@@ -44537,14 +44671,15 @@ function (_BasePlugin) {
      * On mouse up listener.
      *
      * @private
+     * @param {MouseEvent} event `mouseup` event properties.
      */
 
   }, {
     key: "onMouseUp",
-    value: function onMouseUp() {
+    value: function onMouseUp(event) {
       if (this.handleDraggedCells) {
         if (this.handleDraggedCells > 1) {
-          this.fillIn();
+          this.fillIn(event);
         }
 
         this.handleDraggedCells = 0;

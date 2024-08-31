@@ -1,5 +1,7 @@
 /// <reference path="findWidget.ts" />
 
+//@ts-ignore
+dayjs.extend(dayjs_plugin_customParseFormat);
 
 const defaultInitialVars: InitialVars = {
 	isWatchingSourceFile: false,
@@ -13,6 +15,7 @@ const defaultInitialVars: InitialVars = {
 declare var acquireVsCodeApi: any
 declare var initialContent: string
 declare var initialConfig: EditCsvConfig | undefined
+// declare var regression: RegressionLib
 
 declare var initialVars: InitialVars
 
@@ -41,7 +44,10 @@ if (typeof initialConfig === 'undefined') {
 
 }
 
+declare const dayjs: typeof import('dayjs')
+declare type Dayjs = import('dayjs').Dayjs
 
+const regression: typeof import('../thirdParty/regression/regression').default = (window as any).regression
 
 const csv: typeof import('papaparse') = (window as any).Papa
 //handsontable instance

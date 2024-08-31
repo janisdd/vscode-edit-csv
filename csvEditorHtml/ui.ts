@@ -577,7 +577,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			// 	: `${text} <span class="remove-row clickable" onclick="removeRow(${row})" style="visibility: hidden"><i class="fas fa-trash"></i></span>`
 		} as any,
 		afterChange: onAnyChange, //only called when cell value changed (e.g. not when col/row removed)
-		fillHandle: initialConfig?.dragToAutoFill === 'copyOnly' ? {
+		fillHandle: initialConfig?.dragToAutoFill !== 'none' ? {
 			autoInsertRow: false,
 		} : undefined,
 		undo: true,
@@ -1891,6 +1891,14 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	}
 
 	if (hot) {
+
+		let autoFillPlugin = hot.getPlugin('autofill')
+
+		//if copy only, we can use the default autofill
+		//if auto fill is disabled, this is done on hot init
+		if (initialConfig?.dragToAutoFill === `excelLike`) {
+			autoFillPlugin.setFillFunction(customAutoFillFunc)
+		}
 
 		if (previousSelectedCell === null || previousViewportOffsets === null) {
 			//the whole set select cell takes for 100k rows ~1.5s

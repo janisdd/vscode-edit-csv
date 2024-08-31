@@ -4,6 +4,11 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.6.0
+- (same as vs code extension v0.10.0)
+- added `excelLike` option to `dragToAutoFill` setting
+  - this is now the default
+
 ## 1.5.1
 - (same as vs code extension v0.9.1)
 - fixed issue #146 - doubleClickRowHandleForcedHeight was a string (package config must be a number)
