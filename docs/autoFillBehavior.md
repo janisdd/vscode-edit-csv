@@ -45,7 +45,7 @@ If you mainly work with a number style, you can change the default via the exten
 
 Automatic filling numbers uses [linear regression](https://en.wikipedia.org/wiki/Linear_regression) to determine the values to be filled in (Excel also uses linear regression).
 
-As interpolation is used for float values, the result is rounded to two decimal places.
+Two decimal places are used for Int/Float interpolation.
 
 ### Contains Number
 

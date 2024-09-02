@@ -62,11 +62,11 @@
     const run = len.mul(sum[2]).minus(sum[0].mul(sum[0]));
     const rise = len.mul(sum[3]).minus(sum[0].mul(sum[1]));
     const zero = Big(0);
-    const gradient = run.cmp(zero) === 0 ? zero : roundBig(rise.div(run), options.precision, options.bigRoundingMode);
-    const intercept = roundBig(sum[1].div(len).sub(gradient.mul(sum[0]).div(len)), options.precision, options.bigRoundingMode);
+    const gradient = run.cmp(zero) === 0 ? zero : roundBig(rise.div(run), options.precisionBig, options.bigRoundingMode);
+    const intercept = roundBig(sum[1].div(len).sub(gradient.mul(sum[0]).div(len)), options.precisionBig, options.bigRoundingMode);
     const predict = (x) => [
-      roundBig(x, options.precision, options.bigRoundingMode),
-      roundBig(gradient.mul(x).add(intercept), options.precision, options.bigRoundingMode)
+      roundBig(x, options.precisionBig, options.bigRoundingMode),
+      roundBig(gradient.mul(x).add(intercept), options.precisionBig, options.bigRoundingMode)
     ];
     return {
       points: options.predictPoints ? data.map((point) => predict(point[0])) : [],

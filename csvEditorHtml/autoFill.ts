@@ -481,7 +481,8 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 			}
 
 			let dataPoints = ints.map((val, index) => [Big(index + 1), val])
-			let model = regression.linearBig(dataPoints)
+			//precision 2 should be enough for most cases
+			let model = regression.linearBig(dataPoints, { precisionBig: 2})
 			interpolationSequenceModelsNumbers.push(model)
 
 			if (isSimpleIncrement) {

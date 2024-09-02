@@ -534,6 +534,27 @@ let test_dates_invalid: AutoFillTestData[] = [
 	},
 	//--- 
 	{
+		name: 'valid date leapyear',
+		data: ['29.02.2020'],
+		targetCount: 2,
+		isNormalDirection: true,
+		expected: ['01.03.2020', '02.03.2020']
+	},
+	{
+		name: 'invalid date will use first int (no leapyer)',
+		data: ['29.02.2021'],
+		targetCount: 2,
+		isNormalDirection: true,
+		expected: ['30.02.2021', '31.02.2021']
+	},
+	{
+		name: 'invalid date will use first int (no leapyer) (other dir)',
+		data: ['29.02.2021'],
+		targetCount: 2,
+		isNormalDirection: false,
+		expected: ['28.02.2021', '27.02.2021']
+	},
+	{
 		name: 'starts with int and contains date',
 		data: ['1 30.11.2020 abc'],
 		targetCount: 2,
