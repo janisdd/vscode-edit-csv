@@ -251,14 +251,14 @@ let tests_containsNumbersInts_StartsWithNumber_special: AutoFillTestData[] = [
 	},
 
 	{
-		name: 'starts with float precision test 1  (big properly configured, at least 20 fract digits [only important devision, sqrt, pow])',
+		name: 'starts with float precision test 1  (big properly configured, at least 20 fract digits [only important devision, sqrt, pow]) (not rounded because we only add/sub)',
 		data: ['1.0123456789012345678913333333334000000000000000000000000000000000000000000000000000000000004564560198 xyz abc'],
 		targetCount: 1,
 		isNormalDirection: true,
 		expected: ['2.0123456789012345678913333333334000000000000000000000000000000000000000000000000000000000004564560198 xyz abc']
 	},
 	{
-		name: 'starts with float precision test 1  (big properly configured, at least 20 fract digits [only important devision, sqrt, pow])',
+		name: 'starts with float precision test 1  (big properly configured, at least 20 fract digits [only important devision, sqrt, pow]) (not rounded because we only add/sub)',
 		//100 digits . 100 digits
 		data: ['1123456789012345678913333333334000000000000000000000000000000000000000000000000000000000004564560198.1123456789012345678913333333334000000000000000000000000000000000000000000000000000000000004564560198 xyz abc'],
 		targetCount: 1,

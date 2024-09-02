@@ -128,6 +128,8 @@ In most cases it will work *just fine*, but there may be some special cases.
 
 In general, the following values can be filled in automatically: Numbers, month names and dates.
 
+Similar to Excel, you can hold down the `alt` key before releasing the mouse button to copy the cell values. No interpolation is carried out.
+
 You can find a complete explanation of how automatic filling works in `docs/autoFillBehavior.md`.
 
 ## Known Issues
