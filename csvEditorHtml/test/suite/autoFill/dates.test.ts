@@ -552,7 +552,7 @@ let test_dates_invalid: AutoFillTestData[] = [
 		data: ['29.02.2021'],
 		targetCount: 2,
 		isNormalDirection: false,
-		expected: ['28.02.2021', '27.02.2021']
+		expected: ['28.02.2021', '27.02.2021'].reverse()
 	},
 	{
 		name: 'starts with int and contains date',

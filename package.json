@@ -693,7 +693,7 @@
 	},
 	"scripts": {
 		"preinstall": "npx npm-force-resolutions",
-		"vscode:prepublish": "npm audit && npm run compile && npm run promptUp",
+		"vscode:prepublish": "npm audit && npm run compile && npm run testFe && npm run promptUp",
 		"compile": "tsc -p ./ && tsc -p ./csvEditorHtml/tsconfig.json",
 		"watch": "tsc -watch -p ./",
 		"package": "vsce package",
