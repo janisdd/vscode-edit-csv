@@ -24,7 +24,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  * Version: 6.5.4
- * Release date: 19/12/2018 (built at 03/09/2024 15:50:03)
+ * Release date: 19/12/2018 (built at 03/09/2024 16:19:32)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29763,7 +29763,7 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "03/09/2024 15:50:03";
+Handsontable.buildDate = "03/09/2024 16:19:32";
 Handsontable.packageName = "handsontable";
 Handsontable.version = "6.5.4";
 var baseVersion = "";
@@ -44232,9 +44232,10 @@ function (_BasePlugin) {
           // without custom fill, we don't want to modify fillData or selectionData (else populateFromArray doesn't work)
           if (isFillColumn) {
             dragLength = endOfDragCoords.row - startOfDragCoords.row + 1; // fill columns (vertical)
+            // we need to use the copy here because fillData = selectionData and we mutate fillData
 
-            var len = selectionData.length;
-            var numColumns = selectionData[0].length; // every column data as an array
+            var len = selectionDataCopy.length;
+            var numColumns = selectionDataCopy[0].length; // every column data as an array
 
             while (dragLength > fillData.length) {
               fillData.push(Array(numColumns).fill(''));
@@ -44244,7 +44245,7 @@ function (_BasePlugin) {
               var _fillData = [];
 
               for (var _row = 0; _row < len; _row++) {
-                _fillData.push(selectionData[_row][_col]);
+                _fillData.push(selectionDataCopy[_row][_col]);
               }
 
               var _preFillData = this._fillSingleLine(_fillData, dragLength, isNormalDirection, event);
@@ -44268,8 +44269,8 @@ function (_BasePlugin) {
           } else {
             // fill rows (horizontal)
             dragLength = endOfDragCoords.col - startOfDragCoords.col + 1;
-            var _len = selectionData[0].length;
-            var numRows = selectionData.length; // every row data as an array
+            var _len = selectionDataCopy[0].length;
+            var numRows = selectionDataCopy.length; // every row data as an array
 
             if (dragLength > _len) {
               for (var i = 0; i < numRows; i++) {
@@ -44283,7 +44284,7 @@ function (_BasePlugin) {
               var _fillData2 = [];
 
               for (var _col2 = 0; _col2 < _len; _col2++) {
-                _fillData2.push(selectionData[_row3][_col2]);
+                _fillData2.push(selectionDataCopy[_row3][_col2]);
               }
 
               var _preFillData2 = this._fillSingleLine(_fillData2, dragLength, isNormalDirection, event);
