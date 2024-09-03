@@ -29,7 +29,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js')
 	// let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
 
-	let regressionJS = _getResourcePath('thirdParty/regression/regression.min.umd.js')
+	let regressionJS = _getResourcePath('thirdParty/regression/regression.min.js')
 
 	const mousetrapJs = _getResourcePath('thirdParty/mousetrap/mousetrap.min.js')
 	const mousetrapBindGlobalJs = _getResourcePath('thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js')

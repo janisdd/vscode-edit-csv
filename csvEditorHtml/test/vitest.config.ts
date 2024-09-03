@@ -27,7 +27,7 @@ export default defineConfig({
           type: 'text/javascript',
         },
         {
-          src: './thirdParty/regression/regression.min.umd.js', //our regression uses big.js
+          src: './thirdParty/regression/regression.min.js', //our regression uses big.js
           type: 'text/javascript',
         },
         {

@@ -28,7 +28,7 @@ function createEditorHtml(webview, context, config, initialVars) {
     // let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js')
     let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js');
     // let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
-    let regressionJS = _getResourcePath('thirdParty/regression/regression.min.umd.js');
+    let regressionJS = _getResourcePath('thirdParty/regression/regression.min.js');
     const mousetrapJs = _getResourcePath('thirdParty/mousetrap/mousetrap.min.js');
     const mousetrapBindGlobalJs = _getResourcePath('thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js');
     const bigJs = _getResourcePath('thirdParty/big.js/big.min.js');
