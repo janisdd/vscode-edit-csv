@@ -4,8 +4,12 @@
 
 # 0.10.0
 
-- added `excelLike` option to `dragToAutoFill` setting
+- added feature #161 - `excelLike` option to `dragToAutoFill` setting
   - this is now the default
+- added feature #155 -  zoom the table content (only cells, not headers)
+  - ui buttons are added or use mouse + ctrl (same as vs code font size feature)
+- added option `pasteBehavior` to determine where the old cells should be moved after a paste operation , see #156
+- added option `pasteScrollBehavior` to determine where to scroll after a paste operation, see #156
 
 # 0.9.2
 

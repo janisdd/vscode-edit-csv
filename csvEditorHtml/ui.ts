@@ -578,7 +578,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		} as any,
 		afterChange: onAnyChange, //only called when cell value changed (e.g. not when col/row removed)
 		fillHandle: initialConfig?.dragToAutoFill !== 'none' ? {
-			autoInsertRow: false,
+			autoInsertRow: true,
 		} : undefined,
 		undo: true,
 		colHeaders: defaultColHeaderFuncBound as any,
@@ -1852,9 +1852,12 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 	hot.addHook('afterRender', afterRenderForced as any)
 
-	hot.getPlugin('copyPaste').rowsLimit = copyPasteRowLimit
-	hot.getPlugin('copyPaste').columnsLimit = copyPasteColLimit
-	hot.getPlugin('copyPaste').pasteSeparatorMode = initialConfig?.pasteMode || 'normal'
+	let copyPastePlugin = hot.getPlugin('copyPaste')
+	copyPastePlugin.rowsLimit = copyPasteRowLimit
+	copyPastePlugin.columnsLimit = copyPasteColLimit
+	copyPastePlugin.pasteSeparatorMode = initialConfig?.pasteMode || 'normal'
+	copyPastePlugin.pasteMode = initialConfig?.pasteBehavior || `overwrite`
+	copyPastePlugin.pasteScrollBehavior = initialConfig?.pasteScrollBehavior || `scrollToLastPastedCell`
 
 	const oldShouldApplyHeaderReadOption = defaultCsvReadOptions._hasHeader
 	const settingsApplied = checkIfHasHeaderReadOptionIsAvailable(true)
@@ -1897,6 +1900,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	if (hot) {
 
 		let autoFillPlugin = hot.getPlugin('autofill')
+		// autoFillPlugin.autoInsertRow = true
 
 		//if copy only, we can use the default autofill
 		//if auto fill is disabled, this is done on hot init

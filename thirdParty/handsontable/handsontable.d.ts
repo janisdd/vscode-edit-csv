@@ -788,6 +788,7 @@ declare namespace Handsontable {
       copyableRanges: any[];
       pasteMode: PasteModeType;
       rowsLimit: number;
+      pasteScrollBehavior: "scrollToLastPastedCell" | "scrollToFirstPastedCell" | "dontScroll"
       focusableElement: FocusableWrapper;
 
       pasteSeparatorMode: "normal" | "onlyKeepRowSeparators" | "onlyKeepColumnSeparators" | "ignoreAllSeparators"

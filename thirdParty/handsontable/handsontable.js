@@ -24,7 +24,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  * Version: 6.5.4
- * Release date: 19/12/2018 (built at 26/08/2024 20:17:54)
+ * Release date: 19/12/2018 (built at 03/09/2024 15:50:03)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29763,7 +29763,7 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "26/08/2024 20:17:54";
+Handsontable.buildDate = "03/09/2024 15:50:03";
 Handsontable.packageName = "handsontable";
 Handsontable.version = "6.5.4";
 var baseVersion = "";
@@ -52118,6 +52118,14 @@ function (_BasePlugin) {
 
     _this.rowsLimit = ROWS_LIMIT;
     /**
+     * When set to `scrollToLastPastedCell`, scroll to the last pasted cell (this will select all pasted cells)
+     * When set to `scrollToFirstPastedCell`, scroll to the last first pasted cell (only select that cell)
+     * When set to `dontScroll`, don't scroll after the paste
+     * @type {'scrollToLastPastedCell' | 'scrollToFirstPastedCell' | 'dontScroll'}
+     */
+
+    _this.pasteScrollBehavior = 'scrollToLastPastedCell';
+    /**
      * when pasting text data (normally from spreadsheets) there are two types of separators
      * row separators, which are new line characters (when we read a new line, we start a new row)
      * column separators, which are tabs (when we read a column, we start a new column)
@@ -52132,7 +52140,7 @@ function (_BasePlugin) {
      * `"ignoreAllSeparators"`: always paste the content into a single cell (keep all separators)
      *
      * NOTE that we still use the multi cell logic and only convert the cells back with join (so Sheet js parse is applied, e.g. convert double quotes to single quotes, etc).
-     * @type {"normal" | "onlyKeepRowSeparators" | "onlyKeepColumnSeparators" | "ignoreAllSeparators"}
+     * @type {'normal' | 'onlyKeepRowSeparators' | 'onlyKeepColumnSeparators' | 'ignoreAllSeparators'}
      */
 
     _this.pasteSeparatorMode = 'normal'; // these are only used for combining the cells again
@@ -52672,9 +52680,38 @@ function (_BasePlugin) {
           startRow = _this$populateValues2[0],
           startColumn = _this$populateValues2[1],
           endRow = _this$populateValues2[2],
-          endColumn = _this$populateValues2[3];
+          endColumn = _this$populateValues2[3]; // this.hot.selectCell(
+      //   startRow,
+      //   startColumn,
+      //   this.pasteScrollBehavior === 'scrollToLastFirstPastedCell' ? Math.min(this.hot.countRows() - 1, endRow) : startRow,
+      //   this.pasteScrollBehavior === 'scrollToLastFirstPastedCell' ? Math.min(this.hot.countCols() - 1, endColumn) : startColumn,
+      // );
 
-      this.hot.selectCell(startRow, startColumn, Math.min(this.hot.countRows() - 1, endRow), Math.min(this.hot.countCols() - 1, endColumn));
+
+      this.hot.selectCell(startRow, startColumn, Math.min(this.hot.countRows() - 1, endRow), Math.min(this.hot.countCols() - 1, endColumn), false);
+
+      switch (this.pasteScrollBehavior) {
+        case 'scrollToFirstPastedCell':
+          {
+            this.hot.scrollViewportTo(startRow, startColumn, false, false);
+            break;
+          }
+
+        case 'scrollToLastPastedCell':
+          {
+            this.hot.scrollViewportTo(Math.min(this.hot.countRows() - 1, endRow), Math.min(this.hot.countCols() - 1, endColumn), true, true);
+            break;
+          }
+
+        case 'dontScroll':
+          {
+            break;
+          }
+
+        default:
+          break;
+      }
+
       this.hot.runHooks('afterPaste', inputArray, this.copyableRanges);
     }
     /**

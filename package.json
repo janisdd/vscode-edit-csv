@@ -602,6 +602,36 @@
 						"always paste into a single cell (ignoring row and column separators)"
 					]
 				},
+				"csv-edit.pasteBehavior": {
+					"type": "string",
+					"default": "overwrite",
+					"description": "the paste behaviour to be used (what should happen to the old content)",
+					"enum": [
+						"overwrite",
+						"shift_down",
+						"shift_right"
+					],
+					"enumDescriptions": [
+						"pasting content overwrites the existing content",
+						"pasting content shifts the existing content (cells) down",
+						"pasting content shifts the existing content (cells) to the right"
+					]
+				},
+				"csv-edit.pasteScrollBehavior": {
+					"type": "string",
+					"default": "scrollToLastPastedCell",
+					"description": "the scroll behaviour after pasting data",
+					"enum": [
+						"scrollToLastPastedCell",
+						"scrollToFirstPastedCell",
+						"dontScroll"
+					],
+					"enumDescriptions": [
+						"scrolls to the laste pasted cell",
+						"scrolls to the first pasted cell",
+						"don't scroll to the pasted cells"
+					]
+				},
 				"csv-edit.fontFamilyInTable": {
 					"type": "string",
 					"default": "default",

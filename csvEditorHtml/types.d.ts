@@ -312,7 +312,7 @@ type EditCsvConfig = {
 	openTableAndSelectCellAtCursorPos: "initialOnly_correctRowAlwaysFirstColumn" | "initialOnly_correctRowAndColumn" | "never"
 
 	/**
-	 * the paste mode/behavior
+	 * the paste mode
 	 * note that the normal processing is done by handsontable (sheet.js) and we just join the cells back again
 	 *
 	 * normal: normal paste (rows and columns are respected),
@@ -321,6 +321,27 @@ type EditCsvConfig = {
 	 * ignoreAllSeparators: always paste into a single cell (ignoring row and column separator)"
 	 */
 	pasteMode: "normal" | "onlyKeepRowSeparators" | "onlyKeepColumnSeparators" | "ignoreAllSeparators"
+
+	/**
+	 * the paste behavior
+	 * the paste behaviour to be used (what should happen to the old content)
+	 *
+	 * overwrite: pasting content overwrites the existing content
+	 * shift_down: pasting content shifts the existing content (cells) down
+	 * shift_right: pasting content shifts the existing content (cells) to the right
+	 */
+	pasteBehavior: "overwrite" | "shift_down" | "shift_right"
+
+	/**
+	 * the paste scroll behavior
+	 * 
+	 * scrollToLastPastedCell: scrolls to the laste pasted cell
+	 * scrollToFirstPastedCell: scrolls to the first pasted cell
+	 * dontScroll: don't scroll to the pasted cells
+	 * 
+	 * note: the cells are always selected after pasting
+	 */
+	pasteScrollBehavior: "scrollToLastPastedCell" | "scrollToFirstPastedCell" | "dontScroll"
 
 	/**
 	 * sets the font family usesd in the table

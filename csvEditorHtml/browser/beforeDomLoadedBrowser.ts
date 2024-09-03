@@ -61,6 +61,8 @@ var initialConfig: EditCsvConfig | undefined = {
 	hideOpenCsvEditorUiActions: false, //noop, has only effect if set inside the user settings (vs code extension)
 	openTableAndSelectCellAtCursorPos: "never",
 	pasteMode: 'normal',
+	pasteBehavior: 'overwrite',
+	pasteScrollBehavior: 'scrollToLastPastedCell',
 	fontFamilyInTable: 'default',
 	showDeleteColumnHeaderButton: true,
 	showDeleteRowHeaderButton: true,

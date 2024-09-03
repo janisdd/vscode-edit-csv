@@ -48,6 +48,8 @@ const defaultConfig: EditCsvConfig = {
 	hideOpenCsvEditorUiActions: false, //noop, has only effect if set inside the user settings
 	openTableAndSelectCellAtCursorPos: "initialOnly_correctRowAlwaysFirstColumn",
 	pasteMode: 'normal',
+	pasteBehavior: 'overwrite',
+	pasteScrollBehavior: 'scrollToLastPastedCell',
 	fontFamilyInTable: 'default',
 	showDeleteColumnHeaderButton: true,
 	showDeleteRowHeaderButton: true,
