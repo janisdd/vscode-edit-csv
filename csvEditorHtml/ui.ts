@@ -687,7 +687,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						for (let targetCol = _selection.start.col; targetCol <= _selection.end.col; targetCol++) {
 							columnIndicesToHide.push(targetCol)
 						}
-						
+
 						_hideColumnByIndices(columnIndicesToHide)
 					},
 					disabled: function () {
@@ -1701,7 +1701,11 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		rowHeights: function (visualRowIndex: number) {
 
 			//see https://handsontable.com/docs/6.2.2/Options.html#rowHeights
-			let defaultHeight = 23
+			let defaultHeight = (16 + fontSizeAddModifier) + 7
+
+			//there are some hard coded values in the handsontable source code for cell height?
+			//so, we set it to the same value as the default height
+			defaultHeight = Math.max(23, defaultHeight)
 
 			if (!hot) return defaultHeight
 
@@ -2458,9 +2462,16 @@ function changeFontSizeInPx(fontSizeInPx: number) {
 		//remove custom font size and use editor font size
 		document.body.classList.remove('extension-settings-font-size')
 		document.body.classList.add('vs-code-settings-font-size')
+
+		let fontSizeInPx = document.documentElement.style.getPropertyValue('--vscode-editor-font-size')
+		let fontSize = parseInt(fontSizeInPx.substring(0, fontSizeInPx.length - 2))
+		currentFontSize = isNaN(fontSize) ? 16 : fontSize
+
 	} else {
 		document.body.classList.add('extension-settings-font-size')
 		document.body.classList.remove('vs-code-settings-font-size')
+
+		currentFontSize = fontSizeInPx
 	}
 
 	reRenderTable()
@@ -3015,4 +3026,80 @@ function setToolMenuIsOpen(setOpen: boolean) {
 		toolsMenuBtnIcon.classList.remove(`fa-chevron-up`)
 	}
 
+}
+
+let debouncedTableReRender = debounce(() => {
+
+	reRenderTable(() => {
+		//we need to do this because:
+		// when we sometimes scroll out then the virtual renderer has not rendered enough rows...
+		//@ts-ignore
+		hot.view.wt.wtOverlays.adjustElementsSize(true);
+		//@ts-ignore
+		hot.view.wt.draw()
+		//don't ask why we have to call it twice (no idea)... but it works
+		//@ts-ignore
+		hot.view.wt.draw()
+
+		//fix open editor
+		let currEditor = hot!.getActiveEditor()
+		//@ts-ignore
+		if (currEditor.state !== 'STATE_VIRGIN') {
+			//@ts-ignore
+			currEditor.refreshDimensions()
+		}
+
+	})
+}, 1000)
+
+//always use 2 because it works good
+//also handsontable has sometimes problems when fractions are used...
+function incTableContentZoom() {
+	_changeTableContentZoom(2)
+}
+
+function decTableContentZoom() {
+	_changeTableContentZoom(-2)
+}
+
+function resetTableContentZoom() {
+	__changeTableContentZoom(0)
+}
+
+function _changeTableContentZoom(amount: number) {
+
+	let newScaler = fontSizeAddModifier
+	newScaler += amount
+
+	// less than 12 not changes cell height because 23 is a hard coded min?
+	// at least there are some defaults with 23 px
+	if (currentFontSize + newScaler < 12) {
+		return
+	} else if (currentFontSize + newScaler > 100) {
+		return
+	}
+
+	__changeTableContentZoom(newScaler)
+}
+
+function __changeTableContentZoom(newScalerFinal: number) {
+	fontSizeAddModifier = newScalerFinal
+
+	document.documentElement.style.setProperty('--hot-font-size-add-modifier', `${fontSizeAddModifier}px`)
+
+	//this will also immediately update col widths, ...
+	// //@ts-ignore
+	// hot.view.wt.wtOverlays.adjustElementsSize(true); //scrollbars don't need to be updated immediately
+	//@ts-ignore
+	hot.view.wt.draw()
+
+	//a bit less ugly when an editor is open
+	let currEditor = hot!.getActiveEditor()
+	//@ts-ignore
+	if (currEditor.state !== 'STATE_VIRGIN') {
+		//@ts-ignore
+		currEditor.refreshDimensions()
+	}
+
+	debouncedTableReRender()
 }

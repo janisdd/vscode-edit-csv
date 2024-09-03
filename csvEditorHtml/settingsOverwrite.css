@@ -5,12 +5,24 @@ this file is used to apply extension settings via css variables
 
 html {
 	--extension-font-size: 16px;
+	--hot-font-size-add-modifier: 1;
 }
 
 /* use font size from editor */
 
 body.vs-code-settings-font-size {
 	font-size: calc(1 * var(--vscode-editor-font-size));
+}
+
+body.vs-code-settings-font-size .handsontable td {
+	font-size: calc(var(--vscode-editor-font-size) + var(--hot-font-size-add-modifier));
+	height: calc(var(--vscode-editor-font-size) + var(--hot-font-size-add-modifier) + 6px);
+	line-height: calc(var(--vscode-editor-font-size) + var(--hot-font-size-add-modifier) + 5px);
+}
+body.vs-code-settings-font-size .handsontableInputHolder textarea {
+	font-size: calc(var(--vscode-editor-font-size) + var(--hot-font-size-add-modifier));
+	height: calc(var(--vscode-editor-font-size) + var(--hot-font-size-add-modifier) + 6px);
+	line-height: calc(var(--vscode-editor-font-size) + var(--hot-font-size-add-modifier) + 5px);
 }
 
 body.vs-code-settings-font-size .input {
@@ -52,6 +64,17 @@ body.vs-code-settings-font-size .textarea {
 
 body.extension-settings-font-size {
 	font-size: calc(1 * var(--extension-font-size));
+}
+
+body.extension-settings-font-size .handsontable td {
+	font-size: calc(var(--extension-font-size) + var(--hot-font-size-add-modifier));
+	height: calc(var(--extension-font-size) + var(--hot-font-size-add-modifier) + 6px);
+	line-height: calc(var(--extension-font-size) + var(--hot-font-size-add-modifier) + 5px);
+}
+body.extension-settings-font-size .handsontableInputHolder textarea {
+	font-size: calc(var(--extension-font-size) + var(--hot-font-size-add-modifier));
+	height: calc(var(--extension-font-size) + var(--hot-font-size-add-modifier) + 6px);
+	line-height: calc(var(--extension-font-size) + var(--hot-font-size-add-modifier) + 5px);
 }
 
 body.extension-settings-font-size .input {

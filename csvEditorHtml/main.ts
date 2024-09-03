@@ -3,6 +3,10 @@
 //@ts-ignore
 dayjs.extend(dayjs_plugin_customParseFormat);
 
+//used for temporary changing the font size
+var fontSizeAddModifier = 0
+let currentFontSize = 16
+
 const defaultInitialVars: InitialVars = {
 	isWatchingSourceFile: false,
 	sourceFileCursorLineIndex: null,
@@ -83,8 +87,8 @@ let hiddenPhysicalRowIndicesSorted: number[] = []
 let hiddenPhysicalColumnIndicesSorted: number[] = []
 
 //visual indices
-let firstAndLastVisibleRows: {first: number, last: number} | null = null
-let firstAndLastVisibleColumns: {first: number, last: number} | null = null
+let firstAndLastVisibleRows: { first: number, last: number } | null = null
+let firstAndLastVisibleColumns: { first: number, last: number } | null = null
 
 let copyPasteRowLimit = 10_000_000
 let copyPasteColLimit = 10_000_000
@@ -465,6 +469,21 @@ function setupGlobalShortcutsInVs() {
 			hoveredATag.classList.remove(isOpenUrlKeyDownClass)
 		}
 	})
+
+	function handleWheel(e: WheelEvent) {
+
+		if (!e.ctrlKey) return
+		e.preventDefault()
+		e.stopPropagation()
+
+		if (e.deltaY > 0) {
+			decTableContentZoom()
+		} else {
+			incTableContentZoom()
+		}
+	}
+
+	document.documentElement.addEventListener(`wheel`, handleWheel, { passive: false })
 
 	//---- some shortcuts are also in ui.ts where the handsontable instance is created...
 	//needed for core handsontable shortcuts e.g. that involve arrow keys

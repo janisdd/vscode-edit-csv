@@ -256,6 +256,22 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 											</vscode-button>
 										</div>
 
+										<!-- table temporary zoom -->
+										<div class="flexed changeable-indicator" style="margin-left: 1em;">
+											<div>
+												<vscode-button appearance="icon" id="table-zoom-icon" class="clickable" title="Resets the table content zoom" onclick="resetTableContentZoom()">
+													<span>
+													<i class="fas fa-search-plus"></i>
+													</span>
+												</vscode-button>
+											</div>
+											<!--<div id="table-zoom-info" class="text" style="margin-left: 0.5rem;">0</div>-->
+											<div class="changeable" style="margin-left: 0.5rem;">
+												<span class="clickable" onclick="incTableContentZoom()"><i class="fas fa-chevron-up"></i></span>
+												<span class="clickable" onclick="decTableContentZoom()"><i class="fas fa-chevron-down"></i></span>
+											</div>
+										</div>
+
 										<div id="source-file-unwatched-indicator" class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline" style="float: right;margin-right: 5px;"
 											data-tooltip="The csv source file is not monitored for changes. Changes to the source file are ignored if the source file is changed by vs code or an external programme. To manually reload the contents of the source file, use the 'manual refresh button'.">
 											<span>
@@ -796,6 +812,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 					<!-- turns out handsontable checks if the values are isNaN and if both are numbers they are parsed as floats and compared as floats ... so comparing numbers or text should be fine here -->
 						<li>Sorting is not automatically updated after data has changed</li>
 						<li>Sorting state is exported</li>
+						<li>Similar to Excel, you can hold down the <div class="keys">alt</div> key before releasing the mouse button to copy the cell values. No interpolation is carried out.</li>
 						<li>You can use ctrl/cmd click on a column header to sort by multiple columns</li>
 						<li>The unsaved changes indicator is display on any change (never cleared until you apply the changes, even if you revert manually)</li>
 						<li>When you see the unsaved changes indicator right after the table was loaded then some rows were expanded (to ensure all rows have the same length)</li>

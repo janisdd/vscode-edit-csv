@@ -9,6 +9,8 @@ html {
 	/* will be set before dom loaded to: inherit OR var(--vscode-editor-font-family) */
 	--extension-table-font-family: inherit;
 	--type-ramp-base-font-size: 14px;
+
+	/* -hot-row- */
 }
 
 html, body {
@@ -112,6 +114,28 @@ input.input {
 .mar-bot {
 	margin-bottom: 1em;
 }
+
+/* .handsontable td {
+	font-size: 50px;
+
+	font-size: 50px;
+	line-height: 100%;
+}
+
+.handsontableInputHolder textarea {
+	line-height: 1;
+}  */
+.handsontable td {
+	font-size: calc(var(--extension-font-size) + var(--hot-font-size-add-modifier));
+	height: calc(var(--extension-font-size) + var(--hot-font-size-add-modifier) + 6px);
+	line-height: calc(var(--extension-font-size) + var(--hot-font-size-add-modifier) + 5px);
+}
+
+.handsontableInputHolder textarea {
+	font-size: calc(var(--extension-font-size) + var(--hot-font-size-add-modifier));
+	height: calc(var(--extension-font-size) + var(--hot-font-size-add-modifier) + 6px);
+	line-height: calc(var(--extension-font-size) + var(--hot-font-size-add-modifier) + 5px);
+} 
 
 .handsontable th .remove-col,
 .handsontable th .remove-row {
