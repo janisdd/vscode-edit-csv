@@ -24,7 +24,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  * Version: 6.5.4
- * Release date: 19/12/2018 (built at 03/09/2024 16:19:32)
+ * Release date: 19/12/2018 (built at 06/09/2024 10:31:51)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29763,7 +29763,7 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "03/09/2024 16:19:32";
+Handsontable.buildDate = "06/09/2024 10:31:51";
 Handsontable.packageName = "handsontable";
 Handsontable.version = "6.5.4";
 var baseVersion = "";
@@ -44125,10 +44125,9 @@ function (_BasePlugin) {
       this.registerEvents();
       this.addHook('afterOnCellCornerMouseDown', function (event) {
         return _this2.onAfterCellCornerMouseDown(event);
-      });
-      this.addHook('afterOnCellCornerDblClick', function (event) {
-        return _this2.onCellCornerDblClick(event);
-      });
+      }); // this does not work with our custom fill function implementation and this does not seem useful?
+      // this.addHook('afterOnCellCornerDblClick', event => this.onCellCornerDblClick(event));
+
       this.addHook('beforeOnCellMouseOver', function (event, coords) {
         return _this2.onBeforeCellMouseOver(coords);
       });
