@@ -1,5 +1,6 @@
 .vscode/**
 .vscode-test/**
+.vscode-test.mjs
 .github/**
 out/test/**
 src/**
@@ -40,6 +41,9 @@ promtUploadbuild.js
 cypress
 csvEditorHtml/browser/**
 csvEditorHtml/out/browser/**
+csvEditorHtml/out/test/**
 # not used anymore but we might need to copy certain rules...
 .vscode-test-web/**
 exampleCSV/**
+CHANGELOG.md
+docs/
