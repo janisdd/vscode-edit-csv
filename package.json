@@ -735,7 +735,8 @@
 		"buildBrowser": "node ./csvEditorHtml/out/browser/build/build.js"
 	},
 	"dependencies": {
-		"@vscode/webview-ui-toolkit": "1.0.0"
+		"@vscode/webview-ui-toolkit": "1.0.0",
+		"dayjs": "1.11.13"
 	},
 	"devDependencies": {
 		"@sweetalert2/theme-dark": "3.2.0",
@@ -754,7 +755,6 @@
 		"@vscode/test-electron": "2.4.1",
 		"bulma-toast": "2.0.3",
 		"chardet": "1.2.1",
-		"dayjs": "1.11.13",
 		"fs-extra": "9.0.1",
 		"glob": "7.1.6",
 		"iconv-lite": "0.6.2",
