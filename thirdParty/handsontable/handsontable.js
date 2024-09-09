@@ -24,7 +24,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
  * Version: 6.5.4
- * Release date: 19/12/2018 (built at 06/09/2024 10:31:51)
+ * Release date: 19/12/2018 (built at 09/09/2024 12:13:42)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29763,7 +29763,7 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "06/09/2024 10:31:51";
+Handsontable.buildDate = "09/09/2024 12:13:42";
 Handsontable.packageName = "handsontable";
 Handsontable.version = "6.5.4";
 var baseVersion = "";
@@ -52683,28 +52683,35 @@ function (_BasePlugin) {
           endColumn = _this$populateValues2[3]; // this.hot.selectCell(
       //   startRow,
       //   startColumn,
-      //   this.pasteScrollBehavior === 'scrollToLastFirstPastedCell' ? Math.min(this.hot.countRows() - 1, endRow) : startRow,
-      //   this.pasteScrollBehavior === 'scrollToLastFirstPastedCell' ? Math.min(this.hot.countCols() - 1, endColumn) : startColumn,
+      //   Math.min(this.hot.countRows() - 1, endRow),
+      //   Math.min(this.hot.countCols() - 1, endColumn),
+      //   false
       // );
 
-
-      this.hot.selectCell(startRow, startColumn, Math.min(this.hot.countRows() - 1, endRow), Math.min(this.hot.countCols() - 1, endColumn), false);
 
       switch (this.pasteScrollBehavior) {
         case 'scrollToFirstPastedCell':
           {
-            this.hot.scrollViewportTo(startRow, startColumn, false, false);
+            // somehow this does a better jop in keeping the col/row in the viewport than scrollViewportTo
+            this.hot.selectCell(Math.min(this.hot.countRows() - 1, endRow), Math.min(this.hot.countCols() - 1, endColumn), startRow, startColumn); // this.hot.scrollViewportTo(
+            //   startRow,
+            //   startColumn,
+            //   false,
+            //   false
+            // );
+
             break;
           }
 
         case 'scrollToLastPastedCell':
           {
-            this.hot.scrollViewportTo(Math.min(this.hot.countRows() - 1, endRow), Math.min(this.hot.countCols() - 1, endColumn), true, true);
+            this.hot.selectCell(startRow, startColumn, Math.min(this.hot.countRows() - 1, endRow), Math.min(this.hot.countCols() - 1, endColumn));
             break;
           }
 
         case 'dontScroll':
           {
+            this.hot.selectCell(startRow, startColumn, Math.min(this.hot.countRows() - 1, endRow), Math.min(this.hot.countCols() - 1, endColumn), false);
             break;
           }
 
