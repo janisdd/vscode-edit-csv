@@ -68,7 +68,7 @@ In this case all unnecessary quotes are removed
 
 *essentially it's just import csv and export csv*
 
-When you click on `edit csv file`
+When you click on `Edit CSV file`
 
 - the file content is cut into pieced and transferred via `[webview].postMessage`
 - the current config is stringified and injected into the editor (webview) html
@@ -200,14 +200,14 @@ All possible settings can be found in `[project root]/csvEditorHtml/types.d.ts >
 })
 ```
 
-There is one problem left: the `Edit csv` button in the title bar (and the file right click menu action) will still use the settings set by the user...
+There is one problem left: the `Edit CSV` button in the title bar (and the file right click menu action) will still use the settings set by the user...
 For this there is the option `csv-edit.hideOpenCsvEditorUiActions`. If set to true it will hide the two ui actions. This way you can create a buttom from your extension and open the editor and force your settings.
 
 **Make sure to keep the type EditCsvConfig up-to-date (in case any types change)**
 
 The extension will warn you about any unknown settings supplied but will not check the actual property values!
 
-It will overwrite the settings configured by the user and call the same method as `edit-csv.edit` (the default when the editor is opened via the `Edit csv` button).
+It will overwrite the settings configured by the user and call the same method as `edit-csv.edit` (the default when the editor is opened via the `Edit CSV` button).
 
 ## How to build locally
 

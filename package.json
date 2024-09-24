@@ -1,6 +1,6 @@
 {
 	"name": "vscode-edit-csv",
-	"displayName": "Edit csv",
+	"displayName": "Edit CSV",
 	"description": "extension to edit csv files with a table ui",
 	"version": "0.10.0",
 	"license": "MIT",
@@ -60,7 +60,7 @@
 			{
 				"command": "edit-csv.edit",
 				"category": "CSV",
-				"title": "Edit csv"
+				"title": "Edit CSV"
 			},
 			{
 				"command": "edit-csv.goto-source",
@@ -245,7 +245,7 @@
 			]
 		},
 		"configuration": {
-			"title": "Edit csv configuration",
+			"title": "Edit CSV configuration",
 			"type": "object",
 			"properties": {
 				"csv-edit.highlightCsvComments": {
