@@ -51,7 +51,7 @@ It is not clear what to expect here...
 - the quotes indicate the intend to not have a leading space
 - the space between the `,` and the `"` indicate a space
 
-Papaparse chooses to include the leading space, resulting in `a`, ` b`, ` "c"`
+Papaparse chooses to include the leading space, resulting in `a`, ` b`, ` "c"`  
 Probably because the csv rfc states: 
 >spaces are considered part of a field and should not be ignored.
 
