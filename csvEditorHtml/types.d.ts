@@ -499,6 +499,11 @@ type CsvWriteOptions = {
 	 * true: information about quoted fields are retained during parsing and written to output(for more details see readme), false: information about quoted field is discarded
 	 */
 	retainQuoteInformation: boolean
+
+	/**
+	 * true: disables any automatic quoting; supersedes all other quoting options
+	 */
+	disableAutomaticQuoting: boolean
 }
 
 type MiscOptions = {

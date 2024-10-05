@@ -145,6 +145,7 @@ let defaultCsvWriteOptions: CsvWriteOptions = {
 	quoteAllFields: false,
 	quoteEmptyOrNullFields: false,
 	retainQuoteInformation: true,
+	disableAutomaticQuoting: false,
 }
 //will be set when we read the csv content
 let newLineFromInput = '\n'

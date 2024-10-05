@@ -334,6 +334,10 @@ changelog: (latest first)
 		/** @type {boolean} */
 		var _quoteEmptyOrNullFields = false;
 
+		//true: no quotes are introduced at all
+		/** @type {boolean} */
+		var _disableAutomaticQuoting = false;
+
 		unpackConfig();
 
 		var quoteCharRegex = new RegExp(escapeRegExp(_quoteChar), 'g');
@@ -424,6 +428,10 @@ changelog: (latest first)
 
 			if (typeof _config.quoteEmptyOrNullFields === 'boolean') {
 				_quoteEmptyOrNullFields = _config.quoteEmptyOrNullFields;
+			}
+
+			if (typeof _config.disableAutomaticQuoting === 'boolean') {
+				_disableAutomaticQuoting = _config.disableAutomaticQuoting;
 			}
 		}
 
@@ -532,6 +540,10 @@ changelog: (latest first)
 
 			if (str.constructor === Date)
 				return JSON.stringify(str).slice(1, 25);
+			
+			if (_disableAutomaticQuoting) {
+				return str
+			}
 
 			str = str.toString().replace(quoteCharRegex, _escapedQuote);
 

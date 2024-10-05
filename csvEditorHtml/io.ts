@@ -250,6 +250,9 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 	//@ts-ignore
 	_conf['columnIsQuoted'] = csvWriteOptions.retainQuoteInformation ? columnIsQuoted : null
 
+	//@ts-ignore
+	_conf['disableAutomaticQuoting'] = true
+
 	let dataAsString = csv.unparse(data, _conf)
 
 	let finalNewLineOption: EditCsvConfig["finalNewLine"] = "sameAsSourceFile"
