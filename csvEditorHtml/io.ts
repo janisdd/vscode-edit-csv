@@ -251,7 +251,7 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 	_conf['columnIsQuoted'] = csvWriteOptions.retainQuoteInformation ? columnIsQuoted : null
 
 	//@ts-ignore
-	_conf['disableAutomaticQuoting'] = true
+	_conf['disableAutomaticQuoting'] = csvWriteOptions.disableAutomaticQuoting
 
 	let dataAsString = csv.unparse(data, _conf)
 
