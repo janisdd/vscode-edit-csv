@@ -34,6 +34,24 @@ Then run yarn test / npm run test
 	- parse: rowInsertCommentLines_commentsString !== null, left trimmed strings starting with it are treated as comments and are parsed into a row with 1 cell
 	- unparse: rowInsertCommentLines_commentsString !== null, left trimmed strings first cells will be trimmed left and only the first cell will be exported
 
+- fixed issue https://github.com/mholt/PapaParse/issues/1035 (same as https://github.com/janisdd/vscode-edit-csv/issues/167)
+  - also fixes https://github.com/mholt/PapaParse/issues/1068
+  - issue: the escape char was not properly set when only the quoteChar was changed
+  - subsequent issue: do determine if a field must be quoted `BAD_DELIMITERS` was used, which always includes `"` and `Papa.BYTE_ORDER_MARK`
+    - it also didn't check the actual quoteChar
+
+- added option `_quoteLeadingSpace` and `_quoteTrailingSpace`
+  - `_quoteLeadingSpace` defaults to true: if a field starts with a whitespace, should it be quoted (true) or not (false)
+  - `_quoteTrailingSpace` defaults to true: if a field ends with a whitespace, should it be quoted (true) or not (false)
+
+- added option `_determineFieldHasQuotesFunc` to determine if a field should be quoted (it cannot remove quotes!!)
+  - if a field contains some special characters, it is quoted, e.g. delimiter, quotes, new line, ...
+  - this func can be used to add quotes to fields (but not to remove quotes!) it is OR-ed with the other indicators
+
+- when setting `retainQuoteInformation` to `true`, we now also output `cellIsQuotedInfo` which contains the information if a cell was quoted or not
+- `cellIsQuotedInfo` now respects `skipEmptyLines` and returns the same amount of rows as the data array
+
+--- all further changes are directly noted in the `.js` file ---
 
 ## Minified version
 

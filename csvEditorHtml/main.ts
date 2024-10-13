@@ -114,6 +114,8 @@ let headerRowWithIndexRedoStack: Array<HeaderRowWithIndexUndoStackItem> = []
  * so this is set in {@link displayData} and should be kept up-to-date because it's used for unparsing
  */
 let columnIsQuoted: boolean[]
+//TODO visual or physical indices?
+let cellIsQuotedInfoPhysicalIndices: boolean[][] = []
 
 //csv reader options + some ui options
 //this gets overwritten with the real configuration in setCsvReadOptionsInitial

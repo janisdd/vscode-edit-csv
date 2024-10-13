@@ -84,6 +84,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 	return {
 		data: parseResult.data,
 		columnIsQuoted: (parseResult as any).columnIsQuoted,
+		cellIsQuotedInfo: _parseResult.cellIsQuotedInfo,
 		outLineIndexToCsvLineIndexMapping: _parseResult.outLineIndexToCsvLineIndexMapping ?? null,
 		outColumnIndexToCsvColumnIndexMapping: _parseResult.outColumnIndexToCsvColumnIndexMapping ?? null,
 		originalContent: content,

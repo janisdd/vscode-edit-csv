@@ -144,8 +144,14 @@ function _normalizeDataArray(csvParseResult: ExtendedCsvParseResult, csvReadConf
 	let someRowWasExpanded = false
 	let firstRealRowExpandedWasFound = false
 
+	if (csvParseResult.cellIsQuotedInfo.length !== csvParseResult.data.length) {
+		postVsWarning(`cell quote information length does not match data length, defaulting to setting 'newColumnQuoteInformationIsQuoted': ${newColumnQuoteInformationIsQuoted}`)
+		csvParseResult.cellIsQuotedInfo = Array.from(Array(csvParseResult.data.length), () => Array(maxCols).fill(newColumnQuoteInformationIsQuoted))
+	}
+
 	for (let i = 0; i < csvParseResult.data.length; i++) {
-		const row = csvParseResult.data[i];
+		const row = csvParseResult.data[i]
+		const quoteRowInfo = csvParseResult.cellIsQuotedInfo[i]
 
 		//first real row (not a comment)
 		//we might need to expand the quote information array
@@ -169,6 +175,10 @@ function _normalizeDataArray(csvParseResult: ExtendedCsvParseResult, csvReadConf
 			if (row.length > 0 && isCommentCell(row[0], csvReadConfig) === false) {
 				someRowWasExpanded = true
 			}
+		}
+
+		if (quoteRowInfo.length < maxCols) {
+			quoteRowInfo.push(...Array.from(Array(maxCols - quoteRowInfo.length), (p, index) => newColumnQuoteInformationIsQuoted))
 		}
 
 		//because we mutate the array the csv parse result will be changed...

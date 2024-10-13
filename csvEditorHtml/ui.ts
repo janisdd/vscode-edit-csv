@@ -517,6 +517,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	//this will also expand comment rows but we only use the first column value...
 	_normalizeDataArray(csvParseResult, csvReadConfig)
 	columnIsQuoted = csvParseResult.columnIsQuoted
+	cellIsQuotedInfoPhysicalIndices = csvParseResult.cellIsQuotedInfo
 
 	//if first rows are comments, use the next real data row
 	_resolveInitiallyHiddenColumns(csvParseResult, csvReadConfig)
@@ -1364,6 +1365,20 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				columnIsQuoted.splice(visualColIndex, 0, ...Array(amount).fill(newColumnQuoteInformationIsQuoted))
 			}
 
+			if (cellIsQuotedInfoPhysicalIndices && cellIsQuotedInfoPhysicalIndices.length > 0) {
+
+				for (let i = 0; i < amount; i++) {
+					let visualIndex = visualColIndex + i
+					const physicalIndex = hot.toPhysicalColumn(visualIndex)
+
+					//add a column
+					for (let j = 0; j < cellIsQuotedInfoPhysicalIndices.length; j++) {
+						const row = cellIsQuotedInfoPhysicalIndices[j]
+						row.splice(physicalIndex, 0, newColumnQuoteInformationIsQuoted)
+					}
+				}
+			}
+
 			firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
 
 			// syncColWidths() //covered by afterRender
@@ -1371,6 +1386,27 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//dont' call this as it corrupts hot index mappings (because all other hooks need to finish first before we update hot settings)
 			//also it's not needed as handsontable already handles this internally
 			// updateFixedRowsCols()
+		},
+		beforeRemoveCol(visualColIndex, amount, logicalCols) {
+
+			//physical indices are only working here (not in afterRemoveCol) becasue in after the mapping is already updated
+			if (!hot) return
+
+			if (cellIsQuotedInfoPhysicalIndices && cellIsQuotedInfoPhysicalIndices.length > 0) {
+
+				for (let i = 0; i < amount; i++) {
+					let visualIndex = visualColIndex + i
+					const physicalIndex = hot.toPhysicalColumn(visualIndex)
+		
+					//remove a column
+					for (let j = 0; j < cellIsQuotedInfoPhysicalIndices.length; j++) {
+						const row = cellIsQuotedInfoPhysicalIndices[j]
+						row.splice(physicalIndex, 1)
+					}
+				}
+		
+			}
+				
 		},
 		afterRemoveCol: function (visualColIndex, amount, someting?: any, source?: string) {
 

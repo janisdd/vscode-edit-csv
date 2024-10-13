@@ -683,6 +683,7 @@ type Point = {
 type ExtendedCsvParseResult = {
 	data: string[][]
 	columnIsQuoted: boolean[]
+	cellIsQuotedInfo: boolean[][]
 	outLineIndexToCsvLineIndexMapping: number[] | null
 	outColumnIndexToCsvColumnIndexMapping: number[][] | null
 	originalContent: string
@@ -745,6 +746,9 @@ interface ParseResult {
 	meta: ParseMeta;
 	outLineIndexToCsvLineIndexMapping: number[] | undefined
 	outColumnIndexToCsvColumnIndexMapping: number[][] | undefined
+	
+	columnIsQuoted: boolean[]
+	cellIsQuotedInfo: boolean[][]
 }
 
 interface ParseConfig {
