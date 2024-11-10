@@ -1197,6 +1197,10 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		// 	//this is also fired on various other event (e.g. col resize...) but better sync more than miss an event
 		// 	syncColWidths()
 		// },
+		beforeColumnMove: function (startColVisualIndex: number[], endColVisualIndex: number) {
+			//before move, no indices are updated
+			//we don't need to update cellIsQuotedInfoPhysicalIndices here because moving columns only changes the visual indices
+		},
 		/**
 		 * this is an array if we e.g. move consecutive columns (2,3)
 		 *   but maybe there is a way... this func should handle this anyway
@@ -1289,6 +1293,10 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			// syncColWidths() //covered by afterRender
 			onAnyChange()
 		} as any),
+		beforeRowMove: function (startRow: number[], endRow: number) {
+			//before move, no indices are updated
+			//we don't need to update cellIsQuotedInfoPhysicalIndices here because moving columns only changes the visual indices
+		}, 
 		afterRowMove: function (startRow: number, endRow: number) {
 			if (!hot) throw new Error('table was null')
 			onAnyChange()
@@ -1406,6 +1414,15 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				}
 		
 			}
+
+			let physicalIndex = hot.toPhysicalColumn(visualColIndex)
+			for (let i = 0; i < hiddenPhysicalColumnIndicesSorted.length; i++) {
+				const hiddenPhysicalRowIndex = hiddenPhysicalColumnIndicesSorted[i];
+
+				if (hiddenPhysicalRowIndex >= physicalIndex) {
+					hiddenPhysicalColumnIndicesSorted[i] -= amount
+				}
+			}
 				
 		},
 		afterRemoveCol: function (visualColIndex, amount, someting?: any, source?: string) {
@@ -1413,13 +1430,6 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//we need to modify some or all hiddenPhysicalColumnIndices...
 			if (!hot) return
 
-			for (let i = 0; i < hiddenPhysicalColumnIndicesSorted.length; i++) {
-				const hiddenPhysicalRowIndex = hiddenPhysicalColumnIndicesSorted[i];
-
-				if (hiddenPhysicalRowIndex >= visualColIndex) {
-					hiddenPhysicalColumnIndicesSorted[i] -= amount
-				}
-			}
 			firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
 
 			let isFromUndoRedo = (source === `UndoRedo.undo` || source === `UndoRedo.redo`)
@@ -1453,17 +1463,27 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//hot.updateSettings (inside this func) the plugin internal states are changed and the indices/mappings are corrupted
 			// updateFixedRowsCols()
 		},
-		afterRemoveRow: function (visualRowIndex, amount) {
-			//we need to modify some or all hiddenPhysicalRowIndices...
+		beforeRemoveRow: function (visualRowIndex, amount) {
 			if (!hot) return
+
+			//do this in before row remove, here we still have the row and the mapping should be ok
+
+			let physicalIndex = hot.toPhysicalRow(visualRowIndex)
+			cellIsQuotedInfoPhysicalIndices.splice(physicalIndex, amount)
 
 			for (let i = 0; i < hiddenPhysicalRowIndicesSorted.length; i++) {
 				const hiddenPhysicalRowIndex = hiddenPhysicalRowIndicesSorted[i];
 
-				if (hiddenPhysicalRowIndex >= visualRowIndex) {
+				if (hiddenPhysicalRowIndex >= physicalIndex) {
 					hiddenPhysicalRowIndicesSorted[i] -= amount
 				}
 			}
+
+		},
+		afterRemoveRow: function (visualRowIndex, amount) {
+			//we need to modify some or all hiddenPhysicalRowIndices...
+			if (!hot) return
+
 			firstAndLastVisibleRows = getFirstAndLastVisibleRows()
 
 			//when we have a header row and the original index was 10 and now we have only 5 rows... change index to be the last row
@@ -2428,6 +2448,11 @@ function transposeColumsAndRows() {
 	//see https://stackoverflow.com/questions/17428587/transposing-a-2d-array-in-javascript
 	let transpose = allData[0].map((col, i) => allData.map(row => row[i]))
 
+	//transpose 2d array cellIsQuotedInfoPhysicalIndices
+
+	let transposeQuoteInfo = cellIsQuotedInfoPhysicalIndices[0].map((col, i) => cellIsQuotedInfoPhysicalIndices.map(row => row[i]))
+	cellIsQuotedInfoPhysicalIndices = transposeQuoteInfo
+	
 	statusInfo.innerText = `Swapping finished, rendering...`
 
 	setTimeout(() => {
@@ -2864,9 +2889,32 @@ function pre_afterCreateRow(this: any, visualRowIndex: number, amount: number) {
 //and then they increment the physical row via the amount
 //however, it works somehow...
 function afterCreateRow(visualRowIndex: number, amount: number) {
+
+	if (hot) {
+		//this is not really needed because CURRENTLY after a row is created, 
+		//the physical index is the same as the visual index (only for the created row)
+		let physicalRowIndex = hot.toPhysicalRow(visualRowIndex)
+
+		//we always ensure all rows have the same length...
+		let numCols = hot.countCols()
+
+		for (let i = 0; i < amount; i++) {
+
+			let newRowQuoteInformation: boolean[] = Array.from(Array(numCols), () => newColumnQuoteInformationIsQuoted)
+
+			cellIsQuotedInfoPhysicalIndices.splice(
+				physicalRowIndex, 
+				0,
+				 newRowQuoteInformation
+				)	
+		}
+	}
+
 	//added below
 	//critical because we could update hot settings here
 	//we need to modify some or all hiddenPhysicalRowIndices...
+	//TODO this only works because for some reason for new rows the physical index is the same as the visual index!?!?
+	//  but it sould not work for the other rows???
 
 	for (let i = 0; i < hiddenPhysicalRowIndicesSorted.length; i++) {
 		const hiddenPhysicalRowIndex = hiddenPhysicalRowIndicesSorted[i];
