@@ -4,6 +4,14 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+
+## 1.7.0
+- (same as vs code extension # 0.11.0)
+- added option `forceQuoteLeadingWhitespace` and `forceQuoteTrailingWhitespace` which will quote fields when they have leading or trailing whitespace
+- fixed issue #163 by changed option `retainQuoteInformation` from `bool` to `string` with the options
+  - `none` (old false), `determinedByColumns` (old true) and `full` (new default)
+  - `full` tracks the quote information for every cell individually
+
 ## 1.6.0
 - (same as vs code extension v0.10.0)
 - added feature #161 - `excelLike` option to `dragToAutoFill` setting

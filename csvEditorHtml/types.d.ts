@@ -214,9 +214,23 @@ type EditCsvConfig = {
 	autoColumnWidthsIgnoreComments: boolean
 
 	/**
-	 * true: information about quoted fields are retained during parsing (for more details see readme), false: information about quoted field is discarded
+	 * determines how the quote information is tracked across cells. NOTE: This only sets quotes for cells, but never prevents quotes from being added (so as not to interfere with other quote-related settings)
+	 * 
+	 * none: do not retain any quote information
+	 * determineByColumns: is determined by the first cell in the same column (as the cell in question)
+	 * full: track the quote information for every cell individually
 	 */
-	retainQuoteInformation: boolean
+	retainQuoteInformation: 'none' | 'determinedByColumns' | 'full'
+
+	/**
+	 * true: if a csv field begins with whitespace, it should always be enclosed in quotes, false: not"
+	 */
+	forceQuoteLeadingWhitespace: boolean
+
+	/**
+	 * true: if a csv field ends with whitespace, it should always be enclosed in quotes, false: not
+	 */
+	forceQuoteTrailingWhitespace: boolean
 
 	/**
 	 * true: new columns will get true as quote information (also for added columns via expanding), false: new columns will get false as quote information
@@ -494,11 +508,6 @@ type CsvWriteOptions = {
 	 * this setting takes precedence over {@link quoteAllFields}
 	 */
 	quoteEmptyOrNullFields: boolean
-
-	/**
-	 * true: information about quoted fields are retained during parsing and written to output(for more details see readme), false: information about quoted field is discarded
-	 */
-	retainQuoteInformation: boolean
 }
 
 type MiscOptions = {

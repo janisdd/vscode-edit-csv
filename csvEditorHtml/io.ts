@@ -57,7 +57,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 
 				if (typeof error.row === 'number') {
 					statusInfo.innerText = `Error`
-					const errorMsg = `${error.message} on line ${error.row+1}`
+					const errorMsg = `${error.message} on line ${error.row + 1}`
 					csvEditorDiv.innerText = errorMsg
 					_error(errorMsg) //row is 0 based
 					continue
@@ -127,7 +127,7 @@ function getFirstRowWithIndex(skipCommentLines: boolean = true): HeaderRowWithIn
 	for (let i = 0; i < rowCount; i++) {
 		const row = hot.getDataAtRow(i)
 		if (row.length === 0) continue
-		
+
 		if (skipCommentLines && isCommentCell(row[0], defaultCsvReadOptions)) continue
 
 		firstDataRow = [...row] //make a copy to not get a reference
@@ -156,7 +156,7 @@ function getFirstRowWithIndexByData(data: string[][], skipCommentLines: boolean 
 	for (let i = 0; i < rowCount; i++) {
 		const row = data[i]
 		if (row.length === 0) continue
-		
+
 		if (skipCommentLines && isCommentCell(row[0], defaultCsvReadOptions)) continue
 
 		firstDataRow = [...row] //make a copy to not get a reference
@@ -223,7 +223,7 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 
 		if (typeof csvReadOptions.comments === 'string'
 			&& typeof csvWriteOptions.comments === 'string'
-			&& isCommentCell(row[0], csvReadOptions)) { 
+			&& isCommentCell(row[0], csvReadOptions)) {
 			//this is a comment
 
 			//we expanded comment rows to have the max length
@@ -232,7 +232,7 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 
 			const index = row[0].indexOf(csvReadOptions.comments)
 			//trim left else papaparse (and probably other programs) will not recognize the comment anymore...
-			row[0] = `${row[0].substring(0, index)}${csvWriteOptions.comments}${row[0].substring(index+csvReadOptions.comments.length)}`.trimLeft().replace(/\n/mg, "")
+			row[0] = `${row[0].substring(0, index)}${csvWriteOptions.comments}${row[0].substring(index + csvReadOptions.comments.length)}`.trimLeft().replace(/\n/mg, "")
 
 		}
 
@@ -248,8 +248,49 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 	//@ts-ignore
 	_conf['rowInsertCommentLines_commentsString'] = typeof csvWriteOptions.comments === 'string' ? csvWriteOptions.comments : null
 
+	switch (initialConfig?.retainQuoteInformation ?? 'full') {
+		case 'none': {
+			break
+		}
+		case 'determinedByColumns': {
+			//@ts-ignore
+			_conf['columnIsQuoted'] = columnIsQuoted
+			break
+		}
+		case 'full': {
+
+			//add back the header because data now includes the header
+			let cellIsQuotedInfoPhysicalIndicesFull = [...cellIsQuotedInfoPhysicalIndices]
+			if (headerRowWithIndex && cellIsQuotedInfoPhysicalIndicesHeaderRow.length > 0) {
+				cellIsQuotedInfoPhysicalIndicesFull.splice(headerRowWithIndex.physicalIndex, 0, cellIsQuotedInfoPhysicalIndicesHeaderRow)
+			}
+
+			//@ts-ignore
+			_conf['determineFieldHasQuotes'] = (content: string | null, row: number, col: number) => {
+				if (row >= cellIsQuotedInfoPhysicalIndicesFull.length) {
+					return newColumnQuoteInformationIsQuoted
+				}
+
+				let physicalRow = hot!.toPhysicalRow(row)
+
+				if (col >= cellIsQuotedInfoPhysicalIndicesFull[row].length) {
+					return newColumnQuoteInformationIsQuoted
+				}
+
+				let physicalCol = hot!.toPhysicalColumn(col)
+
+				return cellIsQuotedInfoPhysicalIndicesFull[physicalRow][physicalCol] ?? newColumnQuoteInformationIsQuoted
+			}
+
+			break
+		}
+	}
+
 	//@ts-ignore
-	_conf['columnIsQuoted'] = csvWriteOptions.retainQuoteInformation ? columnIsQuoted : null
+	_conf['quoteLeadingSpace'] = initialConfig?.forceQuoteLeadingWhitespace ?? false
+	//@ts-ignore
+	_conf['quoteTrailingSpace'] = initialConfig?.forceQuoteTrailingWhitespace ?? false
+
 
 	let dataAsString = csv.unparse(data, _conf)
 
@@ -259,8 +300,8 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 	}
 
 	switch (finalNewLineOption) {
-		case 'sameAsSourceFile':{
-			
+		case 'sameAsSourceFile': {
+
 			if (hasFinalNewLine) {
 				dataAsString += csvWriteOptions.newline
 			} else {
@@ -273,7 +314,7 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 			dataAsString += csvWriteOptions.newline
 			break
 		}
-		case 'remove':{
+		case 'remove': {
 			//just don't add it back
 			break
 		}
@@ -484,13 +525,13 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 						reloadFileFromDisk()
 						break
 					}
-					
-					case 'yesAndNotify': 
+
+					case 'yesAndNotify':
 					default: {
 						toggleSourceFileChangedModalDiv(true)
 						break
 					}
-				
+
 				}
 			}
 
@@ -531,7 +572,7 @@ function onReceiveCsvContentSlice(slice: StringSlice) {
  * performs the last steps to actually show the data (set status, render table, ...)
  * also called on reset data
  */
-function startRenderData(){
+function startRenderData() {
 
 	statusInfo.innerText = `Rendering table...`
 
@@ -550,7 +591,7 @@ function startRenderData(){
 
 		resetData(initialContent, defaultCsvReadOptions)
 		statusInfo.innerText = `Performing last steps...`
-		
+
 		//profiling shows that handsontable calls some column resize function which causes the last hang...
 		//status display should be cleared after the handsontable operation so enqueue
 		if (!defaultCsvReadOptions._hasHeader) { //when we apply header this will reset the status for us
@@ -558,7 +599,7 @@ function startRenderData(){
 				statusInfo.innerText = '';
 			}, 0)
 		}
-		
+
 	})
 
 }

@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit CSV",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.10.0",
+	"version": "0.11.0",
 	"license": "MIT",
 	"icon": "images/logo.png",
 	"publisher": "janisdd",
@@ -459,9 +459,29 @@
 					"description": "true: auto sizing columns will ignore comments, false: auto sizing columns will take comments into account"
 				},
 				"csv-edit.retainQuoteInformation": {
+					"type": "string",
+					"default": "full",
+					"description": "determines how the quote information is tracked across cells. NOTE: This only sets quotes for cells, but never prevents quotes from being added (so as not to interfere with other quote-related settings)",
+					"enum": [
+						"none",
+						"determinedByColumns",
+						"full"
+					],
+					"enumDescriptions": [
+						"do not retain any quote information",
+						"is determined by the first cell in the same column (as the cell in question)",
+						"track the quote information for every cell individually"
+					]
+				},
+				"csv-edit.forceQuoteLeadingWhitespace": {
 					"type": "boolean",
-					"default": true,
-					"description": "true: information about quoted fields are retained during parsing (for more details see readme), false: information about quoted field is discarded"
+					"default": false,
+					"description": "true: if a csv field begins with whitespace, it should always be enclosed in quotes, false: not"
+				},
+				"csv-edit.forceQuoteTrailingWhitespace": {
+					"type": "boolean",
+					"default": false,
+					"description": "true: if a csv field ends with whitespace, it should always be enclosed in quotes, false: not"
 				},
 				"csv-edit.newColumnQuoteInformationIsQuoted": {
 					"type": "boolean",

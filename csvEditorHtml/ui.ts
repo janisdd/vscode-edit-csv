@@ -101,6 +101,9 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 
 			let hasAnyChangesBefore = getHasAnyChangesUi()
 
+			let headerCellIsQuotedInfoPhysicalIndices = cellIsQuotedInfoPhysicalIndices[headerRowWithIndex.physicalIndex]
+			cellIsQuotedInfoPhysicalIndicesHeaderRow = headerCellIsQuotedInfoPhysicalIndices
+
 			hot.alter('remove_row', headerRowWithIndex.physicalIndex)
 
 			elWrite.checked = true
@@ -127,6 +130,8 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			return
 		}
 
+		//disable has header
+
 		if (fromUndo) return
 
 		if (headerRowWithIndex === null) {
@@ -140,6 +145,11 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 		const visualCol = hot.toVisualColumn(0)
 		//see https://handsontable.com/docs/6.2.2/Core.html#populateFromArray
 		hot.populateFromArray(visualRow, visualCol, [[...headerRowWithIndex.row]])
+
+		//we already inserted the header row, this will insert the quote info with default values
+		//so, reapply the old values
+		cellIsQuotedInfoPhysicalIndices[headerRowWithIndex.physicalIndex] = cellIsQuotedInfoPhysicalIndicesHeaderRow
+		cellIsQuotedInfoPhysicalIndicesHeaderRow = []
 
 		headerRowWithIndex = null
 

@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+
+
+# 0.11.0
+
+- added option `forceQuoteLeadingWhitespace` and `forceQuoteTrailingWhitespace` which will quote fields when they have leading or trailing whitespace
+- fixed issue #163 by changed option `retainQuoteInformation` from `bool` to `string` with the options
+  - `none` (old false), `determinedByColumns` (old true) and `full` (new default)
+  - `full` tracks the quote information for every cell individually
+
 # 0.10.0
 
 - added feature #161 - `excelLike` option to `dragToAutoFill` setting

@@ -116,6 +116,8 @@ let headerRowWithIndexRedoStack: Array<HeaderRowWithIndexUndoStackItem> = []
 let columnIsQuoted: boolean[]
 //TODO visual or physical indices?
 let cellIsQuotedInfoPhysicalIndices: boolean[][] = []
+//when we active the has header option we, we remove it from the hot data but we need to keep the quote information
+let cellIsQuotedInfoPhysicalIndicesHeaderRow: boolean[] = []
 
 //csv reader options + some ui options
 //this gets overwritten with the real configuration in setCsvReadOptionsInitial
@@ -146,7 +148,6 @@ let defaultCsvWriteOptions: CsvWriteOptions = {
 	escapeChar: '"',
 	quoteAllFields: false,
 	quoteEmptyOrNullFields: false,
-	retainQuoteInformation: true,
 }
 //will be set when we read the csv content
 let newLineFromInput = '\n'
