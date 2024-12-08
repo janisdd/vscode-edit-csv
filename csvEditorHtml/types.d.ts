@@ -341,10 +341,11 @@ type EditCsvConfig = {
 	 * the paste behaviour to be used (what should happen to the old content)
 	 *
 	 * overwrite: pasting content overwrites the existing content
+	 * overwriteExceptEmpty: pasting content overwrites the existing content except for empty cells (in the pasting content)
 	 * shift_down: pasting content shifts the existing content (cells) down
 	 * shift_right: pasting content shifts the existing content (cells) to the right
 	 */
-	pasteBehavior: "overwrite" | "shift_down" | "shift_right"
+	pasteBehavior: "overwrite" | "overwriteExceptEmpty" | "shift_down" | "shift_right"
 
 	/**
 	 * the paste scroll behavior

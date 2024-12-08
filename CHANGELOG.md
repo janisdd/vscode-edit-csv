@@ -3,6 +3,11 @@
 ## [Unreleased]
 
 
+# 0.11.1
+
+- fixed issue #174 - added option `overwriteExceptEmpty` to the `pasteBehavior` setting
+  - it only overwrites the cell content if the paste cell is not empty
+
 
 # 0.11.0
 
@@ -10,6 +15,8 @@
 - fixed issue #163 by changed option `retainQuoteInformation` from `bool` to `string` with the options
   - `none` (old false), `determinedByColumns` (old true) and `full` (new default)
   - `full` tracks the quote information for every cell individually
+- fixed issue where hiding comment rows hides the wrong rows
+  - happened when data was sorted and then rows were removed
 
 # 0.10.0
 

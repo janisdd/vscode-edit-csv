@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit CSV",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.11.0",
+	"version": "0.11.1",
 	"license": "MIT",
 	"icon": "images/logo.png",
 	"publisher": "janisdd",
@@ -628,11 +628,13 @@
 					"description": "the paste behaviour to be used (what should happen to the old content)",
 					"enum": [
 						"overwrite",
+						"overwriteExceptEmpty",
 						"shift_down",
 						"shift_right"
 					],
 					"enumDescriptions": [
 						"pasting content overwrites the existing content",
+						"pasting content overwrites the existing content except for empty cells (in the pasting content)",
 						"pasting content shifts the existing content (cells) down",
 						"pasting content shifts the existing content (cells) to the right"
 					]

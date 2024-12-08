@@ -4,13 +4,20 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.7.1
+- (same as vs code extension v0.11.1)
+- fixed issue #174 - added option `overwriteExceptEmpty` to the `pasteBehavior` setting
+  - it only overwrites the cell content if the paste cell is not empty
+
 
 ## 1.7.0
-- (same as vs code extension # 0.11.0)
+- (same as vs code extension v0.11.0)
 - added option `forceQuoteLeadingWhitespace` and `forceQuoteTrailingWhitespace` which will quote fields when they have leading or trailing whitespace
 - fixed issue #163 by changed option `retainQuoteInformation` from `bool` to `string` with the options
   - `none` (old false), `determinedByColumns` (old true) and `full` (new default)
   - `full` tracks the quote information for every cell individually
+- fixed issue where hiding comment rows hides the wrong rows
+  - happened when data was sorted and then rows were removed
 
 ## 1.6.0
 - (same as vs code extension v0.10.0)
