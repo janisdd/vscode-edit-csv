@@ -3,6 +3,10 @@
 ## [Unreleased]
 
 
+# 0.11.2
+- added feature #142 - added option `tryToGuessHasHeader`
+  - tries to guess from the csv data if there is a header line or not
+
 # 0.11.1
 
 - fixed issue #174 - added option `overwriteExceptEmpty` to the `pasteBehavior` setting

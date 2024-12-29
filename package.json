@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit CSV",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.11.1",
+	"version": "0.11.2",
 	"license": "MIT",
 	"icon": "images/logo.png",
 	"publisher": "janisdd",
@@ -317,6 +317,11 @@
 						"options bar will always start expanded",
 						"options bar will always start collapsed"
 					]
+				},
+				"csv-edit.tryToGuessHasHeader": {
+					"type": "boolean",
+					"default": false,
+					"description": "true: tries to guess if the csv file has a header line, false: not. Note: This only sets the has header option to true, but never to false"
 				},
 				"csv-edit.readOption_hasHeader": {
 					"type": "string",
@@ -748,6 +753,7 @@
 		"vscode:prepublish": "npm audit && npm run compile && npm run testFe && npm run promptUp",
 		"compile": "npx tsc -p ./ && tsc -p ./csvEditorHtml/tsconfig.json",
 		"watch": "npx tsc -watch -p ./",
+		"watchEditor": "npx tsc -w -p ./csvEditorHtml/tsconfig.json",
 		"package": "vsce package",
 		"test": "npm run compile && vscode-test",
 		"testFe": "vitest run --config csvEditorHtml/test/vitest.config.ts",

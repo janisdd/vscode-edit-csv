@@ -532,6 +532,18 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	//if first rows are comments, use the next real data row
 	_resolveInitiallyHiddenColumns(csvParseResult, csvReadConfig)
 
+	let autoDetectHasHeader = false
+
+	//if we put this before hot rendering (and not where the read option is applied), we save ~3s... but why?
+	if (initialConfig?.tryToGuessHasHeader) {
+		const hasHeader = tryToGuessHasHeader(csvParseResult.data, csvReadConfig)
+		if (hasHeader) {
+			autoDetectHasHeader = true
+			//we need to also set the ui, else option is not applied
+			hasHeaderReadOptionInput.checked = true
+		}
+	}
+
 	//reset header row
 	headerRowWithIndex = null
 
@@ -1930,7 +1942,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 	//if we have only 1 row and header is enabled by default...this would be an error (we cannot display something)
 
-	if (oldShouldApplyHeaderReadOption === true) {
+	if (oldShouldApplyHeaderReadOption === true || autoDetectHasHeader) {
 
 		if (settingsApplied === true) { //this must be applied else we get duplicate first row
 

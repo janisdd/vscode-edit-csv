@@ -130,6 +130,11 @@ type EditCsvConfig = {
  */
 	readOption_hasHeader: 'true' | 'false'
 
+	/**
+	 * true: tries to guess if the csv file has a header line, false: not.
+	 * Note: This only sets the has header option to true, but never to false
+	 */
+	tryToGuessHasHeader: boolean
 
 	/**
 	 * true: export header as row

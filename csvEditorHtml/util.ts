@@ -839,7 +839,7 @@ function setCsvReadOptionsInitial(options: CsvReadOptions) {
 	// 	el2.checked = csvReadOptions.skipEmptyLines
 	// }
 
-	const el3 = _getById('has-header') as HTMLInputElement
+	const el3 = hasHeaderReadOptionInput as HTMLInputElement
 	el3.checked = defaultCsvReadOptions._hasHeader
 
 	const el4 = _getById('comment-string') as HTMLInputElement
@@ -2065,4 +2065,81 @@ function getFirstAndLastVisibleRows(): { first: number, last: number } {
 	}
 
 	return { first: firstVisibleRow, last: lastVisibleRow }
+}
+
+/**
+ * tries to guess if the csv has a header
+ * @param csvLines the csv lines to use
+ * @param csvReadConfig the csv read config
+ * @returns true: has header, false: not or unknown
+ */
+function tryToGuessHasHeader(csvLines: string[][], csvReadConfig: CsvReadOptions): boolean {
+	if (csvLines.length <= 1) return false
+
+	const rowsToSample = Math.min(csvLines.length - 1, 100)
+	// we expect all rows to have the same length
+
+	// idea:
+	// (ignore comment rows)
+	// headers are normally the description of the data in the column
+	// thus, it is normally "different" from the data in the column
+	// so, to check if the first row is a header, we 
+	//   check if the data in the first row is found in the other rows. if this is true for at least X columns, we assume it is a header
+	// another good indicator are the types... numbers are normally not in headers
+	// some other often uses values are usually not in headers:
+	//   - true/false 
+	//
+	// only use at max Y lines for this check (else it would get too slow)
+	const headerSameValueHasCellThresholdInColumns = 3
+
+	const cellValuesMapPerColumn: Array<Map<string, number>> = []
+	let isFirstRealRow =  true
+
+	for (let i = 1; i <= rowsToSample; i++) {
+		const row = csvLines[i]
+
+		const firstCell = row[0]
+		if (isCommentCell(firstCell, csvReadConfig)) continue
+
+		for (let j = 0; j < row.length; j++) {
+			const cellValue = row[j] ?  row[j].trim().toLowerCase() : ``
+
+			if (isFirstRealRow) {
+				cellValuesMapPerColumn[j] = new Map()
+			}
+
+			cellValuesMapPerColumn[j].set(cellValue, (cellValuesMapPerColumn[j].get(cellValue) ?? 0) + 1)
+		}
+
+		isFirstRealRow = false
+	}
+
+	const firstRow = csvLines[0]
+	const isOnlyNumbersPerColumn: boolean[] = []
+	let numColsThatLookLikeHeader = 0
+
+	for (let i = 0; i < firstRow.length; i++) {
+		if (!firstRow[i]) continue
+		const cellValue = firstRow[i].trim().toLowerCase()
+		
+		//check if the cell value is a number (via regex)
+		let isEnNumber = cellValue.search(knownNumberStylesMap['en'].regexStartToEnd)
+		let isNonEnNumber = cellValue.search(knownNumberStylesMap['non-en'].regexStartToEnd)
+		let isNumberString = isEnNumber !== -1 || isNonEnNumber !== -1
+
+		isOnlyNumbersPerColumn[i] = isNumberString
+
+		const valueCount = cellValuesMapPerColumn[i].get(cellValue)
+
+		if (!valueCount || isNumberString) {
+			numColsThatLookLikeHeader++
+
+			if (numColsThatLookLikeHeader >= headerSameValueHasCellThresholdInColumns) {
+				return true
+			}
+		}
+	}
+
+	return false
+
 }

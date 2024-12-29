@@ -11,6 +11,7 @@ const defaultConfig = {
     lastRowOrFirstRowNavigationBehavior: 'wrap',
     lastColumnOrFirstColumnNavigationBehavior: 'wrap',
     optionsBarAppearance: "collapsed",
+    tryToGuessHasHeader: false,
     readOption_comment: "#",
     readOption_quoteChar: '"',
     readOption_escapeChar: '"',
