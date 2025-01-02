@@ -2172,10 +2172,6 @@ function tryToGuessHasHeader(csvLines: string[][], csvReadConfig: CsvReadOptions
 		}
 	}
 
-	if (numColsThatContainASingleNumber >= cellContainsNumberThusNoHeaderThreshold) {
-		return false
-	}
-
 	if (numColsThatLookLikeHeader >= lookLikeHeaderCellThresholdInColumns) {
 		return true
 	}
