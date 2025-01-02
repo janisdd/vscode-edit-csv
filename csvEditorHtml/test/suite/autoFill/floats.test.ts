@@ -1,5 +1,5 @@
 import { expect, test, suite } from 'vitest'
-import { AutoFillTestData, AutoFillTestSuit } from './setup'
+import { AutoFillTestData, AutoFillTestSuit } from './types'
 
 
 let tests_onlyFloatsLinearRegression: AutoFillTestData[] = [

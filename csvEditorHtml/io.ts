@@ -17,7 +17,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 	hasFinalNewLine = content.endsWith('\n')
 
 	//comments are parses as normal text, only one cell is added
-	const parseResult = csv.parse(content, {
+	const parseResult = papaCsv.parse(content, {
 		...csvReadOptions,
 		//note this overwrites the comments string from the read config!
 		comments: false, //false gives use all lines we later check each line if it's a comment to merge the cells in that row
@@ -292,7 +292,7 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 	_conf['quoteTrailingSpace'] = initialConfig?.forceQuoteTrailingWhitespace ?? false
 
 
-	let dataAsString = csv.unparse(data, _conf)
+	let dataAsString = papaCsv.unparse(data, _conf)
 
 	let finalNewLineOption: EditCsvConfig["finalNewLine"] = "sameAsSourceFile"
 	if (initialConfig) {

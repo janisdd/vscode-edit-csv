@@ -53,7 +53,7 @@ declare type Dayjs = import('dayjs').Dayjs
 
 const regression: typeof import('../thirdParty/regression/regression').default = (window as any).regression
 
-const csv: typeof import('papaparse') = (window as any).Papa
+const papaCsv: typeof import('papaparse') = (window as any).Papa
 //handsontable instance
 let hot: import('../thirdParty/handsontable/handsontable') | null
 
@@ -259,6 +259,9 @@ let isBrowser = false
 let allColWidths: Array<number> = []
 //afterRender is called directly after we render the table but we might want to apply old col widths here
 let isInitialHotRender = true
+
+
+
 
 const cssFgColorVariableName = `--text-color`
 

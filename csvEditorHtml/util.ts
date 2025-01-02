@@ -1,3 +1,59 @@
+//has to be at the top, else tests fail???
+
+/**
+ * normal cell values for guessing has header
+ */
+const normalCellValues = new Set([
+	`true`,
+	`false`,
+])
+
+const knownNumberStylesMap: KnownNumberStylesMap = {
+	"en": {
+		key: 'en',
+		/**
+		 * this allows:
+		 * 0(000)
+		 * 0(000).0(000)
+		 * .0(000)
+		 * all repeated with - in front (negative numbers)
+		 * all repeated with e0(000) | e+0(000) | e-0(000)
+		 */
+		regex: /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/,
+		regexStartToEnd: /^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/,
+		thousandSeparator: /(\,| )/gm,
+		thousandSeparatorReplaceRegex: /((\,| )\d{3})+/gm
+	},
+	"non-en": {
+		key: 'non-en',
+		/**
+		 * this allows:
+		 * 0(000)
+		 * 0(000),0(000)
+		 * ,0(000)
+		 * all repeated with - in front (negative numbers)
+		 * all repeated with e0(000) | e+0(000) | e-0(000)
+		 */
+		regex: /-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?/,
+		regexStartToEnd: /^-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?$/,
+		thousandSeparator: /(\.| )/gm,
+		thousandSeparatorReplaceRegex: /((\.| )\d{3})+/gm
+	}
+}
+
+/**
+ * returns the number style from the ui
+ */
+function getNumbersStyleFromUi(): NumbersStyle {
+	
+	if (numbersStyleEnRadio.checked) return knownNumberStylesMap['en']
+
+	if (numbersStyleNonEnRadio.checked) return knownNumberStylesMap['non-en']
+
+	postVsWarning(`Got unknown numbers style from ui, defaulting to 'en'`)
+
+	return knownNumberStylesMap['en']
+}
 
 /**
  * returns the html element with the given id
@@ -1385,42 +1441,39 @@ function getFirstCanonicalNumberStringInCell(cellValue: string, numbersStyle: Nu
 	if (!numberRegexRes || numberRegexRes.length === 0) return null
 
 	//this not longer has thousand separators...
-	//big js only accepts numbers in en format (3.14)
+	//big js only accepts numbers in en format (3.14) (always en format)
 	return numberRegexRes[0].replace(/\,/gm, '.')
 }
 
-const knownNumberStylesMap: KnownNumberStylesMap = {
-	"en": {
-		key: 'en',
-		/**
-		 * this allows:
-		 * 0(000)
-		 * 0(000).0(000)
-		 * .0(000)
-		 * all repeated with - in front (negative numbers)
-		 * all repeated with e0(000) | e+0(000) | e-0(000)
-		 */
-		regex: /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/,
-		regexStartToEnd: /^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/,
-		thousandSeparator: /(\,| )/gm,
-		thousandSeparatorReplaceRegex: /((\,| )\d{3})+/gm
-	},
-	"non-en": {
-		key: 'non-en',
-		/**
-		 * this allows:
-		 * 0(000)
-		 * 0(000),0(000)
-		 * ,0(000)
-		 * all repeated with - in front (negative numbers)
-		 * all repeated with e0(000) | e+0(000) | e-0(000)
-		 */
-		regex: /-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?/,
-		regexStartToEnd: /^-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?$/,
-		thousandSeparator: /(\.| )/gm,
-		thousandSeparatorReplaceRegex: /((\.| )\d{3})+/gm
+/**
+ * checks if the cell only contains a single number (start to end, no trimming, no lowercaseing)
+ */
+function checkCellOnlyContainsSingleNumber(cellValue: string, numbersStyle: NumbersStyle): boolean {
+
+	let cellContent = cellValue
+
+	let matchSize = 0
+	let originalSize = cellValue.length
+
+	let thousandSeparatorsMatches
+	while (thousandSeparatorsMatches = numbersStyle.thousandSeparatorReplaceRegex.exec(cellValue)) {
+
+		let replaceContent = thousandSeparatorsMatches[0].replace(numbersStyle.thousandSeparator, '')
+
+		matchSize += thousandSeparatorsMatches[0].length - replaceContent.length
+
+		cellContent = cellContent.replace(thousandSeparatorsMatches[0], replaceContent)
 	}
+
+	let numberRegexRes = numbersStyle.regex.exec(cellContent)
+
+	if (!numberRegexRes || numberRegexRes.length === 0) return false
+
+	matchSize += numberRegexRes[0].length
+
+	return matchSize === originalSize
 }
+
 
 /**
  * sets the number style ui from the given nubmer style
@@ -1450,52 +1503,6 @@ function setNumbersStyleUi(numbersStyleToUse: EditCsvConfig["initialNumbersStyle
 	}
 }
 
-/**
- * returns the number style from the ui
- */
-function getNumbersStyleFromUi(): NumbersStyle {
-
-	let knownNumberStylesMap: KnownNumberStylesMap = {
-		"en": {
-			key: 'en',
-			/**
-			 * this allows:
-			 * 0(000)
-			 * 0(000).0(000)
-			 * .0(000)
-			 * all repeated with - in front (negative numbers)
-			 * all repeated with e0(000) | e+0(000) | e-0(000)
-			 */
-			regex: /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/,
-			regexStartToEnd: /^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/,
-			thousandSeparator: /(\,| )/gm,
-			thousandSeparatorReplaceRegex: /((\,| )\d{3})+/gm
-		},
-		"non-en": {
-			key: 'non-en',
-			/**
-			 * this allows:
-			 * 0(000)
-			 * 0(000),0(000)
-			 * ,0(000)
-			 * all repeated with - in front (negative numbers)
-			 * all repeated with e0(000) | e+0(000) | e-0(000)
-			 */
-			regex: /-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?/,
-			regexStartToEnd: /^-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?$/,
-			thousandSeparator: /(\.| )/gm,
-			thousandSeparatorReplaceRegex: /((\.| )\d{3})+/gm
-		}
-	}
-	
-	if (numbersStyleEnRadio.checked) return knownNumberStylesMap['en']
-
-	if (numbersStyleNonEnRadio.checked) return knownNumberStylesMap['non-en']
-
-	postVsWarning(`Got unknown numbers style from ui, defaulting to 'en'`)
-
-	return knownNumberStylesMap['en']
-}
 
 //don't know how to type this properly without typeof ...
 const b = new Big(1)
@@ -2090,12 +2097,26 @@ function tryToGuessHasHeader(csvLines: string[][], csvReadConfig: CsvReadOptions
 	//   - true/false 
 	//
 	// only use at max Y lines for this check (else it would get too slow)
-	const headerSameValueHasCellThresholdInColumns = 3
+	const lookLikeHeaderCellThresholdInColumns = 3
+	//if we have at least X cells that contain a number, we assume it is not a header
+	const cellContainsNumberThusNoHeaderThreshold = 3
+
+	//get the potential header row (ignore all comment rows)
+	let firstRow: string[] = []
+	let i = 0
+	for (; i <= rowsToSample; i++) {
+		if (!csvLines[i]) continue
+		firstRow = csvLines[i]
+		const firstCellValue = firstRow[0].trim().toLowerCase()
+		if (isCommentCell(firstCellValue, csvReadConfig)) continue
+		break
+	}
+	i++
 
 	const cellValuesMapPerColumn: Array<Map<string, number>> = []
 	let isFirstRealRow =  true
 
-	for (let i = 1; i <= rowsToSample; i++) {
+	for (; i <= rowsToSample; i++) {
 		const row = csvLines[i]
 
 		const firstCell = row[0]
@@ -2114,32 +2135,50 @@ function tryToGuessHasHeader(csvLines: string[][], csvReadConfig: CsvReadOptions
 		isFirstRealRow = false
 	}
 
-	const firstRow = csvLines[0]
 	const isOnlyNumbersPerColumn: boolean[] = []
 	let numColsThatLookLikeHeader = 0
+	let numColsThatContainASingleNumber = 0
 
 	for (let i = 0; i < firstRow.length; i++) {
 		if (!firstRow[i]) continue
 		const cellValue = firstRow[i].trim().toLowerCase()
 		
 		//check if the cell value is a number (via regex)
-		let isEnNumber = cellValue.search(knownNumberStylesMap['en'].regexStartToEnd)
-		let isNonEnNumber = cellValue.search(knownNumberStylesMap['non-en'].regexStartToEnd)
-		let isNumberString = isEnNumber !== -1 || isNonEnNumber !== -1
+		
+		let isEnNumber = checkCellOnlyContainsSingleNumber(cellValue, knownNumberStylesMap['en'])
+		let isNonEnNumber = checkCellOnlyContainsSingleNumber(cellValue, knownNumberStylesMap['non-en'])
+
+		const isKnownNormalCellValue  = normalCellValues.has(cellValue)
+
+		let isNumberString = isEnNumber || isNonEnNumber
+
+		if (isNumberString) {
+			numColsThatContainASingleNumber++
+		}
+
+		if (numColsThatContainASingleNumber >= cellContainsNumberThusNoHeaderThreshold) {
+			return false
+		}
 
 		isOnlyNumbersPerColumn[i] = isNumberString
 
-		const valueCount = cellValuesMapPerColumn[i].get(cellValue)
+		const valueCount = cellValuesMapPerColumn[i].get(cellValue) ?? 0
 
-		if (!valueCount || isNumberString) {
+		const looksLikeNormalCell = isNumberString || valueCount > 0 || isKnownNormalCellValue
+
+		if (looksLikeNormalCell === false) {
+			//if value count is not found -> header cell is not part of the other rows
 			numColsThatLookLikeHeader++
-
-			if (numColsThatLookLikeHeader >= headerSameValueHasCellThresholdInColumns) {
-				return true
-			}
 		}
 	}
 
-	return false
+	if (numColsThatContainASingleNumber >= cellContainsNumberThusNoHeaderThreshold) {
+		return false
+	}
 
+	if (numColsThatLookLikeHeader >= lookLikeHeaderCellThresholdInColumns) {
+		return true
+	}
+
+	return false
 }
