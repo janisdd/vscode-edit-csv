@@ -36,7 +36,7 @@ UserId,FirstName,ShouldNotCount,PLangName,ParticipationCount,MaxNormalTestPoints
 		expected: false,
 	},
 	{
-		name: 'threshold many unique header values -> has header',
+		name: 'threshold many unique header values (X,Y,Z, not part of other values in same column) -> has header',
 		csv: `
 X,Y,Z,Online,M
 Central America and the Caribbean,Belize,Household,Offline,H
@@ -46,7 +46,7 @@ Europe,Germany,Cosmetics,Offline,M
 		expected: true,
 	},
 	{
-		name: 'less than threshold many unique header values -> no header', //because germany is repeated
+		name: 'less than threshold many unique header values -> no header', //because Germany,Online,M is repeated
 		csv: `
 X,Germany,Personal Care,Online,M
 Central America and the Caribbean,Belize,Household,Offline,H
@@ -104,7 +104,7 @@ UserId,FirstName,ShouldNotCount,PLangName,ParticipationCount,MaxNormalTestPoints
 
 	// numbers
 	{
-		name: 'ints in header',
+		name: 'ints in header, more than threshold many numbers in header -> no header',
 		csv: `
 UserId,123,123,123
 513,Alaa,False,Java,1,3,2
@@ -184,6 +184,16 @@ UserId,Max,Passed,123,
 	{
 		name: 'at least 3 columns look like numbers', //numbers are normally not in the header
 		csv: `
+UserId,Max,999,999,999
+513,Alaa,False,Java,1,3,2
+329,Hanna,False,Java,1,3,2
+588,David,False,Java,1,3,2
+		`,
+		expected: false,
+	},
+	{
+		name: 'threshold number, threshold normal values -> numbers take precedence', //numbers are normally not in the header
+		csv: `
 UserId,Max,Passed,999,999,999
 513,Alaa,False,Java,1,3,2
 329,Hanna,False,Java,1,3,2
@@ -193,7 +203,7 @@ UserId,Max,Passed,999,999,999
 	},
 
 	{
-		name: 'header with numbers (we count it as text)',
+		name: 'header with numbers (we count it as body)',
 		csv: `
 UserId,123,a 123,b123
 513,Alaa,False,Java,1,3,2
@@ -203,7 +213,7 @@ UserId,123,a 123,b123
 		expected: true,
 	},
 	{
-		name: 'header with floats (we count it as text)',
+		name: 'header with floats (we count it as body)',
 		csv: `
 UserId,Test 1, Test 2, Test 3
 513,Alaa,False,Java,1,3,2
