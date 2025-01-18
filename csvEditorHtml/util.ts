@@ -2135,7 +2135,6 @@ function tryToGuessHasHeader(csvLines: string[][], csvReadConfig: CsvReadOptions
 		isFirstRealRow = false
 	}
 
-	const isOnlyNumbersPerColumn: boolean[] = []
 	let numColsThatLookLikeHeader = 0
 	let numColsThatContainASingleNumber = 0
 
@@ -2160,13 +2159,14 @@ function tryToGuessHasHeader(csvLines: string[][], csvReadConfig: CsvReadOptions
 			return false
 		}
 
-		isOnlyNumbersPerColumn[i] = isNumberString
-
 		const valueCount = cellValuesMapPerColumn[i].get(cellValue) ?? 0
 
-		const looksLikeNormalCell = isNumberString || valueCount > 0 || isKnownNormalCellValue
+		//numbers are normally not in headers
+		//if a cell value is found in other rows, it is normally not a header
+		//true/false (known values) are normally not in headers
+		const looksLikeTableBodyNormalCell = isNumberString || valueCount > 0 || isKnownNormalCellValue
 
-		if (looksLikeNormalCell === false) {
+		if (looksLikeTableBodyNormalCell === false) {
 			//if value count is not found -> header cell is not part of the other rows
 			numColsThatLookLikeHeader++
 		}
