@@ -102,6 +102,12 @@ type HeaderRowWithIndexUndoStackItem = {
 let headerRowWithIndexUndoStack: Array<HeaderRowWithIndexUndoStackItem> = []
 let headerRowWithIndexRedoStack: Array<HeaderRowWithIndexUndoStackItem> = []
 
+//the actual delimiter used when parsing
+let usedDelimiter: string
+//TODO undef
+let outColumnIndexToCsvColumnEndIndexWithDelimiterMapping: Exclude<ParseResult['outColumnIndexToCsvColumnIndexMapping'], undefined>
+let outLineIndexToCsvLineIndexMapping: Exclude<ParseResult['outLineIndexToCsvLineIndexMapping'], undefined>
+
 /**
  * this is part of the output from papaparse
  * for each column 

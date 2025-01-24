@@ -1,4 +1,3 @@
-
 /**
  * some initial vars from the extension when the webview is created
  */
@@ -592,7 +591,19 @@ type SetEditorHasChangesMessage = {
 	hasChanges: boolean
 }
 
-type PostMessage = ReadyMessage | DisplayMessageBoxMessage | OverwriteFileMessage | CopyToClipboardMessage | SetEditorHasChangesMessage
+type SetMultipleCursorsMessage = {
+	command: 'setMultipleCursors'
+	positions: CursorsPosition[]
+}
+
+type CursorsPosition = {
+	startLine: number
+	startColumn: number
+	endLine: number
+	endColumn: number
+}
+
+type PostMessage = ReadyMessage | DisplayMessageBoxMessage | OverwriteFileMessage | CopyToClipboardMessage | SetEditorHasChangesMessage | SetMultipleCursorsMessage
 
 type VsState = {
 	readOptionIsCollapsed: boolean
@@ -606,6 +617,16 @@ type VsExtension = {
 	getState: () => VsState | undefined
 }
 
+type HandsontableSelection = {
+	start: {
+		row: number
+		col: number
+	}
+	end: {
+		row: number
+		col: number
+	}
+}
 
 type HandsontableMergedCells = {
 	/**

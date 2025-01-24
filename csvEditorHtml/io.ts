@@ -1,4 +1,3 @@
-
 /*
  * everything for communication or read / write
  */
@@ -74,6 +73,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 	}
 
 	defaultCsvWriteOptions.delimiter = parseResult.meta.delimiter
+	usedDelimiter = parseResult.meta.delimiter
 	newLineFromInput = parseResult.meta.linebreak
 	updateNewLineSelect()
 
@@ -81,6 +81,8 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 
 	//maybe use namespace merging? (didn't work or don't kow how)
 	let _parseResult = parseResult as ParseResult
+	outColumnIndexToCsvColumnEndIndexWithDelimiterMapping = _parseResult.outColumnIndexToCsvColumnIndexMapping ?? []
+	outLineIndexToCsvLineIndexMapping = _parseResult.outLineIndexToCsvLineIndexMapping ?? []
 	return {
 		data: parseResult.data,
 		columnIsQuoted: (parseResult as any).columnIsQuoted,
@@ -613,4 +615,20 @@ function call_after_DOM_updated(fn: any) {
 
 function notExhaustiveSwitch(x: never): never {
 	throw new Error('not exhaustive switch')
+}
+
+/**
+ * Posts a message to the extension to set multiple cursor positions in the source file
+ * @param positions Array of cursor positions, each with line and column index (0-based)
+ */
+function postSetMultipleCursors(positions: CursorsPosition[]) {
+	if (!vscode) {
+		console.log(`postSetMultipleCursors (but in browser)`)
+		return
+	}
+
+	vscode.postMessage({
+		command: 'setMultipleCursors',
+		positions: positions
+	})
 }

@@ -817,6 +817,39 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						return hiddenPhysicalColumnIndicesSorted.length === 0
 					}
 				},
+				'set_multiple_cursors': {
+					name: 'selection to file cursors',
+					hidden: function () {
+						//don't show in browser
+						if (!vscode) return true
+						return false
+					},
+					submenu: {
+						items: [
+							{
+								key: 'set_multiple_cursors:option1',
+								name: 'Cursor at cell start',
+								callback: function (key: string, selections: HandsontableSelection[], clickEvent: Event) {
+									postSetMultipleCursors(calculateSourceFileCursorPositions(selections, 'start'))
+								},
+							},
+							{
+								key: 'set_multiple_cursors:option2',
+								name: 'Cursor at cell end',
+								callback: function (key: string, selections: HandsontableSelection[], clickEvent: Event) {
+									postSetMultipleCursors(calculateSourceFileCursorPositions(selections, 'end'))
+								},
+							},
+							{
+								key: 'set_multiple_cursors:option3',
+								name: 'Cursor selected entire cell',
+								callback: function (key: string, selections: HandsontableSelection[], clickEvent: Event) {
+									postSetMultipleCursors(calculateSourceFileCursorPositions(selections, 'entire'))
+								},
+							},
+						]
+					}
+				},
 
 			}
 		} as ContextMenuSettings,

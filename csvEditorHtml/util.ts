@@ -2178,3 +2178,276 @@ function tryToGuessHasHeader(csvLines: string[][], csvReadConfig: CsvReadOptions
 
 	return false
 }
+
+function calculateSourceFileCursorPositions(selections: HandsontableSelection[], where: 'start' | 'end' | 'entire'): CursorsPosition[] {
+	const positions: CursorsPosition[] = []
+	console.log(outColumnIndexToCsvColumnEndIndexWithDelimiterMapping)
+	console.log(outLineIndexToCsvLineIndexMapping)
+
+	const sourceFileLines = initialContent.split('\n')
+	//empty lines are decoded as [-1]
+	const outColumnIndexToCsvColumnEndIndexWithDelimiterMappingRealLines = outColumnIndexToCsvColumnEndIndexWithDelimiterMapping.filter(row => row.length > 0 && row[0] !== -1)
+
+	//we can then use these to get the column data because now each row points to the correct column data
+	const outLineIndexToCsvLineIndexMappingFull = []
+	let offset = 0
+
+
+	let lastLineIndex = 0
+	let notEmptyLineCounter = 0
+	for (let i = 0; i < outLineIndexToCsvLineIndexMapping.length; i++) {
+		const tableRowIndex = outLineIndexToCsvLineIndexMapping[i]
+		const columnData = outColumnIndexToCsvColumnEndIndexWithDelimiterMapping[tableRowIndex + offset]
+
+		outLineIndexToCsvLineIndexMappingFull.push(tableRowIndex + offset)
+		//before check, because last empty lines are mapped to the last csv row
+		lastLineIndex = tableRowIndex + offset
+		
+		if (columnData.length === 0 || columnData[0] === -1) {
+			//empty line in source file
+			offset++;
+		} else {
+			notEmptyLineCounter++
+		}
+
+	}
+
+	//special case if the last file lines are empty, they map to the last csv row
+	let emptyLinesAtFileEndCounter = 0
+	{
+		for (let i = outColumnIndexToCsvColumnEndIndexWithDelimiterMapping.length - 1; i >= 0; i--) {
+			const columnData = outColumnIndexToCsvColumnEndIndexWithDelimiterMapping[i]
+			if (columnData.length === 0 || columnData[0] === -1) {
+				//empty line in source file
+				emptyLinesAtFileEndCounter++
+				continue
+			}
+			break
+		}
+		for (let i = 0; i < emptyLinesAtFileEndCounter; i++) {
+			outLineIndexToCsvLineIndexMappingFull[outLineIndexToCsvLineIndexMappingFull.length - i - 1] = lastLineIndex + emptyLinesAtFileEndCounter - i
+		}
+	}
+
+	console.log(outLineIndexToCsvLineIndexMappingFull)
+
+	const csvRowToFileLineMap = new Map<number, number[]>()
+	let csvRowCounter = -1
+	let lastCsvRowIndexWithEmptyLines = -2
+	for (let i = 0; i < outLineIndexToCsvLineIndexMappingFull.length; i++) {
+		const csvRowIndexWithEmptyLines = outLineIndexToCsvLineIndexMappingFull[i]
+		const columnData = outColumnIndexToCsvColumnEndIndexWithDelimiterMapping[csvRowIndexWithEmptyLines]
+		if (columnData.length === 0 || columnData[0] === -1) {
+			continue
+		}
+		if (csvRowIndexWithEmptyLines !== lastCsvRowIndexWithEmptyLines) {
+			csvRowCounter++
+			lastCsvRowIndexWithEmptyLines = csvRowIndexWithEmptyLines
+		}
+
+		const lines = csvRowToFileLineMap.get(csvRowCounter) ?? []
+		lines.push(i)
+		csvRowToFileLineMap.set(csvRowCounter, lines)
+	}
+	console.log(csvRowToFileLineMap)
+
+
+	switch (where) {
+		case 'start': {
+
+			for (let i = 0; i < selections.length; i++) {
+				const selection = selections[i]
+				const startLine = selection.start.row
+				const endLine = selection.end.row
+
+				for (let row = startLine; row <= endLine; row++) {
+					const startColumn = selection.start.col
+					const endColumn = selection.end.col
+
+					let startRow = _lastIndexOf(outLineIndexToCsvLineIndexMapping, row)
+					if (startRow === null) {
+						postVsWarning(`could not find startRow for ${row}`)
+						throw new Error('startRow was null')
+					}
+
+					if (startRow === outLineIndexToCsvLineIndexMapping.length - 1) {
+						//last row might be empty lines
+						startRow = startRow - emptyLinesAtFileEndCounter
+					}
+
+					const fileLines = csvRowToFileLineMap.get(row) ?? []
+
+					if (fileLines.length === 1) {
+						//single line
+
+						//cannot be normal data, because then we have no delimiter
+						let isCommentRow = outColumnIndexToCsvColumnEndIndexWithDelimiterMappingRealLines[row].length === 1
+						
+						for (let column = startColumn; column <= endColumn; column++) {
+							//+1 because before first char is 0, after first char is 1	
+							let realStartColumnIndex = column === 0 ? 0 : outColumnIndexToCsvColumnEndIndexWithDelimiterMappingRealLines[row][column - 1] + 1
+
+							if (isCommentRow) {
+								//+1: comment row has no delimiter
+								realStartColumnIndex = 0
+							}
+
+							positions.push({
+								startLine: startRow,
+								startColumn: realStartColumnIndex,
+								endLine: startRow,
+								endColumn: realStartColumnIndex,
+							})
+						}
+						
+					} else {
+						//multi line cell in row
+						const columnData = outColumnIndexToCsvColumnEndIndexWithDelimiterMappingRealLines[row]
+
+						for (let column = startColumn; column <= endColumn; column++) {
+
+							let currColumnIndexInSourceFile = 0
+							let neededColumnIndexInSourceFile = column === 0 ? 0 : columnData[column - 1] + 1
+
+							for (let lineIndex = 0; lineIndex < fileLines.length; lineIndex++) {
+								const fileLineIndex = fileLines[lineIndex]
+								const fileLine = sourceFileLines[fileLineIndex] + `\n`
+
+								//<= makes no difference because when we subtract, we get 0
+								//we continue here
+								if (currColumnIndexInSourceFile + fileLine.length < neededColumnIndexInSourceFile) {
+									//we can jump over the line
+									currColumnIndexInSourceFile += fileLine.length
+									continue
+								}
+
+								//we need to subtract lineIndex because lines start with 0
+								positions.push({
+									startLine: fileLineIndex,
+									startColumn: neededColumnIndexInSourceFile - currColumnIndexInSourceFile,
+									endLine: fileLineIndex,
+									endColumn: neededColumnIndexInSourceFile - currColumnIndexInSourceFile,
+								})
+								break
+							}
+
+						}
+
+					}
+
+				}
+			}
+
+			break
+		}
+		case 'end': {
+			for (let i = 0; i < selections.length; i++) {
+				const selection = selections[i]
+				const startLine = selection.start.row
+				const endLine = selection.end.row
+
+				for (let row = startLine; row <= endLine; row++) {
+					const startColumn = selection.start.col
+					const endColumn = selection.end.col
+
+					let startRow = _lastIndexOf(outLineIndexToCsvLineIndexMapping, row)
+					if (startRow === null) {
+						postVsWarning(`could not find startRow for ${row}`)
+						throw new Error('startRow was null')
+					}
+
+					if (startRow === outLineIndexToCsvLineIndexMapping.length - 1) {
+						//last row might be empty lines
+						startRow = startRow - emptyLinesAtFileEndCounter
+					}
+
+					const fileLinesForCsvRow = csvRowToFileLineMap.get(row) ?? []
+
+					if (fileLinesForCsvRow.length === 1) {
+						//single line
+
+						//cannot be normal data, because then we have no delimiter
+						let isCommentRow = outColumnIndexToCsvColumnEndIndexWithDelimiterMappingRealLines[row].length === 1
+						
+						for (let column = startColumn; column <= endColumn; column++) {
+							//+1 because before first char is 0, after first char is 1	
+
+							let realStartColumnIndex = column !== outColumnIndexToCsvColumnEndIndexWithDelimiterMappingRealLines.length - 1
+								? outColumnIndexToCsvColumnEndIndexWithDelimiterMappingRealLines[row][column] - usedDelimiter.length + 1
+								: outColumnIndexToCsvColumnEndIndexWithDelimiterMappingRealLines[row][column] + 1 //last col has no delimiter
+
+								if (isCommentRow) {
+									//+1: comment row has no delimiter
+									realStartColumnIndex = outColumnIndexToCsvColumnEndIndexWithDelimiterMappingRealLines[row][0] + 1
+								}
+
+							positions.push({
+								startLine: startRow,
+								startColumn: realStartColumnIndex,
+								endLine: startRow,
+								endColumn: realStartColumnIndex,
+							})
+						}
+						
+					} else {
+						//multi line cell in row
+						const columnData = outColumnIndexToCsvColumnEndIndexWithDelimiterMappingRealLines[row]
+
+						for (let column = startColumn; column <= endColumn; column++) {
+
+							let currColumnIndexInSourceFile = 0
+							let neededColumnIndexInSourceFile = column < columnData.length - 1
+								? columnData[column]
+								: columnData[column] + 1 //last col has no delimiter in mapping data
+
+							for (let lineIndex = 0; lineIndex < fileLinesForCsvRow.length; lineIndex++) {
+								const fileLineIndex = fileLinesForCsvRow[lineIndex]
+								//last row has no new line
+								const fileLine = sourceFileLines[fileLineIndex] + (lineIndex < fileLinesForCsvRow.length - 1 ? `\n` : ``)
+
+								//<= makes no difference because when we subtract, we get 0
+								//we continue here
+								if (currColumnIndexInSourceFile + fileLine.length < neededColumnIndexInSourceFile) {
+									//we can jump over the line
+									currColumnIndexInSourceFile += fileLine.length
+									continue
+								}
+
+								//we need to subtract lineIndex because lines start with 0
+								positions.push({
+									startLine: fileLineIndex,
+									startColumn: neededColumnIndexInSourceFile - currColumnIndexInSourceFile,
+									endLine: fileLineIndex,
+									endColumn: neededColumnIndexInSourceFile - currColumnIndexInSourceFile,
+								})
+								break
+							}
+
+						}
+
+					}
+
+				}
+			}
+			break
+		}
+		case 'entire': {
+
+			//TODO: implement
+
+				break
+		}
+		default: {
+			notExhaustiveSwitch(where)
+		}
+	}
+
+	return positions
+}
+
+function _lastIndexOf(array: number[], value: number) {
+	for (let i = array.length - 1; i >= 0; i--) {
+		if (array[i] === value) return i
+	}
+	return null
+}
