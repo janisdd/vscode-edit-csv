@@ -419,6 +419,11 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
                 setEditorHasChanges(instance, message.hasChanges);
                 break;
             }
+            case "setMultipleCursors": {
+                const { positions } = message;
+                setMultipleCursorsInSourceFile(instance, positions);
+                break;
+            }
             //this only works for vs extension and also asks the user for permission...
             // case 'openUrl': {
             // 	//from https://github.com/microsoft/vscode/issues/9651
@@ -693,6 +698,26 @@ function onSourceFileChanged(path, instance) {
         command: 'sourceFileChanged'
     };
     instance.panel.webview.postMessage(msg);
+}
+function setMultipleCursorsInSourceFile(instance, positions) {
+    console.log('positions', positions);
+    vscode.workspace.openTextDocument(instance.sourceUri)
+        .then(document => {
+        vscode.window.showTextDocument(document)
+            .then(editor => {
+            // Create an array of VSCode selections from the cursor positions
+            const selections = positions.map(pos => {
+                return new vscode.Selection(pos.startLine, pos.startColumn, pos.endLine, pos.endColumn);
+            });
+            // Set the selections in the editor
+            editor.selections = selections;
+            //focus the editor
+            console.log(vscode.window.activeTextEditor);
+            setTimeout(() => {
+                console.log(vscode.window.activeTextEditor);
+            }, 1000);
+        });
+    });
 }
 // class CsvEditStateSerializer  implements vscode.WebviewPanelSerializer{
 // 	static state: VsState = {
