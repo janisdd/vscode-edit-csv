@@ -2191,12 +2191,14 @@ function calculateSourceFileCursorPositions2(selections: HandsontableSelection[]
 		const endLine = selection.end.row
 
 		for (let row = startLine; row <= endLine; row++) {
+			const _row = hot!.toPhysicalRow(row)
 			let startColumn = selection.start.col
 			let endColumn = selection.end.col
+			
 
-			let fileCsvColPositions = outCsvFieldToInputPositionMapping[row]
+			let fileCsvColPositions = outCsvFieldToInputPositionMapping[_row]
 			if (fileCsvColPositions === undefined) {
-				postVsWarning(`could not find row for ${row}`)
+				postVsWarning(`could not find row for ${_row}`)
 				throw new Error('row was undefined')
 			}
 
@@ -2207,8 +2209,9 @@ function calculateSourceFileCursorPositions2(selections: HandsontableSelection[]
 			}
 
 			for (let column = startColumn; column <= endColumn; column++) {
+				const _column = hot!.toPhysicalColumn(column)
 				//+1 because before first char is 0, after first char is 1	
-				let position = fileCsvColPositions[column]
+				let position = fileCsvColPositions[_column]
 
 				switch (where) {
 					case 'start':  {

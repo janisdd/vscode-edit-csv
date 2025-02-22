@@ -891,7 +891,7 @@ function onSourceFileChanged(path: string, instance: Instance) {
 	instance.panel.webview.postMessage(msg)
 }
 
-function setMultipleCursorsInSourceFile(instance: Instance, positions: CursorsPosition[]) {
+function setMultipleCursorsInSourceFile(instance: Instance, positions: FilePosition[]) {
 	console.log('positions', positions)
 	vscode.workspace.openTextDocument(instance.sourceUri)
 		.then(document => {
@@ -899,11 +899,14 @@ function setMultipleCursorsInSourceFile(instance: Instance, positions: CursorsPo
 				.then(editor => {
 					// Create an array of VSCode selections from the cursor positions
 					const selections = positions.map(pos => {
+						const posStart = document.positionAt(pos.startPos)
+						const posEnd = document.positionAt(pos.endPos)
+
 						return new vscode.Selection(
-							pos.startLine,
-							pos.startColumn,
-							pos.endLine,
-							pos.endColumn
+							posStart.line,
+							posStart.character,
+							posEnd.line,
+							posEnd.character,
 						)
 					})
 					
