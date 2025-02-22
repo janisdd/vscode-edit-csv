@@ -19,7 +19,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 	const parseResult = papaCsv.parse(content, {
 		...csvReadOptions,
 		//note this overwrites the comments string from the read config!
-		comments: false, //false gives use all lines we later check each line if it's a comment to merge the cells in that row
+		comments: null, //false gives use all lines we later check each line if it's a comment to merge the cells in that row
 		//left trimmed lines are comments and if !== null we want to include comments as one celled row (in the ui)
 		//papaparse parses comments with this only if the begin with the comment string (no space before!!)
 		rowInsertCommentLines_commentsString: typeof csvReadOptions.comments === 'string' && csvReadOptions.comments !== '' ? csvReadOptions.comments : null,
@@ -39,7 +39,8 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 		retainQuoteInformation: true, //we keep true here and decide if we use it whe nwe output data
 		calcLineIndexToCsvLineIndexMapping: initialVars.sourceFileCursorLineIndex !== null ? true : false,
 		calcColumnIndexToCsvColumnIndexMapping: initialVars.sourceFileCursorColumnIndex !== null ? true : false,
-	} as any)
+		calcCsvFieldToInputPositionMapping: true,
+	})
 
 	if (parseResult.errors.length === 1 && parseResult.errors[0].type === 'Delimiter' && parseResult.errors[0].code === 'UndetectableDelimiter') {
 		//this is ok papaparse will default to ,
@@ -79,16 +80,16 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 
 	readDelimiterTooltip.setAttribute('data-tooltip', `${readDelimiterTooltipText} (detected: ${defaultCsvWriteOptions.delimiter.replace("\t", "⇥")})`)
 
-	//maybe use namespace merging? (didn't work or don't kow how)
-	let _parseResult = parseResult as ParseResult
-	outColumnIndexToCsvColumnEndIndexWithDelimiterMapping = _parseResult.outColumnIndexToCsvColumnIndexMapping ?? []
-	outLineIndexToCsvLineIndexMapping = _parseResult.outLineIndexToCsvLineIndexMapping ?? []
+	outColumnIndexToCsvColumnEndIndexWithDelimiterMapping = parseResult.meta.outColumnIndexToCsvColumnIndexMapping ?? []
+	outLineIndexToCsvLineIndexMapping = parseResult.meta.outLineIndexToCsvLineIndexMapping ?? []
+	outCsvFieldToInputPositionMapping = parseResult.meta.outCsvFieldToInputPositionMapping ?? []
+	
 	return {
 		data: parseResult.data,
-		columnIsQuoted: (parseResult as any).columnIsQuoted,
-		cellIsQuotedInfo: _parseResult.cellIsQuotedInfo,
-		outLineIndexToCsvLineIndexMapping: _parseResult.outLineIndexToCsvLineIndexMapping ?? null,
-		outColumnIndexToCsvColumnIndexMapping: _parseResult.outColumnIndexToCsvColumnIndexMapping ?? null,
+		columnIsQuoted: parseResult.meta.columnIsQuoted ?? [],
+		cellIsQuotedInfo: parseResult.meta.cellIsQuotedInfo ?? [],
+		outLineIndexToCsvLineIndexMapping: parseResult.meta.outLineIndexToCsvLineIndexMapping ?? null,
+		outColumnIndexToCsvColumnIndexMapping: parseResult.meta.outColumnIndexToCsvColumnIndexMapping ?? null,
 		originalContent: content,
 		hasFinalNewLine: hasFinalNewLine,
 	}
@@ -190,7 +191,9 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 		csvWriteOptions.newline = newLineFromInput
 	}
 
-	const _conf: import('papaparse').UnparseConfig = {
+	// papaCsv.unparse()
+	
+	const _conf: Exclude<Parameters<typeof papaCsv.unparse>[1], undefined> = {
 		...csvWriteOptions,
 		quotes: csvWriteOptions.quoteAllFields,
 		//custom created option to handle null, undefined and empty string values
@@ -240,23 +243,17 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 
 	}
 
+	_conf.skipEmptyLines = false
 
-	//not documented in papaparse...
-	//@ts-ignore
-	_conf['skipEmptyLines'] = false
-
-	//a custom param
 	//rowInsertCommentLines_commentsString: trim left comment lines and only export first cell
-	//@ts-ignore
-	_conf['rowInsertCommentLines_commentsString'] = typeof csvWriteOptions.comments === 'string' ? csvWriteOptions.comments : null
+	_conf.rowInsertCommentLines_commentsString = typeof csvWriteOptions.comments === 'string' ? csvWriteOptions.comments : null
 
 	switch (initialConfig?.retainQuoteInformation ?? 'full') {
 		case 'none': {
 			break
 		}
 		case 'determinedByColumns': {
-			//@ts-ignore
-			_conf['columnIsQuoted'] = columnIsQuoted
+			_conf.quotes = columnIsQuoted
 			break
 		}
 		case 'full': {
@@ -267,8 +264,7 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 				cellIsQuotedInfoPhysicalIndicesFull.splice(headerRowWithIndex.physicalIndex, 0, cellIsQuotedInfoPhysicalIndicesHeaderRow)
 			}
 
-			//@ts-ignore
-			_conf['determineFieldHasQuotes'] = (content: string | null, row: number, col: number) => {
+			_conf.determineFieldHasQuotesFunc = (content: string | null, row: number, col: number) => {
 				if (row >= cellIsQuotedInfoPhysicalIndicesFull.length) {
 					return newColumnQuoteInformationIsQuoted
 				}
@@ -288,11 +284,8 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 		}
 	}
 
-	//@ts-ignore
-	_conf['quoteLeadingSpace'] = initialConfig?.forceQuoteLeadingWhitespace ?? false
-	//@ts-ignore
-	_conf['quoteTrailingSpace'] = initialConfig?.forceQuoteTrailingWhitespace ?? false
-
+	_conf.quoteLeadingSpace= initialConfig?.forceQuoteLeadingWhitespace ?? false
+	_conf.quoteTrailingSpace = initialConfig?.forceQuoteTrailingWhitespace ?? false
 
 	let dataAsString = papaCsv.unparse(data, _conf)
 
@@ -621,7 +614,7 @@ function notExhaustiveSwitch(x: never): never {
  * Posts a message to the extension to set multiple cursor positions in the source file
  * @param positions Array of cursor positions, each with line and column index (0-based)
  */
-function postSetMultipleCursors(positions: CursorsPosition[]) {
+function postSetMultipleCursors(positions: FilePosition[]) {
 	if (!vscode) {
 		console.log(`postSetMultipleCursors (but in browser)`)
 		return

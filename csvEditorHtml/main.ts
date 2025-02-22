@@ -1,4 +1,5 @@
 /// <reference path="findWidget.ts" />
+/// <reference path="../thirdParty/papaparse/papaparse.d.ts" />
 
 //@ts-ignore
 dayjs.extend(dayjs_plugin_customParseFormat);
@@ -53,10 +54,9 @@ declare type Dayjs = import('dayjs').Dayjs
 
 const regression: typeof import('../thirdParty/regression/regression').default = (window as any).regression
 
-const papaCsv: typeof import('papaparse') = (window as any).Papa
+const papaCsv: typeof import('../thirdParty/papaparse/papaparse').Papa = (window as any).papaparse.Papa
 //handsontable instance
 let hot: import('../thirdParty/handsontable/handsontable') | null
-
 //add toFormat to big numbers
 //@ts-ignore
 toFormat(Big)
@@ -107,6 +107,7 @@ let usedDelimiter: string
 //TODO undef
 let outColumnIndexToCsvColumnEndIndexWithDelimiterMapping: Exclude<ParseResult['outColumnIndexToCsvColumnIndexMapping'], undefined>
 let outLineIndexToCsvLineIndexMapping: Exclude<ParseResult['outLineIndexToCsvLineIndexMapping'], undefined>
+let outCsvFieldToInputPositionMapping: Exclude<ReturnType<typeof papaCsv.parse>['meta']['outCsvFieldToInputPositionMapping'], null>
 
 /**
  * this is part of the output from papaparse

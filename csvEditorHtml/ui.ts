@@ -830,21 +830,21 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 								key: 'set_multiple_cursors:option1',
 								name: 'Cursor at cell start',
 								callback: function (key: string, selections: HandsontableSelection[], clickEvent: Event) {
-									postSetMultipleCursors(calculateSourceFileCursorPositions(selections, 'start'))
+									postSetMultipleCursors(calculateSourceFileCursorPositions2(selections, 'start'))
 								},
 							},
 							{
 								key: 'set_multiple_cursors:option2',
 								name: 'Cursor at cell end',
 								callback: function (key: string, selections: HandsontableSelection[], clickEvent: Event) {
-									postSetMultipleCursors(calculateSourceFileCursorPositions(selections, 'end'))
+									postSetMultipleCursors(calculateSourceFileCursorPositions2(selections, 'end'))
 								},
 							},
 							{
 								key: 'set_multiple_cursors:option3',
 								name: 'Cursor selected entire cell',
 								callback: function (key: string, selections: HandsontableSelection[], clickEvent: Event) {
-									postSetMultipleCursors(calculateSourceFileCursorPositions(selections, 'entire'))
+									postSetMultipleCursors(calculateSourceFileCursorPositions2(selections, 'entire'))
 								},
 							},
 						]

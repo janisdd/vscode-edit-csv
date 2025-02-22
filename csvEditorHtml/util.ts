@@ -2179,7 +2179,83 @@ function tryToGuessHasHeader(csvLines: string[][], csvReadConfig: CsvReadOptions
 	return false
 }
 
+function calculateSourceFileCursorPositions2(selections: HandsontableSelection[], where: 'start' | 'end' | 'entire'): FilePosition[] {
+
+	const positions: FilePosition[] = []
+	console.log(`outCsvFieldToInputPositionMapping`, outCsvFieldToInputPositionMapping)
+	//TODO if user added/removed cells??
+
+	for (let i = 0; i < selections.length; i++) {
+		const selection = selections[i]
+		const startLine = selection.start.row
+		const endLine = selection.end.row
+
+		for (let row = startLine; row <= endLine; row++) {
+			let startColumn = selection.start.col
+			let endColumn = selection.end.col
+
+			let fileCsvColPositions = outCsvFieldToInputPositionMapping[row]
+			if (fileCsvColPositions === undefined) {
+				postVsWarning(`could not find row for ${row}`)
+				throw new Error('row was undefined')
+			}
+
+			//special case: comment row has only one cell -> only one position
+			if (fileCsvColPositions.length === 1) {
+				startColumn = 0
+				endColumn = 0
+			}
+
+			for (let column = startColumn; column <= endColumn; column++) {
+				//+1 because before first char is 0, after first char is 1	
+				let position = fileCsvColPositions[column]
+
+				switch (where) {
+					case 'start':  {
+						positions.push({
+							startPos: position.start,
+							endPos: position.start,
+						})
+						break
+					}
+					case 'end': {
+						positions.push({
+							startPos: position.end,
+							endPos: position.end,
+						})
+			
+						break
+					}
+					case 'entire': {
+						positions.push({
+							startPos: position.start,
+							endPos: position.end,
+						})
+			
+							break
+					}
+					default: {
+						notExhaustiveSwitch(where)
+					}
+				}
+			}
+		}
+	}
+
+	return positions
+
+}
+
 function calculateSourceFileCursorPositions(selections: HandsontableSelection[], where: 'start' | 'end' | 'entire'): CursorsPosition[] {
+
+	//the main probleme here is that our position information/mapping from the source file to the csv file is not for this purpose
+	//it's is for setting the table focus on the correct cell from the source file cursor position
+	//this means we don't have an inverse mapping from the csv file to the source file
+	//e.g. multi line cells have only one column mapping (char indices) but we have multiple lines in the source file
+	//option 1: update papaparse to support this
+	//option 2: calculate an inverse mapping from the csv file to the source file
+	//for now we use option 2
+
 	const positions: CursorsPosition[] = []
 	console.log(outColumnIndexToCsvColumnEndIndexWithDelimiterMapping)
 	console.log(outLineIndexToCsvLineIndexMapping)

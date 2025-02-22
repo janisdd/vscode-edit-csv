@@ -593,7 +593,7 @@ type SetEditorHasChangesMessage = {
 
 type SetMultipleCursorsMessage = {
 	command: 'setMultipleCursors'
-	positions: CursorsPosition[]
+	positions: FilePosition[]
 }
 
 type CursorsPosition = {
@@ -601,6 +601,12 @@ type CursorsPosition = {
 	startColumn: number
 	endLine: number
 	endColumn: number
+}
+
+//string index
+type FilePosition = {
+	startPos: number
+	endPos: number
 }
 
 type PostMessage = ReadyMessage | DisplayMessageBoxMessage | OverwriteFileMessage | CopyToClipboardMessage | SetEditorHasChangesMessage | SetMultipleCursorsMessage
@@ -776,6 +782,7 @@ type InsertColumnAction = {
 
 
 
+//TODO remove
 interface ParseResult {
 	data: Array<any>;
 	errors: Array<ParseError>;
@@ -785,11 +792,6 @@ interface ParseResult {
 	
 	columnIsQuoted: boolean[]
 	cellIsQuotedInfo: boolean[][]
-}
-
-interface ParseConfig {
-	calcLineIndexToCsvLineIndexMapping: boolean
-	calcColumnIndexToCsvColumnIndexMapping: boolean
 }
 
 type HotCellPos = {

@@ -707,7 +707,9 @@ function setMultipleCursorsInSourceFile(instance, positions) {
             .then(editor => {
             // Create an array of VSCode selections from the cursor positions
             const selections = positions.map(pos => {
-                return new vscode.Selection(pos.startLine, pos.startColumn, pos.endLine, pos.endColumn);
+                const posStart = document.positionAt(pos.startPos);
+                const posEnd = document.positionAt(pos.endPos);
+                return new vscode.Selection(posStart.line, posStart.character, posEnd.line, posEnd.character);
             });
             // Set the selections in the editor
             editor.selections = selections;

@@ -775,7 +775,6 @@
 		"@types/mocha": "2.2.48",
 		"@types/mousetrap": "1.6.3",
 		"@types/node": "18.11.9",
-		"@types/papaparse": "4.5.6",
 		"@types/readline-sync": "1.4.3",
 		"@types/vscode": "1.70.0",
 		"@vitest/browser": "2.0.5",
