@@ -824,6 +824,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						if (!vscode) return true
 						return false
 					},
+					disabled: function() {
+						return hasOriginalTableStructuralChanges
+					},
 					submenu: {
 						items: [
 							{
@@ -1262,6 +1265,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		 * endColVisualIndex: the column is inserted left to this index
 		 */
 		afterColumnMove: (function (startColVisualIndices: number[], endColVisualIndex: number) {
+			hasOriginalTableStructuralChanges = true
 
 			if (!hot) throw new Error('table was null')
 
@@ -1353,6 +1357,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//we don't need to update cellIsQuotedInfoPhysicalIndices here because moving columns only changes the visual indices
 		}, 
 		afterRowMove: function (startRow: number, endRow: number) {
+			hasOriginalTableStructuralChanges = true
+
 			if (!hot) throw new Error('table was null')
 			onAnyChange()
 		},
@@ -1406,6 +1412,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			}
 		},
 		afterCreateCol: function (visualColIndex, amount, source?: string) {
+			hasOriginalTableStructuralChanges = true
 
 			if (!hot) return
 
@@ -1481,6 +1488,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				
 		},
 		afterRemoveCol: function (visualColIndex, amount, someting?: any, source?: string) {
+			hasOriginalTableStructuralChanges = true
 
 			//we need to modify some or all hiddenPhysicalColumnIndices...
 			if (!hot) return
@@ -1507,6 +1515,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		//and then they increment the physical row via the amount
 		//however, it works somehow...
 		afterCreateRow: function (visualRowIndex, amount) {
+			hasOriginalTableStructuralChanges = true
+
 			//added below
 			//critical because we could update hot settings here
 			pre_afterCreateRow(visualRowIndex, amount)
@@ -1536,6 +1546,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 		},
 		afterRemoveRow: function (visualRowIndex, amount) {
+			hasOriginalTableStructuralChanges = true
+
 			//we need to modify some or all hiddenPhysicalRowIndices...
 			if (!hot) return
 

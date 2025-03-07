@@ -230,6 +230,37 @@ let shouldApplyHasHeaderAfterRowsAdded = false
 let isReadonlyMode = false
 
 /**
+ * the original csv file has a layout and sometimes we use the original positions
+ * in the table view the user can add/remove rows/columns
+ * when we use the table data (e.g. selected cell) and want to get the position in the original csv file
+ * then this can only work if the table structure was not changed!
+ * e.g. when we parse the file we get the layout/cell info and we want to find the original cell position
+ * we cannot simply compare the current to the original table layout because user could add and then remove a column
+ *   in a different position
+ * 
+ * UNDO/REDO is not handled for now
+ * 
+ * the following events will set this to true
+ * - add row [afterCreateRow]
+ * - remove row [afterRemoveRow]
+ * (- move row) [afterRowMove]
+ * - add col [afterCreateCol]
+ * - remove col [afterRemoveCol]
+ * (- move col) [afterColumnMove]
+ * (- sort col)
+ * - source file change detected -> cancel
+ * 
+ * the following actions will reset this to false
+ * - apply changes to file and save [TODO unparse has to keep track of new cell positions...]
+ * - reset data and apply read options [via startRenderData]
+ * - source file change detected -> reset [via startRenderData]
+ * 
+ * changing row/col order is ok because we have a mapping from visual to physical indices
+ * HOWEVER, the mapping is broken in handsontable so this is not always 100% correct
+ */
+let hasOriginalTableStructuralChanges = false
+
+/**
  * original data had a final new line or not
  * set in {@link parseCsv}
  */

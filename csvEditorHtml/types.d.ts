@@ -447,7 +447,7 @@ type CsvReadOptions = {
 	/**
 	 * the new line string, use '' for auto detect
 	 */
-	newline: string,
+	newline: '' | '\n' | '\r' | '\r\n',
 	/**
 	 * the quote string
 	 */

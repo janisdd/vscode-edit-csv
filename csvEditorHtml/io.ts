@@ -570,6 +570,7 @@ function onReceiveCsvContentSlice(slice: StringSlice) {
 function startRenderData() {
 
 	statusInfo.innerText = `Rendering table...`
+	hasOriginalTableStructuralChanges = false
 
 	//TODO as we don't longer use undo/redo with has header option this might not be necessary any longer...
 	//we need to change defaultCsvReadOptions because the undo/redo might mess up our
