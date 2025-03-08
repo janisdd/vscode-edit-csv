@@ -205,6 +205,7 @@ let fixedColumnsLeft: number = 0
  * false: nothing to do
  */
 let isFirstHasHeaderChangedEvent = true
+let isCurrentlyChangingHasHeader = false
 /**
  * the initial width for columns, 0 or a negative number will disable this and auto column size is used on initial render
  */
@@ -250,6 +251,7 @@ let isReadonlyMode = false
  * - remove col [afterRemoveCol]
  * (- move col) [afterColumnMove]
  * - source file change detected -> cancel [via toggleSourceFileChangedModalDiv(false, true)]
+ * (- paste) [is handled via add row/col]
  * 
  * no effect:
  * - sort col [this is ok as virtual and physical only break when sorting is combined with 

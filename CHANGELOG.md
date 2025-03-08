@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+# 0.11.3
+- added feature #176 - add cursor to source file from table selection (via context menu)
+	- disabled when certain actions are performed (see https://github.com/janisdd/vscode-edit-csv/issues/176) but basicalyl all that change the shape of the table (e.g. add/remove rows/cols)
+	- enabled again when applying changes or reloading/resetting data
+- fixed delayed `readOption_hasHeader` feature where the options is automatically enabled as soon as the table has more than 1 row
 
 # 0.11.2
 - added feature #142 - added option `tryToGuessHasHeader`

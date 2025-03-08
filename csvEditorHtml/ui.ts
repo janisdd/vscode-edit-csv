@@ -69,6 +69,9 @@ function getHasHeaderRow() {
  * @param fromUndo true: only update col headers, do not change the table data (will be done by undo/redo), false: normal
  */
 function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
+	if (isCurrentlyChangingHasHeader) return
+
+	isCurrentlyChangingHasHeader = true
 
 	const el = hasHeaderReadOptionInput //or defaultCsvReadOptions._hasHeader
 
@@ -97,7 +100,9 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			if (fromUndo) return
 
 			headerRowWithIndex = dataWithIndex
-			el.checked = true //sync ui in case we get here via autoApplyHasHeader
+			//sync ui in case we get here via autoApplyHasHeader
+			//but this also triggers the change event!
+			el.checked = true 
 
 			_updateHandsontableSettings({
 				fixedRowsTop: fixedRowsTop,
@@ -143,6 +148,7 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 		if (fromUndo) return
 
 		if (headerRowWithIndex === null) {
+			isCurrentlyChangingHasHeader = false
 			throw new Error('could not insert header row')
 		}
 
@@ -199,6 +205,7 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 		call_after_DOM_updated(() => {
 
 			func()
+			isCurrentlyChangingHasHeader = false
 
 			setTimeout(() => {
 				statusInfo.innerText = '';
@@ -210,6 +217,7 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 	}
 
 	func()
+	isCurrentlyChangingHasHeader = false
 
 }
 
@@ -264,6 +272,10 @@ function tryApplyHasHeader() {
 			setShouldAutpApplyHasHeader(true)
 			return
 		}
+	}
+
+	if (!canApply) {
+		return
 	}
 
 	//else just apply
@@ -829,7 +841,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					}
 				},
 				'set_multiple_cursors': {
-					name: 'selection to file cursors',
+					name: 'Selection to file cursors',
 					hidden: function () {
 						//don't show in browser
 						if (!vscode) return true
