@@ -809,3 +809,10 @@ type UrlInStringCoords = {
 	startIndex: number
 	endIndex: number
 }
+
+type GetDataAsCsvResult = {
+	csv: string
+	meta: {
+		outCsvFieldToInputPositionMapping: FieldPosition[][];
+	}
+}

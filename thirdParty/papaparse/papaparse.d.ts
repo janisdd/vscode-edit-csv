@@ -119,9 +119,19 @@ export interface ParseError {
      */
     index?: number;
 }
+export type UnparseResult = {
+    csv: string;
+    /**
+     * meta information about the unparsing
+     */
+    meta: UnparseResultMeta;
+};
+export interface UnparseResultMeta {
+    outCsvFieldToInputPositionMapping: FieldPosition[][] | null;
+}
 export type UnparseConfigAll = {
     delimiter: string;
-    newlineChar: string;
+    newline: string;
     quoteChar: string;
     /**
      * empty to use quote char
@@ -147,6 +157,7 @@ export type UnparseConfigAll = {
      * see {@link ParseConfigAll.rowInsertCommentLines_commentsString}
      */
     rowInsertCommentLines_commentsString: string | null;
+    calcCsvFieldToInputPositionMapping: boolean;
 };
 export type UnparseConfig = Partial<UnparseConfigAll>;
 /**
@@ -177,7 +188,7 @@ export declare class Papa {
     static DefaultQuoteChar: string;
     static DefaultEscapeChar: string;
     static parse(input: string, _config?: ParseConfig): ParseResult;
-    static unparse(data: Array<Array<string | null | undefined>>, _config?: UnparseConfig): string;
+    static unparse(data: Array<Array<string | null | undefined>>, _config?: UnparseConfig): UnparseResult;
 }
 export declare class Parser {
     _config: ParseConfigEffective;

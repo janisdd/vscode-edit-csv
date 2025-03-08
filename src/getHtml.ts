@@ -935,7 +935,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 						<span style="width: 3rem">Reload</span>
 					</vscode-button>
 
-					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleSourceFileChangedModalDiv(false)">
+					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleSourceFileChangedModalDiv(false, true)">
 						<span style="width: 3rem">Ignore</span>
 					</vscode-button>
 				</div>

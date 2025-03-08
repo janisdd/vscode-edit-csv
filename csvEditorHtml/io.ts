@@ -184,7 +184,7 @@ function getFirstRowWithIndexByData(data: string[][], skipCommentLines: boolean 
  * @param {any} csvWriteOptions 
  * @returns {string} 
  */
-function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteOptions): string {
+function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteOptions): GetDataAsCsvResult {
 	const data = getData()
 
 	if (csvWriteOptions.newline === '') {
@@ -197,8 +197,8 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 		...csvWriteOptions,
 		quotes: csvWriteOptions.quoteAllFields,
 		//custom created option to handle null, undefined and empty string values
-		//@ts-ignore
 		quoteEmptyOrNullFields: csvWriteOptions.quoteEmptyOrNullFields,
+		calcCsvFieldToInputPositionMapping: true,
 	}
 
 	if (csvWriteOptions.header) {
@@ -287,7 +287,8 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 	_conf.quoteLeadingSpace= initialConfig?.forceQuoteLeadingWhitespace ?? false
 	_conf.quoteTrailingSpace = initialConfig?.forceQuoteTrailingWhitespace ?? false
 
-	let dataAsString = papaCsv.unparse(data, _conf)
+	const unparseResult = papaCsv.unparse(data, _conf)
+	let dataAsString = unparseResult.csv
 
 	let finalNewLineOption: EditCsvConfig["finalNewLine"] = "sameAsSourceFile"
 	if (initialConfig) {
@@ -317,8 +318,13 @@ function getDataAsCsv(csvReadOptions: CsvReadOptions, csvWriteOptions: CsvWriteO
 			notExhaustiveSwitch(finalNewLineOption)
 	}
 
-
-	return dataAsString
+	return {
+		csv: dataAsString,
+		meta: {
+			//should not be null because we set calcCsvFieldToInputPositionMapping
+			outCsvFieldToInputPositionMapping: unparseResult.meta.outCsvFieldToInputPositionMapping ?? []
+		}
+	}
 }
 
 
@@ -523,7 +529,7 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 
 					case 'yesAndNotify':
 					default: {
-						toggleSourceFileChangedModalDiv(true)
+						toggleSourceFileChangedModalDiv(true, false)
 						break
 					}
 

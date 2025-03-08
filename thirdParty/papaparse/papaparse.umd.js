@@ -28,7 +28,7 @@
   };
   const __unparseConfigUserDefaults = {
     delimiter: ",",
-    newlineChar: "\r\n",
+    newline: "\r\n",
     quoteChar: '"',
     escapeChar: "",
     //empty to use quote char
@@ -38,7 +38,8 @@
     quoteLeadingSpace: true,
     quoteTrailingSpace: true,
     determineFieldHasQuotesFunc: void 0,
-    rowInsertCommentLines_commentsString: null
+    rowInsertCommentLines_commentsString: null,
+    calcCsvFieldToInputPositionMapping: false
   };
   const _Papa = class _Papa {
     static parse(input, _config) {
@@ -696,7 +697,7 @@
       this._data = [];
       this._quotes = _config.quotes;
       this._delimiter = _config.delimiter;
-      this._newlineChar = _config.newlineChar;
+      this._newlineChar = _config.newline;
       this._quoteChar = _config.quoteChar;
       this._skipEmptyLines = _config.skipEmptyLines === "greedy" || _config.skipEmptyLines;
       this._isGreedySkipEmptyLines = _config.skipEmptyLines === "greedy";
@@ -707,6 +708,7 @@
       this._quoteEmptyOrNullFields = _config.quoteEmptyOrNullFields;
       this._quoteCharRegex = new RegExp(escapeRegExp(this._quoteChar), "g");
       this._escapedQuote = _config.escapeChar ? _config.escapeChar + this._quoteChar : this._quoteChar + this._quoteChar;
+      this._outFieldPositionMapping = _config.calcCsvFieldToInputPositionMapping ? [] : null;
       if (Papa.BAD_DELIMITERS.some((value) => _config.delimiter.indexOf(value) !== -1)) {
         this._delimiter = Papa.DefaultDelimiter;
       }
@@ -718,30 +720,58 @@
         const maxCol = this._data[row].length;
         let emptyLine = false;
         const nullLine = this._data[row].length === 0;
+        const currentRowFieldPositions = [];
+        let currFieldPos = 0;
         if (this._skipEmptyLines) {
           emptyLine = ParserHandle._testEmptyLine(this._data[row], this._isGreedySkipEmptyLines);
         }
-        if (!emptyLine) {
-          if (this._data[row].length > 0 && this._rowInsertCommentLines_commentsString) {
-            const firstCellData = this._data[row][0];
-            if (typeof firstCellData === "string" && firstCellData.startsWith(this._rowInsertCommentLines_commentsString)) {
-              csv += firstCellData + this._newlineChar;
-              continue;
+        if (emptyLine) {
+          continue;
+        }
+        if (this._data[row].length > 0 && this._rowInsertCommentLines_commentsString) {
+          const firstCellData = this._data[row][0];
+          if (typeof firstCellData === "string" && firstCellData.startsWith(this._rowInsertCommentLines_commentsString)) {
+            currFieldPos = csv.length;
+            csv += firstCellData;
+            if (this._outFieldPositionMapping) {
+              currentRowFieldPositions.push({
+                start: currFieldPos,
+                end: csv.length
+              });
+              this._outFieldPositionMapping.push(currentRowFieldPositions);
             }
-          }
-          for (let col = 0; col < maxCol; col++) {
-            if (col > 0 && !nullLine) {
-              csv += this._delimiter;
-            }
-            const colIdx = col;
-            csv += this.safe(this._data[row][colIdx], row, col);
-          }
-          if (row < this._data.length - 1 && (!this._skipEmptyLines || maxCol > 0 && !nullLine)) {
             csv += this._newlineChar;
+            continue;
           }
         }
+        for (let col = 0; col < maxCol; col++) {
+          if (col > 0 && !nullLine) {
+            csv += this._delimiter;
+          }
+          currFieldPos = csv.length;
+          const colIdx = col;
+          csv += this.safe(this._data[row][colIdx], row, col);
+          currentRowFieldPositions.push({
+            start: currFieldPos,
+            end: csv.length
+          });
+        }
+        if (this._outFieldPositionMapping) {
+          if (this._skipEmptyLines && maxCol === 0) ;
+          else {
+            this._outFieldPositionMapping.push(currentRowFieldPositions);
+          }
+        }
+        if (row < this._data.length - 1 && (!this._skipEmptyLines || maxCol > 0 && !nullLine)) {
+          csv += this._newlineChar;
+        }
       }
-      return csv;
+      return {
+        csv,
+        meta: {
+          outCsvFieldToInputPositionMapping: this._outFieldPositionMapping
+        }
+      };
     }
     /** Encloses a value around quotes if needed (makes a value safe for CSV insertion) */
     safe(str, row, col) {

@@ -56,6 +56,11 @@ function toggleOptionsBar(shouldCollapse?: boolean) {
 
 
 /* --- read options --- */
+
+function getHasHeaderRow() {
+	return headerRowWithIndex !== null
+}
+
 /**
  * if input value is set programmatically this is NOT called
  * 
@@ -104,7 +109,10 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			let headerCellIsQuotedInfoPhysicalIndices = cellIsQuotedInfoPhysicalIndices[headerRowWithIndex.physicalIndex]
 			cellIsQuotedInfoPhysicalIndicesHeaderRow = headerCellIsQuotedInfoPhysicalIndices
 
+			let _hasOriginalTableStructuralChanges_before = hasOriginalTableStructuralChanges
 			hot.alter('remove_row', headerRowWithIndex.physicalIndex)
+			//remove_row will trigger the remove row event but this is a known change, so there is no real structural change
+			hasOriginalTableStructuralChanges = _hasOriginalTableStructuralChanges_before
 
 			elWrite.checked = true
 			defaultCsvWriteOptions.header = true
@@ -140,11 +148,13 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 
 		let hasAnyChangesBefore = getHasAnyChangesUi()
 
+		let _hasOriginalTableStructuralChanges_before = hasOriginalTableStructuralChanges
 		hot.alter('insert_row', headerRowWithIndex.physicalIndex)
 		const visualRow = hot.toVisualRow(headerRowWithIndex.physicalIndex)
 		const visualCol = hot.toVisualColumn(0)
 		//see https://handsontable.com/docs/6.2.2/Core.html#populateFromArray
 		hot.populateFromArray(visualRow, visualCol, [[...headerRowWithIndex.row]])
+		hasOriginalTableStructuralChanges = _hasOriginalTableStructuralChanges_before
 
 		//we already inserted the header row, this will insert the quote info with default values
 		//so, reapply the old values
@@ -382,7 +392,8 @@ function setWriteDelimiter(delimiter: string) {
  * updates the preview
  */
 function generateCsvPreview() {
-	const value = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
+	const unparseResult = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
+	const value = unparseResult.csv
 
 	const el = _getById('csv-preview') as HTMLTextAreaElement
 	el.value = value
@@ -1516,6 +1527,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		//however, it works somehow...
 		afterCreateRow: function (visualRowIndex, amount) {
 			hasOriginalTableStructuralChanges = true
+			console.log("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
 
 			//added below
 			//critical because we could update hot settings here
@@ -1547,6 +1559,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		},
 		afterRemoveRow: function (visualRowIndex, amount) {
 			hasOriginalTableStructuralChanges = true
+			console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 
 			//we need to modify some or all hiddenPhysicalRowIndices...
 			if (!hot) return
@@ -2292,7 +2305,7 @@ function toggleAskReloadFileModalDiv(isVisible: boolean) {
  * displays or hides the source file changed modal
  * @param isVisible 
  */
-function toggleSourceFileChangedModalDiv(isVisible: boolean) {
+function toggleSourceFileChangedModalDiv(isVisible: boolean, sourceFileReloadCancelled: boolean) {
 
 	if (isVisible) {
 		sourceFileChangedDiv.classList.add('is-active')
@@ -2300,6 +2313,11 @@ function toggleSourceFileChangedModalDiv(isVisible: boolean) {
 	}
 
 	sourceFileChangedDiv.classList.remove('is-active')
+
+	if (isVisible === false && sourceFileReloadCancelled) {
+		//no reload of content
+		hasOriginalTableStructuralChanges = true
+	}
 }
 
 
@@ -2359,7 +2377,7 @@ function preReloadFileFromDisk() {
  */
 function reloadFileFromDisk() {
 	toggleAskReloadFileModalDiv(false)
-	toggleSourceFileChangedModalDiv(false)
+	toggleSourceFileChangedModalDiv(false, false)
 	_setHasUnsavedChangesUiIndicator(false)
 
 	storeHotSelectedCellAndScrollPosition()
@@ -2389,11 +2407,17 @@ function postApplyContent(saveSourceFile: boolean) {
 
 	if (isReadonlyMode) return
 
-	const csvContent = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
+	const unparseResult = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
+	const csvContent = unparseResult.csv
+
+	outCsvFieldToInputPositionMapping = unparseResult.meta.outCsvFieldToInputPositionMapping
+
+	hasOriginalTableStructuralChanges = false
 
 	//used to clear focus... else styles are not properly applied
 	//@ts-ignore
 	if (document.activeElement !== document.body) document.activeElement.blur();
+
 
 	_postApplyContent(csvContent, saveSourceFile)
 }

@@ -107,6 +107,8 @@ let usedDelimiter: string
 //TODO undef
 let outColumnIndexToCsvColumnEndIndexWithDelimiterMapping: Exclude<ParseResult['outColumnIndexToCsvColumnIndexMapping'], undefined>
 let outLineIndexToCsvLineIndexMapping: Exclude<ParseResult['outLineIndexToCsvLineIndexMapping'], undefined>
+//this is set when parsing the source file
+//this is also set when unparsing the table to csv and the csv is written back to the source file
 let outCsvFieldToInputPositionMapping: Exclude<ReturnType<typeof papaCsv.parse>['meta']['outCsvFieldToInputPositionMapping'], null>
 
 /**
@@ -247,11 +249,15 @@ let isReadonlyMode = false
  * - add col [afterCreateCol]
  * - remove col [afterRemoveCol]
  * (- move col) [afterColumnMove]
- * (- sort col)
- * - source file change detected -> cancel
+ * - source file change detected -> cancel [via toggleSourceFileChangedModalDiv(false, true)]
+ * 
+ * no effect:
+ * - sort col [this is ok as virtual and physical only break when sorting is combined with 
+ *               moving rows/cols but moving already set it to have structural changes]
+ * - hasHeader [we check if we have a header -> row indices +1 else +0]
  * 
  * the following actions will reset this to false
- * - apply changes to file and save [TODO unparse has to keep track of new cell positions...]
+ * - apply changes to file (and save) [via postApplyContent]
  * - reset data and apply read options [via startRenderData]
  * - source file change detected -> reset [via startRenderData]
  * 

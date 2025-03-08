@@ -2181,14 +2181,17 @@ function tryToGuessHasHeader(csvLines: string[][], csvReadConfig: CsvReadOptions
 
 function calculateSourceFileCursorPositions2(selections: HandsontableSelection[], where: 'start' | 'end' | 'entire'): FilePosition[] {
 
+	//if we have a header row, we need to change the row index + 1
+	const hasHeaderRow = getHasHeaderRow()
+	let rowOffset = hasHeaderRow ? 1 : 0
+
 	const positions: FilePosition[] = []
 	console.log(`outCsvFieldToInputPositionMapping`, outCsvFieldToInputPositionMapping)
-	//TODO if user added/removed cells??
 
 	for (let i = 0; i < selections.length; i++) {
 		const selection = selections[i]
-		const startLine = selection.start.row
-		const endLine = selection.end.row
+		const startLine = selection.start.row + rowOffset
+		const endLine = selection.end.row + rowOffset
 
 		for (let row = startLine; row <= endLine; row++) {
 			const _row = hot!.toPhysicalRow(row)
