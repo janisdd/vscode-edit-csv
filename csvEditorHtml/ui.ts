@@ -875,7 +875,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 							},
 						]
 					}
-				},
+				}
 
 			}
 		} as ContextMenuSettings,
@@ -1539,7 +1539,6 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		//however, it works somehow...
 		afterCreateRow: function (visualRowIndex, amount) {
 			hasOriginalTableStructuralChanges = true
-			console.log("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
 
 			//added below
 			//critical because we could update hot settings here
@@ -1571,7 +1570,6 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		},
 		afterRemoveRow: function (visualRowIndex, amount) {
 			hasOriginalTableStructuralChanges = true
-			console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 
 			//we need to modify some or all hiddenPhysicalRowIndices...
 			if (!hot) return

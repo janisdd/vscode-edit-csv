@@ -2186,7 +2186,7 @@ function calculateSourceFileCursorPositions2(selections: HandsontableSelection[]
 	let rowOffset = hasHeaderRow ? 1 : 0
 
 	const positions: FilePosition[] = []
-	console.log(`outCsvFieldToInputPositionMapping`, outCsvFieldToInputPositionMapping)
+	// console.log(`outCsvFieldToInputPositionMapping`, outCsvFieldToInputPositionMapping)
 
 	for (let i = 0; i < selections.length; i++) {
 		const selection = selections[i]
@@ -2213,8 +2213,10 @@ function calculateSourceFileCursorPositions2(selections: HandsontableSelection[]
 
 			for (let column = startColumn; column <= endColumn; column++) {
 				const _column = hot!.toPhysicalColumn(column)
+				//works because we have at least one cell else we wouldn't have a row
+				const realCol = Math.min(_column, fileCsvColPositions.length - 1)
 				//+1 because before first char is 0, after first char is 1	
-				let position = fileCsvColPositions[_column]
+				let position = fileCsvColPositions[realCol]
 
 				switch (where) {
 					case 'start':  {

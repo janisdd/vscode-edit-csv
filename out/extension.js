@@ -700,7 +700,7 @@ function onSourceFileChanged(path, instance) {
     instance.panel.webview.postMessage(msg);
 }
 function setMultipleCursorsInSourceFile(instance, positions) {
-    console.log('positions', positions);
+    // console.log('positions', positions)
     vscode.workspace.openTextDocument(instance.sourceUri)
         .then(document => {
         vscode.window.showTextDocument(document)
@@ -714,10 +714,10 @@ function setMultipleCursorsInSourceFile(instance, positions) {
             // Set the selections in the editor
             editor.selections = selections;
             //focus the editor
-            console.log(vscode.window.activeTextEditor);
-            setTimeout(() => {
-                console.log(vscode.window.activeTextEditor);
-            }, 1000);
+            // console.log(vscode.window.activeTextEditor)
+            // setTimeout(() => {
+            // 	console.log(vscode.window.activeTextEditor)
+            // }, 1000)
         });
     });
 }

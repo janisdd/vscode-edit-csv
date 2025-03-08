@@ -892,7 +892,7 @@ function onSourceFileChanged(path: string, instance: Instance) {
 }
 
 function setMultipleCursorsInSourceFile(instance: Instance, positions: FilePosition[]) {
-	console.log('positions', positions)
+	// console.log('positions', positions)
 	vscode.workspace.openTextDocument(instance.sourceUri)
 		.then(document => {
 			vscode.window.showTextDocument(document)
@@ -913,10 +913,10 @@ function setMultipleCursorsInSourceFile(instance: Instance, positions: FilePosit
 					// Set the selections in the editor
 					editor.selections = selections
 					//focus the editor
-					console.log(vscode.window.activeTextEditor)
-					setTimeout(() => {
-						console.log(vscode.window.activeTextEditor)
-					}, 1000)
+					// console.log(vscode.window.activeTextEditor)
+					// setTimeout(() => {
+					// 	console.log(vscode.window.activeTextEditor)
+					// }, 1000)
 				})
 		})
 }

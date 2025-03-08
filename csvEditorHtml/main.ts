@@ -257,6 +257,7 @@ let isReadonlyMode = false
  * - sort col [this is ok as virtual and physical only break when sorting is combined with 
  *               moving rows/cols but moving already set it to have structural changes]
  * - hasHeader [we check if we have a header -> row indices +1 else +0]
+ * - normalize data that all rows have the same length [if cells were added that have no counterpart in the file the cell to the left is used]
  * 
  * the following actions will reset this to false
  * - apply changes to file (and save) [via postApplyContent]
