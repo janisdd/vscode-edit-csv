@@ -115,6 +115,11 @@ input.input {
 	margin-bottom: 1em;
 }
 
+.handsontable.htMenu.htContextMenu .ht_master.handsontable .htItemWrapper {
+	display: flex;
+	align-items: center;
+}
+
 /* .handsontable td {
 	font-size: 50px;
 

@@ -655,6 +655,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		fixedColumnsLeft: fixedColumnsLeft,
 		//see https://handsontable.com/docs/7.1.0/demo-context-menu.html
 		contextMenu: {
+			subMenuOpenDelayInMs: 100,
 			items: {
 				'row_above': {
 					callback: function () { //key, selection, clickEvent

@@ -7,6 +7,8 @@
 	- disabled when certain actions are performed (see https://github.com/janisdd/vscode-edit-csv/issues/176) but basicalyl all that change the shape of the table (e.g. add/remove rows/cols)
 	- enabled again when applying changes or reloading/resetting data
 - fixed delayed `readOption_hasHeader` feature where the options is automatically enabled as soon as the table has more than 1 row
+- lowered the context menu sub items display delay from 300ms to 100ms
+- context menu sub menu indicator is now centered
 
 # 0.11.2
 - added feature #142 - added option `tryToGuessHasHeader`

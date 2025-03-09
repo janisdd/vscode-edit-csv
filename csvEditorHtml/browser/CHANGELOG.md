@@ -4,11 +4,16 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.7.2
+- (same as vs code extension 0.11.3)
+- fixed delayed `readOption_hasHeader` feature where the options is automatically enabled as soon as the table has more than 1 row
+- lowered the context menu sub items display delay from 300ms to 100ms
+- context menu sub menu indicator is now centered
+
 ## 1.7.1
 - (same as vs code extension v0.11.1)
 - fixed issue #174 - added option `overwriteExceptEmpty` to the `pasteBehavior` setting
   - it only overwrites the cell content if the paste cell is not empty
-
 
 ## 1.7.0
 - (same as vs code extension v0.11.0)

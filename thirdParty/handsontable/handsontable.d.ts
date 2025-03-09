@@ -2049,6 +2049,7 @@ declare namespace Handsontable {
     interface Settings {
       callback: (key: string, options: contextMenu.Options) => void;
       items: any;
+      subMenuOpenDelayInMs?: number
     }
   }
 

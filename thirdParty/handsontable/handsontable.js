@@ -23,8 +23,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Version: 6.5.4
- * Release date: 19/12/2018 (built at 08/12/2024 15:36:41)
+ * Version: 6.5.6
+ * Release date: 19/12/2018 (built at 09/03/2025 14:07:55)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29763,9 +29763,9 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "08/12/2024 15:36:41";
+Handsontable.buildDate = "09/03/2025 14:07:55";
 Handsontable.packageName = "handsontable";
-Handsontable.version = "6.5.4";
+Handsontable.version = "6.5.6";
 var baseVersion = "";
 
 if (baseVersion) {
@@ -49534,7 +49534,8 @@ function (_BasePlugin) {
 
         _this2.menu = new _menu.default(_this2.hot, {
           className: 'htContextMenu',
-          keepInViewport: true
+          keepInViewport: true,
+          subMenuOpenDelayInMs: settings.subMenuOpenDelayInMs || 300
         });
 
         _this2.hot.runHooks('beforeContextMenuSetItems', menuItems);
@@ -51000,7 +51001,9 @@ function () {
       className: '',
       keepInViewport: true,
       standalone: false,
-      minWidth: MIN_WIDTH
+      minWidth: MIN_WIDTH,
+      subMenuOpenDelayInMs: 300 // default
+
     };
     this.eventManager = new _eventManager.default(this);
     this.container = this.createContainer(this.options.name);
@@ -51085,9 +51088,10 @@ function () {
       this.runLocalHooks('beforeOpen');
       this.container.removeAttribute('style');
       this.container.style.display = 'block';
+      var delay = this.options.subMenuOpenDelayInMs || 300;
       var delayedOpenSubMenu = (0, _function.debounce)(function (row) {
         return _this2.openSubMenu(row);
-      }, 300);
+      }, delay);
       var minWidthOfMenu = this.options.minWidth || MIN_WIDTH;
       var filteredItems = (0, _array.arrayFilter)(this.menuItems, function (item) {
         return (0, _utils.isItemHidden)(item, _this2.hot);
@@ -51201,7 +51205,8 @@ function () {
         parent: this,
         name: dataItem.name,
         className: this.options.className,
-        keepInViewport: true
+        keepInViewport: true,
+        subMenuOpenDelayInMs: this.options.subMenuOpenDelayInMs || 300
       });
       subMenu.setMenuItems(dataItem.submenu.items);
       subMenu.open();
