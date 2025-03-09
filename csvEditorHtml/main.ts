@@ -440,31 +440,23 @@ setupAndApplyInitialConfigPart1(initialConfig, initialVars)
 
 setupGlobalShortcutsInVs()
 
+if (!vscode) {
+	let initialRows = 5
+	let initialCols = 5
+	initialContent = [...Array(initialRows).keys()].map(p =>
+		[...Array(initialCols).keys()].map(k => '').join(',')
+	).join('\n')
+}
 //see readDataAgain
 let _data = parseCsv(initialContent, defaultCsvReadOptions)
 
 //when we get data from vs code we receive it via messages
 if (_data && !vscode) {
-
-	let _exampleData: string[][] = []
-	let initialRows = 5
-	let initialCols = 5
-
-	_exampleData = [...Array(initialRows).keys()].map(p =>
-		[...Array(initialCols).keys()].map(k => '')
-	)
-
 	//@ts-ignore
 	// _exampleData = Handsontable.helper.createSpreadsheetData(100, 20)
 	// _exampleData = Handsontable.helper.createSpreadsheetData(1000, 20)
 	// _exampleData = Handsontable.helper.createSpreadsheetData(10000, 21)
 	// _exampleData = Handsontable.helper.createSpreadsheetData(100000, 20)
-
-	_data = {
-		columnIsQuoted: _exampleData[0].map(p => false),
-		data: _exampleData
-	}
-
 	displayData(_data, defaultCsvReadOptions)
 }
 
