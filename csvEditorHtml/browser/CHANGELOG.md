@@ -9,6 +9,8 @@ note that the changelog is also present on the website when you click on the ver
 - fixed delayed `readOption_hasHeader` feature where the options is automatically enabled as soon as the table has more than 1 row
 - lowered the context menu sub items display delay from 300ms to 100ms
 - context menu sub menu indicator is now centered
+- side bar tooltips is not longer clipped
+- removed preview tag (user requested this)
 
 ## 1.7.1
 - (same as vs code extension v0.11.1)
