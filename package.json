@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit CSV",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.10.0",
+	"version": "0.11.3",
 	"license": "MIT",
 	"icon": "images/logo.png",
 	"publisher": "janisdd",
@@ -15,7 +15,7 @@
 	"keywords": [
 		"CSV"
 	],
-	"preview": true,
+	"preview": false,
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/janisdd/vscode-edit-csv.git"
@@ -318,6 +318,11 @@
 						"options bar will always start collapsed"
 					]
 				},
+				"csv-edit.tryToGuessHasHeader": {
+					"type": "boolean",
+					"default": false,
+					"description": "true: tries to guess if the csv file has a header line, false: not. Note: This only sets the has header option to true, but never to false"
+				},
 				"csv-edit.readOption_hasHeader": {
 					"type": "string",
 					"default": "false",
@@ -459,9 +464,29 @@
 					"description": "true: auto sizing columns will ignore comments, false: auto sizing columns will take comments into account"
 				},
 				"csv-edit.retainQuoteInformation": {
+					"type": "string",
+					"default": "full",
+					"description": "determines how the quote information is tracked across cells. NOTE: This only sets quotes for cells, but never prevents quotes from being added (so as not to interfere with other quote-related settings)",
+					"enum": [
+						"none",
+						"determinedByColumns",
+						"full"
+					],
+					"enumDescriptions": [
+						"do not retain any quote information",
+						"is determined by the first cell in the same column (as the cell in question)",
+						"track the quote information for every cell individually"
+					]
+				},
+				"csv-edit.forceQuoteLeadingWhitespace": {
 					"type": "boolean",
-					"default": true,
-					"description": "true: information about quoted fields are retained during parsing (for more details see readme), false: information about quoted field is discarded"
+					"default": false,
+					"description": "true: if a csv field begins with whitespace, it should always be enclosed in quotes, false: not"
+				},
+				"csv-edit.forceQuoteTrailingWhitespace": {
+					"type": "boolean",
+					"default": false,
+					"description": "true: if a csv field ends with whitespace, it should always be enclosed in quotes, false: not"
 				},
 				"csv-edit.newColumnQuoteInformationIsQuoted": {
 					"type": "boolean",
@@ -608,11 +633,13 @@
 					"description": "the paste behaviour to be used (what should happen to the old content)",
 					"enum": [
 						"overwrite",
+						"overwriteExceptEmpty",
 						"shift_down",
 						"shift_right"
 					],
 					"enumDescriptions": [
 						"pasting content overwrites the existing content",
+						"pasting content overwrites the existing content except for empty cells (in the pasting content)",
 						"pasting content shifts the existing content (cells) down",
 						"pasting content shifts the existing content (cells) to the right"
 					]
@@ -726,6 +753,7 @@
 		"vscode:prepublish": "npm audit && npm run compile && npm run testFe && npm run promptUp",
 		"compile": "npx tsc -p ./ && tsc -p ./csvEditorHtml/tsconfig.json",
 		"watch": "npx tsc -watch -p ./",
+		"watchEditor": "npx tsc -w -p ./csvEditorHtml/tsconfig.json",
 		"package": "vsce package",
 		"test": "npm run compile && vscode-test",
 		"testFe": "vitest run --config csvEditorHtml/test/vitest.config.ts",
@@ -747,10 +775,9 @@
 		"@types/mocha": "2.2.48",
 		"@types/mousetrap": "1.6.3",
 		"@types/node": "18.11.9",
-		"@types/papaparse": "4.5.6",
 		"@types/readline-sync": "1.4.3",
 		"@types/vscode": "1.70.0",
-		"@vitest/browser": "2.1.9",
+		"@vitest/browser": "3.0.8",
 		"@vscode/test-cli": "0.0.10",
 		"@vscode/test-electron": "2.4.1",
 		"bulma-toast": "2.0.3",
@@ -759,13 +786,13 @@
 		"glob": "7.1.6",
 		"iconv-lite": "0.6.2",
 		"jsdom": "16.7.0",
-		"mocha": "11.1.0",
+		"mocha": "11.0.1",
 		"playwright": "1.46.1",
 		"readline-sync": "1.4.10",
 		"sweetalert2": "9.17.2",
 		"toaster-js": "2.2.3",
 		"tslint": "5.8.0",
 		"typescript": "5.0.4",
-		"vitest": "2.1.9"
+		"vitest": "3.0.8"
 	}
 }

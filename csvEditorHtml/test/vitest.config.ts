@@ -31,13 +31,22 @@ export default defineConfig({
           type: 'text/javascript',
         },
         {
+          src: './thirdParty/papaparse/papaparse.min.js',
+          type: 'text/javascript',
+        },
+        {
           src: './csvEditorHtml/util.ts',
+          type: 'text/javascript',
+        },
+        {
+          src: './csvEditorHtml/io.ts',
           type: 'text/javascript',
         },
         {
           src: './csvEditorHtml/autoFill.ts',
           type: 'text/javascript',
         },
+        //could also be moved to init...
         {
           content: `
           window.numbersStyleEnRadio = {
@@ -47,11 +56,15 @@ export default defineConfig({
           toFormat(Big)
           //for custom formatted dates
           dayjs.extend(dayjs_plugin_customParseFormat);
+          
           `,
           type: 'text/javascript',
         },
+        {
+          src: './csvEditorHtml/test/init.ts',
+          type: 'text/javascript',
+        },
 
-        
       ],
     },
     include: ['csvEditorHtml/test/**/*.test.ts'],

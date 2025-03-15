@@ -1,3 +1,59 @@
+//has to be at the top, else tests fail???
+
+/**
+ * normal cell values for guessing has header
+ */
+const normalCellValues = new Set([
+	`true`,
+	`false`,
+])
+
+const knownNumberStylesMap: KnownNumberStylesMap = {
+	"en": {
+		key: 'en',
+		/**
+		 * this allows:
+		 * 0(000)
+		 * 0(000).0(000)
+		 * .0(000)
+		 * all repeated with - in front (negative numbers)
+		 * all repeated with e0(000) | e+0(000) | e-0(000)
+		 */
+		regex: /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/,
+		regexStartToEnd: /^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/,
+		thousandSeparator: /(\,| )/gm,
+		thousandSeparatorReplaceRegex: /((\,| )\d{3})+/gm
+	},
+	"non-en": {
+		key: 'non-en',
+		/**
+		 * this allows:
+		 * 0(000)
+		 * 0(000),0(000)
+		 * ,0(000)
+		 * all repeated with - in front (negative numbers)
+		 * all repeated with e0(000) | e+0(000) | e-0(000)
+		 */
+		regex: /-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?/,
+		regexStartToEnd: /^-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?$/,
+		thousandSeparator: /(\.| )/gm,
+		thousandSeparatorReplaceRegex: /((\.| )\d{3})+/gm
+	}
+}
+
+/**
+ * returns the number style from the ui
+ */
+function getNumbersStyleFromUi(): NumbersStyle {
+	
+	if (numbersStyleEnRadio.checked) return knownNumberStylesMap['en']
+
+	if (numbersStyleNonEnRadio.checked) return knownNumberStylesMap['non-en']
+
+	postVsWarning(`Got unknown numbers style from ui, defaulting to 'en'`)
+
+	return knownNumberStylesMap['en']
+}
 
 /**
  * returns the html element with the given id
@@ -144,8 +200,14 @@ function _normalizeDataArray(csvParseResult: ExtendedCsvParseResult, csvReadConf
 	let someRowWasExpanded = false
 	let firstRealRowExpandedWasFound = false
 
+	if (csvParseResult.cellIsQuotedInfo.length !== csvParseResult.data.length) {
+		postVsWarning(`cell quote information length does not match data length, defaulting to setting 'newColumnQuoteInformationIsQuoted': ${newColumnQuoteInformationIsQuoted}`)
+		csvParseResult.cellIsQuotedInfo = Array.from(Array(csvParseResult.data.length), () => Array(maxCols).fill(newColumnQuoteInformationIsQuoted))
+	}
+
 	for (let i = 0; i < csvParseResult.data.length; i++) {
-		const row = csvParseResult.data[i];
+		const row = csvParseResult.data[i]
+		const quoteRowInfo = csvParseResult.cellIsQuotedInfo[i]
 
 		//first real row (not a comment)
 		//we might need to expand the quote information array
@@ -169,6 +231,10 @@ function _normalizeDataArray(csvParseResult: ExtendedCsvParseResult, csvReadConf
 			if (row.length > 0 && isCommentCell(row[0], csvReadConfig) === false) {
 				someRowWasExpanded = true
 			}
+		}
+
+		if (quoteRowInfo.length < maxCols) {
+			quoteRowInfo.push(...Array.from(Array(maxCols - quoteRowInfo.length), (p, index) => newColumnQuoteInformationIsQuoted))
 		}
 
 		//because we mutate the array the csv parse result will be changed...
@@ -528,6 +594,24 @@ function _insertRowInternal(belowCurrRow: boolean) {
 
 	const targetRowIndex = currRowIndex + (belowCurrRow ? 1 : 0)
 	// const test = hot.toPhysicalRow(targetRowIndex) //also not working when rows are reordered...
+	//NOTE: the physical and visual index handling is messed up in handsontable...
+	//e.g. in core.js > alter(action, index, ...) the index is expected to be a visual index
+	//for 'insert_row' it calls 'datamap.createRow(index, ...)' (the index is not changed)
+	//the docs of DataMap.prototype.createRow = function(index, ...) says it's expecting a physical index!
+	//this is true because  spliceData(index, ...) is called, which modified the source data directly at the given index (so it must be physical!)
+	//after that the afterCreateRow hooks are run which updates the visual <-> physical index mapping (the index is still not changed)
+	//the mapping is stored in the manualRowMove.js plugin, the hook 'onAfterCreateRow' is triggered with the index and 'this.rowsMapper.shiftItems(index, amount)' is called
+	//shiftItems shifts all indices greater than index (and increases them) and then inserts the index itself, so array[index] = index
+	//this means that the mapping for the new row is inserted at the correct position (when we look up a physical index, we would execute array[visualIndex] where the new index is stored)
+	//however, array[index] = index, so the physical index of the new row is the visual index
+	//  it would be more intuitive if we would insert the new physical index but this is not possible by the shiftItems method because the entry for array[index] is always the index itself
+	//  to reproduce this, create a table with 1,2,3,4,5, and some data between, sort it, and then insert a row before row 3
+	//  the row will be displayed at the correct position but the physical index 'wrong' because if you revert the sort, the row will not be before row 3 but at the visual index it was inserted
+	//THIS IS THE CURRENT behavior of handsontable, even in version 12.x
+	//fixing this is not easy, was we would have to pass the physical index to the alter method (in oder to correctly 'spliceData') but all other hooks expect the visual index!!
+	//  also, when we use 'insert_row' we don't know the real physical index because we don't know if the row should be above or below the given row and we would not know the correct visual index
+	// handsontable removed this method in favor of 'insert_row_below' and 'insert_row_above', this way we could compute the correct visual index (by toVisualIndex(index) and then +/-1)
+	//BUT FOR NOW we keep the current bahavior of handsontable
 	hot.alter('insert_row', targetRowIndex)
 
 	//undefined should not happen but just in case
@@ -811,7 +895,7 @@ function setCsvReadOptionsInitial(options: CsvReadOptions) {
 	// 	el2.checked = csvReadOptions.skipEmptyLines
 	// }
 
-	const el3 = _getById('has-header') as HTMLInputElement
+	const el3 = hasHeaderReadOptionInput as HTMLInputElement
 	el3.checked = defaultCsvReadOptions._hasHeader
 
 	const el4 = _getById('comment-string') as HTMLInputElement
@@ -1042,7 +1126,6 @@ function setupAndApplyInitialConfigPart1(initialConfig: EditCsvConfig | undefine
 		escapeChar: initialConfig.writeOption_escapeChar,
 		quoteChar: initialConfig.writeOption_quoteChar,
 		quoteAllFields: initialConfig.quoteAllFields,
-		retainQuoteInformation: initialConfig.retainQuoteInformation,
 		quoteEmptyOrNullFields: initialConfig.quoteEmptyOrNullFields === 'true' ? true : false,
 	})
 
@@ -1358,42 +1441,39 @@ function getFirstCanonicalNumberStringInCell(cellValue: string, numbersStyle: Nu
 	if (!numberRegexRes || numberRegexRes.length === 0) return null
 
 	//this not longer has thousand separators...
-	//big js only accepts numbers in en format (3.14)
+	//big js only accepts numbers in en format (3.14) (always en format)
 	return numberRegexRes[0].replace(/\,/gm, '.')
 }
 
-const knownNumberStylesMap: KnownNumberStylesMap = {
-	"en": {
-		key: 'en',
-		/**
-		 * this allows:
-		 * 0(000)
-		 * 0(000).0(000)
-		 * .0(000)
-		 * all repeated with - in front (negative numbers)
-		 * all repeated with e0(000) | e+0(000) | e-0(000)
-		 */
-		regex: /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/,
-		regexStartToEnd: /^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/,
-		thousandSeparator: /(\,| )/gm,
-		thousandSeparatorReplaceRegex: /((\,| )\d{3})+/gm
-	},
-	"non-en": {
-		key: 'non-en',
-		/**
-		 * this allows:
-		 * 0(000)
-		 * 0(000),0(000)
-		 * ,0(000)
-		 * all repeated with - in front (negative numbers)
-		 * all repeated with e0(000) | e+0(000) | e-0(000)
-		 */
-		regex: /-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?/,
-		regexStartToEnd: /^-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?$/,
-		thousandSeparator: /(\.| )/gm,
-		thousandSeparatorReplaceRegex: /((\.| )\d{3})+/gm
+/**
+ * checks if the cell only contains a single number (start to end, no trimming, no lowercaseing)
+ */
+function checkCellOnlyContainsSingleNumber(cellValue: string, numbersStyle: NumbersStyle): boolean {
+
+	let cellContent = cellValue
+
+	let matchSize = 0
+	let originalSize = cellValue.length
+
+	let thousandSeparatorsMatches
+	while (thousandSeparatorsMatches = numbersStyle.thousandSeparatorReplaceRegex.exec(cellValue)) {
+
+		let replaceContent = thousandSeparatorsMatches[0].replace(numbersStyle.thousandSeparator, '')
+
+		matchSize += thousandSeparatorsMatches[0].length - replaceContent.length
+
+		cellContent = cellContent.replace(thousandSeparatorsMatches[0], replaceContent)
 	}
+
+	let numberRegexRes = numbersStyle.regex.exec(cellContent)
+
+	if (!numberRegexRes || numberRegexRes.length === 0) return false
+
+	matchSize += numberRegexRes[0].length
+
+	return matchSize === originalSize
 }
+
 
 /**
  * sets the number style ui from the given nubmer style
@@ -1423,52 +1503,6 @@ function setNumbersStyleUi(numbersStyleToUse: EditCsvConfig["initialNumbersStyle
 	}
 }
 
-/**
- * returns the number style from the ui
- */
-function getNumbersStyleFromUi(): NumbersStyle {
-
-	let knownNumberStylesMap: KnownNumberStylesMap = {
-		"en": {
-			key: 'en',
-			/**
-			 * this allows:
-			 * 0(000)
-			 * 0(000).0(000)
-			 * .0(000)
-			 * all repeated with - in front (negative numbers)
-			 * all repeated with e0(000) | e+0(000) | e-0(000)
-			 */
-			regex: /-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?/,
-			regexStartToEnd: /^-?(\d+(\.\d*)?|\.\d+)(e[+-]?\d+)?$/,
-			thousandSeparator: /(\,| )/gm,
-			thousandSeparatorReplaceRegex: /((\,| )\d{3})+/gm
-		},
-		"non-en": {
-			key: 'non-en',
-			/**
-			 * this allows:
-			 * 0(000)
-			 * 0(000),0(000)
-			 * ,0(000)
-			 * all repeated with - in front (negative numbers)
-			 * all repeated with e0(000) | e+0(000) | e-0(000)
-			 */
-			regex: /-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?/,
-			regexStartToEnd: /^-?(\d+(\,\d*)?|\,\d+)(e[+-]?\d+)?$/,
-			thousandSeparator: /(\.| )/gm,
-			thousandSeparatorReplaceRegex: /((\.| )\d{3})+/gm
-		}
-	}
-	
-	if (numbersStyleEnRadio.checked) return knownNumberStylesMap['en']
-
-	if (numbersStyleNonEnRadio.checked) return knownNumberStylesMap['non-en']
-
-	postVsWarning(`Got unknown numbers style from ui, defaulting to 'en'`)
-
-	return knownNumberStylesMap['en']
-}
 
 //don't know how to type this properly without typeof ...
 const b = new Big(1)
@@ -2038,4 +2072,184 @@ function getFirstAndLastVisibleRows(): { first: number, last: number } {
 	}
 
 	return { first: firstVisibleRow, last: lastVisibleRow }
+}
+
+/**
+ * tries to guess if the csv has a header
+ * @param csvLines the csv lines to use
+ * @param csvReadConfig the csv read config
+ * @returns true: has header, false: not or unknown
+ */
+function tryToGuessHasHeader(csvLines: string[][], csvReadConfig: CsvReadOptions): boolean {
+	if (csvLines.length <= 1) return false
+
+	const rowsToSample = Math.min(csvLines.length - 1, 100)
+	// we expect all rows to have the same length
+
+	// idea:
+	// (ignore comment rows)
+	// headers are normally the description of the data in the column
+	// thus, it is normally "different" from the data in the column
+	// so, to check if the first row is a header, we 
+	//   check if the data in the first row is found in the other rows. if this is true for at least X columns, we assume it is a header
+	// another good indicator are the types... numbers are normally not in headers
+	// some other often uses values are usually not in headers:
+	//   - true/false 
+	//
+	// only use at max Y lines for this check (else it would get too slow)
+	const lookLikeHeaderCellThresholdInColumns = 3
+	//if we have at least X cells that contain a number, we assume it is not a header
+	const cellContainsNumberThusNoHeaderThreshold = 3
+
+	//get the potential header row (ignore all comment rows)
+	let firstRow: string[] = []
+	let i = 0
+	for (; i <= rowsToSample; i++) {
+		if (!csvLines[i]) continue
+		firstRow = csvLines[i]
+		const firstCellValue = firstRow[0].trim().toLowerCase()
+		if (isCommentCell(firstCellValue, csvReadConfig)) continue
+		break
+	}
+	i++
+
+	const cellValuesMapPerColumn: Array<Map<string, number>> = []
+	let isFirstRealRow =  true
+
+	for (; i <= rowsToSample; i++) {
+		const row = csvLines[i]
+
+		const firstCell = row[0]
+		if (isCommentCell(firstCell, csvReadConfig)) continue
+
+		for (let j = 0; j < row.length; j++) {
+			const cellValue = row[j] ?  row[j].trim().toLowerCase() : ``
+
+			if (isFirstRealRow) {
+				cellValuesMapPerColumn[j] = new Map()
+			}
+
+			cellValuesMapPerColumn[j].set(cellValue, (cellValuesMapPerColumn[j].get(cellValue) ?? 0) + 1)
+		}
+
+		isFirstRealRow = false
+	}
+
+	let numColsThatLookLikeHeader = 0
+	let numColsThatContainASingleNumber = 0
+
+	for (let i = 0; i < firstRow.length; i++) {
+		if (!firstRow[i]) continue
+		const cellValue = firstRow[i].trim().toLowerCase()
+		
+		//check if the cell value is a number (via regex)
+		
+		let isEnNumber = checkCellOnlyContainsSingleNumber(cellValue, knownNumberStylesMap['en'])
+		let isNonEnNumber = checkCellOnlyContainsSingleNumber(cellValue, knownNumberStylesMap['non-en'])
+
+		const isKnownNormalCellValue  = normalCellValues.has(cellValue)
+
+		let isNumberString = isEnNumber || isNonEnNumber
+
+		if (isNumberString) {
+			numColsThatContainASingleNumber++
+		}
+
+		if (numColsThatContainASingleNumber >= cellContainsNumberThusNoHeaderThreshold) {
+			return false
+		}
+
+		const valueCount = cellValuesMapPerColumn[i].get(cellValue) ?? 0
+
+		//numbers are normally not in headers
+		//if a cell value is found in other rows, it is normally not a header
+		//true/false (known values) are normally not in headers
+		const looksLikeTableBodyNormalCell = isNumberString || valueCount > 0 || isKnownNormalCellValue
+
+		if (looksLikeTableBodyNormalCell === false) {
+			//if value count is not found -> header cell is not part of the other rows
+			numColsThatLookLikeHeader++
+		}
+	}
+
+	if (numColsThatLookLikeHeader >= lookLikeHeaderCellThresholdInColumns) {
+		return true
+	}
+
+	return false
+}
+
+function calculateSourceFileCursorPositions2(selections: HandsontableSelection[], where: 'start' | 'end' | 'entire'): FilePosition[] {
+
+	//if we have a header row, we need to change the row index + 1
+	const hasHeaderRow = getHasHeaderRow()
+	let rowOffset = hasHeaderRow ? 1 : 0
+
+	const positions: FilePosition[] = []
+	// console.log(`outCsvFieldToInputPositionMapping`, outCsvFieldToInputPositionMapping)
+
+	for (let i = 0; i < selections.length; i++) {
+		const selection = selections[i]
+		const startLine = selection.start.row + rowOffset
+		const endLine = selection.end.row + rowOffset
+
+		for (let row = startLine; row <= endLine; row++) {
+			const _row = hot!.toPhysicalRow(row)
+			let startColumn = selection.start.col
+			let endColumn = selection.end.col
+			
+
+			let fileCsvColPositions = outCsvFieldToInputPositionMapping[_row]
+			if (fileCsvColPositions === undefined) {
+				postVsWarning(`could not find row for ${_row}`)
+				throw new Error('row was undefined')
+			}
+
+			//special case: comment row has only one cell -> only one position
+			if (fileCsvColPositions.length === 1) {
+				startColumn = 0
+				endColumn = 0
+			}
+
+			for (let column = startColumn; column <= endColumn; column++) {
+				const _column = hot!.toPhysicalColumn(column)
+				//works because we have at least one cell else we wouldn't have a row
+				const realCol = Math.min(_column, fileCsvColPositions.length - 1)
+				//+1 because before first char is 0, after first char is 1	
+				let position = fileCsvColPositions[realCol]
+
+				switch (where) {
+					case 'start':  {
+						positions.push({
+							startPos: position.start,
+							endPos: position.start,
+						})
+						break
+					}
+					case 'end': {
+						positions.push({
+							startPos: position.end,
+							endPos: position.end,
+						})
+			
+						break
+					}
+					case 'entire': {
+						positions.push({
+							startPos: position.start,
+							endPos: position.end,
+						})
+			
+							break
+					}
+					default: {
+						notExhaustiveSwitch(where)
+					}
+				}
+			}
+		}
+	}
+
+	return positions
+
 }

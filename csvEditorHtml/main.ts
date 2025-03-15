@@ -1,4 +1,5 @@
 /// <reference path="findWidget.ts" />
+/// <reference path="../thirdParty/papaparse/papaparse.d.ts" />
 
 //@ts-ignore
 dayjs.extend(dayjs_plugin_customParseFormat);
@@ -53,10 +54,9 @@ declare type Dayjs = import('dayjs').Dayjs
 
 const regression: typeof import('../thirdParty/regression/regression').default = (window as any).regression
 
-const csv: typeof import('papaparse') = (window as any).Papa
+const papaCsv: typeof import('../thirdParty/papaparse/papaparse').Papa = (window as any).papaparse.Papa
 //handsontable instance
 let hot: import('../thirdParty/handsontable/handsontable') | null
-
 //add toFormat to big numbers
 //@ts-ignore
 toFormat(Big)
@@ -102,6 +102,15 @@ type HeaderRowWithIndexUndoStackItem = {
 let headerRowWithIndexUndoStack: Array<HeaderRowWithIndexUndoStackItem> = []
 let headerRowWithIndexRedoStack: Array<HeaderRowWithIndexUndoStackItem> = []
 
+//the actual delimiter used when parsing
+let usedDelimiter: string
+//TODO undef
+let outColumnIndexToCsvColumnEndIndexWithDelimiterMapping: Exclude<ParseResult['outColumnIndexToCsvColumnIndexMapping'], undefined>
+let outLineIndexToCsvLineIndexMapping: Exclude<ParseResult['outLineIndexToCsvLineIndexMapping'], undefined>
+//this is set when parsing the source file
+//this is also set when unparsing the table to csv and the csv is written back to the source file
+let outCsvFieldToInputPositionMapping: Exclude<ReturnType<typeof papaCsv.parse>['meta']['outCsvFieldToInputPositionMapping'], null>
+
 /**
  * this is part of the output from papaparse
  * for each column 
@@ -114,6 +123,10 @@ let headerRowWithIndexRedoStack: Array<HeaderRowWithIndexUndoStackItem> = []
  * so this is set in {@link displayData} and should be kept up-to-date because it's used for unparsing
  */
 let columnIsQuoted: boolean[]
+//TODO visual or physical indices?
+let cellIsQuotedInfoPhysicalIndices: boolean[][] = []
+//when we active the has header option we, we remove it from the hot data but we need to keep the quote information
+let cellIsQuotedInfoPhysicalIndicesHeaderRow: boolean[] = []
 
 //csv reader options + some ui options
 //this gets overwritten with the real configuration in setCsvReadOptionsInitial
@@ -144,7 +157,6 @@ let defaultCsvWriteOptions: CsvWriteOptions = {
 	escapeChar: '"',
 	quoteAllFields: false,
 	quoteEmptyOrNullFields: false,
-	retainQuoteInformation: true,
 }
 //will be set when we read the csv content
 let newLineFromInput = '\n'
@@ -193,6 +205,7 @@ let fixedColumnsLeft: number = 0
  * false: nothing to do
  */
 let isFirstHasHeaderChangedEvent = true
+let isCurrentlyChangingHasHeader = false
 /**
  * the initial width for columns, 0 or a negative number will disable this and auto column size is used on initial render
  */
@@ -218,6 +231,43 @@ let shouldApplyHasHeaderAfterRowsAdded = false
  * set via {@link EditCsvConfig.initiallyIsInReadonlyMode}
  */
 let isReadonlyMode = false
+
+/**
+ * the original csv file has a layout and sometimes we use the original positions
+ * in the table view the user can add/remove rows/columns
+ * when we use the table data (e.g. selected cell) and want to get the position in the original csv file
+ * then this can only work if the table structure was not changed!
+ * e.g. when we parse the file we get the layout/cell info and we want to find the original cell position
+ * we cannot simply compare the current to the original table layout because user could add and then remove a column
+ *   in a different position
+ * 
+ * UNDO/REDO is not handled for now
+ * 
+ * the following events will set this to true
+ * - add row [afterCreateRow]
+ * - remove row [afterRemoveRow]
+ * (- move row) [afterRowMove]
+ * - add col [afterCreateCol]
+ * - remove col [afterRemoveCol]
+ * (- move col) [afterColumnMove]
+ * - source file change detected -> cancel [via toggleSourceFileChangedModalDiv(false, true)]
+ * (- paste) [is handled via add row/col]
+ * 
+ * no effect:
+ * - sort col [this is ok as virtual and physical only break when sorting is combined with 
+ *               moving rows/cols but moving already set it to have structural changes]
+ * - hasHeader [we check if we have a header -> row indices +1 else +0]
+ * - normalize data that all rows have the same length [if cells were added that have no counterpart in the file the cell to the left is used]
+ * 
+ * the following actions will reset this to false
+ * - apply changes to file (and save) [via postApplyContent]
+ * - reset data and apply read options [via startRenderData]
+ * - source file change detected -> reset [via startRenderData]
+ * 
+ * changing row/col order is ok because we have a mapping from visual to physical indices
+ * HOWEVER, the mapping is broken in handsontable so this is not always 100% correct
+ */
+let hasOriginalTableStructuralChanges = false
 
 /**
  * original data had a final new line or not
@@ -256,6 +306,9 @@ let isBrowser = false
 let allColWidths: Array<number> = []
 //afterRender is called directly after we render the table but we might want to apply old col widths here
 let isInitialHotRender = true
+
+
+
 
 const cssFgColorVariableName = `--text-color`
 
@@ -387,31 +440,23 @@ setupAndApplyInitialConfigPart1(initialConfig, initialVars)
 
 setupGlobalShortcutsInVs()
 
+if (!vscode) {
+	let initialRows = 5
+	let initialCols = 5
+	initialContent = [...Array(initialRows).keys()].map(p =>
+		[...Array(initialCols).keys()].map(k => '').join(',')
+	).join('\n')
+}
 //see readDataAgain
 let _data = parseCsv(initialContent, defaultCsvReadOptions)
 
 //when we get data from vs code we receive it via messages
 if (_data && !vscode) {
-
-	let _exampleData: string[][] = []
-	let initialRows = 5
-	let initialCols = 5
-
-	_exampleData = [...Array(initialRows).keys()].map(p =>
-		[...Array(initialCols).keys()].map(k => '')
-	)
-
 	//@ts-ignore
 	// _exampleData = Handsontable.helper.createSpreadsheetData(100, 20)
 	// _exampleData = Handsontable.helper.createSpreadsheetData(1000, 20)
 	// _exampleData = Handsontable.helper.createSpreadsheetData(10000, 21)
 	// _exampleData = Handsontable.helper.createSpreadsheetData(100000, 20)
-
-	_data = {
-		columnIsQuoted: _exampleData[0].map(p => false),
-		data: _exampleData
-	}
-
 	displayData(_data, defaultCsvReadOptions)
 }
 

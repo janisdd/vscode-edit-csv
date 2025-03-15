@@ -56,6 +56,11 @@ function toggleOptionsBar(shouldCollapse?: boolean) {
 
 
 /* --- read options --- */
+
+function getHasHeaderRow() {
+	return headerRowWithIndex !== null
+}
+
 /**
  * if input value is set programmatically this is NOT called
  * 
@@ -64,6 +69,9 @@ function toggleOptionsBar(shouldCollapse?: boolean) {
  * @param fromUndo true: only update col headers, do not change the table data (will be done by undo/redo), false: normal
  */
 function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
+	if (isCurrentlyChangingHasHeader) return
+
+	isCurrentlyChangingHasHeader = true
 
 	const el = hasHeaderReadOptionInput //or defaultCsvReadOptions._hasHeader
 
@@ -92,7 +100,9 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			if (fromUndo) return
 
 			headerRowWithIndex = dataWithIndex
-			el.checked = true //sync ui in case we get here via autoApplyHasHeader
+			//sync ui in case we get here via autoApplyHasHeader
+			//but this also triggers the change event!
+			el.checked = true 
 
 			_updateHandsontableSettings({
 				fixedRowsTop: fixedRowsTop,
@@ -101,7 +111,13 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 
 			let hasAnyChangesBefore = getHasAnyChangesUi()
 
+			let headerCellIsQuotedInfoPhysicalIndices = cellIsQuotedInfoPhysicalIndices[headerRowWithIndex.physicalIndex]
+			cellIsQuotedInfoPhysicalIndicesHeaderRow = headerCellIsQuotedInfoPhysicalIndices
+
+			let _hasOriginalTableStructuralChanges_before = hasOriginalTableStructuralChanges
 			hot.alter('remove_row', headerRowWithIndex.physicalIndex)
+			//remove_row will trigger the remove row event but this is a known change, so there is no real structural change
+			hasOriginalTableStructuralChanges = _hasOriginalTableStructuralChanges_before
 
 			elWrite.checked = true
 			defaultCsvWriteOptions.header = true
@@ -127,19 +143,29 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 			return
 		}
 
+		//disable has header
+
 		if (fromUndo) return
 
 		if (headerRowWithIndex === null) {
+			isCurrentlyChangingHasHeader = false
 			throw new Error('could not insert header row')
 		}
 
 		let hasAnyChangesBefore = getHasAnyChangesUi()
 
+		let _hasOriginalTableStructuralChanges_before = hasOriginalTableStructuralChanges
 		hot.alter('insert_row', headerRowWithIndex.physicalIndex)
 		const visualRow = hot.toVisualRow(headerRowWithIndex.physicalIndex)
 		const visualCol = hot.toVisualColumn(0)
 		//see https://handsontable.com/docs/6.2.2/Core.html#populateFromArray
 		hot.populateFromArray(visualRow, visualCol, [[...headerRowWithIndex.row]])
+		hasOriginalTableStructuralChanges = _hasOriginalTableStructuralChanges_before
+
+		//we already inserted the header row, this will insert the quote info with default values
+		//so, reapply the old values
+		cellIsQuotedInfoPhysicalIndices[headerRowWithIndex.physicalIndex] = cellIsQuotedInfoPhysicalIndicesHeaderRow
+		cellIsQuotedInfoPhysicalIndicesHeaderRow = []
 
 		headerRowWithIndex = null
 
@@ -179,6 +205,7 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 		call_after_DOM_updated(() => {
 
 			func()
+			isCurrentlyChangingHasHeader = false
 
 			setTimeout(() => {
 				statusInfo.innerText = '';
@@ -190,6 +217,7 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 	}
 
 	func()
+	isCurrentlyChangingHasHeader = false
 
 }
 
@@ -244,6 +272,10 @@ function tryApplyHasHeader() {
 			setShouldAutpApplyHasHeader(true)
 			return
 		}
+	}
+
+	if (!canApply) {
+		return
 	}
 
 	//else just apply
@@ -372,7 +404,8 @@ function setWriteDelimiter(delimiter: string) {
  * updates the preview
  */
 function generateCsvPreview() {
-	const value = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
+	const unparseResult = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
+	const value = unparseResult.csv
 
 	const el = _getById('csv-preview') as HTMLTextAreaElement
 	el.value = value
@@ -517,9 +550,22 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	//this will also expand comment rows but we only use the first column value...
 	_normalizeDataArray(csvParseResult, csvReadConfig)
 	columnIsQuoted = csvParseResult.columnIsQuoted
+	cellIsQuotedInfoPhysicalIndices = csvParseResult.cellIsQuotedInfo
 
 	//if first rows are comments, use the next real data row
 	_resolveInitiallyHiddenColumns(csvParseResult, csvReadConfig)
+
+	let autoDetectHasHeader = false
+
+	//if we put this before hot rendering (and not where the read option is applied), we save ~3s... but why?
+	if (initialConfig?.tryToGuessHasHeader) {
+		const hasHeader = tryToGuessHasHeader(csvParseResult.data, csvReadConfig)
+		if (hasHeader) {
+			autoDetectHasHeader = true
+			//we need to also set the ui, else option is not applied
+			hasHeaderReadOptionInput.checked = true
+		}
+	}
 
 	//reset header row
 	headerRowWithIndex = null
@@ -609,6 +655,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		fixedColumnsLeft: fixedColumnsLeft,
 		//see https://handsontable.com/docs/7.1.0/demo-context-menu.html
 		contextMenu: {
+			subMenuOpenDelayInMs: 100,
 			items: {
 				'row_above': {
 					callback: function () { //key, selection, clickEvent
@@ -794,6 +841,42 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						return hiddenPhysicalColumnIndicesSorted.length === 0
 					}
 				},
+				'set_multiple_cursors': {
+					name: 'Selection to file cursors',
+					hidden: function () {
+						//don't show in browser
+						if (!vscode) return true
+						return false
+					},
+					disabled: function() {
+						return hasOriginalTableStructuralChanges
+					},
+					submenu: {
+						items: [
+							{
+								key: 'set_multiple_cursors:option1',
+								name: 'Cursor at cell start',
+								callback: function (key: string, selections: HandsontableSelection[], clickEvent: Event) {
+									postSetMultipleCursors(calculateSourceFileCursorPositions2(selections, 'start'))
+								},
+							},
+							{
+								key: 'set_multiple_cursors:option2',
+								name: 'Cursor at cell end',
+								callback: function (key: string, selections: HandsontableSelection[], clickEvent: Event) {
+									postSetMultipleCursors(calculateSourceFileCursorPositions2(selections, 'end'))
+								},
+							},
+							{
+								key: 'set_multiple_cursors:option3',
+								name: 'Cursor selected entire cell',
+								callback: function (key: string, selections: HandsontableSelection[], clickEvent: Event) {
+									postSetMultipleCursors(calculateSourceFileCursorPositions2(selections, 'entire'))
+								},
+							},
+						]
+					}
+				}
 
 			}
 		} as ContextMenuSettings,
@@ -1196,12 +1279,17 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		// 	//this is also fired on various other event (e.g. col resize...) but better sync more than miss an event
 		// 	syncColWidths()
 		// },
+		beforeColumnMove: function (startColVisualIndex: number[], endColVisualIndex: number) {
+			//before move, no indices are updated
+			//we don't need to update cellIsQuotedInfoPhysicalIndices here because moving columns only changes the visual indices
+		},
 		/**
 		 * this is an array if we e.g. move consecutive columns (2,3)
 		 *   but maybe there is a way... this func should handle this anyway
 		 * endColVisualIndex: the column is inserted left to this index
 		 */
 		afterColumnMove: (function (startColVisualIndices: number[], endColVisualIndex: number) {
+			hasOriginalTableStructuralChanges = true
 
 			if (!hot) throw new Error('table was null')
 
@@ -1288,7 +1376,13 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			// syncColWidths() //covered by afterRender
 			onAnyChange()
 		} as any),
+		beforeRowMove: function (startRow: number[], endRow: number) {
+			//before move, no indices are updated
+			//we don't need to update cellIsQuotedInfoPhysicalIndices here because moving columns only changes the visual indices
+		}, 
 		afterRowMove: function (startRow: number, endRow: number) {
+			hasOriginalTableStructuralChanges = true
+
 			if (!hot) throw new Error('table was null')
 			onAnyChange()
 		},
@@ -1342,6 +1436,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			}
 		},
 		afterCreateCol: function (visualColIndex, amount, source?: string) {
+			hasOriginalTableStructuralChanges = true
 
 			if (!hot) return
 
@@ -1364,6 +1459,20 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				columnIsQuoted.splice(visualColIndex, 0, ...Array(amount).fill(newColumnQuoteInformationIsQuoted))
 			}
 
+			if (cellIsQuotedInfoPhysicalIndices && cellIsQuotedInfoPhysicalIndices.length > 0) {
+
+				for (let i = 0; i < amount; i++) {
+					let visualIndex = visualColIndex + i
+					const physicalIndex = hot.toPhysicalColumn(visualIndex)
+
+					//add a column
+					for (let j = 0; j < cellIsQuotedInfoPhysicalIndices.length; j++) {
+						const row = cellIsQuotedInfoPhysicalIndices[j]
+						row.splice(physicalIndex, 0, newColumnQuoteInformationIsQuoted)
+					}
+				}
+			}
+
 			firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
 
 			// syncColWidths() //covered by afterRender
@@ -1372,18 +1481,42 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//also it's not needed as handsontable already handles this internally
 			// updateFixedRowsCols()
 		},
+		beforeRemoveCol(visualColIndex, amount, logicalCols) {
+
+			//physical indices are only working here (not in afterRemoveCol) becasue in after the mapping is already updated
+			if (!hot) return
+
+			if (cellIsQuotedInfoPhysicalIndices && cellIsQuotedInfoPhysicalIndices.length > 0) {
+
+				for (let i = 0; i < amount; i++) {
+					let visualIndex = visualColIndex + i
+					const physicalIndex = hot.toPhysicalColumn(visualIndex)
+		
+					//remove a column
+					for (let j = 0; j < cellIsQuotedInfoPhysicalIndices.length; j++) {
+						const row = cellIsQuotedInfoPhysicalIndices[j]
+						row.splice(physicalIndex, 1)
+					}
+				}
+		
+			}
+
+			let physicalIndex = hot.toPhysicalColumn(visualColIndex)
+			for (let i = 0; i < hiddenPhysicalColumnIndicesSorted.length; i++) {
+				const hiddenPhysicalRowIndex = hiddenPhysicalColumnIndicesSorted[i];
+
+				if (hiddenPhysicalRowIndex >= physicalIndex) {
+					hiddenPhysicalColumnIndicesSorted[i] -= amount
+				}
+			}
+				
+		},
 		afterRemoveCol: function (visualColIndex, amount, someting?: any, source?: string) {
+			hasOriginalTableStructuralChanges = true
 
 			//we need to modify some or all hiddenPhysicalColumnIndices...
 			if (!hot) return
 
-			for (let i = 0; i < hiddenPhysicalColumnIndicesSorted.length; i++) {
-				const hiddenPhysicalRowIndex = hiddenPhysicalColumnIndicesSorted[i];
-
-				if (hiddenPhysicalRowIndex >= visualColIndex) {
-					hiddenPhysicalColumnIndicesSorted[i] -= amount
-				}
-			}
 			firstAndLastVisibleColumns = getFirstAndLastVisibleColumns()
 
 			let isFromUndoRedo = (source === `UndoRedo.undo` || source === `UndoRedo.redo`)
@@ -1406,6 +1539,8 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		//and then they increment the physical row via the amount
 		//however, it works somehow...
 		afterCreateRow: function (visualRowIndex, amount) {
+			hasOriginalTableStructuralChanges = true
+
 			//added below
 			//critical because we could update hot settings here
 			pre_afterCreateRow(visualRowIndex, amount)
@@ -1417,17 +1552,29 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//hot.updateSettings (inside this func) the plugin internal states are changed and the indices/mappings are corrupted
 			// updateFixedRowsCols()
 		},
-		afterRemoveRow: function (visualRowIndex, amount) {
-			//we need to modify some or all hiddenPhysicalRowIndices...
+		beforeRemoveRow: function (visualRowIndex, amount) {
 			if (!hot) return
+
+			//do this in before row remove, here we still have the row and the mapping should be ok
+
+			let physicalIndex = hot.toPhysicalRow(visualRowIndex)
+			cellIsQuotedInfoPhysicalIndices.splice(physicalIndex, amount)
 
 			for (let i = 0; i < hiddenPhysicalRowIndicesSorted.length; i++) {
 				const hiddenPhysicalRowIndex = hiddenPhysicalRowIndicesSorted[i];
 
-				if (hiddenPhysicalRowIndex >= visualRowIndex) {
+				if (hiddenPhysicalRowIndex >= physicalIndex) {
 					hiddenPhysicalRowIndicesSorted[i] -= amount
 				}
 			}
+
+		},
+		afterRemoveRow: function (visualRowIndex, amount) {
+			hasOriginalTableStructuralChanges = true
+
+			//we need to modify some or all hiddenPhysicalRowIndices...
+			if (!hot) return
+
 			firstAndLastVisibleRows = getFirstAndLastVisibleRows()
 
 			//when we have a header row and the original index was 10 and now we have only 5 rows... change index to be the last row
@@ -1864,7 +2011,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 	//if we have only 1 row and header is enabled by default...this would be an error (we cannot display something)
 
-	if (oldShouldApplyHeaderReadOption === true) {
+	if (oldShouldApplyHeaderReadOption === true || autoDetectHasHeader) {
 
 		if (settingsApplied === true) { //this must be applied else we get duplicate first row
 
@@ -2169,7 +2316,7 @@ function toggleAskReloadFileModalDiv(isVisible: boolean) {
  * displays or hides the source file changed modal
  * @param isVisible 
  */
-function toggleSourceFileChangedModalDiv(isVisible: boolean) {
+function toggleSourceFileChangedModalDiv(isVisible: boolean, sourceFileReloadCancelled: boolean) {
 
 	if (isVisible) {
 		sourceFileChangedDiv.classList.add('is-active')
@@ -2177,6 +2324,11 @@ function toggleSourceFileChangedModalDiv(isVisible: boolean) {
 	}
 
 	sourceFileChangedDiv.classList.remove('is-active')
+
+	if (isVisible === false && sourceFileReloadCancelled) {
+		//no reload of content
+		hasOriginalTableStructuralChanges = true
+	}
 }
 
 
@@ -2236,7 +2388,7 @@ function preReloadFileFromDisk() {
  */
 function reloadFileFromDisk() {
 	toggleAskReloadFileModalDiv(false)
-	toggleSourceFileChangedModalDiv(false)
+	toggleSourceFileChangedModalDiv(false, false)
 	_setHasUnsavedChangesUiIndicator(false)
 
 	storeHotSelectedCellAndScrollPosition()
@@ -2266,11 +2418,17 @@ function postApplyContent(saveSourceFile: boolean) {
 
 	if (isReadonlyMode) return
 
-	const csvContent = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
+	const unparseResult = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
+	const csvContent = unparseResult.csv
+
+	outCsvFieldToInputPositionMapping = unparseResult.meta.outCsvFieldToInputPositionMapping
+
+	hasOriginalTableStructuralChanges = false
 
 	//used to clear focus... else styles are not properly applied
 	//@ts-ignore
 	if (document.activeElement !== document.body) document.activeElement.blur();
+
 
 	_postApplyContent(csvContent, saveSourceFile)
 }
@@ -2392,6 +2550,11 @@ function transposeColumsAndRows() {
 	//see https://stackoverflow.com/questions/17428587/transposing-a-2d-array-in-javascript
 	let transpose = allData[0].map((col, i) => allData.map(row => row[i]))
 
+	//transpose 2d array cellIsQuotedInfoPhysicalIndices
+
+	let transposeQuoteInfo = cellIsQuotedInfoPhysicalIndices[0].map((col, i) => cellIsQuotedInfoPhysicalIndices.map(row => row[i]))
+	cellIsQuotedInfoPhysicalIndices = transposeQuoteInfo
+	
 	statusInfo.innerText = `Swapping finished, rendering...`
 
 	setTimeout(() => {
@@ -2828,9 +2991,32 @@ function pre_afterCreateRow(this: any, visualRowIndex: number, amount: number) {
 //and then they increment the physical row via the amount
 //however, it works somehow...
 function afterCreateRow(visualRowIndex: number, amount: number) {
+
+	if (hot) {
+		//this is not really needed because CURRENTLY after a row is created, 
+		//the physical index is the same as the visual index (only for the created row)
+		let physicalRowIndex = hot.toPhysicalRow(visualRowIndex)
+
+		//we always ensure all rows have the same length...
+		let numCols = hot.countCols()
+
+		for (let i = 0; i < amount; i++) {
+
+			let newRowQuoteInformation: boolean[] = Array.from(Array(numCols), () => newColumnQuoteInformationIsQuoted)
+
+			cellIsQuotedInfoPhysicalIndices.splice(
+				physicalRowIndex, 
+				0,
+				 newRowQuoteInformation
+				)	
+		}
+	}
+
 	//added below
 	//critical because we could update hot settings here
 	//we need to modify some or all hiddenPhysicalRowIndices...
+	//TODO this only works because for some reason for new rows the physical index is the same as the visual index!?!?
+	//  but it sould not work for the other rows???
 
 	for (let i = 0; i < hiddenPhysicalRowIndicesSorted.length; i++) {
 		const hiddenPhysicalRowIndex = hiddenPhysicalRowIndicesSorted[i];

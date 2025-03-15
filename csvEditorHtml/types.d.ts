@@ -1,4 +1,3 @@
-
 /**
  * some initial vars from the extension when the webview is created
  */
@@ -130,6 +129,11 @@ type EditCsvConfig = {
  */
 	readOption_hasHeader: 'true' | 'false'
 
+	/**
+	 * true: tries to guess if the csv file has a header line, false: not.
+	 * Note: This only sets the has header option to true, but never to false
+	 */
+	tryToGuessHasHeader: boolean
 
 	/**
 	 * true: export header as row
@@ -214,9 +218,23 @@ type EditCsvConfig = {
 	autoColumnWidthsIgnoreComments: boolean
 
 	/**
-	 * true: information about quoted fields are retained during parsing (for more details see readme), false: information about quoted field is discarded
+	 * determines how the quote information is tracked across cells. NOTE: This only sets quotes for cells, but never prevents quotes from being added (so as not to interfere with other quote-related settings)
+	 * 
+	 * none: do not retain any quote information
+	 * determineByColumns: is determined by the first cell in the same column (as the cell in question)
+	 * full: track the quote information for every cell individually
 	 */
-	retainQuoteInformation: boolean
+	retainQuoteInformation: 'none' | 'determinedByColumns' | 'full'
+
+	/**
+	 * true: if a csv field begins with whitespace, it should always be enclosed in quotes, false: not"
+	 */
+	forceQuoteLeadingWhitespace: boolean
+
+	/**
+	 * true: if a csv field ends with whitespace, it should always be enclosed in quotes, false: not
+	 */
+	forceQuoteTrailingWhitespace: boolean
 
 	/**
 	 * true: new columns will get true as quote information (also for added columns via expanding), false: new columns will get false as quote information
@@ -327,10 +345,11 @@ type EditCsvConfig = {
 	 * the paste behaviour to be used (what should happen to the old content)
 	 *
 	 * overwrite: pasting content overwrites the existing content
+	 * overwriteExceptEmpty: pasting content overwrites the existing content except for empty cells (in the pasting content)
 	 * shift_down: pasting content shifts the existing content (cells) down
 	 * shift_right: pasting content shifts the existing content (cells) to the right
 	 */
-	pasteBehavior: "overwrite" | "shift_down" | "shift_right"
+	pasteBehavior: "overwrite" | "overwriteExceptEmpty" | "shift_down" | "shift_right"
 
 	/**
 	 * the paste scroll behavior
@@ -428,7 +447,7 @@ type CsvReadOptions = {
 	/**
 	 * the new line string, use '' for auto detect
 	 */
-	newline: string,
+	newline: '' | '\n' | '\r' | '\r\n',
 	/**
 	 * the quote string
 	 */
@@ -494,11 +513,6 @@ type CsvWriteOptions = {
 	 * this setting takes precedence over {@link quoteAllFields}
 	 */
 	quoteEmptyOrNullFields: boolean
-
-	/**
-	 * true: information about quoted fields are retained during parsing and written to output(for more details see readme), false: information about quoted field is discarded
-	 */
-	retainQuoteInformation: boolean
 }
 
 type MiscOptions = {
@@ -577,7 +591,25 @@ type SetEditorHasChangesMessage = {
 	hasChanges: boolean
 }
 
-type PostMessage = ReadyMessage | DisplayMessageBoxMessage | OverwriteFileMessage | CopyToClipboardMessage | SetEditorHasChangesMessage
+type SetMultipleCursorsMessage = {
+	command: 'setMultipleCursors'
+	positions: FilePosition[]
+}
+
+type CursorsPosition = {
+	startLine: number
+	startColumn: number
+	endLine: number
+	endColumn: number
+}
+
+//string index
+type FilePosition = {
+	startPos: number
+	endPos: number
+}
+
+type PostMessage = ReadyMessage | DisplayMessageBoxMessage | OverwriteFileMessage | CopyToClipboardMessage | SetEditorHasChangesMessage | SetMultipleCursorsMessage
 
 type VsState = {
 	readOptionIsCollapsed: boolean
@@ -591,6 +623,16 @@ type VsExtension = {
 	getState: () => VsState | undefined
 }
 
+type HandsontableSelection = {
+	start: {
+		row: number
+		col: number
+	}
+	end: {
+		row: number
+		col: number
+	}
+}
 
 type HandsontableMergedCells = {
 	/**
@@ -683,6 +725,7 @@ type Point = {
 type ExtendedCsvParseResult = {
 	data: string[][]
 	columnIsQuoted: boolean[]
+	cellIsQuotedInfo: boolean[][]
 	outLineIndexToCsvLineIndexMapping: number[] | null
 	outColumnIndexToCsvColumnIndexMapping: number[][] | null
 	originalContent: string
@@ -739,17 +782,16 @@ type InsertColumnAction = {
 
 
 
+//TODO remove
 interface ParseResult {
 	data: Array<any>;
 	errors: Array<ParseError>;
 	meta: ParseMeta;
 	outLineIndexToCsvLineIndexMapping: number[] | undefined
 	outColumnIndexToCsvColumnIndexMapping: number[][] | undefined
-}
-
-interface ParseConfig {
-	calcLineIndexToCsvLineIndexMapping: boolean
-	calcColumnIndexToCsvColumnIndexMapping: boolean
+	
+	columnIsQuoted: boolean[]
+	cellIsQuotedInfo: boolean[][]
 }
 
 type HotCellPos = {
@@ -766,4 +808,11 @@ type UrlInStringCoords = {
 	url: string
 	startIndex: number
 	endIndex: number
+}
+
+type GetDataAsCsvResult = {
+	csv: string
+	meta: {
+		outCsvFieldToInputPositionMapping: FieldPosition[][];
+	}
 }

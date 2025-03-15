@@ -2,6 +2,36 @@
 
 ## [Unreleased]
 
+# 0.11.3
+- added feature #176 - add cursor to source file from table selection (via context menu)
+	- disabled when certain actions are performed (see https://github.com/janisdd/vscode-edit-csv/issues/176) but basicalyl all that change the shape of the table (e.g. add/remove rows/cols)
+	- enabled again when applying changes or reloading/resetting data
+- fixed delayed `readOption_hasHeader` feature where the options is automatically enabled as soon as the table has more than 1 row
+- lowered the context menu sub items display delay from 300ms to 100ms
+- context menu sub menu indicator is now centered
+- side bar tooltips is not longer clipped
+- removed preview tag (user requested this)
+- removed some unused (not minified js) files from packages vsix
+
+# 0.11.2
+- added feature #142 - added option `tryToGuessHasHeader`
+  - tries to guess from the csv data if there is a header line or not
+
+# 0.11.1
+
+- fixed issue #174 - added option `overwriteExceptEmpty` to the `pasteBehavior` setting
+  - it only overwrites the cell content if the paste cell is not empty
+
+
+# 0.11.0
+
+- added option `forceQuoteLeadingWhitespace` and `forceQuoteTrailingWhitespace` which will quote fields when they have leading or trailing whitespace
+- fixed issue #163 by changed option `retainQuoteInformation` from `bool` to `string` with the options
+  - `none` (old false), `determinedByColumns` (old true) and `full` (new default)
+  - `full` tracks the quote information for every cell individually
+- fixed issue where hiding comment rows hides the wrong rows
+  - happened when data was sorted and then rows were removed
+
 # 0.10.0
 
 - added feature #161 - `excelLike` option to `dragToAutoFill` setting

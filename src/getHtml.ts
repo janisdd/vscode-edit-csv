@@ -26,8 +26,8 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 	// let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
 	let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js')
 	// let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js')
-	let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.js')
-	// let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.js')
+	let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.umd.js')
+	// let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.umd.js')
 
 	let regressionJS = _getResourcePath('thirdParty/regression/regression.min.js')
 
@@ -309,9 +309,9 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 													<span id="has-header-label">Has header</span>
 												</vscode-checkbox>
 												<span class="tooltip is-tooltip-right is-tooltip-multiline"
-													data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applies immediately, it will be applied if the table has more than 1 row.">
-													<i class="fas fa-question-circle"></i>
-												</span>
+													data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applies immediately, it will be applied if the table has more than one row. [the readOption_hasHeader and tryToGuessHasHeader settings can control this]">
+												<i class="fas fa-question-circle"></i>
+											</span>
 											</div>
 					
 											<!-- this makes the row data invalid if we have more than 1 col-->
@@ -935,7 +935,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 						<span style="width: 3rem">Reload</span>
 					</vscode-button>
 
-					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleSourceFileChangedModalDiv(false)">
+					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleSourceFileChangedModalDiv(false, true)">
 						<span style="width: 3rem">Ignore</span>
 					</vscode-button>
 				</div>

@@ -115,6 +115,11 @@ input.input {
 	margin-bottom: 1em;
 }
 
+.handsontable.htMenu.htContextMenu .ht_master.handsontable .htItemWrapper {
+	display: flex;
+	align-items: center;
+}
+
 /* .handsontable td {
 	font-size: 50px;
 
@@ -248,7 +253,8 @@ body .modal {
 	display: flex;
 	flex: 1;
 	/* needs to be hidden else the content (the table height will resize this larger than it should), see onResizeGrid */
-	overflow: hidden;
+	/* everything seems to work as expected, if we hide this, some tooltips inside the panel are not fully readable*/
+	/* overflow: hidden; */
 }
 
 .side-paneled .side-panel {

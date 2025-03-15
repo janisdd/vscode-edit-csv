@@ -23,8 +23,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * 
- * Version: 6.5.4
- * Release date: 19/12/2018 (built at 09/09/2024 12:13:42)
+ * Version: 6.5.6
+ * Release date: 19/12/2018 (built at 09/03/2025 14:07:55)
  */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -29763,9 +29763,9 @@ Handsontable.DefaultSettings = _defaultSettings.default;
 Handsontable.EventManager = _eventManager.default;
 Handsontable._getListenersCounter = _eventManager.getListenersCounter; // For MemoryLeak tests
 
-Handsontable.buildDate = "09/09/2024 12:13:42";
+Handsontable.buildDate = "09/03/2025 14:07:55";
 Handsontable.packageName = "handsontable";
-Handsontable.version = "6.5.4";
+Handsontable.version = "6.5.6";
 var baseVersion = "";
 
 if (baseVersion) {
@@ -49534,7 +49534,8 @@ function (_BasePlugin) {
 
         _this2.menu = new _menu.default(_this2.hot, {
           className: 'htContextMenu',
-          keepInViewport: true
+          keepInViewport: true,
+          subMenuOpenDelayInMs: settings.subMenuOpenDelayInMs || 300
         });
 
         _this2.hot.runHooks('beforeContextMenuSetItems', menuItems);
@@ -51000,7 +51001,9 @@ function () {
       className: '',
       keepInViewport: true,
       standalone: false,
-      minWidth: MIN_WIDTH
+      minWidth: MIN_WIDTH,
+      subMenuOpenDelayInMs: 300 // default
+
     };
     this.eventManager = new _eventManager.default(this);
     this.container = this.createContainer(this.options.name);
@@ -51085,9 +51088,10 @@ function () {
       this.runLocalHooks('beforeOpen');
       this.container.removeAttribute('style');
       this.container.style.display = 'block';
+      var delay = this.options.subMenuOpenDelayInMs || 300;
       var delayedOpenSubMenu = (0, _function.debounce)(function (row) {
         return _this2.openSubMenu(row);
-      }, 300);
+      }, delay);
       var minWidthOfMenu = this.options.minWidth || MIN_WIDTH;
       var filteredItems = (0, _array.arrayFilter)(this.menuItems, function (item) {
         return (0, _utils.isItemHidden)(item, _this2.hot);
@@ -51201,7 +51205,8 @@ function () {
         parent: this,
         name: dataItem.name,
         className: this.options.className,
-        keepInViewport: true
+        keepInViewport: true,
+        subMenuOpenDelayInMs: this.options.subMenuOpenDelayInMs || 300
       });
       subMenu.setMenuItems(dataItem.submenu.items);
       subMenu.open();
@@ -52100,9 +52105,10 @@ function (_BasePlugin) {
     _this.copyableRanges = [];
     /**
      * Defines paste (<kbd>CTRL</kbd> + <kbd>V</kbd>) behavior.
-     * * Default value `"overwrite"` will paste clipboard value over current selection.
-     * * When set to `"shift_down"`, clipboard data will be pasted in place of current selection, while all selected cells are moved down.
-     * * When set to `"shift_right"`, clipboard data will be pasted in place of current selection, while all selected cells are moved right.
+     * Default value `"overwrite"` will paste clipboard value over current selection.
+     * When set to `overwriteExceptEmpty`, clipboard value will be pasted over current selection only for past data cells that are not empty
+     * When set to `"shift_down"`, clipboard data will be pasted in place of current selection, while all selected cells are moved down.
+     * When set to `"shift_right"`, clipboard data will be pasted in place of current selection, while all selected cells are moved right.
      *
      * @type {String}
      * @default 'overwrite'
@@ -52454,6 +52460,7 @@ function (_BasePlugin) {
         return;
       }
 
+      var pasteMode = this.pasteMode;
       var newValuesMaxRow = inputArray.length - 1;
       var newValuesMaxColumn = inputArray[0].length - 1;
       var startRow = Math.min(selection[0], selection[2]);
@@ -52466,16 +52473,45 @@ function (_BasePlugin) {
         var newRow = [];
 
         for (var column = startColumn, valuesColumn = 0; column <= endColumn; column += 1) {
-          newRow.push(inputArray[valuesRow][valuesColumn]);
+          if (pasteMode === 'overwriteExceptEmpty') {
+            // selection seems to be visual indices and getDataAtCell also uses visible indices
+            var originalData = this.hot.getDataAtCell(row, column);
+            var pasteCellData = inputArray[valuesRow][valuesColumn];
+
+            if (this._isCellEmpty(pasteCellData)) {
+              newRow.push(originalData);
+            } else {
+              newRow.push(pasteCellData);
+            }
+          } else {
+            newRow.push(inputArray[valuesRow][valuesColumn]);
+          }
+
           valuesColumn = valuesColumn === newValuesMaxColumn ? 0 : valuesColumn += 1;
         }
 
         newValues.push(newRow);
         valuesRow = valuesRow === newValuesMaxRow ? 0 : valuesRow += 1;
+      } // populateFromArray does not know this paste mode, so we only change the data of the paste
+
+
+      if (pasteMode === 'overwriteExceptEmpty') {
+        pasteMode = 'overwrite';
       }
 
-      this.hot.populateFromArray(startRow, startColumn, newValues, void 0, void 0, 'CopyPaste.paste', this.pasteMode);
+      this.hot.populateFromArray(startRow, startColumn, newValues, void 0, void 0, 'CopyPaste.paste', pasteMode);
       return [startRow, startColumn, endRow, endColumn];
+    }
+  }, {
+    key: "_isCellEmpty",
+    value: function _isCellEmpty(cellData) {
+      if (cellData === '') return true;
+
+      if (typeof cellData === 'string') {
+        return cellData.trim() === '';
+      }
+
+      return cellData === null || cellData === void 0;
     }
     /**
      * `copy` event callback on textarea element.

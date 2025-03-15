@@ -286,7 +286,8 @@ function openCsvText(text: string) {
  */
 function downloadAsFile(): void {
 
-	const csvContent = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
+	const unparseResult = getDataAsCsv(defaultCsvReadOptions, defaultCsvWriteOptions)
+	const csvContent = unparseResult.csv
 
 	let encoding: string | null = null
 	{

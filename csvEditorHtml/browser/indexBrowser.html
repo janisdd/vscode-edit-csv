@@ -225,7 +225,7 @@
 
 			<div id="version-n-changelog" style="margin-right: 1rem;">
 				<a href="https://github.com/janisdd/vscode-edit-csv/blob/master/csvEditorHtml/browser/CHANGELOG.md" target="_blank">
-					v1.6.0
+					v1.7.2
 				</a>
 			</div>
 
@@ -410,7 +410,7 @@
 											<span id="has-header-label">Has header</span>
 										</vscode-checkbox>
 										<span class="tooltip is-tooltip-right is-tooltip-multiline"
-											data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applies immediately, it will be applied if the table has more than 1 row.">
+											data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applies immediately, it will be applied if the table has more than one row. [the readOption_hasHeader and tryToGuessHasHeader settings control this]">
 											<i class="fas fa-question-circle"></i>
 										</span>
 									</div>
@@ -1009,7 +1009,7 @@
 						<span style="width: 3rem">Reload</span>
 					</vscode-button>
 
-					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleSourceFileChangedModalDiv(false)">
+					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleSourceFileChangedModalDiv(false, true)">
 						<span style="width: 3rem">Ignore</span>
 					</vscode-button>
 				</div>
@@ -1037,7 +1037,7 @@
 	<script src="../../node_modules/dayjs/plugin/customParseFormat.js"></script>
 	<script src="../out/browser/afterDomLoadedBrowser.js"></script>
 	<script src="../../thirdParty/handsontable/handsontable.min.js"></script>
-	<script src="../../thirdParty/papaparse/papaparse.min.js"></script>
+	<script src="../../thirdParty/papaparse/papaparse.min.umd.js"></script>
 	<script src="../../thirdParty/mousetrap/mousetrap.min.js"></script>
 	<script src="../../thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js"></script>
 

@@ -1,6 +1,6 @@
 /* @license
 Papa Parse
-v5.0.0-custom-1.1.0
+v5.0.0-custom-1.2.0
 https://github.com/mholt/PapaParse
 License: MIT
 commit: 49170b76b382317356c2f707e2e4191430b8d495
@@ -43,6 +43,17 @@ changelog: (latest first)
   - issue: the escape char was not properly set when only the quoteChar was changed
   - subsequent issue: do determine if a field must be quoted `BAD_DELIMITERS` was used, which always includes `"` and `Papa.BYTE_ORDER_MARK`
     - it also didn't check the actual quoteChar
+
+- added option `_quoteLeadingSpace` and `_quoteTrailingSpace`
+  - `_quoteLeadingSpace` defaults to true: if a field starts with a whitespace, should it be quoted (true) or not (false)
+  - `_quoteTrailingSpace` defaults to true: if a field ends with a whitespace, should it be quoted (true) or not (false)
+
+- added option `_determineFieldHasQuotesFunc` to determine if a field should be quoted (it cannot remove quotes!!)
+  - if a field contains some special characters, it is quoted, e.g. delimiter, quotes, new line, ...
+  - this func can be used to add quotes to fields (but not to remove quotes!) it is OR-ed with the other indicators
+
+- when setting `retainQuoteInformation` to `true`, we now also output `cellIsQuotedInfo` which contains the information if a cell was quoted or not
+- `cellIsQuotedInfo` now respects `skipEmptyLines` and returns the same amount of rows as the data array
 */
 
 (function(root, factory)
@@ -306,6 +317,18 @@ changelog: (latest first)
 
 		/** @type {boolean | boolean[]} whether to surround every datum with quotes */
 		var _quotes = false;
+		/** @type {boolean} used as a cache to check the type of _quotes */
+		// eslint-disable-next-line camelcase
+		var _quotes_option_is_a_bool = true;
+		/** @type {boolean} used as a cache to check the type of _quotes */
+		// eslint-disable-next-line camelcase
+		var _quotes_option_is_an_array = false;
+
+		/**
+		 * @type {((content: string, row: number, col: number) => boolean) | null} determines if a field should be quoted
+		 * note that this can only add quotes but not remove them!!!
+		 * */
+		var _determineFieldHasQuotesFunc = null;
 
 		/** whether to write headers */
 		var _writeHeader = true;
@@ -318,6 +341,12 @@ changelog: (latest first)
 
 		/** quote character */
 		var _quoteChar = '"';
+
+		/** {@type boolean} true: quote fields that have a leading whitespace (default for papaparse), false: not */
+		var _quoteLeadingSpace = true;
+
+		/** {@type boolean} true: quote fields that have a trailing whitespace (default for papaparse), false: not */
+		var _quoteTrailingSpace = true;
 
 		/** escaped quote character, either "" or <config.escapeChar>" */
 		var _escapedQuote = _quoteChar + _quoteChar;
@@ -408,8 +437,20 @@ changelog: (latest first)
 				_escapedQuote = _quoteChar + _quoteChar;
 			}
 
+			if (typeof _config.quoteLeadingSpace === 'boolean') {
+				_quoteLeadingSpace = _config.quoteLeadingSpace;
+			}
+
+			if (typeof _config.quoteTrailingSpace === 'boolean') {
+				_quoteTrailingSpace = _config.quoteTrailingSpace;
+			}
+
 			if (typeof _config.header === 'boolean')
 				_writeHeader = _config.header;
+
+			if (typeof _config.determineFieldHasQuotes === 'function') {
+				_determineFieldHasQuotesFunc = _config.determineFieldHasQuotes;
+			}
 
 			if (Array.isArray(_config.columns)) {
 
@@ -462,6 +503,11 @@ changelog: (latest first)
 				_quotes = _columnIsQuoted;
 			}
 
+			// eslint-disable-next-line camelcase
+			_quotes_option_is_a_bool = typeof _quotes === 'boolean';
+			// eslint-disable-next-line camelcase
+			_quotes_option_is_an_array = Array.isArray(_quotes);
+
 			if (typeof fields === 'string')
 				fields = JSON.parse(fields);
 			if (typeof data === 'string')
@@ -477,7 +523,7 @@ changelog: (latest first)
 				{
 					if (i > 0)
 						csv += _delimiter;
-					csv += safe(fields[i], i);
+					csv += safe(fields[i], -1, i);
 				}
 				if (data.length > 0)
 					csv += _newline;
@@ -518,7 +564,7 @@ changelog: (latest first)
 						if (col > 0 && !nullLine)
 							csv += _delimiter;
 						var colIdx = hasHeader && dataKeyedByField ? fields[col] : col;
-						csv += safe(data[row][colIdx], col);
+						csv += safe(data[row][colIdx], row, col);
 					}
 					if (row < data.length - 1 && (!skipEmptyLines || (maxCol > 0 && !nullLine)))
 					{
@@ -530,7 +576,7 @@ changelog: (latest first)
 		}
 
 		/** Encloses a value around quotes if needed (makes a value safe for CSV insertion) */
-		function safe(str, col)
+		function safe(str, row, col)
 		{
 			if (typeof str === 'undefined' || str === null || str === '') {
 				if (_quoteEmptyOrNullFields) {
@@ -546,13 +592,24 @@ changelog: (latest first)
 			var containsQuotes = str.indexOf(_quoteChar) > -1;
 			str = str.replace(quoteCharRegex, _escapedQuote);
 
-			var needsQuotes = (typeof _quotes === 'boolean' && _quotes)
-				|| (Array.isArray(_quotes) && _quotes[col])
+			var _preTestNeedQuotes = false;
+			if (_determineFieldHasQuotesFunc) {
+				_preTestNeedQuotes = _determineFieldHasQuotesFunc(str, row, col);
+				if (_preTestNeedQuotes === undefined || _preTestNeedQuotes === null) {
+					_preTestNeedQuotes = false;
+				}
+			}
+
+			// eslint-disable-next-line camelcase
+			var needsQuotes = (_quotes_option_is_a_bool && _quotes)
+				// eslint-disable-next-line camelcase
+				|| (_quotes_option_is_an_array && _quotes[col])
+				|| _preTestNeedQuotes
 				|| hasAny(str, Papa.NEED_QUOTES_CHARS) // new line, \r
 				|| containsQuotes
 				|| str.indexOf(_delimiter) > -1 //delimiter
-				|| str.charAt(0) === ' ' // starts with a space
-				|| str.charAt(str.length - 1) === ' '; // ends with a space
+				|| _quoteLeadingSpace && str.charAt(0) === ' ' // starts with a space
+				|| _quoteTrailingSpace && str.charAt(str.length - 1) === ' '; // ends with a space
 
 			return needsQuotes ? _quoteChar + str + _quoteChar : str;
 		}
@@ -1313,9 +1370,17 @@ changelog: (latest first)
 				// for (var i = 0; i < _results.data.length; i++)
 				// 	if (testEmptyLine(_results.data[i]))
 				// 		_results.data.splice(i--, 1);
-				_results.data = _results.data.filter(function(d) {
-					return !testEmptyLine(d);
+				var filterData = _results.data.map(function(row) {
+					return !testEmptyLine(row);
+				})
+
+				_results.data = _results.data.filter(function(d, i) {
+					return filterData[i];
 				});
+				_results.cellIsQuotedInfo = _results.cellIsQuotedInfo.filter(function(d, i) {
+					return filterData[i];
+				})
+
 
 			}
 
@@ -1579,6 +1644,7 @@ changelog: (latest first)
 			escapeChar = config.escapeChar;
 		}
 
+		//we normally don't use the comments option but use this as comment character/string
 		// eslint-disable-next-line camelcase
 		var rowInsertCommentLines_commentsString = config.rowInsertCommentLines_commentsString;
 
@@ -1597,6 +1663,11 @@ changelog: (latest first)
 		var retainQuoteInformation = config.retainQuoteInformation;
 		/** @type {boolean[]} */
 		var columnIsQuoted = null;
+
+		//TODO what about comment, empty lines??
+		/** @type {boolean[][]} for each cell the info if it was quoted originally */
+		var cellIsQuotedInfo = [];
+
 		//when we set this to true we got the right quote information
 		//(when need to skip empty & comment rows and during this we might reset columnIsQuoted multiple times)
 		var firstQuoteInformationRowFound = false;
@@ -1753,6 +1824,16 @@ changelog: (latest first)
 						return returnable(true);
 					}
 				}
+
+				if (!isGuessingDelimiter && retainQuoteInformation) {
+					//in fast mode we don't have quotes
+					cellIsQuotedInfo = Array(data.length);
+					for (var rowI = 0; rowI < data.length; rowI++) {
+						var cells = data[rowI];
+						cellIsQuotedInfo[rowI] = Array(cells.length).fill(false);
+					}
+				}
+
 				return returnable();
 			}
 
@@ -1762,6 +1843,8 @@ changelog: (latest first)
 			var quoteSearch = input.indexOf(quoteChar, cursor);
 			//we don't use fast mode so we assume some field is quoted...
 			columnIsQuoted = [];
+			cellIsQuotedInfo = [];
+			var cellIsQuotedInfoRow = [];
 
 			var currentRowStartIndex = 0; //string index used to calculate the relative current field index in the current row
 			var currentFieldEndIndex = -1;
@@ -1780,8 +1863,11 @@ changelog: (latest first)
 					// Start our search for the closing quote where the cursor is
 					quoteSearch = cursor;
 
-					if (retainQuoteInformation && firstQuoteInformationRowFound === false) {
-						columnIsQuoted.push(true);
+					if (retainQuoteInformation) {
+						if (firstQuoteInformationRowFound === false) {
+							columnIsQuoted.push(true);
+						}
+						cellIsQuotedInfoRow.push(true);
 					}
 
 					// Skip the opening quote
@@ -1918,8 +2004,12 @@ changelog: (latest first)
 					continue;
 				}
 
-				if (retainQuoteInformation && firstQuoteInformationRowFound === false) {
-					columnIsQuoted.push(false);
+				if (retainQuoteInformation) {
+					if (firstQuoteInformationRowFound === false) {
+						columnIsQuoted.push(false);
+					}
+
+					cellIsQuotedInfoRow.push(false);
 				}
 
 				// Comment found at start of new line
@@ -2039,6 +2129,11 @@ changelog: (latest first)
 				}
 				currentRowStartIndex = cursor;
 
+				if (retainQuoteInformation) {
+					cellIsQuotedInfo.push(cellIsQuotedInfoRow);
+					cellIsQuotedInfoRow = [];
+				}
+
 				if (firstQuoteInformationRowFound === false) {
 
 					if (row.length === 1 &&
@@ -2124,7 +2219,8 @@ changelog: (latest first)
 						truncated: !!stopped,
 						cursor: lastCursor + (baseIndex || 0)
 					},
-					columnIsQuoted: columnIsQuoted
+					columnIsQuoted: columnIsQuoted,
+					cellIsQuotedInfo: cellIsQuotedInfo,
 				};
 
 				// use config because we use calcColumnIndexToCsvColumnIndexMapping to notify top
