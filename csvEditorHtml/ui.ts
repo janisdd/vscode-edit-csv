@@ -869,7 +869,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 							},
 							{
 								key: 'set_multiple_cursors:option3',
-								name: 'Cursor selected entire cell',
+								name: 'Cursor select entire cell',
 								callback: function (key: string, selections: HandsontableSelection[], clickEvent: Event) {
 									postSetMultipleCursors(calculateSourceFileCursorPositions2(selections, 'entire'))
 								},
