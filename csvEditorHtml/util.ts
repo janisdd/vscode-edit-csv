@@ -253,6 +253,7 @@ function _normalizeDataArray(csvParseResult: ExtendedCsvParseResult, csvReadConf
 	}
 
 	if (someRowWasExpanded) {
+		console.debug(`[edit csv] csv data changed because one row was extended so that all rows have the same length`)
 		postSetEditorHasChanges(true)
 	}
 

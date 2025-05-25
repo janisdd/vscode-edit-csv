@@ -4,6 +4,10 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.7.3
+- (same as vs code extension 0.11.4)
+- added feature #194 - Better unsaved changes indicator
+
 ## 1.7.2
 - (same as vs code extension 0.11.3)
 - fixed delayed `readOption_hasHeader` feature where the options is automatically enabled as soon as the table has more than 1 row

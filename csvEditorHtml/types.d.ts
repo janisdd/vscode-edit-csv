@@ -423,6 +423,10 @@ type EditCsvConfig = {
 	 */
 	initiallyHiddenColumnNumbers: string[]
 
+	/**
+	 * Determines whether the save buttons should also indicate unsaved changes (true) or not (false)
+	 */
+	useSaveButtonsAsAdditionalUnsavedChangesIndicator: boolean
 }
 
 /* --- frontend settings --- */

@@ -63,6 +63,7 @@ const defaultConfig: EditCsvConfig = {
 	dragToAutoFill: "excelLike",
 	initiallyHiddenColumnNames: [],
 	initiallyHiddenColumnNumbers: [],
+	useSaveButtonsAsAdditionalUnsavedChangesIndicator: true,
 }
 
 /**

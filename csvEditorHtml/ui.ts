@@ -2600,8 +2600,19 @@ function getAreCommentsDisplayed(): boolean {
 function _setHasUnsavedChangesUiIndicator(hasUnsavedChanges: boolean) {
 	if (hasUnsavedChanges) {
 		unsavedChangesIndicator.classList.remove('op-hidden')
+
+		if (initialConfig?.useSaveButtonsAsAdditionalUnsavedChangesIndicator) {
+			btnApplyChangesToFileAndSave.classList.add(`has-unsaved-changes`)
+			btnApplyChangesToFile.classList.add(`has-unsaved-changes`)
+		}
+
 	} else {
 		unsavedChangesIndicator.classList.add('op-hidden')
+
+		if (initialConfig?.useSaveButtonsAsAdditionalUnsavedChangesIndicator) {
+			btnApplyChangesToFileAndSave.classList.remove(`has-unsaved-changes`)
+			btnApplyChangesToFile.classList.remove(`has-unsaved-changes`)
+		}
 	}
 }
 

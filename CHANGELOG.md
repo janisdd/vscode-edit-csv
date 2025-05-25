@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+# 0.11.4
+- added feature #194 - Better unsaved changes indicator
+
 # 0.11.3
 - added feature #176 - add cursor to source file from table selection (via context menu)
 	- disabled when certain actions are performed (see https://github.com/janisdd/vscode-edit-csv/issues/176) but basicalyl all that change the shape of the table (e.g. add/remove rows/cols)

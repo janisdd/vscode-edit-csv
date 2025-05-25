@@ -73,6 +73,11 @@ html, body {
 	margin-top: 3px;
 }
 
+#btn-apply-changes-to-file.has-unsaved-changes,
+#btn-apply-changes-to-file-and-save.has-unsaved-changes {
+	background-color: var(--warning-color-all-themes);
+}
+
 .op-hidden {
 	opacity: 0;
 	display: none;
