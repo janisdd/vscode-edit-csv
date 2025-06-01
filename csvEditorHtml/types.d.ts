@@ -427,6 +427,11 @@ type EditCsvConfig = {
 	 * Determines whether the save buttons should also indicate unsaved changes (true) or not (false)
 	 */
 	useSaveButtonsAsAdditionalUnsavedChangesIndicator: boolean
+
+	/**
+	 * The string used to join multiple column header names when copying column header names
+	 */
+	copyColumnHeaderNamesSeparator: string
 }
 
 /* --- frontend settings --- */

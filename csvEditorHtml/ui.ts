@@ -741,6 +741,42 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						return isReadonlyMode //TODO when all columns are hidden?
 					}
 				},
+				'copy_column_header_name': {
+					name: 'Copy column name',
+					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
+
+						const showColumnHeaderNamesWithLettersLikeExcel = initialConfig?.showColumnHeaderNamesWithLettersLikeExcel ?? false
+						const columnNamesToCopy: string[] = []
+
+						for (let i = 0; i < selection.length; i++) {
+							const singleSelection=  selection[i]
+							
+							for (let j = singleSelection.start.col; j <= singleSelection.end.col; j++) {
+								
+								if (headerRowWithIndex) {
+									columnNamesToCopy.push(`` + headerRowWithIndex.row[j])
+								} else {
+									//we only have `column 1`, `column 2`, ... as names
+									const visualCol = hot!.toPhysicalColumn(j)
+									let colName = showColumnHeaderNamesWithLettersLikeExcel
+										? spreadsheetColumnLetterLabel(visualCol)
+										: getSpreadsheetColumnLabel(visualCol)
+										columnNamesToCopy.push(colName)
+								}
+							}
+						}
+
+						const colNamesString = columnNamesToCopy.join(initialConfig?.copyColumnHeaderNamesSeparator ?? `, `)
+						// console.log(`columnNamesToCopy`, colNamesString)
+
+						if (!isBrowser) {
+							postCopyToClipboard(colNamesString)
+						} else {
+							copyTextToClipboardBrowser(colNamesString)
+						}
+						
+					},
+				},
 				'edit_header_cell': {
 					name: 'Edit header cell',
 					hidden: function () {

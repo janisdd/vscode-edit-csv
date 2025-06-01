@@ -64,6 +64,7 @@ const defaultConfig: EditCsvConfig = {
 	initiallyHiddenColumnNames: [],
 	initiallyHiddenColumnNumbers: [],
 	useSaveButtonsAsAdditionalUnsavedChangesIndicator: true,
+	copyColumnHeaderNamesSeparator: `, `,
 }
 
 /**

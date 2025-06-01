@@ -4,6 +4,7 @@
 
 # 0.11.4
 - added feature #194 - Better unsaved changes indicator
+- added feature #193 - Copy column header to clipboard
 
 # 0.11.3
 - added feature #176 - add cursor to source file from table selection (via context menu)

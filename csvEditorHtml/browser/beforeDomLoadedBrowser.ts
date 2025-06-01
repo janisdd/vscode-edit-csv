@@ -76,6 +76,8 @@ var initialConfig: EditCsvConfig | undefined = {
 	dragToAutoFill: "excelLike",
 	initiallyHiddenColumnNames: [],
 	initiallyHiddenColumnNumbers: [],
+	useSaveButtonsAsAdditionalUnsavedChangesIndicator: true,
+	copyColumnHeaderNamesSeparator: `, `,
 }
 
 function __getById(id: string): HTMLElement {
