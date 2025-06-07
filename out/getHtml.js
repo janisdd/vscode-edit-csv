@@ -298,7 +298,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 													<span id="has-header-label">Has header</span>
 												</vscode-checkbox>
 												<span class="tooltip is-tooltip-right is-tooltip-multiline"
-													data-tooltip="The first row is used as header. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applies immediately, it will be applied if the table has more than one row. [the readOption_hasHeader and tryToGuessHasHeader settings can control this]">
+													data-tooltip="Use the first row as header in the table. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applied immediately, it will be applied if the table has more than one row. [the readOption_hasHeader and tryToGuessHasHeader settings can control this]">
 												<i class="fas fa-question-circle"></i>
 											</span>
 											</div>

@@ -2639,7 +2639,7 @@ function _setHasUnsavedChangesUiIndicator(hasUnsavedChanges: boolean) {
 
 		if (initialConfig?.useSaveButtonsAsAdditionalUnsavedChangesIndicator) {
 			btnApplyChangesToFileAndSave.classList.add(`has-unsaved-changes`)
-			btnApplyChangesToFile.classList.add(`has-unsaved-changes`)
+			btnApplyChangesToFile?.classList.add(`has-unsaved-changes`)
 		}
 
 	} else {
@@ -2647,7 +2647,7 @@ function _setHasUnsavedChangesUiIndicator(hasUnsavedChanges: boolean) {
 
 		if (initialConfig?.useSaveButtonsAsAdditionalUnsavedChangesIndicator) {
 			btnApplyChangesToFileAndSave.classList.remove(`has-unsaved-changes`)
-			btnApplyChangesToFile.classList.remove(`has-unsaved-changes`)
+			btnApplyChangesToFile?.classList.remove(`has-unsaved-changes`)
 		}
 	}
 }

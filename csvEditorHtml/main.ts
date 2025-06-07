@@ -325,7 +325,7 @@ const writeContent = _getById('write-options-content')
 const previewContent = _getById('preview-content')
 
 const btnApplyChangesToFileAndSave = _getById(`btn-apply-changes-to-file-and-save`)
-const btnApplyChangesToFile = _getById(`btn-apply-changes-to-file`)
+const btnApplyChangesToFile = vscode ? _getById(`btn-apply-changes-to-file`) : null as HTMLElement | null
 
 const readDelimiterTooltip = _getById('read-delimiter-tooltip')
 const readDelimiterTooltipText = "Empty to auto detect"
