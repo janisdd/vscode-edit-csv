@@ -8,6 +8,7 @@ note that the changelog is also present on the website when you click on the ver
 - (same as vs code extension 0.11.4)
 - added feature #194 - Better unsaved changes indicator
 - added feature #193 - Copy column header to clipboard
+- updated `has header` ui tooltip
 
 ## 1.7.2
 - (same as vs code extension 0.11.3)

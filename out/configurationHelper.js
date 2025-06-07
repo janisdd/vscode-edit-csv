@@ -63,6 +63,8 @@ const defaultConfig = {
     dragToAutoFill: "excelLike",
     initiallyHiddenColumnNames: [],
     initiallyHiddenColumnNumbers: [],
+    useSaveButtonsAsAdditionalUnsavedChangesIndicator: true,
+    copyColumnHeaderNamesSeparator: `, `,
 };
 /**
  * returns the configuration for this extension
