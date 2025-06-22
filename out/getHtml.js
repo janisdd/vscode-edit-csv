@@ -143,9 +143,9 @@ function createEditorHtml(webview, context, config, initialVars) {
     let bodyPageHtml = ``;
     {
         bodyPageHtml = /*html*/ `
-		<div class="page full-h">
+		<div id="full-page" class="page full-h">
 
-			<div class="all-options">
+			<div id="all-options" class="all-options">
 
 				<table>
 					<thead>
@@ -494,7 +494,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 			</div>
 
-			<div class="table-action-buttons">
+			<div id="table-actions" class="table-action-buttons">
 
 				<div class="separated-btns">
 

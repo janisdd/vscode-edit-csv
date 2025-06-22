@@ -312,6 +312,10 @@ let isInitialHotRender = true
 
 const cssFgColorVariableName = `--text-color`
 
+const pageWrapperDiv = _getById('full-page')
+const allOptionsDiv = _getById('all-options')
+const tableActionsDiv = _getById('table-actions')
+
 const csvEditorWrapper = _getById('csv-editor-wrapper')
 const csvEditorDiv = _getById('csv-editor')
 const helModalDiv = _getById('help-modal')

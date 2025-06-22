@@ -742,7 +742,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					}
 				},
 				'copy_column_header_name': {
-					name: 'Copy column name',
+					name: 'Copy column name(s)',
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
 
 						const showColumnHeaderNamesWithLettersLikeExcel = initialConfig?.showColumnHeaderNamesWithLettersLikeExcel ?? false
@@ -2162,6 +2162,53 @@ function onAnyChange(changes?: CellChanges[] | null, reason?: string) {
 	postSetEditorHasChanges(true)
 }
 
+
+function _getRealHeight(element: HTMLElement, includeMargin: boolean, excludePadding: boolean,) {
+	let pageWrapperDivStyle = getComputedStyle(element)
+	let fullHeight = element.offsetHeight
+
+	if (excludePadding) {
+		let elTopPadding = parseInt(pageWrapperDivStyle.getPropertyValue('padding-top'))
+		let elBotPadding = parseInt(pageWrapperDivStyle.getPropertyValue('padding-bottom'))
+
+		fullHeight -= elTopPadding
+		fullHeight -= elBotPadding
+	}
+
+	if (includeMargin) {
+		let elTopMargin = parseInt(pageWrapperDivStyle.getPropertyValue('margin-top'))
+		let elBotMargin = parseInt(pageWrapperDivStyle.getPropertyValue('margin-bottom'))
+
+		fullHeight += elTopMargin
+		fullHeight += elBotMargin
+	}
+
+	return fullHeight
+}
+
+function _getRealWidth(element: HTMLElement, includeMargin: boolean, excludePadding: boolean,) {
+	let pageWrapperDivStyle = getComputedStyle(element)
+	let fullWidth = element.offsetWidth
+
+	if (excludePadding) {
+		let elTopPadding = parseInt(pageWrapperDivStyle.getPropertyValue('padding-left'))
+		let elBotPadding = parseInt(pageWrapperDivStyle.getPropertyValue('padding-right'))
+
+		fullWidth -= elTopPadding
+		fullWidth -= elBotPadding
+	}
+
+	if (includeMargin) {
+		let elTopMargin = parseInt(pageWrapperDivStyle.getPropertyValue('margin-left'))
+		let elBotMargin = parseInt(pageWrapperDivStyle.getPropertyValue('margin-right'))
+
+		fullWidth += elTopMargin
+		fullWidth += elBotMargin
+	}
+
+	return fullWidth
+}
+
 /**
  * updates the handson table to fill available space (will trigger scrollbars)
  */
@@ -2169,23 +2216,20 @@ function onResizeGrid() {
 
 	if (!hot) return
 
-	const widthString = getComputedStyle(csvEditorWrapper).width
+	let pageWrapperDivHeight = _getRealHeight(pageWrapperDiv, true, true)
+	let allOptionsDivHeight = _getRealHeight(allOptionsDiv, true, false)
+	let tableActionsDivHeight = _getRealHeight(tableActionsDiv, true, false)
 
-	if (!widthString) {
-		_error(`could not resize table, width string was null`)
-		return
-	}
+	let pageWrapperDivWidth = _getRealWidth(pageWrapperDiv, true, true)
+	let allOptionsDivWidth = _getRealWidth(allOptionsDiv, true, false)
+	let tableActionsDivWidth = _getRealWidth(tableActionsDiv, true, false)
 
-	const width = parseInt(widthString.substring(0, widthString.length - 2))
+	console.log(`pageWrapperDivWidth`, pageWrapperDivWidth)
+	console.log(`allOptionsDivWidth`, allOptionsDivWidth)
+	console.log(`tableActionsDivWidth`, tableActionsDivWidth)
 
-	const heightString = getComputedStyle(csvEditorWrapper).height
-
-	if (!heightString) {
-		_error(`could not resize table, height string was null`)
-		return
-	}
-
-	const height = parseInt(heightString.substring(0, heightString.length - 2))
+	const width = pageWrapperDivWidth
+	const height = pageWrapperDivHeight - allOptionsDivHeight - tableActionsDivHeight
 
 	_updateHandsontableSettings({
 		width: width,

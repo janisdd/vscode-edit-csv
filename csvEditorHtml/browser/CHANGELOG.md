@@ -4,6 +4,10 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.7.4
+- (same as vs code extension 0.11.5)
+- fixed issue #197 - table resize now works better
+
 ## 1.7.3
 - (same as vs code extension 0.11.4)
 - added feature #194 - Better unsaved changes indicator
