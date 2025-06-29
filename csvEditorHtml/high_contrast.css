@@ -79,19 +79,46 @@ body.vscode-high-contrast {
   border-color: #5c5c5c;
 }
 
+.vscode-high-contrast .ht_clone_top tr td,
+.vscode-high-contrast .ht_clone_top_left_corner tr td,
+.vscode-high-contrast .ht_clone_left tr td {
+border-color: #5c5c5c;
+}
+
 /* fixed rows top */
-.vscode-high-contrast .ht_clone_top tr:nth-of-type(odd)> td {
+
+.vscode-high-contrast .ht_clone_top tr:nth-of-type(odd)> td,
+.vscode-high-contrast .ht_clone_top_left_corner tr:nth-of-type(odd)> td
+ {
 	background-color: black;
-	border-color: #5c5c5c;
 }
 
-.vscode-high-contrast .ht_clone_top tr:nth-of-type(even)> td {
+.vscode-high-contrast .ht_clone_top tr:nth-of-type(even)> td,
+.vscode-high-contrast .ht_clone_top_left_corner tr:nth-of-type(even)> td {
 	background-color: #1d1d1d;
-	border-color: #5c5c5c;
 }
 
-.vscode-high-contrast .ht_clone_top tr:last-child > td {
+.vscode-high-contrast .ht_clone_top tr:last-child > td,
+.vscode-high-contrast .ht_clone_top_left_corner tr:last-child > td {
 	border-bottom-color: red;
+}
+
+
+/* fixed columns left */
+.vscode-high-contrast .ht_clone_left tr:nth-of-type(odd)> td,
+.vscode-high-contrast .ht_clone_top_left_corner tr:nth-of-type(odd)> td {
+	background-color: black;
+}
+
+.vscode-high-contrast .ht_clone_left tr:nth-of-type(even)> td,
+.vscode-high-contrast .ht_clone_top_left_corner tr:nth-of-type(even)> td {
+	background-color: #1d1d1d;
+}
+
+.vscode-high-contrast .ht_clone_left tr > td:last-child,
+.vscode-high-contrast .ht_clone_top_left_corner tr > td:last-child {
+	border-right-width: 2px;
+	border-right-color: red;
 }
 
 .vscode-dark .handsontable tr {
