@@ -4,6 +4,7 @@
 
 # 0.11.5
 - fixed issue #197 - table resize now works better
+- fixed issue #198 - Fixed Columns turn white in high contrast theme
 
 # 0.11.4
 - added feature #194 - Better unsaved changes indicator
