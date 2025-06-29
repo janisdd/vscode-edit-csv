@@ -1,5 +1,3 @@
-import { expect, test, suite } from 'vitest'
-
 export type AutoFillTestSuit = {
 	name: string
 	tests: AutoFillTestData[]
