@@ -1182,7 +1182,7 @@ changelog: (latest first)
 				{
 					processResults();
 
-					// It's possbile that this line was empty and there's no row here after all
+					// It's possible that this line was empty and there's no row here after all
 					if (_results.data.length === 0)
 						return;
 

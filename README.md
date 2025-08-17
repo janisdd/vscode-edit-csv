@@ -101,7 +101,7 @@ Files with the extension `.csv`, `.tsv` should work out of the box.
 
 You can change the file type in the bottom right corner of the editor (select language mode). This is required for unnamed/new files.
 
-For `tsv`, make sure the indention is set to `tabs`.
+For `tsv`, make sure the indentation is set to `tabs`.
 
 ### File extension xyz is not recognized by the vs code extension
 
@@ -187,7 +187,7 @@ There are some more in `package.json`. Even if they are not referenced directly,
 
 There is a command `edit-csv.editWithConfig`. It can be used to open the editor with settings specified by you.
 
-All possible settings can be found in `[project root]/csvEditorHtml/types.d.ts > EditCsvConfig`. The easiest way is to copy both types `EditCsvConfig` and `EditCsvConfigOverwrite` and then call the extenion command like this:
+All possible settings can be found in `[project root]/csvEditorHtml/types.d.ts > EditCsvConfig`. The easiest way is to copy both types `EditCsvConfig` and `EditCsvConfigOverwrite` and then call the extension command like this:
 
 ```ts
  vscode.commands.registerCommand('yourExtension.yourCommand', () => {
@@ -201,7 +201,7 @@ All possible settings can be found in `[project root]/csvEditorHtml/types.d.ts >
 ```
 
 There is one problem left: the `Edit CSV` button in the title bar (and the file right click menu action) will still use the settings set by the user...
-For this there is the option `csv-edit.hideOpenCsvEditorUiActions`. If set to true it will hide the two ui actions. This way you can create a buttom from your extension and open the editor and force your settings.
+For this there is the option `csv-edit.hideOpenCsvEditorUiActions`. If set to true it will hide the two ui actions. This way you can create a button from your extension and open the editor and force your settings.
 
 **Make sure to keep the type EditCsvConfig up-to-date (in case any types change)**
 

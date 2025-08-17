@@ -417,7 +417,7 @@ type EditCsvConfig = {
 
 	/**
 	 * Specifies the number of column names that are to be hidden initially
-	 * vs code does not conver the number strings to real numbers....
+	 * vs code does not convert the number strings to real numbers....
 	 * 
 	 * we use numbers not indices because the columns show numbers not indices
 	 */

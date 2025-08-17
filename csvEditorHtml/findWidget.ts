@@ -119,7 +119,7 @@ class FindWidget {
 		let currIsSown = this.isFindWidgetDisplayed()
 
 		if (currIsSown === show) {
-			//e.g. when we focuse a cell and the find widget is already displayed then we want to focus again
+			//e.g. when we focus a cell and the find widget is already displayed then we want to focus again
 			if (show) {
 				setTimeout(() => {
 					this.findWidgetInput.focus()
@@ -360,7 +360,7 @@ class FindWidget {
 
 			//when we increment to e.g. only update after 10% then the time will improve!
 			//@ts-ignore
-			this.lastFindResults = await searchPlugin.queryAsync(this.findWidgetInput.value, this.findWidgetQueryCancellationToken, this._onSearchProgress.bind(this), 5) //updat every 5 %
+			this.lastFindResults = await searchPlugin.queryAsync(this.findWidgetInput.value, this.findWidgetQueryCancellationToken, this._onSearchProgress.bind(this), 5) //update every 5 %
 
 			console.timeEnd('searchPlugin.queryAsync')
 

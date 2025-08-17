@@ -36,7 +36,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 		 * not that there is no difference if we have column headers (first row is used)
 		 * comment rows are ignored for this
 		 */
-		retainQuoteInformation: true, //we keep true here and decide if we use it whe nwe output data
+		retainQuoteInformation: true, //we keep true here and decide if we use it when we output data
 		calcLineIndexToCsvLineIndexMapping: initialVars.sourceFileCursorLineIndex !== null ? true : false,
 		calcColumnIndexToCsvColumnIndexMapping: initialVars.sourceFileCursorColumnIndex !== null ? true : false,
 		calcCsvFieldToInputPositionMapping: true,
@@ -510,7 +510,7 @@ function handleVsCodeMessage(event: { data: ReceivedMessageFromVsCode }) {
 			// const hasAnyChanges = getHasAnyChangesUi()
 
 			// if (!hasAnyChanges && !isReadonlyMode) {
-			// 	//just relaod the file because we have no changes anyway...
+			// 	//just reload the file because we have no changes anyway...
 			// 	reloadFileFromDisk()
 			// 	return
 			// }

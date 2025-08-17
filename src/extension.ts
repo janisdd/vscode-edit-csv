@@ -439,7 +439,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 					//TODO
 					//THIS might not get the up-to-date state of the file on the disk
 					//but vs code api cannot get the file encoding (so that we could use vscode.workspace.fs.readFile)
-					//or allow us to force to updat the memory model in vs code of the file...
+					//or allow us to force to update the memory model in vs code of the file...
 
 					//see https://github.com/microsoft/vscode/issues/824
 					//see https://github.com/microsoft/vscode/issues/3025
@@ -564,7 +564,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	
 
-	//because for col it is the cursor pos, it can be larger than the line length! (well, equall numbers)
+	//because for col it is the cursor pos, it can be larger than the line length! (well, equal numbers)
 	let activeCol = activeTextEditor.selection.active.character
 	if (activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeCol) {
 		activeCol =  activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length - 1

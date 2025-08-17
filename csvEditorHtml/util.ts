@@ -612,7 +612,7 @@ function _insertRowInternal(belowCurrRow: boolean) {
 	//fixing this is not easy, was we would have to pass the physical index to the alter method (in oder to correctly 'spliceData') but all other hooks expect the visual index!!
 	//  also, when we use 'insert_row' we don't know the real physical index because we don't know if the row should be above or below the given row and we would not know the correct visual index
 	// handsontable removed this method in favor of 'insert_row_below' and 'insert_row_above', this way we could compute the correct visual index (by toVisualIndex(index) and then +/-1)
-	//BUT FOR NOW we keep the current bahavior of handsontable
+	//BUT FOR NOW we keep the current behavior of handsontable
 	hot.alter('insert_row', targetRowIndex)
 
 	//undefined should not happen but just in case
@@ -1477,7 +1477,7 @@ function checkCellOnlyContainsSingleNumber(cellValue: string, numbersStyle: Numb
 
 
 /**
- * sets the number style ui from the given nubmer style
+ * sets the number style ui from the given number style
  */
 function setNumbersStyleUi(numbersStyleToUse: EditCsvConfig["initialNumbersStyle"]) {
 
@@ -1564,7 +1564,7 @@ function calcHotCellToSelectFromCurosPos(
 	let csvRowToSelect = 0
 	let csvColToSelect = 0
 
-	//wrap in a try catch in case csv was corrupted and we can't finde some index...
+	//wrap in a try catch in case csv was corrupted and we can't find some index...
 	try {
 
 		let currentCsvRowStartTextFileLineIndex = 0
@@ -1830,7 +1830,7 @@ function scrollToSelectedCell(hot: Handsontable, cellToSelect: HotCellPos) {
 		if (firstVisibleCol === 0 && selectedCellLeftOffsetMiddle <= viewportWidth / 2) {
 			//special case because here the table is not scrolled and the selected cell 
 			//is not on the right or not over the half viewport
-			//--> don't scoll
+			//--> don't scroll
 			viewportLeftColToShow = 0
 			//we could also check hot.view.activeWt.wtOverlays.scrollableElement.scrollLeft for scroll bar pos
 		} else {

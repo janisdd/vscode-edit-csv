@@ -185,7 +185,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 
 	//the following months are supported:
 	// at least 3 letters of the months are needed
-	// currently only enlish months are supported
+	// currently only english months are supported
 	// the different in month indices must be the same in the selected data, else we copy
 	// jan, mar, may (diff 2)
 	// jan, mar apr (different diff) -> copy
@@ -277,7 +277,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 					let dashIndex1 = format.indexOf('-')
 					let dashIndex2 = format.indexOf('-', dashIndex1 + 1)
 
-					// let displayFormat = format.replace(`-`, separator1).replace(`-`, separator2) //this does not work if we repalce - with - and then the second replace will replace the first...
+					// let displayFormat = format.replace(`-`, separator1).replace(`-`, separator2) //this does not work if we replace - with - and then the second replace will replace the first...
 					let displayFormat = format.substring(0, dashIndex1) + separator1 + format.substring(dashIndex1 + 1, dashIndex2) + separator2 + format.substring(dashIndex2 + 1)
 
 
@@ -997,7 +997,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 		interpolatedDataAsString.reverse()
 	}
 
-	//just a smal sanity check
+	//just a small sanity check
 	if (interpolatedDataAsString.some(p => typeof p !== 'string')) {
 		//something went wrong -> default
 		return []
