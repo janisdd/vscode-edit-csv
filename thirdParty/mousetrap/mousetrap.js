@@ -90,7 +90,7 @@
 
     /**
      * this is a mapping of keys that require shift on a US keypad
-     * back to the non shift equivelents
+     * back to the non shift equivalents
      *
      * this is so you can use keyup events with these keys
      *
@@ -146,7 +146,7 @@
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
-     * programatically
+     * programmatically
      */
     for (var i = 1; i < 20; ++i) {
         _MAP[111 + i] = 'f' + i;
@@ -282,7 +282,7 @@
     }
 
     /**
-     * stops propogation for this event
+     * stops propagation for this event
      *
      * @param {Event} e
      * @returns void
@@ -600,7 +600,7 @@
          * actually calls the callback function
          *
          * if your callback function returns false this will use the jquery
-         * convention - prevent default and stop propogation on the event
+         * convention - prevent default and stop propagation on the event
          *
          * @param {Function} callback
          * @param {Event} e

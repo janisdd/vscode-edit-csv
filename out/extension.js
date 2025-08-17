@@ -347,7 +347,7 @@ function createNewEditorInstance(context, activeTextEditor, instanceManager, ove
                     //TODO
                     //THIS might not get the up-to-date state of the file on the disk
                     //but vs code api cannot get the file encoding (so that we could use vscode.workspace.fs.readFile)
-                    //or allow us to force to updat the memory model in vs code of the file...
+                    //or allow us to force to update the memory model in vs code of the file...
                     //see https://github.com/microsoft/vscode/issues/824
                     //see https://github.com/microsoft/vscode/issues/3025
                     //in case we closed the file (we have an old view/model of the file) open it again

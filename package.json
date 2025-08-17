@@ -742,7 +742,7 @@
 					"default": [],
 					"items": {
 						"type": "number",
-						"description": "the number (1-based) of the column to be hidden initiall,"
+						"description": "the number (1-based) of the column to be hidden initially"
 					}
 				},
 				"csv-edit.useSaveButtonsAsAdditionalUnsavedChangesIndicator": {

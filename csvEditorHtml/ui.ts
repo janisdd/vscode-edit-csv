@@ -918,7 +918,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 		} as ContextMenuSettings,
 		beforeColumnSort: function (currentSortConfig, destinationSortConfigs) {
 
-			//we cannot use the setting columnSorting because this would remove the hidden indicators, this would change the coulmn width...
+			//we cannot use the setting columnSorting because this would remove the hidden indicators, this would change the column width...
 			if (isReadonlyMode) return false
 
 			return
@@ -1167,7 +1167,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 			let __action = _action as EditHeaderCellAction | RemoveColumnAction | InsertColumnAction
 
-			//when we change has header this is not a prolbem because the undo stack is cleared when we toggle has header
+			//when we change has header this is not a problem because the undo stack is cleared when we toggle has header
 			if (__action.actionType === 'changeHeaderCell' && headerRowWithIndex) {
 				let action = __action as EditHeaderCellAction
 				let visualColIndex: number = action.change[1]
@@ -1243,7 +1243,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 			let __action = _action as EditHeaderCellAction | RemoveColumnAction | InsertColumnAction
 
-			//when we change has header this is not a prolbem because the undo stack is cleared when we toggle has header
+			//when we change has header this is not a problem because the undo stack is cleared when we toggle has header
 			if (__action.actionType === 'changeHeaderCell' && headerRowWithIndex) {
 
 				let action = __action as EditHeaderCellAction
@@ -1513,13 +1513,13 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 			// syncColWidths() //covered by afterRender
 			onAnyChange()
-			//dont' call this as it corrupts hot index mappings (because all other hooks need to finish first before we update hot settings)
+			//don't call this as it corrupts hot index mappings (because all other hooks need to finish first before we update hot settings)
 			//also it's not needed as handsontable already handles this internally
 			// updateFixedRowsCols()
 		},
 		beforeRemoveCol(visualColIndex, amount, logicalCols) {
 
-			//physical indices are only working here (not in afterRemoveCol) becasue in after the mapping is already updated
+			//physical indices are only working here (not in afterRemoveCol) because in after the mapping is already updated
 			if (!hot) return
 
 			if (cellIsQuotedInfoPhysicalIndices && cellIsQuotedInfoPhysicalIndices.length > 0) {
@@ -1624,7 +1624,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			}
 
 			onAnyChange()
-			//dont' call this as it corrupts hot index mappings (because all other hooks need to finish first before we update hot settings)
+			//don't call this as it corrupts hot index mappings (because all other hooks need to finish first before we update hot settings)
 			//also it's not needed as handsontable already handles this internally
 			// updateFixedRowsCols()
 		},
@@ -2556,7 +2556,7 @@ function trimAllCells() {
 				hasAnyChanges = true
 				changeSet.push([row, col, allData[row][col]])
 			}
-			//tooo slow for large tables
+			//too slow for large tables
 			// hot.setDataAtCell(row, col, data.trim())
 		}
 	}
@@ -2624,7 +2624,7 @@ function transposeColumsAndRows() {
 	//  (which is by design)
 	//  but when we transpose the data AND reset to no header row
 	//  then the header row is inserted at the initial position (where we got it from)
-	//  and if we transpose again, the operation is not reversed (origianl -> transpose -> transpose -> original)
+	//  and if we transpose again, the operation is not reversed (original -> transpose -> transpose -> original)
 	//  BUT this is ok for now
 
 	//see https://stackoverflow.com/questions/17428587/transposing-a-2d-array-in-javascript
@@ -2994,7 +2994,7 @@ function afterRenderForced(isForced: boolean) {
 
 	//hot.alter forced a rerender
 	//and we can only run our hooks after hot has updated internal mappings and indices
-	//so we kepp track if our hooks were fired and execute them after the rerender
+	//so we keep track if our hooks were fired and execute them after the rerender
 
 	for (let i = 0; i < hook_list.length; i++) {
 		const hookItem = hook_list[i];
@@ -3061,7 +3061,7 @@ function afterRemoveCol(visualColIndex: number, amount: number, isFromUndoRedo: 
 
 	// syncColWidths() //covered by afterRender
 	onAnyChange()
-	//dont' call this as it corrupts hot index mappings (because all other hooks need to finish first before we update hot settings)
+	//don't call this as it corrupts hot index mappings (because all other hooks need to finish first before we update hot settings)
 	//also it's not needed as handsontable already handles this internally
 	// updateFixedRowsCols()
 }
