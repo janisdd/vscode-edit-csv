@@ -896,7 +896,7 @@ function setCsvReadOptionsInitial(options: CsvReadOptions) {
 	// 	el2.checked = csvReadOptions.skipEmptyLines
 	// }
 
-	const el3 = hasHeaderReadOptionInput as HTMLInputElement
+	const el3 = hasHeaderReadOptionInput
 	el3.checked = defaultCsvReadOptions._hasHeader
 
 	const el4 = _getById('comment-string') as HTMLInputElement
@@ -1183,7 +1183,7 @@ function setupAndApplyInitialConfigPart1(initialConfig: EditCsvConfig | undefine
 			const cssRule = styleSheet.cssRules[j]
 
 			if (cssRule instanceof CSSStyleRule) {
-				const cssStyleRule = cssRule as CSSStyleRule
+				const cssStyleRule = cssRule
 
 				if (cssStyleRule.selectorText === `body.vscode-light`) {
 					cssStyleRule.style.setProperty(cssFgColorVariableName, initialConfig.lightThemeTextColor)
