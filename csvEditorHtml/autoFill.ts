@@ -963,7 +963,7 @@ function customAutoFillFunc(_data: string[], targetCount: number, isNormalDirect
 				let nextDate = currStartDate
 					.add(delta[0] * nextCount, 'day')
 					.add(delta[1] * nextCount, 'month')
-					.add(delta[2] * nextCount, 'year') as typeof currStartDate
+					.add(delta[2] * nextCount, 'year')
 
 				if (nextDate.isValid() === false) {
 					//could get invalid date

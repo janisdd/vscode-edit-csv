@@ -1169,7 +1169,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 			//when we change has header this is not a problem because the undo stack is cleared when we toggle has header
 			if (__action.actionType === 'changeHeaderCell' && headerRowWithIndex) {
-				let action = __action as EditHeaderCellAction
+				let action = __action
 				let visualColIndex: number = action.change[1]
 				let beforeValue = action.change[2]
 
@@ -1246,7 +1246,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 			//when we change has header this is not a problem because the undo stack is cleared when we toggle has header
 			if (__action.actionType === 'changeHeaderCell' && headerRowWithIndex) {
 
-				let action = __action as EditHeaderCellAction
+				let action = __action
 				let visualColIndex: number = action.change[1]
 				let afterValue = action.change[3]
 
