@@ -1941,6 +1941,18 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				return
 			}
 
+			if (event.ctrlKey && (event.key === 'PageDown' || event.key === 'PageUp')) {
+				//we can't stop propagation here because vs code needs to get this for shortcuts
+				// event.stopImmediatePropagation()
+				//@ts-ignore
+				hot!.setListeningPaused(true)
+				setTimeout(() => {
+					//@ts-ignore
+					hot?.setListeningPaused(false)
+				}, 0)
+				return
+			}
+
 			//NOTE that this can prevent all vs code shortcuts... e.g. cmd+p (on mac)!!!
 			if (event.ctrlKey && event.shiftKey && event.altKey && event.key === 'ArrowDown') {
 				event.stopImmediatePropagation()
