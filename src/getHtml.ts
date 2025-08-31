@@ -803,7 +803,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 					</ul>
 
 					For a full list of shortcuts see <a target="_blank"
-						href="https://josepsanzcamp.github.io/handsontable-6.2.2-docs/tutorial-keyboard-navigation.html">https://josepsanzcamp.github.io/handsontable-6.2.2-docs/tutorial-keyboard-navigation.html</a>
+						href="https://janisdd.github.io/handsontable-6.2.2-docs/tutorial-keyboard-navigation.html">https://janisdd.github.io/handsontable-6.2.2-docs/tutorial-keyboard-navigation.html</a>
 				</div>
 
 				<h3 class="title is-3">Hints</h3>

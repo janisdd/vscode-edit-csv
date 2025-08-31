@@ -4,6 +4,7 @@
 
 # 0.11.6
 - fixed issue #202 - `Ctrl+PgUp` and `Ctrl+PgDown` are not forwarded to vs code (only handled by handsontable)
+- fixed issue #204 - help dialog link to keyboard shortcuts
 
 # 0.11.5
 - fixed issue #197 - table resize now works better
