@@ -594,8 +594,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 	findWidgetInstance.setupFind()
 
 	const showColumnHeaderNamesWithLettersLikeExcel = initialConfig?.showColumnHeaderNamesWithLettersLikeExcel ?? false
+	const columnNamesStartIndex = initialConfig?.columnNamesStartIndex ?? 1
 
-	let defaultColHeaderFuncBound = defaultColHeaderFunc.bind(this, showColumnHeaderNamesWithLettersLikeExcel)
+	let defaultColHeaderFuncBound = defaultColHeaderFunc.bind(this, showColumnHeaderNamesWithLettersLikeExcel, columnNamesStartIndex)
 
 	isInitialHotRender = true
 
@@ -2318,11 +2319,11 @@ function _getColWidths(): number[] {
  * @param {string | undefined | null} colName 
  * @param useLettersAsColumnNames true: use excel like letters for column names, false: use the index BUT an explicit colName will take precedence over this setting
  */
-function defaultColHeaderFunc(useLettersAsColumnNames: boolean, colIndex: number, colName: string | undefined | null) {
+function defaultColHeaderFunc(useLettersAsColumnNames: boolean, columnNamesStartIndex: number, colIndex: number, colName: string | undefined | null) {
 
 	let text = useLettersAsColumnNames
-		? spreadsheetColumnLetterLabel(colIndex)
-		: getSpreadsheetColumnLabel(colIndex)
+		? spreadsheetColumnLetterLabel(colIndex + columnNamesStartIndex - 1)
+		: getSpreadsheetColumnLabel(colIndex + columnNamesStartIndex - 1)
 
 	if (headerRowWithIndex !== null && colIndex < headerRowWithIndex.row.length) {
 		let visualIndex = colIndex

@@ -42,6 +42,7 @@ const defaultConfig = {
     initiallyFixedColumnsLeft: 0,
     fontSizeInPx: 16,
     showColumnHeaderNamesWithLettersLikeExcel: false,
+    columnNamesStartIndex: 1,
     shouldWatchCsvSourceFile: 'yesAndNotify',
     sidePanelAppearance: 'collapsed',
     initialNumbersStyle: 'en',

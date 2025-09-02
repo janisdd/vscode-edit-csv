@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+# 0.11.7
+- fixed issue #208 - added option `columnNamesStartIndexOffset` to control which number the first column gets
+
+
 # 0.11.6
 - fixed issue #202 - `Ctrl+PgUp` and `Ctrl+PgDown` are not forwarded to vs code (only handled by handsontable)
 - fixed issue #204 - help dialog link to keyboard shortcuts

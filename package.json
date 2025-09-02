@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit CSV",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.11.6",
+	"version": "0.11.7",
 	"license": "MIT",
 	"icon": "images/logo.png",
 	"publisher": "janisdd",
@@ -517,6 +517,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "true: show column names with letters e.g. A, B, ..., Z (like Excel), false: use numbers for column names e.g. 1, 2, ..."
+				},
+				"csv-edit.columnNamesStartIndexOffset": {
+					"type": "integer",
+					"default": 1,
+					"description": "When numbers are used for column names (column 1, column 2, ...), the first column number starts with this number"
 				},
 				"csv-edit.shouldWatchCsvSourceFile": {
 					"type": "string",

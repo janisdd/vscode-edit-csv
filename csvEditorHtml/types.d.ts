@@ -267,6 +267,11 @@ type EditCsvConfig = {
 	showColumnHeaderNamesWithLettersLikeExcel: boolean //we use the bloaty name because we want to find (via search) this with something like "excel" or "letters"
 
 	/**
+	 * When numbers are used for column names (column 1, column 2, ...), the first column number starts with this number
+	 */
+	columnNamesStartIndex: number
+
+	/**
 	 * if the source csv file should be watched for changes
 	 * 
 	 * no: do not watch the source csv file for changes
