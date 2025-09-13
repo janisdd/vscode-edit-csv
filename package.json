@@ -518,7 +518,7 @@
 					"default": false,
 					"description": "true: show column names with letters e.g. A, B, ..., Z (like Excel), false: use numbers for column names e.g. 1, 2, ..."
 				},
-				"csv-edit.columnNamesStartIndexOffset": {
+				"csv-edit.columnNamesStartIndex": {
 					"type": "integer",
 					"default": 1,
 					"description": "When numbers are used for column names (column 1, column 2, ...), the first column number starts with this number"

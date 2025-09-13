@@ -55,6 +55,7 @@ var initialConfig: EditCsvConfig | undefined = {
 	initiallyFixedColumnsLeft: 0,
 	fontSizeInPx: 16,
 	showColumnHeaderNamesWithLettersLikeExcel: false,
+	columnNamesStartIndex: 1,
 	shouldWatchCsvSourceFile: 'yesAndNotify',
 	sidePanelAppearance: 'expanded',
 	initialNumbersStyle: 'en',
@@ -78,6 +79,7 @@ var initialConfig: EditCsvConfig | undefined = {
 	initiallyHiddenColumnNumbers: [],
 	useSaveButtonsAsAdditionalUnsavedChangesIndicator: true,
 	copyColumnHeaderNamesSeparator: `, `,
+	
 }
 
 function __getById(id: string): HTMLElement {
