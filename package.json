@@ -803,7 +803,7 @@
 		"iconv-lite": "0.6.2",
 		"jsdom": "16.7.0",
 		"mocha": "11.0.1",
-		"playwright": "1.46.1",
+		"playwright": "1.56.1",
 		"readline-sync": "1.4.10",
 		"sweetalert2": "9.17.2",
 		"toaster-js": "2.2.3",
