@@ -2149,6 +2149,15 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
  * then we set the editor to has changes
  */
 function onAnyChange(changes?: CellChanges[] | null, reason?: string) {
+	/**
+	 * Previously, an asterisk (*) was shown indicating unsaved changes
+	 * even when no actual modifications were made.
+	 * This fix ignores cases where the reason is undefined
+	 * and no real changes have occurred.
+	 */
+	if (!reason && (!changes || changes.length === 0)) {
+		return;
+	}
 
 	//this is the case on init (because initial data set)
 	//also when we reset data (button)

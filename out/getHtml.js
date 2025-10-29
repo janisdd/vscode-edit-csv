@@ -145,7 +145,7 @@ function createEditorHtml(webview, context, config, initialVars) {
         bodyPageHtml = /*html*/ `
 		<div id="full-page" class="page full-h">
 
-			<div id="all-options" class="all-options">
+			<div id="all-options" class="all-options" style="display: none !important;">
 
 				<table>
 					<thead>
@@ -494,7 +494,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 			</div>
 
-			<div id="table-actions" class="table-action-buttons">
+			<div id="table-actions" class="table-action-buttons" style="display: none !important;">
 
 				<div class="separated-btns">
 

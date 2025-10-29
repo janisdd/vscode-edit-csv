@@ -61,7 +61,6 @@ var initialConfig: EditCsvConfig | undefined = {
 	initialNumbersStyle: 'en',
 	insertRowBehavior: 'keepRowKeepColumn',
 	insertColBehavior: 'keepRowKeepColumn',
-	initiallyIsInReadonlyMode: false,
 	hideOpenCsvEditorUiActions: false, //noop, has only effect if set inside the user settings (vs code extension)
 	openTableAndSelectCellAtCursorPos: "never",
 	pasteMode: 'normal',

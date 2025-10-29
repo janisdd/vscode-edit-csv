@@ -230,7 +230,7 @@ let shouldApplyHasHeaderAfterRowsAdded = false
  * table is editable or not, also disables some related ui, e.g. buttons
  * set via {@link EditCsvConfig.initiallyIsInReadonlyMode}
  */
-let isReadonlyMode = false
+let isReadonlyMode = true
 
 /**
  * the original csv file has a layout and sometimes we use the original positions

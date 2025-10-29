@@ -156,7 +156,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 		bodyPageHtml= /*html*/`
 		<div id="full-page" class="page full-h">
 
-			<div id="all-options" class="all-options">
+			<div id="all-options" class="all-options" style="display: none !important;">
 
 				<table>
 					<thead>
@@ -505,7 +505,7 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 
 			</div>
 
-			<div id="table-actions" class="table-action-buttons">
+			<div id="table-actions" class="table-action-buttons" style="display: none !important;">
 
 				<div class="separated-btns">
 
