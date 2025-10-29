@@ -4,6 +4,7 @@ import { isCsvFile, getCurrentViewColumn, debugLog, partitionString, debounce } 
 import { createEditorHtml } from './getHtml';
 import { InstanceManager, Instance, SomeInstance } from './instanceManager';
 import { getExtensionConfiguration, overwriteConfiguration } from './configurationHelper';
+import { CsvAutoOpenProvider } from './csvAutoOpenProvider';
 
 // const debounceDocumentChangeInMs = 1000
 
@@ -15,8 +16,55 @@ import { getExtensionConfiguration, overwriteConfiguration } from './configurati
  */
 export const editorUriScheme = 'csv-edit'
 
+// Global instance manager - shared across custom editor and commands
+let globalInstanceManager: InstanceManager | null = null
+let globalContext: vscode.ExtensionContext | null = null
 
-// this method is called when your extension is activated
+// Get the instance manager (for use by custom editor provider)
+export function getInstanceManager(): InstanceManager | null {
+	return globalInstanceManager
+}
+
+/**
+ * Open CSV editor for a document (can be called without activeTextEditor)
+ * This is the core function that creates the table editor
+ */
+export async function openCsvEditorForDocument(
+	document: vscode.TextDocument,
+	overwriteSettings: EditCsvConfigOverwrite | null = null,
+	existingPanel?: vscode.WebviewPanel  // ← NEW: Panel from custom editor
+): Promise<boolean> {
+	if (!globalContext || !globalInstanceManager) {
+		throw new Error('Extension not properly initialized')
+	}
+
+	// Check if editor already exists for this file
+	const existingInstance = globalInstanceManager.findInstanceBySourceUri(document.uri)
+	if (existingInstance) {
+		// Already have editor for this file
+		existingInstance.panel.reveal()
+		
+		// If custom editor provided a panel, dispose it (we're using the existing editor's panel)
+		if (existingPanel) {
+			existingPanel.dispose()
+		}
+		
+		return false  // Did not create new editor
+	}
+
+	// Create editor with document (unified function handles both TextEditor and TextDocument!)
+	createNewEditorInstance(
+		globalContext,
+		document,  // Pass document directly
+		globalInstanceManager,
+		overwriteSettings,
+		existingPanel  // Pass the panel to reuse it!
+	)
+	
+	return true  // Created new editor
+}
+
+// This method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
@@ -28,6 +76,25 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 
 	let instanceManager = new InstanceManager()
+	
+	// Set global variables for use by custom editor provider
+	globalInstanceManager = instanceManager
+	globalContext = context
+
+	// Register auto-open custom editor provider
+	const autoOpenProvider = new CsvAutoOpenProvider()
+	context.subscriptions.push(
+		vscode.window.registerCustomEditorProvider(
+			'edit-csv.csvEditor',
+			autoOpenProvider,
+			{
+				webviewOptions: {
+					retainContextWhenHidden: true  // Keep state when hidden (for large CSVs)
+				},
+				supportsMultipleEditorsPerDocument: false
+			}
+		)
+	)
 
 	const applyCsvCommand = vscode.commands.registerCommand('edit-csv.apply', () => {
 
@@ -278,21 +345,47 @@ function beforeEditCsvCheck(instanceManager: InstanceManager): boolean {
 	return true
 }
 
-function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEditor: vscode.TextEditor, instanceManager: InstanceManager, overwriteSettings: EditCsvConfigOverwrite | null = null): void {
+function createNewEditorInstance(
+	context: vscode.ExtensionContext, 
+	activeTextEditorOrDocument: vscode.TextEditor | vscode.TextDocument, 
+	instanceManager: InstanceManager, 
+	overwriteSettings: EditCsvConfigOverwrite | null = null,
+	existingPanel?: vscode.WebviewPanel
+): void {
+	// Support both TextEditor (old way) and TextDocument (new way)
+	const isActiveTextEditor = 'selection' in activeTextEditorOrDocument
+	const document = isActiveTextEditor ? activeTextEditorOrDocument.document : activeTextEditorOrDocument
+	const activeTextEditor = isActiveTextEditor ? activeTextEditorOrDocument : null
 
-	const uri = activeTextEditor.document.uri
+	const uri = document.uri
 
-	const title = getEditorTitle(activeTextEditor.document)
+	const title = getEditorTitle(document)
 
-	let panel = vscode.window.createWebviewPanel('csv-editor', title, getCurrentViewColumn(), {
-		enableFindWidget: false, //we use our own find widget...
-		enableCommandUris: true,
-		enableScripts: true,
-		retainContextWhenHidden: true
-	})
+	let panel: vscode.WebviewPanel
+	if (existingPanel) {
+		// Reuse the panel VS Code gave us (Custom editor workflow)
+		panel = existingPanel
+		panel.title = title  // Update title
+		
+		// IMPORTANT: Configure webview options for the reused panel
+		// The custom editor panel has different defaults, we need to set our options
+		panel.webview.options = {
+			enableCommandUris: true,
+			enableScripts: true,  // Required for Handsontable to work!
+			localResourceRoots: [context.extensionUri]  // Allow loading local resources
+		}
+	} else {
+		// Create new panel (Command-based workflow)
+		panel = vscode.window.createWebviewPanel('csv-editor', title, getCurrentViewColumn(), {
+			enableFindWidget: false, //we use our own find widget...
+			enableCommandUris: true,
+			enableScripts: true,
+			retainContextWhenHidden: true
+		})
+	}
 
 	//check if the file is in the current workspace
-	let isInCurrentWorkspace = activeTextEditor.document.uri.fsPath !== vscode.workspace.asRelativePath(activeTextEditor.document.uri.fsPath)
+	let isInCurrentWorkspace = document.uri.fsPath !== vscode.workspace.asRelativePath(document.uri.fsPath)
 
 	const config = getExtensionConfiguration()
 
@@ -317,7 +410,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 		if (config.shouldWatchCsvSourceFile !== 'no') {
 			//if the file is in the current workspace we the file model in vs code is always synced so is this (faster reads/cached)
-			watcher = vscode.workspace.createFileSystemWatcher(activeTextEditor.document.fileName, true, false, true)
+			watcher = vscode.workspace.createFileSystemWatcher(document.fileName, true, false, true)
 		}
 
 		instance = {
@@ -330,7 +423,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 			hasChanges: false,
 			originalTitle: title,
 			sourceFileWatcher: watcher,
-			document: activeTextEditor.document,
+			document: document,
 			ignoreChangeEvents: false,
 			unsubscribeWatcher: null,
 			lastCommittedContent: ''
@@ -340,7 +433,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 		if (config.shouldWatchCsvSourceFile !== 'no') {
 			//the problem with this is that it is faster than the file model (in vs code) can sync the file...
-			watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(activeTextEditor.document.fileName, "*"), true, false, true)
+			watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(document.fileName, "*"), true, false, true)
 		}
 
 		instance = {
@@ -353,7 +446,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 			hasChanges: false,
 			originalTitle: title,
 			sourceFileWatcher: watcher,
-			document: activeTextEditor.document,
+			document: document,
 			ignoreChangeEvents: false,
 			unsubscribeWatcher: null,
 			lastCommittedContent: ''
@@ -457,7 +550,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 							}
 						)
 
-				} else if (activeTextEditor.document.isClosed) {
+				} else if (activeTextEditor && activeTextEditor.document.isClosed) {
 					//slow path
 					//not synchronized anymore...
 					//we need to get the real file content from disk
@@ -473,7 +566,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 							}
 						)
 
-				} else {
+				} else if (activeTextEditor) {
 					//fast path
 					//file is still open and synchronized
 					//sometimes the model is not updated fast enough after a change detection, thus we get old content
@@ -482,6 +575,19 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 					// debugLog(`content send`, content.split('\n')[0])
 					instance.lastCommittedContent = content
 					funcSendContent(content)
+				} else {
+					//called from custom editor with document only
+					//always read from disk to be safe
+					vscode.workspace.openTextDocument(instance.sourceUri)
+						.then(
+							doc => {
+								const content = doc.getText()
+								instance.lastCommittedContent = content
+								funcSendContent(content)
+							}, error => {
+								vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
+							}
+						)
 				}
 
 				debugLog('finished sending csv content to webview')
@@ -565,9 +671,12 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	
 
 	//because for col it is the cursor pos, it can be larger than the line length! (well, equal numbers)
-	let activeCol = activeTextEditor.selection.active.character
-	if (activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeCol) {
-		activeCol =  activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length - 1
+	let activeCol = 0
+	if(activeTextEditor){
+		let activeCol = activeTextEditor.selection.active.character
+		if (activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeCol) {
+			activeCol =  activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length - 1
+		}
 	}
 
 	let platform: InitialVars['os']
@@ -593,10 +702,10 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 
 	panel.webview.html = createEditorHtml(panel.webview, context, config, {
 		isWatchingSourceFile: instance.sourceFileWatcher ? true : false,
-		sourceFileCursorLineIndex: activeTextEditor.selection.active.line,
+		sourceFileCursorLineIndex: activeTextEditor ? activeTextEditor.selection.active.line : 0,
 		sourceFileCursorColumnIndex:  activeCol,
-		isCursorPosAfterLastColumn: activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeTextEditor.selection.active.character,
-		openTableAndSelectCellAtCursorPos: config.openTableAndSelectCellAtCursorPos,
+		isCursorPosAfterLastColumn: activeTextEditor ? activeTextEditor.document.lineAt(activeTextEditor.selection.active.line).text.length === activeTextEditor.selection.active.character : false,
+		openTableAndSelectCellAtCursorPos: activeTextEditor ? config.openTableAndSelectCellAtCursorPos : 'never',
 		os: platform
 	})
 
@@ -935,4 +1044,3 @@ function setMultipleCursorsInSourceFile(instance: Instance, positions: FilePosit
 // 		CsvEditStateSerializer.state = state
 // 	}
 // }
-

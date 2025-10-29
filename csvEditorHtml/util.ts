@@ -1163,7 +1163,6 @@ function setupAndApplyInitialConfigPart1(initialConfig: EditCsvConfig | undefine
 	fixedRowsTopInfoSpan.innerText = fixedRowsTop + ''
 	fixedColumnsTopInfoSpan.innerText = fixedColumnsLeft + ''
 
-	isReadonlyMode = initialConfig.initiallyIsInReadonlyMode
 	_updateToggleReadonlyModeUi()
 
 	setNumbersStyleUi(initialConfig.initialNumbersStyle)

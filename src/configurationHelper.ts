@@ -48,7 +48,6 @@ const defaultConfig: EditCsvConfig = {
 	initialNumbersStyle: 'en',
 	insertRowBehavior: 'keepRowKeepColumn',
 	insertColBehavior: 'keepRowKeepColumn',
-	initiallyIsInReadonlyMode: false,
 	hideOpenCsvEditorUiActions: false, //noop, has only effect if set inside the user settings
 	openTableAndSelectCellAtCursorPos: "initialOnly_correctRowAlwaysFirstColumn",
 	pasteMode: 'normal',

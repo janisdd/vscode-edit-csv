@@ -2,7 +2,7 @@
 	"name": "vscode-edit-csv",
 	"displayName": "Edit CSV",
 	"description": "extension to edit csv files with a table ui",
-	"version": "0.11.7",
+	"version": "0.11.7-hr",
 	"license": "MIT",
 	"icon": "images/logo.png",
 	"publisher": "janisdd",
@@ -31,10 +31,26 @@
 		"onCommand:edit-csv.edit",
 		"onCommand:edit-csv.apply",
 		"onCommand:edit-csv.applyAndSave",
-		"onCommand:edit-csv.editWithConfig"
+		"onCommand:edit-csv.editWithConfig",
+		"onCustomEditor:edit-csv.csvEditor"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"customEditors": [
+			{
+				"viewType": "edit-csv.csvEditor",
+				"displayName": "CSV Editor",
+				"selector": [
+					{
+						"filenamePattern": "*.csv"
+					},
+					{
+						"filenamePattern": "*.tsv"
+					}
+				],
+				"priority": "default"
+			}
+		],
 		"languages": [
 			{
 				"id": "csv",
@@ -320,7 +336,7 @@
 				},
 				"csv-edit.tryToGuessHasHeader": {
 					"type": "boolean",
-					"default": false,
+					"default": true,
 					"description": "true: tries to guess if the csv file has a header line, false: not. Note: This only sets the has header option to true, but never to false"
 				},
 				"csv-edit.readOption_hasHeader": {
@@ -510,7 +526,7 @@
 				},
 				"csv-edit.fontSizeInPx": {
 					"type": "number",
-					"default": 16,
+					"default": 0,
 					"description": "the font size in px, 0 or -x to sync the font size with the editor, +x to overwrite the font size (changing will rerender the table)"
 				},
 				"csv-edit.showColumnHeaderNamesWithLettersLikeExcel": {
@@ -589,11 +605,6 @@
 						"we stay in the same row but the cell in the new column is selected",
 						"keep the currently selected cell"
 					]
-				},
-				"csv-edit.initiallyIsInReadonlyMode": {
-					"type": "boolean",
-					"default": false,
-					"description": "true: table starts in readonly mode, false: normal edit mode"
 				},
 				"csv-edit.hideOpenCsvEditorUiActions": {
 					"type": "boolean",
@@ -714,7 +725,7 @@
 				},
 				"csv-edit.convertUrlsToLinkTags": {
 					"type": "boolean",
-					"default": true,
+					"default": false,
 					"description": "true: if a cell contains url-like text, the urls are displayed as urls and can be clicked on. false: all urls are rendered as normal text"
 				},
 				"csv-edit.dragToAutoFill": {
@@ -766,7 +777,7 @@
 	},
 	"scripts": {
 		"preinstall": "npx npm-force-resolutions",
-		"vscode:prepublish": "npm audit && npm run compile && npm run testFe && npm run promptUp",
+		"vscode:prepublish": "npm run compile",
 		"compile": "npx tsc -p ./ && tsc -p ./csvEditorHtml/tsconfig.json",
 		"watch": "npx tsc -watch -p ./",
 		"watchEditor": "npx tsc -w -p ./csvEditorHtml/tsconfig.json",

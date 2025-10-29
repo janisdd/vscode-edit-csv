@@ -48,7 +48,6 @@ const defaultConfig = {
     initialNumbersStyle: 'en',
     insertRowBehavior: 'keepRowKeepColumn',
     insertColBehavior: 'keepRowKeepColumn',
-    initiallyIsInReadonlyMode: false,
     hideOpenCsvEditorUiActions: false,
     openTableAndSelectCellAtCursorPos: "initialOnly_correctRowAlwaysFirstColumn",
     pasteMode: 'normal',
