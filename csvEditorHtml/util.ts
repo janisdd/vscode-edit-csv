@@ -803,11 +803,17 @@ function commentValueAndUrlsRenderer(instance: Handsontable, td: HTMLTableDataCe
 			const htmlParts = createCellValueWithUrlLinks(value!, urls)
 			Handsontable.dom.empty(td)
 			td.append(...htmlParts)
-		}
 
-		//this applied css classes to the cell
-		//@ts-ignore
-		Handsontable.renderers.BaseRenderer.apply(this, arguments);
+			//this applied css classes to the cell
+			//@ts-ignore
+			Handsontable.renderers.BaseRenderer.apply(this, arguments);
+		} else {
+			//can happen if url starts with correct prefix http:// but is actually invalid
+			//e.g. https://<test... or http://*test
+			//cell has no urls
+			//@ts-ignore
+			Handsontable.renderers.TextRenderer.apply(this, arguments);
+		}
 
 	} else {
 		//cell has no urls

@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+# 0.11.8
+- fixed issue #216 - cell with invalid urls (starts as a url but is actually invalid) render no content
+
 # 0.11.7
 - fixed issue #208 - added option `columnNamesStartIndexOffset` to control which number the first column gets
 
