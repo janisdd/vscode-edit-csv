@@ -63,7 +63,21 @@ export function activate(context: vscode.ExtensionContext) {
 		openSourceFileFunc(instanceManager)
 	})
 
-	const editCsvCommand = vscode.commands.registerCommand('edit-csv.edit', () => {
+	const editCsvCommand = vscode.commands.registerCommand('edit-csv.edit', (uri?: vscode.Uri) => {
+
+		// If a URI was passed (e.g. from tab context menu or explorer context menu),
+		// open that document first so it becomes the active editor before proceeding.
+		if (uri && (!vscode.window.activeTextEditor || vscode.window.activeTextEditor.document.uri.toString() !== uri.toString())) {
+			vscode.workspace.openTextDocument(uri).then(document => {
+				vscode.window.showTextDocument(document, { preview: false }).then(() => {
+					const shouldOpenEditor = beforeEditCsvCheck(instanceManager)
+					if (!shouldOpenEditor) return
+					if (!vscode.window.activeTextEditor) return
+					createNewEditorInstance(context, vscode.window.activeTextEditor, instanceManager)
+				})
+			})
+			return
+		}
 
 		const shouldOpenEditor = beforeEditCsvCheck(instanceManager)
 

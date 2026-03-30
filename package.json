@@ -161,6 +161,88 @@
 					"group": "navigation"
 				}
 			],
+			"editor/title/context": [
+				{
+					"when": "resourceLangId == csv && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == tsv && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == CSV && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == TSV && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'CSV (semicolon)' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (semicolon)' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (pipe)' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (whitespace)' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (tilde)' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (caret)' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (colon)' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (double quote)' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (equals)' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (dot)' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'csv (hyphen)' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				},
+				{
+					"when": "resourceLangId == 'dynamic csv' && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
+					"command": "edit-csv.edit",
+					"group": "navigation"
+				}
+			],
 			"editor/title": [
 				{
 					"when": "editorLangId == csv && resourceScheme != csv-edit && !config.csv-edit.hideOpenCsvEditorUiActions",
