@@ -627,6 +627,18 @@ export function createEditorHtml(webview: vscode.Webview, context: vscode.Extens
 									</span>
 								</div>
 
+								<div class="menu-item" onclick="transposeColumsAndRows(true)">
+									<span slot="start" class="icon is-small"><i class="fas fa-retweet"></i></span>
+									<span style="width: 2rem">Transpose (include header)</span>
+
+									<span slot="end" class="icon is-small">
+										<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
+											data-tooltip="Swaps columns and rows, including the header row as the first column. The result will have no header row. This will clear undo/redo stack!">
+											<i class="fas fa-question-circle"></i>
+										</span>
+									</span>
+								</div>
+
 							</div>
 						</div>
 

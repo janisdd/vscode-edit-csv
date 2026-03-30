@@ -2619,35 +2619,59 @@ function trimAllCells() {
 
 }
 
-function transposeColumsAndRows() {
+function transposeColumsAndRows(includeHeader = false) {
 
 	if (!hot) return
 
-	const allData = getData()
+	let allData = getData()
 
 	//is always rectangular because we call
 	//_normalizeDataArray
 	// console.log(`allData`, allData)
 
-	//if we have a header row, we not transpose it (as this is probably what the user intended)
-	//when we have a header row, it is not included in the data array
+	let quoteInfo = cellIsQuotedInfoPhysicalIndices
 
-	//NOTE there is an isse when we have comments above the header row
-	//  because we use the first row with data as header row
-	//  (which is by design)
-	//  but when we transpose the data AND reset to no header row
-	//  then the header row is inserted at the initial position (where we got it from)
-	//  and if we transpose again, the operation is not reversed (original -> transpose -> transpose -> original)
-	//  BUT this is ok for now
+	if (includeHeader && headerRowWithIndex !== null) {
+		//prepend the header row into the data so it gets transposed as the first column
+		const headerAsStrings = headerRowWithIndex.row.map<string>((val) => val !== null ? val : '')
+		allData = [headerAsStrings, ...allData]
+
+		//also prepend the header quote info
+		const headerQuoteInfo = cellIsQuotedInfoPhysicalIndicesHeaderRow.length > 0
+			? cellIsQuotedInfoPhysicalIndicesHeaderRow
+			: new Array(headerAsStrings.length).fill(false)
+		quoteInfo = [headerQuoteInfo, ...quoteInfo]
+
+		//clear the header state since headers are now part of the data
+		headerRowWithIndex = null
+		cellIsQuotedInfoPhysicalIndicesHeaderRow = []
+		const elRead = hasHeaderReadOptionInput
+		elRead.checked = false
+		const elWrite = _getById('has-header-write') as HTMLInputElement
+		elWrite.checked = false
+		defaultCsvWriteOptions.header = false
+		defaultCsvReadOptions._hasHeader = false
+	} else {
+		//if we have a header row, we not transpose it (as this is probably what the user intended)
+		//when we have a header row, it is not included in the data array
+
+		//NOTE there is an isse when we have comments above the header row
+		//  because we use the first row with data as header row
+		//  (which is by design)
+		//  but when we transpose the data AND reset to no header row
+		//  then the header row is inserted at the initial position (where we got it from)
+		//  and if we transpose again, the operation is not reversed (original -> transpose -> transpose -> original)
+		//  BUT this is ok for now
+	}
 
 	//see https://stackoverflow.com/questions/17428587/transposing-a-2d-array-in-javascript
 	let transpose = allData[0].map((col, i) => allData.map(row => row[i]))
 
 	//transpose 2d array cellIsQuotedInfoPhysicalIndices
 
-	let transposeQuoteInfo = cellIsQuotedInfoPhysicalIndices[0].map((col, i) => cellIsQuotedInfoPhysicalIndices.map(row => row[i]))
+	let transposeQuoteInfo = quoteInfo[0].map((col, i) => quoteInfo.map(row => row[i]))
 	cellIsQuotedInfoPhysicalIndices = transposeQuoteInfo
-	
+
 	statusInfo.innerText = `Swapping finished, rendering...`
 
 	setTimeout(() => {
