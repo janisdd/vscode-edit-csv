@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+# 0.11.9
+- merged pr #229 - Add 'Edit CSV' to editor tab context menu
+  - this also fixes a small bug with the `explorer/context` where opening the table would fail
+
 # 0.11.8
 - fixed issue #216 - cell with invalid urls (starts as a url but is actually invalid) render no content
 

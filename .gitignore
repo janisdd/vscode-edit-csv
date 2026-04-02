@@ -7,6 +7,7 @@ scripts.md
 backup
 *.vsix
 out/test
+out/
 cypress
 csvEditorHtml/browser/dist
 csvEditorHtml/browser/imgs/private
