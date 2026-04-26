@@ -4,6 +4,9 @@ note that the changelog is also present on the website when you click on the ver
 
 ### [Unreleased]
 
+## 1.7.8
+- (same as vs code extension 0.11.10)
+
 ## 1.7.7
 - (same as vs code extension 0.11.8)
 

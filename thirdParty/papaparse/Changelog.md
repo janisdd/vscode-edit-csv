@@ -18,6 +18,37 @@ Then run yarn test / npm run test
 
 ## Changes (latest first)
 
+- `quoteChar` in read config can now be empty `''` to ignore quotes while parsing
+- changed unparse result from string to object
+  - now includes meta data about the result
+    - mapping from csv fields to string position
+
+- manually converted to typescript
+  - added types
+  - removed some unused code (node js stuff, streaming, ...)
+  - dist includes real .d.ts file
+  - dist includes umd version
+  - dist includes minified version
+  - changed to vitest for testing
+- added tracking of csv field to input position mapping (includes extra spaces, added tests for this)
+  - some features are not supported in preview mode (e.g. most mappings)
+
+- started to track versions with `-custom-1.0.0` suffix
+
+- added config options:
+  - `calcInverseMappings: bool` the other mappings are from source file to csv table, this options calculates the inverse mappings (csv table to source file)
+    - the result will contain `outCsvCellToSourceFilePositionMapping` (where each entry is the start & end position of the cell in the source file)
+    	- one row for each row in the csv table
+      - one entry for each cell in each csv row
+      - entry: {start: number, end: number}
+- added config options:
+  - `calcLineIndexToCsvLineIndexMapping: bool` and `calcColumnIndexToCsvColumnIndexMapping: bool`
+  - if set to true, the result will contain `outLineIndexToCsvLineIndexMapping` and `outColumnIndexToCsvColumnIndexMapping`
+    - outLineIndexToCsvLineIndexMapping: for every line in the input text the csv line it refers to
+    - outColumnIndexToCsvColumnIndexMapping: the end string indices for every csv line fields (for every csv row)
+      - note that the last col has no separator, and if it's empty the last end second last indices will be the same!!
+- fixed and issue where multi-character delimiter won't work
+- added option `quoteEmptyOrNullFields` (defaults to false) to unparse which defines how null, undefined and empty strings are quoted
 - fixes issue where all fields quoted and missing closing quote on last field will hang the function guessDelimiter
 	- this is because the field in the row will not terminated by the new line because the closing quote is missing (\n is also valid inside multi line fields)
 	- in combination with an unknown delimiter (the wrong one) will cause that no quote is accepted as closing quote and we never find a single valid row (after 10 we normally stop guessing)

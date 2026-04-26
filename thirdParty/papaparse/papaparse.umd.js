@@ -4,7 +4,7 @@
   "use strict";
   /* @license
   Papa Parse
-  v5.0.0-custom-2.0.0
+  v5.0.0-custom-2.1.0
   https://github.com/mholt/PapaParse
   License: MIT
   commit: 49170b76b382317356c2f707e2e4191430b8d495
@@ -90,6 +90,7 @@
           newLine,
           skipEmptyLines,
           comments,
+          _config.quoteChar,
           _config.delimitersToGuess
         );
         if (delimGuess.successful && delimGuess.bestDelimiter) {
@@ -167,7 +168,7 @@
         }
       }
     }
-    _guessDelimiter(input, newline, skipEmptyLines, comments, delimitersToGuess) {
+    _guessDelimiter(input, newline, skipEmptyLines, comments, quoteChar, delimitersToGuess) {
       let bestDelim = null;
       let bestDelta = null;
       let maxFieldCount = null;
@@ -182,6 +183,7 @@
           comments,
           delimiter: delim,
           newline,
+          quoteChar,
           previewInRows: 10,
           calcColumnIndexToCsvColumnIndexMapping: false,
           calcLineIndexToCsvLineIndexMapping: false,
@@ -289,9 +291,6 @@
       this._outColumnIndexToCsvColumnIndexMapping = config.calcColumnIndexToCsvColumnIndexMapping ? [] : null;
       this._outFieldPositionMapping = config.calcCsvFieldToInputPositionMapping ? [] : null;
       this._cellIsQuotedInfoRow = [];
-      if (!this._quoteChar) {
-        this._quoteChar = Papa.DefaultQuoteChar;
-      }
       this._escapeChar = config.escapeChar ? config.escapeChar : this._quoteChar;
       if (Papa.BAD_DELIMITERS.indexOf(this._delim) > -1) {
         this._delim = Papa.DefaultDelimiter;
@@ -315,7 +314,7 @@
       if (!input) {
         return this.returnable();
       }
-      if (input.indexOf(this._quoteChar) === -1) {
+      if (!this._quoteChar || input.indexOf(this._quoteChar) === -1) {
         const rows = input.split(this._newlineString);
         let rowString = "";
         for (let i = 0; i < rows.length; i++) {
@@ -782,8 +781,11 @@
         return "";
       }
       str = str.toString();
-      const containsQuotes = str.indexOf(this._quoteChar) > -1;
-      str = str.replace(this._quoteCharRegex, this._escapedQuote);
+      let containsQuotes = false;
+      if (this._quoteChar) {
+        containsQuotes = str.indexOf(this._quoteChar) > -1;
+        str = str.replace(this._quoteCharRegex, this._escapedQuote);
+      }
       let _preTestNeedQuotes = false;
       if (this._determineFieldHasQuotesFunc) {
         _preTestNeedQuotes = this._determineFieldHasQuotesFunc(str, row, col);

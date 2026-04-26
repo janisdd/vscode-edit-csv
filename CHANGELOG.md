@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+# 0.11.10
+- fixed issue #219 - Empty QuoteChar not respected
+  - updated papaparse to support empty `quoteChar` in read and write config
+
 # 0.11.9
 - merged pr #229 - Add 'Edit CSV' to editor tab context menu
   - this also fixes a small bug with the `explorer/context` where opening the table would fail
