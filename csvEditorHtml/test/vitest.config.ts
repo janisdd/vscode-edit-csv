@@ -31,7 +31,7 @@ export default defineConfig({
           type: 'text/javascript',
         },
         {
-          src: './thirdParty/papaparse/papaparse.min.js',
+          src: './thirdParty/papaparse/papaparse.umd.js',
           type: 'text/javascript',
         },
         {

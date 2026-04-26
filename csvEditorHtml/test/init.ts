@@ -1,6 +1,6 @@
 
 window.vscode = null
-window.papaCsv = window.Papa
+window.papaCsv = window.papaparse.Papa
 
 const defaultInitialVars = {
 	isWatchingSourceFile: false,
