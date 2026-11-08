@@ -24,6 +24,8 @@ declare var initialConfig: EditCsvConfig | undefined
 
 declare var initialVars: InitialVars
 
+declare var initialLanguage: string | undefined
+
 let vscode: VsExtension | undefined = undefined
 
 if (typeof acquireVsCodeApi !== 'undefined') {
@@ -538,5 +540,12 @@ function setupGlobalShortcutsInVs() {
 	//---- some shortcuts are also in ui.ts where the handsontable instance is created...
 	//needed for core handsontable shortcuts e.g. that involve arrow keys
 
-
 }
+
+	// 优先使用 VS Code 注入的语言，在网页端则使用浏览器的 navigator.language
+	const currentAppLang = (typeof initialLanguage !== 'undefined' && initialLanguage) 
+		? initialLanguage 
+		: (typeof navigator !== 'undefined' ? navigator.language : 'en');
+
+	setLanguage(currentAppLang);
+	translateDom();
