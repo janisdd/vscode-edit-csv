@@ -21,8 +21,8 @@ const zhCnTranslation: Record<string, string> = {
 	Transpose: "转置",
 	"Write header": "写入表头",
 	"Quote all fields": "引用所有字段",
-};
+}
 
-registerTranslation("zh-cn", zhCnTranslation);
-registerTranslation("zh-hans", zhCnTranslation);
-registerTranslation("zh", zhCnTranslation);
+registerTranslation("zh-cn", zhCnTranslation)
+registerTranslation("zh-hans", zhCnTranslation)
+registerTranslation("zh", zhCnTranslation)

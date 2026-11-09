@@ -1,70 +1,83 @@
-// csvEditorHtml/i18n.ts
+// Current language
+let currentLanguage = "en"
 
-// 当前语言
-let currentLanguage = 'en';
-
-// 所有语言包注册表
-const allTranslations: Record<string, Record<string, string>> = {};
+// Translation dictionaries
+const allTranslations: Record<string, Record<string, string>> = {}
 
 /**
- * 注册语言包
+ * Register a translation dictionary for a specific language
  */
 function registerTranslation(lang: string, dict: Record<string, string>) {
-	allTranslations[lang.toLowerCase()] = dict;
+	allTranslations[lang.toLowerCase()] = dict
 }
 
 /**
- * 设置当前语言
+ * Set the active language
  */
 function setLanguage(lang: string) {
 	if (lang) {
-		currentLanguage = lang.toLowerCase();
+		const lower = lang.toLowerCase()
+		// Normalize Chinese locales (e.g. zh-cn, zh-hans, zh-CN -> zh-cn)
+		if (lower.startsWith("zh")) {
+			currentLanguage = "zh-cn"
+		} else {
+			currentLanguage = lower
+		}
 	}
 }
 
 /**
- * 作者要求的 t(enText) 函数
- * 全局可用，直接传英文，有翻译就返回中文，没有就返回原英文
+ * Translation helper that falls back to the original English text
  */
 function t(enText: string): string {
-	const dict = allTranslations[currentLanguage];
+	const dict = allTranslations[currentLanguage]
 	if (dict && dict[enText]) {
-		return dict[enText];
+		return dict[enText]
 	}
-	return enText;
+	return enText
 }
 
 /**
- * 遍历 DOM 替换静态文本
+ * Traverse DOM and translate elements marked with data-i18n attributes
  */
 function translateDom() {
-	// 翻译标签内的文字内容
-	document.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => {
-		const key = el.getAttribute('data-i18n');
+	// Translate text content
+	document.querySelectorAll<HTMLElement>("[data-i18n]").forEach((el) => {
+		const key = el.getAttribute("data-i18n")
 		if (key) {
-			el.textContent = t(key);
+			el.textContent = t(key)
 		}
-	});
+	})
 
-	// 翻译悬停提示 title
-	document.querySelectorAll<HTMLElement>('[data-i18n-title]').forEach((el) => {
-		const key = el.getAttribute('data-i18n-title');
+	// Translate tooltips
+	document.querySelectorAll<HTMLElement>("[data-i18n-title]").forEach((el) => {
+		const key = el.getAttribute("data-i18n-title")
 		if (key) {
-			el.title = t(key);
+			el.title = t(key)
 		}
-	});
+	})
 
-	// 翻译输入框占位符 placeholder
-	document.querySelectorAll<HTMLInputElement>('[data-i18n-placeholder]').forEach((el) => {
-		const key = el.getAttribute('data-i18n-placeholder');
-		if (key) {
-			el.placeholder = t(key);
-		}
-	});
+	// Translate input placeholders
+	document
+		.querySelectorAll<HTMLInputElement>("[data-i18n-placeholder]")
+		.forEach((el) => {
+			const key = el.getAttribute("data-i18n-placeholder")
+			if (key) {
+				el.placeholder = t(key)
+			}
+		})
 }
 
-// 显式挂载到全局 window，确保其他脚本 100% 能直接调用
-window.registerTranslation = registerTranslation;
-window.setLanguage = setLanguage;
-window.t = t;
-window.translateDom = translateDom;
+// Extend global Window interface
+interface Window {
+	registerTranslation: (lang: string, dict: Record<string, string>) => void
+	setLanguage: (lang: string) => void
+	t: (enText: string) => string
+	translateDom: () => void
+}
+
+// Mount to window object
+window.registerTranslation = registerTranslation
+window.setLanguage = setLanguage
+window.t = t
+window.translateDom = translateDom
