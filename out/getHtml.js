@@ -11,7 +11,7 @@ function getResourcePath(webview, context, filePath) {
     //fix for windows because there path.join will use \ as separator and when we inline this string in html/js
     //we get specials strings e.g. c:\n
     // return `vscode-resource:${path.join(context.extensionPath, filePath).replace(/\\/g, '/')}`
-    return `${webview.asWebviewUri(vscode.Uri.file(path.join(context.extensionPath, filePath).replace(/\\/g, "/")))}`;
+    return `${webview.asWebviewUri(vscode.Uri.file(path.join(context.extensionPath, filePath).replace(/\\/g, '/')))}`;
 }
 exports.getResourcePath = getResourcePath;
 /**
@@ -22,39 +22,39 @@ exports.getResourcePath = getResourcePath;
  */
 function createEditorHtml(webview, context, config, initialVars) {
     const _getResourcePath = getResourcePath.bind(undefined, webview, context);
-    let handsontableCss = _getResourcePath("thirdParty/handsontable/handsontable.min.css");
+    let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.min.css');
     // let handsontableCss = _getResourcePath('thirdParty/handsontable/handsontable.css')
-    let handsontableJs = _getResourcePath("thirdParty/handsontable/handsontable.min.js");
+    let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.min.js');
     // let handsontableJs = _getResourcePath('thirdParty/handsontable/handsontable.js')
-    let papaparseJs = _getResourcePath("thirdParty/papaparse/papaparse.min.umd.js");
+    let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.min.umd.js');
     // let papaparseJs = _getResourcePath('thirdParty/papaparse/papaparse.umd.js')
-    let regressionJS = _getResourcePath("thirdParty/regression/regression.min.js");
-    const mousetrapJs = _getResourcePath("thirdParty/mousetrap/mousetrap.min.js");
-    const mousetrapBindGlobalJs = _getResourcePath("thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js");
-    const bigJs = _getResourcePath("thirdParty/big.js/big.min.js");
-    const bigJsToFormat = _getResourcePath("thirdParty/toFormat/toFormat.min.js");
-    let fontAwesomeCss = _getResourcePath("thirdParty/fortawesome/fontawesome-free/css/all.min.css");
+    let regressionJS = _getResourcePath('thirdParty/regression/regression.min.js');
+    const mousetrapJs = _getResourcePath('thirdParty/mousetrap/mousetrap.min.js');
+    const mousetrapBindGlobalJs = _getResourcePath('thirdParty/mousetrap/plugins/global-bind/mousetrap-global-bind.min.js');
+    const bigJs = _getResourcePath('thirdParty/big.js/big.min.js');
+    const bigJsToFormat = _getResourcePath('thirdParty/toFormat/toFormat.min.js');
+    let fontAwesomeCss = _getResourcePath('thirdParty/fortawesome/fontawesome-free/css/all.min.css');
     //we need to load the font manually because the url() seems to not work properly with vscode-resource
-    const iconFont = _getResourcePath("thirdParty/fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2");
-    const mainCss = _getResourcePath("csvEditorHtml/main.css");
-    const darkThemeCss = _getResourcePath("csvEditorHtml/dark.css");
-    const lightThemeCss = _getResourcePath("csvEditorHtml/light.css");
-    const hightContrastThemeCss = _getResourcePath("csvEditorHtml/high_contrast.css");
-    const settingsOverwriteCss = _getResourcePath("csvEditorHtml/settingsOverwrite.css");
+    const iconFont = _getResourcePath('thirdParty/fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2');
+    const mainCss = _getResourcePath('csvEditorHtml/main.css');
+    const darkThemeCss = _getResourcePath('csvEditorHtml/dark.css');
+    const lightThemeCss = _getResourcePath('csvEditorHtml/light.css');
+    const hightContrastThemeCss = _getResourcePath('csvEditorHtml/high_contrast.css');
+    const settingsOverwriteCss = _getResourcePath('csvEditorHtml/settingsOverwrite.css');
     //scripts
-    const progressJs = _getResourcePath("csvEditorHtml/out/progressbar.js");
-    const findWidgetJs = _getResourcePath("csvEditorHtml/out/findWidget.js");
-    const ioJs = _getResourcePath("csvEditorHtml/out/io.js");
-    const uiJs = _getResourcePath("csvEditorHtml/out/ui.js");
-    const utilJs = _getResourcePath("csvEditorHtml/out/util.js");
-    const autoFillJs = _getResourcePath("csvEditorHtml/out/autoFill.js");
-    const mainJs = _getResourcePath("csvEditorHtml/out/main.js");
-    const beforeDomLoadedJs = _getResourcePath("csvEditorHtml/out/beforeDomLoaded.js");
-    const i18nJs = _getResourcePath("csvEditorHtml/out/i18n.js");
-    const zhCnJs = _getResourcePath("csvEditorHtml/out/locales/zh-cn.js");
-    const toolkit = _getResourcePath("node_modules/@vscode/webview-ui-toolkit/dist/toolkit.min.js");
-    const dayJS = _getResourcePath("node_modules/dayjs/dayjs.min.js");
-    const dayJSPlugins1 = _getResourcePath("node_modules/dayjs/plugin/customParseFormat.js");
+    const progressJs = _getResourcePath('csvEditorHtml/out/progressbar.js');
+    const findWidgetJs = _getResourcePath('csvEditorHtml/out/findWidget.js');
+    const ioJs = _getResourcePath('csvEditorHtml/out/io.js');
+    const uiJs = _getResourcePath('csvEditorHtml/out/ui.js');
+    const utilJs = _getResourcePath('csvEditorHtml/out/util.js');
+    const autoFillJs = _getResourcePath('csvEditorHtml/out/autoFill.js');
+    const mainJs = _getResourcePath('csvEditorHtml/out/main.js');
+    const beforeDomLoadedJs = _getResourcePath('csvEditorHtml/out/beforeDomLoaded.js');
+    const i18nJs = _getResourcePath('csvEditorHtml/out/i18n.js');
+    const zhCnJs = _getResourcePath('csvEditorHtml/out/locales/zh-cn.js');
+    const toolkit = _getResourcePath('node_modules/@vscode/webview-ui-toolkit/dist/toolkit.min.js');
+    const dayJS = _getResourcePath('node_modules/dayjs/dayjs.min.js');
+    const dayJSPlugins1 = _getResourcePath('node_modules/dayjs/plugin/customParseFormat.js');
     //use blocks so vs code adds folding
     let findWidgetHtml = ``;
     {
@@ -155,7 +155,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 							<th>
 								<div class="options-title clickable" onclick="toggleOptionsBar()">
 									<span>
-										<i id="options-bar-icon" class="fas fa-chevron-right"></i> <span data-i18n="Read options">Read options
+										<i id="options-bar-icon" class="fas fa-chevron-right"></i> <span data-i18n="Read options">Read options</span>
 									</span>
 								</div>
 							</th>
@@ -371,6 +371,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 											<div>
 												<vscode-button appearance="secondary" class="" style="height: 36px; margin-top: 1rem;" onclick="toggleAskReadAgainModal(true)">
 													<span style="width: 14rem" data-i18n="Reset data and apply read options">Reset data and apply read options</span>
+
 													<span slot="end" class="icon is-small">
 														<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
 															data-tooltip="The input file content was stored locally and is used as data. Thus this view is independent of the source file">
@@ -837,7 +838,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<div class="box">
-				<span style="width: 14rem" data-i18n="Reset data and apply read options">Reset data and apply read options</span>
+				<h3 class="title is-3" data-i18n="Reset data and apply read options">Reset data and apply read options</h3>
 
 				<p>
 					Are you sure that you want to overwrite the table with the initial content (snapshot) of the source file? <br />
@@ -917,7 +918,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 				<div style="margin-top: 1em">
 					<vscode-button class="" onclick="reloadFileFromDisk()">
-						<span style="width: 3rem">Reload</span>
+						<span style="width: 3rem" data-i18n="Reload">Reload</span>
 					</vscode-button>
 
 					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleSourceFileChangedModalDiv(false, true)">
@@ -964,7 +965,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 	<script>
 		var initialConfig = ${JSON.stringify(config)};
 		var initialVars = ${JSON.stringify(initialVars)};
-		var initialLanguage = ${JSON.stringify(vscode.env.language)};
+		var initialLanguage = ${JSON.stringify(config.initialLanguage && config.initialLanguage !== 'auto' ? config.initialLanguage : vscode.env.language)}
 		</script>
 		<script src="${beforeDomLoadedJs}"></script>
 	

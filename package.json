@@ -330,6 +330,17 @@
 			"title": "Edit CSV configuration",
 			"type": "object",
 			"properties": {
+				"csv-edit.initialLanguage": {
+					"type": "string",
+					"enum": ["auto", "en", "zh-cn"],
+					"enumDescriptions": [
+						"Automatically detect language from VS Code",
+						"English",
+						"Simplified Chinese"
+					],
+					"default": "auto",
+					"description": "The initial language used for the editor UI."
+				},
 				"csv-edit.highlightCsvComments": {
 					"type": "boolean",
 					"default": true,

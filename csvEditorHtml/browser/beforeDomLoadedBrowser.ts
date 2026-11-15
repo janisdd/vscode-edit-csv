@@ -79,7 +79,7 @@ var initialConfig: EditCsvConfig | undefined = {
 	initiallyHiddenColumnNumbers: [],
 	useSaveButtonsAsAdditionalUnsavedChangesIndicator: true,
 	copyColumnHeaderNamesSeparator: `, `,
-	
+	initialLanguage: 'auto',
 }
 
 function __getById(id: string): HTMLElement {
