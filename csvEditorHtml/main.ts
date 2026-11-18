@@ -20,6 +20,7 @@ const defaultInitialVars: InitialVars = {
 declare var acquireVsCodeApi: any
 declare var initialContent: string
 declare var initialConfig: EditCsvConfig | undefined
+declare var initialLanguage: string | undefined
 // declare var regression: RegressionLib
 
 declare var initialVars: InitialVars
@@ -540,3 +541,10 @@ function setupGlobalShortcutsInVs() {
 
 
 }
+
+//prioritize the language injected by VS Code; on the web, use the browser's navigator.language
+const currentAppLang = (typeof initialLanguage !== 'undefined' && initialLanguage) 
+    ? initialLanguage 
+    : (typeof navigator !== 'undefined' ? navigator.language : 'en')
+setLanguage(currentAppLang)
+translateDom()

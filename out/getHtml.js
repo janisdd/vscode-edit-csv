@@ -50,6 +50,8 @@ function createEditorHtml(webview, context, config, initialVars) {
     const autoFillJs = _getResourcePath('csvEditorHtml/out/autoFill.js');
     const mainJs = _getResourcePath('csvEditorHtml/out/main.js');
     const beforeDomLoadedJs = _getResourcePath('csvEditorHtml/out/beforeDomLoaded.js');
+    const i18nJs = _getResourcePath('csvEditorHtml/out/i18n.js');
+    const zhCnJs = _getResourcePath('csvEditorHtml/out/locales/zh-cn.js');
     const toolkit = _getResourcePath('node_modules/@vscode/webview-ui-toolkit/dist/toolkit.min.js');
     const dayJS = _getResourcePath('node_modules/dayjs/dayjs.min.js');
     const dayJSPlugins1 = _getResourcePath('node_modules/dayjs/plugin/customParseFormat.js');
@@ -153,18 +155,18 @@ function createEditorHtml(webview, context, config, initialVars) {
 							<th>
 								<div class="options-title clickable" onclick="toggleOptionsBar()">
 									<span>
-										<i id="options-bar-icon" class="fas fa-chevron-right"></i> Read options
+										<i id="options-bar-icon" class="fas fa-chevron-right"></i> <span data-i18n="Read options">Read options</span>
 									</span>
 								</div>
 							</th>
 							<th>
 								<div class="options-title clickable" onclick="toggleOptionsBar()">
-										Write options
+										<span data-i18n="Write options">Write options</span>
 								</div>
 							</th>
 							<th style="width: 100%;">
 								<div class="options-title">
-										<div class="clickable" onclick="toggleOptionsBar()">Preview</div>
+										<div class="clickable" onclick="toggleOptionsBar()" data-i18n="Preview">Preview</div>
 
 										<vscode-button appearance="icon" class="mar-left-half clickable" onclick="generateCsvPreview()" title="Refresh the preview">
 										<span>
@@ -295,7 +297,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 					
 											<div class="field">
 												<vscode-checkbox id="has-header" type="checkbox" name="has-header" class="" checked="checked" onchange="tryApplyHasHeader(true, false)">
-													<span id="has-header-label">Has header</span>
+													<span id="has-header-label" data-i18n="Has header">Has header</span>
 												</vscode-checkbox>
 												<span class="tooltip is-tooltip-right is-tooltip-multiline"
 													data-tooltip="Use the first row as header in the table. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applied immediately, it will be applied if the table has more than one row. [the readOption_hasHeader and tryToGuessHasHeader settings can control this]">
@@ -368,7 +370,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 											<div>
 												<vscode-button appearance="secondary" class="" style="height: 36px; margin-top: 1rem;" onclick="toggleAskReadAgainModal(true)">
-													<span style="width: 14rem">Reset data and apply read options</span>
+													<span style="width: 14rem" data-i18n="Reset data and apply read options">Reset data and apply read options</span>
 
 													<span slot="end" class="icon is-small">
 														<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
@@ -394,7 +396,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 										<div class="field">
 											<vscode-checkbox id="has-header-write" type="checkbox" name="has-header-write" class="" checked="checked" onchange="setHasHeaderWrite()">
-												<span>Write header</span>
+												<span data-i18n="Write header">Write header</span>
 											</vscode-checkbox>
 											<span class="tooltip is-tooltip-bottom" data-tooltip="Checked: writes the header row, unchecked: not">
 												<i class="fas fa-question-circle"></i>
@@ -460,7 +462,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 					
 											<div class="field">
 												<vscode-checkbox id="quote-all-fields-write" type="checkbox" name="quote-all-fields-write" class="" checked="checked" onchange="setQuoteAllFieldsWrite()">
-												<span>Quote all fields</span>
+												<span data-i18n="Quote all fields">Quote all fields</span>
 												</vscode-checkbox>
 											</div>
 					
@@ -507,7 +509,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 					
 					<vscode-button appearance="secondary" id="add-row-btn" class="on-readonly-disable-btn" onclick="addRow()">
 						<span slot="start" class="icon is-small"><i class="fas fa-plus"></i></span>
-						<span style="width: 4rem">Add row</span>
+						<span style="width: 4rem" data-i18n="Add row">Add row</span>
 					</vscode-button>
 					<div class="row-col-insert-btns">
 					
@@ -521,7 +523,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 					<vscode-button appearance="secondary" id="add-col-btn" class="on-readonly-disable-btn" onclick="addColumn()">
 						<span slot="start" class="icon is-small"><i class="fas fa-plus"></i></span>
-						<span style="width: 5rem">Add column</span>
+						<span style="width: 5rem" data-i18n="Add column">Add column</span>
 					</vscode-button>
 					<div class="row-col-insert-btns">
 						<vscode-button appearance="secondary" class="on-readonly-disable-btn" onclick="insertColLeft()" title="Insert column left to current column [ctrl+shift+alt+left]">
@@ -534,7 +536,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 					<vscode-button appearance="secondary" id="btn-apply-changes-to-file-and-save" class="mar-left on-readonly-disable-btn" onclick="postApplyContent(true)">
 						<span slot="start" class="icon is-small"><i class="fas fa-save"></i></span>
-						<span style="width: 13rem">Apply changes to file and save</span>
+						<span style="width: 13rem" data-i18n="Apply changes to file and save">Apply changes to file and save</span>
 
 						<span slot="end" class="icon is-small">
 							<span class="tooltip is-tooltip-multiline mar-left-half"
@@ -546,7 +548,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 					<vscode-button appearance="secondary" id="btn-apply-changes-to-file" class="on-readonly-disable-btn mar-left-half" onclick="postApplyContent(false)">
 						<span slot="start" class="icon is-small"><i class="fas fa-reply"></i></span>
-						<span style="width: 9rem">Apply changes to file</span>
+						<span style="width: 9rem" data-i18n="Apply changes to file">Apply changes to file</span>
 
 						<span slot="end" class="icon is-small">
 							<span class="tooltip mar-left-half is-tooltip-multiline" data-tooltip="Applies the csv content back to the source file (if something changed). After this the editor has no unsaved changes.">
@@ -566,11 +568,11 @@ function createEditorHtml(webview, context, config, initialVars) {
 						<div>
 							<vscode-button appearance="secondary" id="show-comments-btn" style="margin-right: 1em; height: 100%" onclick="showOrHideAllComments(true)">
 								<span slot="start" class="icon is-small"><i class="far fa-comments"></i></span>
-								<span style="width: 7rem">Show comments</span>
+								<span style="width: 7rem" data-i18n="Show comments">Show comments</span>
 							</vscode-button>
 							<vscode-button appearance="secondary" id="hide-comments-btn" style="margin-right: 1em; height: 100%" onclick="showOrHideAllComments(false)">
 								<span slot="start" class="icon is-small"><i class="fas fa-comments"></i></span>
-								<span style="width: 7rem">Hide comments</span>
+								<span style="width: 7rem" data-i18n="Hide comments">Hide comments</span>
 
 								<span slot="end" class="icon is-small">
 									<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
@@ -586,7 +588,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 							<vscode-button appearance="secondary" style="height: 100%;" class="on-readonly-disable-btn btn-with-menu" onclick="toggleToolMenu()">
 								<span slot="start" class="icon is-small"><i class="fas fa-toolbox"></i></span>
-								<span style="width: 2.8rem">Tools</span>
+								<span style="width: 2.8rem" data-i18n="Tools">Tools</span>
 								<span slot="end" class="icon is-small"><i id="tools-menu-btn-icon" class="fas fa-chevron-down"></i></span>
 							</vscode-button>
 
@@ -594,7 +596,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 								<div class="menu-item" onclick="trimAllCells()">
 									<span slot="start" class="icon is-small"><i class="fas fa-hand-scissors"></i></span>
-									<span style="width: 2rem">Trim</span>
+									<span style="width: 2rem" data-i18n="Trim">Trim</span>
 
 									<span slot="end" class="icon is-small">
 										<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
@@ -606,7 +608,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 								<div class="menu-item" onclick="transposeColumsAndRows()">
 									<span slot="start" class="icon is-small"><i class="fas fa-retweet"></i></span>
-									<span style="width: 2rem">Transpose</span>
+									<span style="width: 2rem" data-i18n="Transpose">Transpose</span>
 
 									<span slot="end" class="icon is-small">
 										<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
@@ -621,7 +623,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 						<vscode-button appearance="secondary" class="" onclick="toggleHelpModal(true)">
 							<span slot="start" class="icon is-small"><i class="fas fa-question"></i></span>
-							<span style="width: 2rem">Help</span>
+							<span style="width: 2rem" data-i18n="Help">Help</span>
 						</vscode-button>
 					</div>
 
@@ -836,7 +838,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<div class="box">
-				<h3 class="title is-3">Reset data and apply read options</h3>
+				<h3 class="title is-3" data-i18n="Reset data and apply read options">Reset data and apply read options</h3>
 
 				<p>
 					Are you sure that you want to overwrite the table with the initial content (snapshot) of the source file? <br />
@@ -846,11 +848,11 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 				<div style="margin-top: 1em">
 					<vscode-button class="" onclick="resetDataFromResetDialog()">
-						<span style="width: 3rem">Reset</span>
+						<span style="width: 3rem" data-i18n="Reset">Reset</span>
 					</vscode-button>
 
 					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleAskReadAgainModal(false)">
-						<span style="width: 3rem">Cancel</span>
+						<span style="width: 3rem" data-i18n="Cancel">Cancel</span>
 					</vscode-button>
 				</div>
 
@@ -880,11 +882,11 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 				<div style="margin-top: 1em">
 					<vscode-button class="" onclick="reloadFileFromDisk()">
-						<span style="width: 3rem">Reload</span>
+						<span style="width: 3rem" data-i18n="Reload">Reload</span>
 					</vscode-button>
 
 					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleAskReloadFileModalDiv(false)">
-						<span style="width: 3rem">Cancel</span>
+						<span style="width: 3rem" data-i18n="Cancel">Cancel</span>
 					</vscode-button>
 				</div>
 
@@ -916,7 +918,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 				<div style="margin-top: 1em">
 					<vscode-button class="" onclick="reloadFileFromDisk()">
-						<span style="width: 3rem">Reload</span>
+						<span style="width: 3rem" data-i18n="Reload">Reload</span>
 					</vscode-button>
 
 					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleSourceFileChangedModalDiv(false, true)">
@@ -963,6 +965,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 	<script>
 		var initialConfig = ${JSON.stringify(config)};
 		var initialVars = ${JSON.stringify(initialVars)};
+		var initialLanguage = ${JSON.stringify(config.initialLanguage && config.initialLanguage !== 'auto' ? config.initialLanguage : vscode.env.language)}
 		</script>
 		<script src="${beforeDomLoadedJs}"></script>
 	
@@ -996,6 +999,8 @@ function createEditorHtml(webview, context, config, initialVars) {
 	<script src="${autoFillJs}"></script>
 	<script src="${utilJs}"></script>
 	<script src="${uiJs}"></script>
+	<script src="${i18nJs}"></script>
+	<script src="${zhCnJs}"></script>
 	<script src="${mainJs}"></script>
 
 	</body>

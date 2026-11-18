@@ -66,6 +66,7 @@ const defaultConfig = {
     initiallyHiddenColumnNumbers: [],
     useSaveButtonsAsAdditionalUnsavedChangesIndicator: true,
     copyColumnHeaderNamesSeparator: `, `,
+    initialLanguage: 'auto',
 };
 /**
  * returns the configuration for this extension

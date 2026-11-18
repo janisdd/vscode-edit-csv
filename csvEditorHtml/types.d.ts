@@ -437,6 +437,14 @@ type EditCsvConfig = {
 	 * The string used to join multiple column header names when copying column header names
 	 */
 	copyColumnHeaderNamesSeparator: string
+
+	/**
+	 * the initial language used for the editor UI
+	 * auto: the language is detected from the environment (VS Code or the browser)
+	 * en: English
+	 * zh-cn: Simplified Chinese
+	 */
+	initialLanguage: 'auto' | 'en' | 'zh-cn'
 }
 
 /* --- frontend settings --- */
