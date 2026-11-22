@@ -200,7 +200,7 @@ function _applyHasHeader(displayRenderInformation: boolean, fromUndo = false) {
 	}
 
 	if (displayRenderInformation) {
-		statusInfo.innerText = `Rendering table...`
+		statusInfo.innerText = t(`Rendering table...`)
 
 		call_after_DOM_updated(() => {
 
@@ -229,7 +229,7 @@ function setShouldAutpApplyHasHeader(shouldSet: boolean) {
 	if (shouldSet) {
 		shouldApplyHasHeaderAfterRowsAdded = true
 		hasHeaderReadOptionInput.classList.add(`toggle-auto-future`)
-		hasHeaderLabel.title = `Activated automatically, if table has >= 2 rows`
+		hasHeaderLabel.title = t(`Activated automatically, if table has >= 2 rows`)
 	} else {
 		hasHeaderReadOptionInput.classList.remove(`toggle-auto-future`)
 		shouldApplyHasHeaderAfterRowsAdded = false
@@ -431,7 +431,7 @@ function reRenderTable(callback?: () => void) {
 
 	if (!hot) return
 
-	statusInfo.innerText = `Rendering table...`
+	statusInfo.innerText = t(`Rendering table...`)
 	call_after_DOM_updated(() => {
 		hot!.render()
 		setTimeout(() => {
@@ -602,6 +602,9 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 
 	hot = new Handsontable(container, {
 		data: csvParseResult.data,
+		//the built-in handsontable texts (e.g. the context menu) are translated through the
+		//handsontable language dictionaries (see csvEditorHtml/locales/handsontable-zh-cn.ts)
+		language: getLanguage() === 'zh-cn' ? 'zh-cn' : 'en-US',
 		readOnly: isReadonlyMode,
 		trimWhitespace: false,
 		rowHeaderWidth: getRowHeaderWidth(csvParseResult.data.length),
@@ -722,7 +725,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 				},
 				'alignment': {},
 				'hide_columns': {
-					name: 'Hide column(s)',
+					name: t('Hide column(s)'),
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
 						if (!hot) return
 						// if (!headerRowWithIndex) return
@@ -743,7 +746,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					}
 				},
 				'copy_column_header_name': {
-					name: 'Copy column name(s)',
+					name: t('Copy column name(s)'),
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
 
 						const showColumnHeaderNamesWithLettersLikeExcel = initialConfig?.showColumnHeaderNamesWithLettersLikeExcel ?? false
@@ -779,7 +782,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					},
 				},
 				'edit_header_cell': {
-					name: 'Edit header cell',
+					name: t('Edit header cell'),
 					hidden: function () {
 						//there is no selection for header cells...
 						let selectedRanges = hot!.getSelected()
@@ -814,7 +817,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					}
 				},
 				'resize_row_header_cell': {
-					name: `Resize row to ${initialConfig?.doubleClickRowHandleForcedHeight ?? 106}px`,
+					name: tFormat(`Resize row to {0}px`, initialConfig?.doubleClickRowHandleForcedHeight ?? 106),
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
 
 						if (!hot) return
@@ -841,7 +844,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					}
 				},
 				'resize_column_header_cell': {
-					name: `Resize column to ${initialConfig?.doubleClickColumnHandleForcedWith ?? 200}px`,
+					name: tFormat(`Resize column to {0}px`, initialConfig?.doubleClickColumnHandleForcedWith ?? 200),
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
 
 						let plugin = hot!.getPlugin('manualColumnResize')
@@ -870,7 +873,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					}
 				},
 				'unhide_all_columns': {
-					name: 'Unhide all columns',
+					name: t('Unhide all columns'),
 					callback: function (key: string, selection: Array<{ start: { col: number, row: number }, end: { col: number, row: number } }>, clickEvent: Event) {
 						_unhideAllColumns()
 					},
@@ -879,7 +882,7 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 					}
 				},
 				'set_multiple_cursors': {
-					name: 'Selection to file cursors',
+					name: t('Selection to file cursors'),
 					hidden: function () {
 						//don't show in browser
 						if (!vscode) return true
@@ -892,21 +895,21 @@ function displayData(this: any, csvParseResult: ExtendedCsvParseResult | null, c
 						items: [
 							{
 								key: 'set_multiple_cursors:option1',
-								name: 'Cursor at cell start',
+								name: t('Cursor at cell start'),
 								callback: function (key: string, selections: HandsontableSelection[], clickEvent: Event) {
 									postSetMultipleCursors(calculateSourceFileCursorPositions2(selections, 'start'))
 								},
 							},
 							{
 								key: 'set_multiple_cursors:option2',
-								name: 'Cursor at cell end',
+								name: t('Cursor at cell end'),
 								callback: function (key: string, selections: HandsontableSelection[], clickEvent: Event) {
 									postSetMultipleCursors(calculateSourceFileCursorPositions2(selections, 'end'))
 								},
 							},
 							{
 								key: 'set_multiple_cursors:option3',
-								name: 'Cursor select entire cell',
+								name: t('Cursor select entire cell'),
 								callback: function (key: string, selections: HandsontableSelection[], clickEvent: Event) {
 									postSetMultipleCursors(calculateSourceFileCursorPositions2(selections, 'entire'))
 								},
@@ -2648,7 +2651,7 @@ function transposeColumsAndRows() {
 	let transposeQuoteInfo = cellIsQuotedInfoPhysicalIndices[0].map((col, i) => cellIsQuotedInfoPhysicalIndices.map(row => row[i]))
 	cellIsQuotedInfoPhysicalIndices = transposeQuoteInfo
 	
-	statusInfo.innerText = `Swapping finished, rendering...`
+	statusInfo.innerText = t(`Swapping finished, rendering...`)
 
 	setTimeout(() => {
 		statusInfo.innerText = ''
@@ -3241,7 +3244,7 @@ function _updateToggleReadonlyModeUi() {
 	//new state is isReadonlyMode
 	if (isReadonlyMode) {
 		isReadonlyModeToggleSpan.classList.add(`active`)
-		isReadonlyModeToggleSpan.title = `Sets the table to edit mode`
+		isReadonlyModeToggleSpan.title = t(`Sets the table to edit mode`)
 
 		//disable edit ui
 		const btnEditableUi = document.querySelectorAll(`.on-readonly-disable-btn`)
@@ -3256,7 +3259,7 @@ function _updateToggleReadonlyModeUi() {
 
 	} else {
 		isReadonlyModeToggleSpan.classList.remove(`active`)
-		isReadonlyModeToggleSpan.title = `Sets the table to readonly mode`
+		isReadonlyModeToggleSpan.title = t(`Sets the table to readonly mode`)
 
 		//enable edit ui
 		const btnEditableUi = document.querySelectorAll(`.on-readonly-disable-btn`)

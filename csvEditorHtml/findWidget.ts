@@ -391,14 +391,14 @@ class FindWidget {
 
 		// console.log(`this.lastFindResults`, this.lastFindResults)
 
-		statusInfo.innerText = `Rendering table...`
+		statusInfo.innerText = t(`Rendering table...`)
 
 		if (this.lastFindResults.length === 0) {
 
 			if (this.findWidgetQueryCancellationToken.isCancellationRequested === false) {
-				this.findWidgetInfo.innerText = `No results`
+				this.findWidgetInfo.innerText = t(`No results`)
 			} else {
-				this.findWidgetInfo.innerText = `Cancelled`
+				this.findWidgetInfo.innerText = t(`Cancelled`)
 			}
 		}
 

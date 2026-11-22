@@ -35,6 +35,14 @@ export default defineConfig({
           type: 'text/javascript',
         },
         {
+          src: './csvEditorHtml/i18n.ts',
+          type: 'text/javascript',
+        },
+        {
+          src: './csvEditorHtml/locales/zh-cn.ts',
+          type: 'text/javascript',
+        },
+        {
           src: './csvEditorHtml/util.ts',
           type: 'text/javascript',
         },

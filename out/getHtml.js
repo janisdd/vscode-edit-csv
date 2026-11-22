@@ -52,6 +52,7 @@ function createEditorHtml(webview, context, config, initialVars) {
     const beforeDomLoadedJs = _getResourcePath('csvEditorHtml/out/beforeDomLoaded.js');
     const i18nJs = _getResourcePath('csvEditorHtml/out/i18n.js');
     const zhCnJs = _getResourcePath('csvEditorHtml/out/locales/zh-cn.js');
+    const handsontableZhCnJs = _getResourcePath('csvEditorHtml/out/locales/handsontable-zh-cn.js');
     const toolkit = _getResourcePath('node_modules/@vscode/webview-ui-toolkit/dist/toolkit.min.js');
     const dayJS = _getResourcePath('node_modules/dayjs/dayjs.min.js');
     const dayJSPlugins1 = _getResourcePath('node_modules/dayjs/plugin/customParseFormat.js');
@@ -69,23 +70,23 @@ function createEditorHtml(webview, context, config, initialVars) {
 		</div>
 
 		<div class="search-input-wrapper">
-			<vscode-text-field id="find-widget-input" placeholder="Find..." class="input" title="Enter to start search">
+			<vscode-text-field id="find-widget-input" placeholder="Find..." class="input" title="Enter to start search" data-i18n-placeholder="Find..." data-i18n-title="Enter to start search">
 			<span slot="end" style="width: 81px">
 					<!-- search options -->
 				<div class="flexed find-options">
-					<vscode-button appearance="icon" id="find-window-option-match-case" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionMatchCase()" title="Match case">
+					<vscode-button appearance="icon" id="find-window-option-match-case" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionMatchCase()" title="Match case" data-i18n-title="Match case">
 						<span>Aa</span>
 					</vscode-button>
 
-					<vscode-button appearance="icon" id="find-window-option-whole-cell" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionWholeCell()" title="Match whole cell value">
+					<vscode-button appearance="icon" id="find-window-option-whole-cell" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionWholeCell()" title="Match whole cell value" data-i18n-title="Match whole cell value">
 						<span>Abl</span>
 					</vscode-button>
 
-					<vscode-button appearance="icon" id="find-window-option-whole-cell-trimmed" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionMatchTrimmedCell()" title="Trims the cell value before comparing">
+					<vscode-button appearance="icon" id="find-window-option-whole-cell-trimmed" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionMatchTrimmedCell()" title="Trims the cell value before comparing" data-i18n-title="Trims the cell value before comparing">
 						<span>A</span>
 					</vscode-button>
 
-					<vscode-button appearance="icon" id="find-window-option-regex" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionRegex()" title="Use regular expression">
+					<vscode-button appearance="icon" id="find-window-option-regex" class="btn option" onclick="findWidgetInstance.toggleFindWindowOptionRegex()" title="Use regular expression" data-i18n-title="Use regular expression">
 						<span>
 							<i class="fas fa-square-full"></i>
 							<i class="fas fa-asterisk"></i>
@@ -103,35 +104,35 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 		<div class="info">
 			<vscode-button appearance="icon" id="find-widget-start-search" class="clickable" style="margin-right: 3px;" onclick="findWidgetInstance.refreshCurrentSearch()"
-				title="Start search (Enter)">
+				title="Start search (Enter)" data-i18n-title="Start search (Enter)">
 				<i class="fas fa-search"></i>
 			</vscode-button>
 			<span id="find-widget-info">0/0</span>
-			<span id="find-widget-cancel-search" title="Cancel search (Escape)" class="clickable" onclick="findWidgetInstance.onCancelSearch()" style="display: none;">
+			<span id="find-widget-cancel-search" title="Cancel search (Escape)" class="clickable" data-i18n-title="Cancel search (Escape)" onclick="findWidgetInstance.onCancelSearch()" style="display: none;">
 				<i class="fas fa-hand-paper"></i>
 			</span>
 			<span id="find-widget-outdated-search" class="outdated-search clickable" style="display: none;" onclick="findWidgetInstance.refreshCurrentSearch()"
-				title="The table has changed, thus the search is outdated. Click to refresh the search.">
+				title="The table has changed, thus the search is outdated. Click to refresh the search." data-i18n-title="The table has changed, thus the search is outdated. Click to refresh the search.">
 				<i class="fas fa-exclamation-triangle"></i>
 			</span>
-		</div>	
+		</div>
 
 		<!-- search navigation buttons-->
 		<div class="find-navigation-actions">
 
-			<vscode-button appearance="icon" id="find-widget-previous" class="clickable" onclick="findWidgetInstance.gotoPreviousFindMatch()" title="Previous match (⇧F3)">
+			<vscode-button appearance="icon" id="find-widget-previous" class="clickable" onclick="findWidgetInstance.gotoPreviousFindMatch()" title="Previous match (⇧F3)" data-i18n-title="Previous match (⇧F3)">
 				<span>
 					<i class="fas fa-chevron-up"></i>
 				</span>
 			</vscode-button>
 	
-			<vscode-button appearance="icon" id="find-widget-next"  class="clickable" onclick="findWidgetInstance.gotoNextFindMatch()" title="Next match (F3)">
+			<vscode-button appearance="icon" id="find-widget-next"  class="clickable" onclick="findWidgetInstance.gotoNextFindMatch()" title="Next match (F3)" data-i18n-title="Next match (F3)">
 				<span>
 					<i class="fas fa-chevron-down"></i>
 				</span>
 			</vscode-button>
 	
-			<vscode-button appearance="icon" class="clickable"  onclick="findWidgetInstance.showOrHideWidget(false)" title="Close (Escape)">
+			<vscode-button appearance="icon" class="clickable"  onclick="findWidgetInstance.showOrHideWidget(false)" title="Close (Escape)" data-i18n-title="Close (Escape)">
 				<span>
 					<i class="fas fa-times"></i>
 				</span>
@@ -168,37 +169,37 @@ function createEditorHtml(webview, context, config, initialVars) {
 								<div class="options-title">
 										<div class="clickable" onclick="toggleOptionsBar()" data-i18n="Preview">Preview</div>
 
-										<vscode-button appearance="icon" class="mar-left-half clickable" onclick="generateCsvPreview()" title="Refresh the preview">
+										<vscode-button appearance="icon" class="mar-left-half clickable" onclick="generateCsvPreview()" title="Refresh the preview" data-i18n-title="Refresh the preview">
 										<span>
 											<i class="fas fa-redo-alt"></i>
 										</span>
 										</vscode-button>
 				
 										<!-- no css tooltip because we want a delay-->
-										<vscode-button appearance="icon" id="preview-copy-icon" class="mar-left-half clickable" onclick="copyPreviewToClipboard()" title="Creates the preview and copies it to the clipboard">
+										<vscode-button appearance="icon" id="preview-copy-icon" class="mar-left-half clickable" onclick="copyPreviewToClipboard()" title="Creates the preview and copies it to the clipboard" data-i18n-title="Creates the preview and copies it to the clipboard">
 											<span>
 												<i class="fas fa-paste"></i>
 											</span>
 										</vscode-button>
 				
-										<vscode-button appearance="icon" id="re-render-table-icon" class="mar-left-half clickable" onclick="reRenderTable()" style="margin-left: 2em;" title="Redraws the table. This can fix some measuring issues (e.g. after the font size changed)">
+										<vscode-button appearance="icon" id="re-render-table-icon" class="mar-left-half clickable" onclick="reRenderTable()" style="margin-left: 2em;" title="Redraws the table. This can fix some measuring issues (e.g. after the font size changed)" data-i18n-title="Redraws the table. This can fix some measuring issues (e.g. after the font size changed)">
 											<span>
 												<i class="fas fa-ruler-combined"></i>
 											</span>
 										</vscode-button>
 
-										<vscode-button appearance="icon" id="force-column-resize-icon" class="mar-left-half clickable" onclick="forceAutoResizeColumns()" style="margin-left: 0.5em;" title="Resizes all column widths to match their content">
+										<vscode-button appearance="icon" id="force-column-resize-icon" class="mar-left-half clickable" onclick="forceAutoResizeColumns()" style="margin-left: 0.5em;" title="Resizes all column widths to match their content" data-i18n-title="Resizes all column widths to match their content">
 											<span>
 												<i class="fas fa-arrows-alt-h"></i>
 											</span>
 										</vscode-button>
-										<vscode-button appearance="icon" id="force-row-resize-icon" class="mar-left-half clickable" onclick="forceAutoResizeRows()" style="margin-left: 0.5em;" title="Resizes all row heights to match their content">
+										<vscode-button appearance="icon" id="force-row-resize-icon" class="mar-left-half clickable" onclick="forceAutoResizeRows()" style="margin-left: 0.5em;" title="Resizes all row heights to match their content" data-i18n-title="Resizes all row heights to match their content">
 										<span>
 											<i class="fas fa-arrows-alt-v"></i>
 										</span>
 									</vscode-button>
 
-										<vscode-button appearance="icon" id="reload-file" class="clickable" onclick="preReloadFileFromDisk()" style="margin-left: 2em;" title="Reload the csv file content (from disk)">
+										<vscode-button appearance="icon" id="reload-file" class="clickable" onclick="preReloadFileFromDisk()" style="margin-left: 2em;" title="Reload the csv file content (from disk)" data-i18n-title="Reload the csv file content (from disk)">
 											<span>
 												<i class="fas fa-sync-alt"></i>
 											</span>
@@ -207,12 +208,12 @@ function createEditorHtml(webview, context, config, initialVars) {
 										<!-- fixed rows top -->
 										<div class="flexed changeable-indicator" style="margin-left: 2em;">
 											<div>
-												<vscode-button appearance="icon" id="fixed-rows-icon" class="clickable" title="Set fixed rows top" onclick="_toggleFixedRowsText()">
+												<vscode-button appearance="icon" id="fixed-rows-icon" class="clickable" title="Set fixed rows top" data-i18n-title="Set fixed rows top" onclick="_toggleFixedRowsText()">
 													<span>
 														<i class="rotated-90deg fas fa-align-left"></i>
 													</span>
 												</vscode-button>
-												<span id="fixed-rows-text" style="margin-left: 0.5rem;" class="dis-hidden">fixed rows:</span>
+												<span id="fixed-rows-text" style="margin-left: 0.5rem;" class="dis-hidden" data-i18n="fixed rows:">fixed rows:</span>
 											</div>
 											<div id="fixed-rows-top-info" class="text" style="margin-left: 0.5rem;">0</div>
 											<div class="changeable" style="margin-left: 0.5rem;">
@@ -223,12 +224,12 @@ function createEditorHtml(webview, context, config, initialVars) {
 										<!-- fixed columns left -->
 										<div class="flexed changeable-indicator" style="margin-left: 1em;">
 											<div>
-												<vscode-button appearance="icon" id="fixed-columns-icon" class="clickable" title="Set fixed columns left" onclick="_toggleFixedColumnsText()">
+												<vscode-button appearance="icon" id="fixed-columns-icon" class="clickable" title="Set fixed columns left" data-i18n-title="Set fixed columns left" onclick="_toggleFixedColumnsText()">
 													<span>
 														<i class="fas fa-align-left"></i>
 													</span>
 												</vscode-button>
-												<span id="fixed-columns-text" style="margin-left: 0.5rem;" class="dis-hidden">fixed columns:</span>
+												<span id="fixed-columns-text" style="margin-left: 0.5rem;" class="dis-hidden" data-i18n="fixed columns:">fixed columns:</span>
 											</div>
 											<div id="fixed-columns-top-info" class="text" style="margin-left: 0.5rem;">0</div>
 											<div class="changeable" style="margin-left: 0.5rem;">
@@ -238,7 +239,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 										</div>
 										<!-- toggle readonly mode -->
 										<div class="flexed toggle-btn clickable" style="margin-left: 1em;">
-											<vscode-button appearance="icon" id="is-readonly-mode-toggle" onclick="toggleReadonlyMode()" title="Toggls the readonly table mode (SET IN CODE AT STARTUP)">
+											<vscode-button appearance="icon" id="is-readonly-mode-toggle" onclick="toggleReadonlyMode()" title="Toggls the readonly table mode (SET IN CODE AT STARTUP)" data-i18n-title="Toggls the readonly table mode (SET IN CODE AT STARTUP)">
 												<span>
 													<i class="fas fa-pen"></i>
 													<i class="fas fa-slash"></i>
@@ -250,7 +251,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 										<!-- table temporary zoom -->
 										<div class="flexed changeable-indicator" style="margin-left: 1em;">
 											<div>
-												<vscode-button appearance="icon" id="table-zoom-icon" class="clickable" title="Resets the table content zoom" onclick="resetTableContentZoom()">
+												<vscode-button appearance="icon" id="table-zoom-icon" class="clickable" title="Resets the table content zoom" data-i18n-title="Resets the table content zoom" onclick="resetTableContentZoom()">
 													<span>
 													<i class="fas fa-search-plus"></i>
 													</span>
@@ -264,13 +265,13 @@ function createEditorHtml(webview, context, config, initialVars) {
 										</div>
 
 										<div id="source-file-unwatched-indicator" class="hoverable tooltip op-hidden is-tooltip-left is-tooltip-multiline" style="float: right;margin-right: 5px;"
-											data-tooltip="The csv source file is not monitored for changes. Changes to the source file are ignored if the source file is changed by vs code or an external programme. To manually reload the contents of the source file, use the 'manual refresh button'.">
+											data-tooltip="The csv source file is not monitored for changes. Changes to the source file are ignored if the source file is changed by vs code or an external programme. To manually reload the contents of the source file, use the 'manual refresh button'." data-i18n-tooltip="The csv source file is not monitored for changes. Changes to the source file are ignored if the source file is changed by vs code or an external programme. To manually reload the contents of the source file, use the 'manual refresh button'.">
 											<span>
 												<i class="fas fa-eye"></i>
 											</span>
 										</div>
 										<div id="unsaved-changes-indicator" class="hoverable unsaved-changes-indicator op-hidden tooltip is-tooltip-left" style="float: right;margin-right: 10px;"
-											data-tooltip="You might have unsaved changes">
+											data-tooltip="You might have unsaved changes" data-i18n-tooltip="You might have unsaved changes">
 											<span>
 												<i class="fas fa-save"></i>
 											</span>
@@ -286,10 +287,10 @@ function createEditorHtml(webview, context, config, initialVars) {
 									<div id="read-options-content" class="options-content on-readonly-disable-div">
 
 										<div class="field same-line" style="display: none;">
-												<label>Encoding</label>
+												<label data-i18n="Encoding">Encoding</label>
 												<div class="select">
 													<vscode-dropdown id="read-option-encoding" style="width: 11rem;">
-														<vscode-option id="read-option-encoding-auto" value="auto">Auto detect</vscode-option>
+														<vscode-option id="read-option-encoding-auto" value="auto" data-i18n="Auto detect">Auto detect</vscode-option>
 														<!-- options will be auto inserted here -->
 													</vscode-dropdown>
 												</div>
@@ -300,7 +301,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 													<span id="has-header-label" data-i18n="Has header">Has header</span>
 												</vscode-checkbox>
 												<span class="tooltip is-tooltip-right is-tooltip-multiline"
-													data-tooltip="Use the first row as header in the table. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applied immediately, it will be applied if the table has more than one row. [the readOption_hasHeader and tryToGuessHasHeader settings can control this]">
+													data-tooltip="Use the first row as header in the table. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applied immediately, it will be applied if the table has more than one row. [the readOption_hasHeader and tryToGuessHasHeader settings can control this]" data-i18n-tooltip="Use the first row as header in the table. Note that changing this option will also change the write header option. It will also clear the undo/redo stack! If the table has only one row this cannot be applied immediately, it will be applied if the table has more than one row. [the readOption_hasHeader and tryToGuessHasHeader settings can control this]">
 												<i class="fas fa-question-circle"></i>
 											</span>
 											</div>
@@ -320,27 +321,27 @@ function createEditorHtml(webview, context, config, initialVars) {
 											<div class="flexed">
 												<div class="field">
 													<label>
-														<span>Delimiter</span>
-														<span class="clickable tooltip" data-tooltip="Set to tab character"
+														<span data-i18n="Delimiter">Delimiter</span>
+														<span class="clickable tooltip" data-tooltip="Set to tab character" data-i18n-tooltip="Set to tab character"
 															onclick="setReadDelimiter('\t')">⇥</span>
-														<span id="read-delimiter-tooltip" class="tooltip" data-tooltip="Empty to auto detect">
+														<span id="read-delimiter-tooltip" class="tooltip" data-tooltip="Empty to auto detect" data-i18n-tooltip="Empty to auto detect">
 															<i class="fas fa-question-circle"></i>
 														</span>
 													</label>
 													<!--<vscode-text-field id="delimiter-string" class="input" type="text" placeholder="auto" oninput="setDelimiterString()" />-->
-													<input id="delimiter-string" class="input vscode-text-field" type="text" placeholder="auto" oninput="setDelimiterString()" />
+													<input id="delimiter-string" class="input vscode-text-field" type="text" data-i18n-placeholder="auto" placeholder="auto" oninput="setDelimiterString()" />
 												</div>
 					
 												<div class="field mar-left-half">
 													<label>
-														<span>Comment</span>
+														<span data-i18n="Comment">Comment</span>
 														<span class="tooltip is-tooltip-multiline"
-															data-tooltip="Comments before and after csv data are preserved. Comments between data rows are ignored. Empty to treat every line as data (no comments).">
+															data-tooltip="Comments before and after csv data are preserved. Comments between data rows are ignored. Empty to treat every line as data (no comments)." data-i18n-tooltip="Comments before and after csv data are preserved. Comments between data rows are ignored. Empty to treat every line as data (no comments).">
 															<i class="fas fa-question-circle"></i>
 														</span>
 													</label>
 													<!--<vscode-text-field id="comment-string" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentString()" />-->
-													<input id="comment-string" class="input vscode-text-field" type="text" placeholder="Empty for no comments" oninput="setCommentString()" />
+													<input id="comment-string" class="input vscode-text-field" type="text" data-i18n-placeholder="Empty for no comments" placeholder="Empty for no comments" oninput="setCommentString()" />
 												</div>
 											</div>
 					
@@ -348,7 +349,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 											<div class="flexed">
 												<div class="field">
 													<label>
-														<span>QuoteChar</span>
+														<span data-i18n="QuoteChar">QuoteChar</span>
 													</label>
 													<!--<vscode-text-field id="quote-char-string" class="input" type="text" oninput="setQuoteCharString()" onchange="setQuoteCharString()" /> -->
 													<input id="quote-char-string" class="input vscode-text-field" type="text" oninput="setQuoteCharString()" />
@@ -357,14 +358,14 @@ function createEditorHtml(webview, context, config, initialVars) {
 												<div class="field mar-left-half">
 												
 													<label>
-														<span>EscapeChar</span>
+														<span data-i18n="EscapeChar">EscapeChar</span>
 														<span class="tooltip is-tooltip-multiline"
-															data-tooltip="The character used to escape the QuoteChar inside field values">
+															data-tooltip="The character used to escape the QuoteChar inside field values" data-i18n-tooltip="The character used to escape the QuoteChar inside field values">
 															<i class="fas fa-question-circle"></i>
 														</span>
 													</label>
 													<!--<vscode-text-field id="escape-char-string" placeholder="Placeholder Text" class="input" type="text" oninput="setEscapeCharString()"/>-->
-													<input id="escape-char-string" placeholder="Placeholder Text" class="input vscode-text-field" type="text" oninput="setEscapeCharString()" />
+													<input id="escape-char-string" placeholder="Placeholder Text" data-i18n-placeholder="Placeholder Text" class="input vscode-text-field" type="text" oninput="setEscapeCharString()" />
 												</div>
 											</div>
 
@@ -374,7 +375,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 													<span slot="end" class="icon is-small">
 														<span class="tooltip  mar-left-half is-tooltip-multiline is-tooltip-right"
-															data-tooltip="The input file content was stored locally and is used as data. Thus this view is independent of the source file">
+															data-tooltip="The input file content was stored locally and is used as data. Thus this view is independent of the source file" data-i18n-tooltip="The input file content was stored locally and is used as data. Thus this view is independent of the source file">
 															<i class="fas fa-question-circle"></i>
 														</span>
 													</span>
@@ -386,10 +387,10 @@ function createEditorHtml(webview, context, config, initialVars) {
 									<div id="write-options-content" class="options-content on-readonly-disable-div">
 
 										<div class="field same-line" style="display: none;">
-											<label>Encoding</label>
+											<label data-i18n="Encoding">Encoding</label>
 											<div class="select">
 												<vscode-dropdown id="write-option-encoding" style="width: 11rem;">
-													<vscode-option value="auto">Same as read</vscode-option>
+													<vscode-option value="auto" data-i18n="Same as read">Same as read</vscode-option>
 												</vscode-dropdown>
 											</div>
 										</div>
@@ -398,7 +399,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 											<vscode-checkbox id="has-header-write" type="checkbox" name="has-header-write" class="" checked="checked" onchange="setHasHeaderWrite()">
 												<span data-i18n="Write header">Write header</span>
 											</vscode-checkbox>
-											<span class="tooltip is-tooltip-bottom" data-tooltip="Checked: writes the header row, unchecked: not">
+											<span class="tooltip is-tooltip-bottom" data-tooltip="Checked: writes the header row, unchecked: not" data-i18n-tooltip="Checked: writes the header row, unchecked: not">
 												<i class="fas fa-question-circle"></i>
 											</span>
 										</div>
@@ -408,30 +409,30 @@ function createEditorHtml(webview, context, config, initialVars) {
 											<div class="field">
 												<label for="delimiter-string-write">
 													<label>
-														<span>Delimiter</span>
-														<span class="clickable tooltip" data-tooltip="Set to tab character"
+														<span data-i18n="Delimiter">Delimiter</span>
+														<span class="clickable tooltip" data-tooltip="Set to tab character" data-i18n-tooltip="Set to tab character"
 															onclick="setWriteDelimiter('\t')">⇥</span>
-														<span class="tooltip" data-tooltip="Empty to use delimiter from read">
+														<span class="tooltip" data-tooltip="Empty to use delimiter from read" data-i18n-tooltip="Empty to use delimiter from read">
 															<i class="fas fa-question-circle"></i>
 														</span>
 													</label>
 												</label>
 												<!--<vscode-text-field id="delimiter-string-write" class="input" type="text" placeholder="auto" oninput="setDelimiterStringWrite()" />-->
-												<input id="delimiter-string-write" class="input vscode-text-field"" type="text" placeholder="auto" oninput="setDelimiterStringWrite()" />
+												<input id="delimiter-string-write" class="input vscode-text-field"" type="text" data-i18n-placeholder="auto" placeholder="auto" oninput="setDelimiterStringWrite()" />
 											</div>
 					
 											<div class="field mar-left-half">
 												<label for="comment-string-write">
 													<label>
-														<span>Comment</span>
+														<span data-i18n="Comment">Comment</span>
 														<span class="tooltip is-tooltip-multiline"
-															data-tooltip="Empty for no comments. Comments before and after csv data are written if char is present. Empty to exclude comments.">
+															data-tooltip="Empty for no comments. Comments before and after csv data are written if char is present. Empty to exclude comments." data-i18n-tooltip="Empty for no comments. Comments before and after csv data are written if char is present. Empty to exclude comments.">
 															<i class="fas fa-question-circle"></i>
 														</span>
 													</label>
 												</label>
 												<!--<vscode-text-field id="comment-string-write" class="input" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()" />-->
-												<input id="comment-string-write" class="input vscode-text-field"" type="text" placeholder="Empty for no comments" oninput="setCommentStringWrite()" />
+												<input id="comment-string-write" class="input vscode-text-field"" type="text" data-i18n-placeholder="Empty for no comments" placeholder="Empty for no comments" oninput="setCommentStringWrite()" />
 											</div>
 										</div>
 					
@@ -439,7 +440,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 										<div class="flexed">
 											<div class="field">
 												<label>
-													<span>QuoteChar</span>
+													<span data-i18n="QuoteChar">QuoteChar</span>
 												</label>
 												<!--<vscode-text-field id="quote-char-string-write" class="input" type="text" oninput="setQuoteCharStringWrite()" />-->
 												<input id="quote-char-string-write" class="input vscode-text-field" type="text" oninput="setQuoteCharStringWrite()" />
@@ -447,9 +448,9 @@ function createEditorHtml(webview, context, config, initialVars) {
 					
 											<div class="field mar-left-half">
 												<label>
-													<span>EscapeChar</span>
+													<span data-i18n="EscapeChar">EscapeChar</span>
 													<span class="tooltip is-tooltip-multiline"
-														data-tooltip="The character used to escape the QuoteChar inside field values">
+														data-tooltip="The character used to escape the QuoteChar inside field values" data-i18n-tooltip="The character used to escape the QuoteChar inside field values">
 														<i class="fas fa-question-circle"></i>
 													</span>
 												</label>
@@ -470,13 +471,13 @@ function createEditorHtml(webview, context, config, initialVars) {
 					
 										<!-- see help modal why -->
 										<div class="flexed" style="display: none;">
-											<div class="field same-line" title="End of line terminator">
-												<label for="comment-string-write">EOL</label>
+											<div class="field same-line" title="End of line terminator" data-i18n-title="End of line terminator">
+												<label for="comment-string-write" data-i18n="EOL">EOL</label>
 												<div class="select">
 													<vscode-dropdown id="newline-select-write" onchange="setNewLineWrite()">
-														<vscode-option id="newline-same-as-input-option" value="">Same as input</vscode-option>
-														<vscode-option value="lf">Linux/Mac (LF)</vscode-option>
-														<vscode-option value="crlf">Windows (CRLF)</vscode-option>
+														<vscode-option id="newline-same-as-input-option" value="" data-i18n="Same as input">Same as input</vscode-option>
+														<vscode-option value="lf" data-i18n="Linux/Mac (LF)">Linux/Mac (LF)</vscode-option>
+														<vscode-option value="crlf" data-i18n="Windows (CRLF)">Windows (CRLF)</vscode-option>
 													</vscode-dropdown>
 												</div>
 											</div>
@@ -540,7 +541,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 						<span slot="end" class="icon is-small">
 							<span class="tooltip is-tooltip-multiline mar-left-half"
-								data-tooltip="Applies the csv content back to the source file and saves the source file (if something changed) [ctrl+s/cmd+s]">
+								data-tooltip="Applies the csv content back to the source file and saves the source file (if something changed) [ctrl+s/cmd+s]" data-i18n-tooltip="Applies the csv content back to the source file and saves the source file (if something changed) [ctrl+s/cmd+s]">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</span>
@@ -551,7 +552,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 						<span style="width: 9rem" data-i18n="Apply changes to file">Apply changes to file</span>
 
 						<span slot="end" class="icon is-small">
-							<span class="tooltip mar-left-half is-tooltip-multiline" data-tooltip="Applies the csv content back to the source file (if something changed). After this the editor has no unsaved changes.">
+							<span class="tooltip mar-left-half is-tooltip-multiline" data-tooltip="Applies the csv content back to the source file (if something changed). After this the editor has no unsaved changes." data-i18n-tooltip="Applies the csv content back to the source file (if something changed). After this the editor has no unsaved changes.">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</span>
@@ -576,7 +577,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 								<span slot="end" class="icon is-small">
 									<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
-										data-tooltip="Hides rows starting with a comment. The row headers will display an indicator if a row above or below is hidden. Hidden rows are also exported!">
+										data-tooltip="Hides rows starting with a comment. The row headers will display an indicator if a row above or below is hidden. Hidden rows are also exported!" data-i18n-tooltip="Hides rows starting with a comment. The row headers will display an indicator if a row above or below is hidden. Hidden rows are also exported!">
 										<i class="fas fa-question-circle"></i>
 									</span>
 								</span>
@@ -600,7 +601,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 									<span slot="end" class="icon is-small">
 										<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
-											data-tooltip="Trims every cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo stack!">
+											data-tooltip="Trims every cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo stack!" data-i18n-tooltip="Trims every cell (including header row) in the table (removes leading and trailing spaces, tabs, ...). This will clear undo/redo stack!">
 											<i class="fas fa-question-circle"></i>
 										</span>
 									</span>
@@ -612,7 +613,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 									<span slot="end" class="icon is-small">
 										<span class="tooltip mar-left-half is-tooltip-multiline is-tooltip-left"
-											data-tooltip="Swaps columns and rows. This excludes the header row. This will clear undo/redo stack!">
+											data-tooltip="Swaps columns and rows. This excludes the header row. Slow for large tables! This will clear undo/redo stack!" data-i18n-tooltip="Swaps columns and rows. This excludes the header row. Slow for large tables! This will clear undo/redo stack!">
 											<i class="fas fa-question-circle"></i>
 										</span>
 									</span>
@@ -641,9 +642,9 @@ function createEditorHtml(webview, context, config, initialVars) {
 					<div id="side-panel-inner">
 
 						<div class="stat">
-							<div>Numbers sum
+							<div><span data-i18n="Numbers sum">Numbers sum</span>
 								<span class="tooltip is-tooltip-right is-tooltip-multiline"
-									data-tooltip="The sum of numbers in the selected cells (only connected cells). Only the first number of a cell is used. Arbitrary-precision is powered by big.js">
+									data-tooltip="The sum of numbers in the selected cells (only connected cells). Only the first number of a cell is used. Arbitrary-precision is powered by big.js" data-i18n-tooltip="The sum of numbers in the selected cells (only connected cells). Only the first number of a cell is used. Arbitrary-precision is powered by big.js">
 									<i class="far fa-question-circle"></i>
 								</span>
 							</div>
@@ -651,8 +652,8 @@ function createEditorHtml(webview, context, config, initialVars) {
 						</div>
 
 						<div class="stat">
-							<div>Selected cells
-								<span class="tooltip is-tooltip-right" data-tooltip="The number of selected cells">
+							<div><span data-i18n="Selected cells">Selected cells</span>
+								<span class="tooltip is-tooltip-right" data-tooltip="The number of selected cells" data-i18n-tooltip="The number of selected cells">
 									<i class="far fa-question-circle"></i>
 								</span>
 							</div>
@@ -660,8 +661,8 @@ function createEditorHtml(webview, context, config, initialVars) {
 						</div>
 
 						<div class="sub-stat">
-							<div>Not empty
-								<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="The selected cells count where the value is not empty (whitespace is counted as value)">
+							<div><span data-i18n="Not empty">Not empty</span>
+								<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="The selected cells count where the value is not empty (whitespace is counted as value)" data-i18n-tooltip="The selected cells count where the value is not empty (whitespace is counted as value)">
 									<i class="far fa-question-circle"></i>
 								</span>
 							</div>
@@ -669,8 +670,8 @@ function createEditorHtml(webview, context, config, initialVars) {
 						</div>
 
 						<div class="stat">
-							<div>Selected rows
-								<span class="tooltip is-tooltip-right" data-tooltip="The selected rows count">
+							<div><span data-i18n="Selected rows">Selected rows</span>
+								<span class="tooltip is-tooltip-right" data-tooltip="The selected rows count" data-i18n-tooltip="The selected rows count">
 									<i class="far fa-question-circle"></i>
 								</span>
 							</div>
@@ -679,8 +680,8 @@ function createEditorHtml(webview, context, config, initialVars) {
 						</div>
 
 						<div class="stat">
-							<div>Selected cols
-								<span class="tooltip is-tooltip-right" data-tooltip="The selected columns count">
+							<div><span data-i18n="Selected cols">Selected cols</span>
+								<span class="tooltip is-tooltip-right" data-tooltip="The selected columns count" data-i18n-tooltip="The selected columns count">
 									<i class="far fa-question-circle"></i>
 								</span>
 							</div>
@@ -690,20 +691,20 @@ function createEditorHtml(webview, context, config, initialVars) {
 						<div class="stat divider"></div>
 
 						<div class="stat">
-							<div>Rows count</div>
+							<div data-i18n="Rows count">Rows count</div>
 							<div id="stat-rows-count">000</div>
 						</div>
 
 						<div class="stat">
-							<div>Cols count</div>
+							<div data-i18n="Cols count">Cols count</div>
 							<div id="stat-cols-count">000</div>
 						</div>
 
 						<div class="stat divider"></div>
 
 						<div class="stat">
-							<div>Numbers style
-								<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="The number style only applies for the stats, does not affect sorting! Change before selecting cells.">
+							<div><span data-i18n="Numbers style">Numbers style</span>
+								<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="The number style only applies for the stats, does not affect sorting! Change before selecting cells." data-i18n-tooltip="The number style only applies for the stats, does not affect sorting! Change before selecting cells.">
 									<i class="far fa-question-circle"></i>
 								</span>
 							</div>
@@ -711,13 +712,13 @@ function createEditorHtml(webview, context, config, initialVars) {
 							<vscode-radio-group>
 								<vscode-radio id="numbers-style-en">
 									<span>en: 3.14</span>
-									<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="Decimal separator: '.' Thousand separator: a single whitespace or ','">
+									<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="Decimal separator: '.' Thousand separator: a single whitespace or ','" data-i18n-tooltip="Decimal separator: '.' Thousand separator: a single whitespace or ','">
 										<i class="far fa-question-circle"></i>
 									</span>
 								</vscode-radio>
 								<vscode-radio  id="numbers-style-non-en">
 									<span>non-en: 3,14</span>
-									<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="Decimal separator: ',' Thousand separator: a single whitespace or '.'">
+									<span class="tooltip is-tooltip-right is-tooltip-multiline" data-tooltip="Decimal separator: ',' Thousand separator: a single whitespace or '.'" data-i18n-tooltip="Decimal separator: ',' Thousand separator: a single whitespace or '.'">
 										<i class="far fa-question-circle"></i>
 									</span>
 								</vscode-radio>
@@ -741,7 +742,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 
 				<!-- main editor/grid area -->
 				<div id="csv-editor-wrapper" class="csv-editor-wrapper">
-					<div id="csv-editor">No data received</div>
+					<div id="csv-editor" data-i18n="No data received">No data received</div>
 				</div>
 
 			</div>
@@ -757,68 +758,68 @@ function createEditorHtml(webview, context, config, initialVars) {
 		<div class="modal-content">
 			<div class="box">
 
-				<h3 class="title is-3">Features/Shortcuts</h3>
+				<h3 class="title is-3" data-i18n="Features/Shortcuts">Features/Shortcuts</h3>
 				<div class="content">
 					<ul>
-						<li>Undo/Redo</li>
-						<li>Click on column header text to sort</li>
-						<li>Click left next to the row/column header text to select then drag to rearrange</li>
-						<li>Resize row/column</li>
+						<li data-i18n="Undo/Redo">Undo/Redo</li>
+						<li data-i18n="Click on column header text to sort">Click on column header text to sort</li>
+						<li data-i18n="Click left next to the row/column header text to select then drag to rearrange">Click left next to the row/column header text to select then drag to rearrange</li>
+						<li data-i18n="Resize row/column">Resize row/column</li>
 						<li>
-							<div class="keys">Home</div> to move to the first cell in a row
+							<div class="keys">Home</div> <span data-i18n="to move to the first cell in a row">to move to the first cell in a row</span>
 						</li>
 						<li>
-							<div class="keys">End</div> to move to the last cell in a row
-						</li>
-
-						<li>
-							<div class="keys">Ctrl</div>+<div class="keys">Home</div> to move to the first cell in a column
-						</li>
-						<li>
-							<div class="keys">Ctrl</div>+<div class="keys">End</div> to move to the last cell in a column
-						</li>
-						<li>
-							<div class="keys">Esc</div> to cancel editing and close cell editor
-						</li>
-						<li>
-							<div class="keys">Ctrl</div>+<div class="keys">Enter</div> to add a line break in a cell
+							<div class="keys">End</div> <span data-i18n="to move to the last cell in a row">to move to the last cell in a row</span>
 						</li>
 
-						<li>To delete a row/column hover over it and click the trash-icon</li>
+						<li>
+							<div class="keys">Ctrl</div>+<div class="keys">Home</div> <span data-i18n="to move to the first cell in a column">to move to the first cell in a column</span>
+						</li>
+						<li>
+							<div class="keys">Ctrl</div>+<div class="keys">End</div> <span data-i18n="to move to the last cell in a column">to move to the last cell in a column</span>
+						</li>
+						<li>
+							<div class="keys">Esc</div> <span data-i18n="to cancel editing and close cell editor">to cancel editing and close cell editor</span>
+						</li>
+						<li>
+							<div class="keys">Ctrl</div>+<div class="keys">Enter</div> <span data-i18n="to add a line break in a cell">to add a line break in a cell</span>
+						</li>
 
-						<li>Double click on a column resize handle to fit content, double click on an auto sized column to set width
+						<li data-i18n="To delete a row/column hover over it and click the trash-icon">To delete a row/column hover over it and click the trash-icon</li>
+
+						<li data-i18n="Double click on a column resize handle to fit content, double click on an auto sized column to set width to 200px (good for very wide columns)">Double click on a column resize handle to fit content, double click on an auto sized column to set width
 							to
 							200px (good for very wide columns)</li>
 
 					</ul>
 
-					For a full list of shortcuts see <a target="_blank"
+					<span data-i18n="For a full list of shortcuts see">For a full list of shortcuts see</span> <a target="_blank"
 						href="https://janisdd.github.io/handsontable-6.2.2-docs/tutorial-keyboard-navigation.html">https://janisdd.github.io/handsontable-6.2.2-docs/tutorial-keyboard-navigation.html</a>
 				</div>
 
-				<h3 class="title is-3">Hints</h3>
+				<h3 class="title is-3" data-i18n="Hints">Hints</h3>
 				<div class="content">
 					<ul>
 					<!-- turns out handsontable checks if the values are isNaN and if both are numbers they are parsed as floats and compared as floats ... so comparing numbers or text should be fine here -->
-						<li>Sorting is not automatically updated after data has changed</li>
-						<li>Sorting state is exported</li>
-						<li>Similar to Excel, you can hold down the <div class="keys">alt</div> key before releasing the mouse button to copy the cell values. No interpolation is carried out.</li>
-						<li>You can use ctrl/cmd click on a column header to sort by multiple columns</li>
-						<li>The unsaved changes indicator is display on any change (never cleared until you apply the changes, even if you revert manually)</li>
-						<li>When you see the unsaved changes indicator right after the table was loaded then some rows were expanded (to ensure all rows have the same length)</li>
-						<li>You can right-click on the table to get a context menu</li>
-						<li>Hidden rows/columns are also exported</li>
-						<li>Comment rows will export only the first cell/column. If you use a cell other than the first for comments the cell color will indicate this. </li>
-						<li>If you edit an unnamed (csv) file and close it then the editor will be closed too (unsaved changes will
+						<li data-i18n="Sorting is not automatically updated after data has changed">Sorting is not automatically updated after data has changed</li>
+						<li data-i18n="Sorting state is exported">Sorting state is exported</li>
+						<li><span data-i18n="Similar to Excel, you can hold down the">Similar to Excel, you can hold down the</span> <div class="keys">alt</div> <span data-i18n="key before releasing the mouse button to copy the cell values. No interpolation is carried out.">key before releasing the mouse button to copy the cell values. No interpolation is carried out.</li>
+						<li data-i18n="You can use ctrl/cmd click on a column header to sort by multiple columns">You can use ctrl/cmd click on a column header to sort by multiple columns</li>
+						<li data-i18n="The unsaved changes indicator is display on any change (never cleared until you apply the changes, even if you revert manually)">The unsaved changes indicator is display on any change (never cleared until you apply the changes, even if you revert manually)</li>
+						<li data-i18n="When you see the unsaved changes indicator right after the table was loaded then some rows were expanded (to ensure all rows have the same length)">When you see the unsaved changes indicator right after the table was loaded then some rows were expanded (to ensure all rows have the same length)</li>
+						<li data-i18n="You can right-click on the table to get a context menu">You can right-click on the table to get a context menu</li>
+						<li data-i18n="Hidden rows/columns are also exported">Hidden rows/columns are also exported</li>
+						<li data-i18n="Comment rows will export only the first cell/column. If you use a cell other than the first for comments the cell color will indicate this.">Comment rows will export only the first cell/column. If you use a cell other than the first for comments the cell color will indicate this. </li>
+						<li data-i18n="If you edit an unnamed (csv) file and close it then the editor will be closed too (unsaved changes will be lost)!">If you edit an unnamed (csv) file and close it then the editor will be closed too (unsaved changes will
 							be lost)!</li>
-						<li>Copy & Past use tab (<div class="keys">⇥</div>) as separator (same as excel)</li>
-						<li>You cannot change the new line character (because vs code automatically converts it to the file setting
+						<li><span data-i18n="Copy &amp; Past use tab (">Copy &amp; Past use tab (</span><div class="keys">⇥</div><span data-i18n=") as separator (same as excel)">) as separator (same as excel)</span></li>
+						<li data-i18n="You cannot change the new line character (because vs code automatically converts it to the file setting i think)">You cannot change the new line character (because vs code automatically converts it to the file setting
 							i think)
 						</li>
-						<li>If a row has more cell than the others empty cells are added to match the row with the highest cell
+						<li data-i18n="If a row has more cell than the others empty cells are added to match the row with the highest cell count">If a row has more cell than the others empty cells are added to match the row with the highest cell
 							count</li>
-						<li>Extension configuration is only applied for new editors</li>
-						<li>You can delete multiple rows/cols by selecting them via shift and right click then remove (or <div class="keys">Ctrl</div>+<div class="keys">Shift</div>+<div class="keys">Alt</div>+<div class="keys">Minus</div>)</li>
+						<li data-i18n="Extension configuration is only applied for new editors">Extension configuration is only applied for new editors</li>
+						<li><span data-i18n="You can delete multiple rows/cols by selecting them via shift and right click then remove (or">You can delete multiple rows/cols by selecting them via shift and right click then remove (or</span> <div class="keys">Ctrl</div>+<div class="keys">Shift</div>+<div class="keys">Alt</div>+<div class="keys">Minus</div>)</li>
 					</ul>
 				</div>
 
@@ -840,11 +841,9 @@ function createEditorHtml(webview, context, config, initialVars) {
 			<div class="box">
 				<h3 class="title is-3" data-i18n="Reset data and apply read options">Reset data and apply read options</h3>
 
-				<p>
-					Are you sure that you want to overwrite the table with the initial content (snapshot) of the source file? <br />
-					This will use the original data (when opening the CSV editor) and discard all changes applied to the table! <br />
-					Please note that the content of the csv file will not be read or loaded again (a snapshot of the file was stored in memory when the csv editor was opened)!
-				</p>
+				<p>					<span data-i18n="Are you sure that you want to overwrite the table with the initial content (snapshot) of the source file?">Are you sure that you want to overwrite the table with the initial content (snapshot) of the source file?</span> <br />
+					<span data-i18n="This will use the original data (when opening the CSV editor) and discard all changes applied to the table!">This will use the original data (when opening the CSV editor) and discard all changes applied to the table!</span> <br />
+					<span data-i18n="Please note that the content of the csv file will not be read or loaded again (a snapshot of the file was stored in memory when the csv editor was opened)!">Please note that the content of the csv file will not be read or loaded again (a snapshot of the file was stored in memory when the csv editor was opened)!</span></p>
 
 				<div style="margin-top: 1em">
 					<vscode-button class="" onclick="resetDataFromResetDialog()">
@@ -871,14 +870,12 @@ function createEditorHtml(webview, context, config, initialVars) {
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<div class="box">
-				<h3 class="title is-3">Reload file content and discard changes</h3>
+				<h3 class="title is-3" data-i18n="Reload file content and discard changes">Reload file content and discard changes</h3>
 
-				<p>
-					Are you sure you want to read the source file again?<br />
-					All changes to the table will be discarded!<br />
+				<p>					<span data-i18n="Are you sure you want to read the source file again?">Are you sure you want to read the source file again?</span><br />
+					<span data-i18n="All changes to the table will be discarded!">All changes to the table will be discarded!</span><br />
 					<br />
-					<i>This also updates the snapshot of the file that is used for the 'reset data' function.</i>
-				</p>
+					<i><span data-i18n="This also updates the snapshot of the file that is used for the 'reset data' function.">This also updates the snapshot of the file that is used for the 'reset data' function.</span></i></p>
 
 				<div style="margin-top: 1em">
 					<vscode-button class="" onclick="reloadFileFromDisk()">
@@ -905,16 +902,14 @@ function createEditorHtml(webview, context, config, initialVars) {
 		<div class="modal-background"></div>
 		<div class="modal-content">
 			<div class="box">
-				<h3 class="title is-3">Source file changed</h3>
+				<h3 class="title is-3" data-i18n="Source file changed">Source file changed</h3>
 
-				<p>
-					The source file has been changed, so the table is no longer up-to-date.<br />
-					You can reload the contents of the file, which will discard all changes to the table!<br />
+				<p>					<span data-i18n="The source file has been changed, so the table is no longer up-to-date.">The source file has been changed, so the table is no longer up-to-date.</span><br />
+					<span data-i18n="You can reload the contents of the file, which will discard all changes to the table!">You can reload the contents of the file, which will discard all changes to the table!</span><br />
 					<br />
-					Or you can ignore the changes.<br />
+					<span data-i18n="Or you can ignore the changes.">Or you can ignore the changes.</span><br />
 					<br />
-					<i>This will also update the snapshot of the file that is used for the 'reset data' feature.</i>
-				</p>
+					<i><span data-i18n="This will also update the snapshot of the file that is used for the 'reset data' feature.">This will also update the snapshot of the file that is used for the 'reset data' feature.</span></i></p>
 
 				<div style="margin-top: 1em">
 					<vscode-button class="" onclick="reloadFileFromDisk()">
@@ -922,7 +917,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 					</vscode-button>
 
 					<vscode-button appearance="secondary" style="margin-left: 0.5em" class="" onclick="toggleSourceFileChangedModalDiv(false, true)">
-						<span style="width: 3rem">Ignore</span>
+						<span style="width: 3rem" data-i18n="Ignore">Ignore</span>
 					</vscode-button>
 				</div>
 
@@ -1001,6 +996,7 @@ function createEditorHtml(webview, context, config, initialVars) {
 	<script src="${uiJs}"></script>
 	<script src="${i18nJs}"></script>
 	<script src="${zhCnJs}"></script>
+	<script src="${handsontableZhCnJs}"></script>
 	<script src="${mainJs}"></script>
 
 	</body>

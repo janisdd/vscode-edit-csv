@@ -1419,7 +1419,7 @@ function _calculateStats(row: number, column: number, row2: number, column2: num
 
 	statSelectedNotEmptyCells.innerText = `${notEmptyCount}`
 	statSumOfNumbers.innerText = containsInvalidNumbers
-		? `Some invalid num`
+		? t(`Some invalid num`)
 		: `${formatBigJsNumber(numbersSum, numbersStyleToUse)}`
 
 }
@@ -1962,22 +1962,22 @@ function getOpenLinkModifierTooltopPart(): string {
 	if (isBrowser) {
 
 		if (isMacOpenLinkModifierKey) {
-			return `(cmd + click)`
+			return t(`(cmd + click)`)
 		}
 
 		//windows: ctrl
 		//on linux browsers ctrl + click for open in new tab
-		return `(ctrl + click)`
+		return t(`(ctrl + click)`)
 	}
 
 	//vs code extension
 
 	if (isMacOpenLinkModifierKey) {
 		// return `(alt + click)`
-		return `(cmd + click)`
+		return t(`(cmd + click)`)
 	}
 
-	return `(ctrl + click)`
+	return t(`(ctrl + click)`)
 }
 
 function isOpenLinkModifierPressed(e: KeyboardEvent | MouseEvent) {

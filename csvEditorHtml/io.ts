@@ -56,14 +56,14 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 				}
 
 				if (typeof error.row === 'number') {
-					statusInfo.innerText = `Error`
+					statusInfo.innerText = t(`Error`)
 					const errorMsg = `${error.message} on line ${error.row + 1}`
 					csvEditorDiv.innerText = errorMsg
 					_error(errorMsg) //row is 0 based
 					continue
 				}
 
-				statusInfo.innerText = `Error`
+				statusInfo.innerText = t(`Error`)
 				const errorMsg = `${error.message}`
 				csvEditorDiv.innerText = errorMsg
 				_error(errorMsg)
@@ -78,7 +78,7 @@ function parseCsv(content: string, csvReadOptions: CsvReadOptions): ExtendedCsvP
 	newLineFromInput = parseResult.meta.linebreak
 	updateNewLineSelect()
 
-	readDelimiterTooltip.setAttribute('data-tooltip', `${readDelimiterTooltipText} (detected: ${defaultCsvWriteOptions.delimiter.replace("\t", "⇥")})`)
+	readDelimiterTooltip.setAttribute('data-tooltip', tFormat(`{0} (detected: {1})`, readDelimiterTooltipText, defaultCsvWriteOptions.delimiter.replace("\t", "⇥")))
 
 	outColumnIndexToCsvColumnEndIndexWithDelimiterMapping = parseResult.meta.outColumnIndexToCsvColumnIndexMapping ?? []
 	outLineIndexToCsvLineIndexMapping = parseResult.meta.outLineIndexToCsvLineIndexMapping ?? []
@@ -552,7 +552,7 @@ function onReceiveCsvContentSlice(slice: StringSlice) {
 	// console.log(`received slice ${slice.sliceNr}/${slice.totalSlices}`)
 	if (slice.sliceNr === 1) {
 		initialContent = ''
-		statusInfo.innerText = `Receiving csv...`
+		statusInfo.innerText = t(`Receiving csv...`)
 		csvEditorDiv.innerText = ``
 	}
 
@@ -575,7 +575,7 @@ function onReceiveCsvContentSlice(slice: StringSlice) {
  */
 function startRenderData() {
 
-	statusInfo.innerText = `Rendering table...`
+	statusInfo.innerText = t(`Rendering table...`)
 	hasOriginalTableStructuralChanges = false
 
 	//TODO as we don't longer use undo/redo with has header option this might not be necessary any longer...
@@ -592,7 +592,7 @@ function startRenderData() {
 	call_after_DOM_updated(() => {
 
 		resetData(initialContent, defaultCsvReadOptions)
-		statusInfo.innerText = `Performing last steps...`
+		statusInfo.innerText = t(`Performing last steps...`)
 
 		//profiling shows that handsontable calls some column resize function which causes the last hang...
 		//status display should be cleared after the handsontable operation so enqueue
