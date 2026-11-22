@@ -27,6 +27,13 @@ function setLanguage(lang: string) {
 }
 
 /**
+ * Returns the currently active language code (e.g. "zh-cn")
+ */
+function getLanguage(): string {
+	return currentLanguage
+}
+
+/**
  * Translation helper that falls back to the original English text
  */
 function t(enText: string): string {
@@ -35,6 +42,19 @@ function t(enText: string): string {
 		return dict[enText]
 	}
 	return enText
+}
+
+/**
+ * Translation helper for texts that contain dynamic parts
+ * "{0}", "{1}", ... are replaced with the corresponding value of values
+ * e.g. tFormat("Resize row to {0}px", 106)
+ */
+function tFormat(enText: string, ...values: (string | number)[]): string {
+	let text = t(enText)
+	for (let i = 0; i < values.length; i++) {
+		text = text.replace(`{${i}}`, String(values[i]))
+	}
+	return text
 }
 
 /**
@@ -57,6 +77,16 @@ function translateDom() {
 		}
 	})
 
+	// Translate tooltips (custom css tooltips, see the data-tooltip attribute)
+	document
+		.querySelectorAll<HTMLElement>("[data-i18n-tooltip]")
+		.forEach((el) => {
+			const key = el.getAttribute("data-i18n-tooltip")
+			if (key) {
+				el.setAttribute("data-tooltip", t(key))
+			}
+		})
+
 	// Translate input placeholders
 	document
 		.querySelectorAll<HTMLInputElement>("[data-i18n-placeholder]")
@@ -72,12 +102,16 @@ function translateDom() {
 interface Window {
 	registerTranslation: (lang: string, dict: Record<string, string>) => void
 	setLanguage: (lang: string) => void
+	getLanguage: () => string
 	t: (enText: string) => string
+	tFormat: (enText: string, ...values: (string | number)[]) => string
 	translateDom: () => void
 }
 
 // Mount to window object
 window.registerTranslation = registerTranslation
 window.setLanguage = setLanguage
+window.getLanguage = getLanguage
 window.t = t
+window.tFormat = tFormat
 window.translateDom = translateDom

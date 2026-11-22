@@ -4,6 +4,9 @@ import { isCsvFile, getCurrentViewColumn, debugLog, partitionString, debounce } 
 import { createEditorHtml } from './getHtml';
 import { InstanceManager, Instance, SomeInstance } from './instanceManager';
 import { getExtensionConfiguration, overwriteConfiguration } from './configurationHelper';
+import { setLanguage, t, tFormat } from './i18n';
+//register the translations for the extension side (e.g. the notifications)
+import './locales/zh-cn'
 
 // const debounceDocumentChangeInMs = 1000
 
@@ -19,6 +22,9 @@ export const editorUriScheme = 'csv-edit'
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+
+	//use the language from vs code for the notifications
+	setLanguage(vscode.env.language)
 
 	//from https://stackoverflow.com/questions/38267360/vscode-extension-api-identify-file-or-folder-click-in-explorer-context-menu
 	//to get a list of all known languages for: resourceLangId
@@ -56,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 		if (vscode.window.activeTextEditor) { //a web view is no text editor...
-			vscode.window.showInformationMessage("Open a csv editor first to show the source csv file")
+			vscode.window.showInformationMessage(t("Open a csv editor first to show the source csv file"))
 			return
 		}
 
@@ -96,7 +102,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const editCsvWithConfigCommand = vscode.commands.registerCommand('edit-csv.editWithConfig', (overwriteConfigObj: EditCsvConfigOverwrite | undefined) => {
 
 		if (!overwriteConfigObj) {
-			vscode.window.showErrorMessage("No settings object provided")
+			vscode.window.showErrorMessage(t("No settings object provided"))
 			return
 		}
 
@@ -136,7 +142,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// 		content += ""
 		// 		console.log(`content`, content.split('\n')[0])
 		// 	}, error => {
-		// 		vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
+		// 		vscode.window.showErrorMessage(tFormat(`could not read the source file, error: {0}`, error?.message));
 		// 	}
 		// )
 
@@ -239,7 +245,7 @@ function openSourceFileFunc(instanceManager: InstanceManager): void {
 	try {
 		instance = instanceManager.getActiveEditorInstance()
 	} catch (error: any) {
-		vscode.window.showErrorMessage(`Could not find the source file for the editor (no instance found), error: ${error.message}`)
+		vscode.window.showErrorMessage(tFormat(`Could not find the source file for the editor (no instance found), error: {0}`, error.message))
 		return
 	}
 	vscode.workspace.openTextDocument(instance.sourceUri)
@@ -269,7 +275,7 @@ function beforeEditCsvCheck(instanceManager: InstanceManager): boolean {
 	//see //see https://github.com/microsoft/vscode/issues/31078
 	//see https://github.com/Microsoft/vscode/blob/master/src/vs/editor/common/model/textModel.ts > MODEL_SYNC_LIMIT
 	if (!vscode.window.activeTextEditor || !isCsvFile(vscode.window.activeTextEditor.document)) {
-		vscode.window.showInformationMessage("Open a csv file first to show the csv editor or file too large (> 50MB)")
+		vscode.window.showInformationMessage(t("Open a csv file first to show the csv editor or file too large (> 50MB)"))
 		return false
 	}
 
@@ -390,7 +396,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 	try {
 		instanceManager.addInstance(instance)
 	} catch (error: any) {
-		vscode.window.showErrorMessage(`Could not create an editor instance, error: ${error.message}`)
+		vscode.window.showErrorMessage(tFormat(`Could not create an editor instance, error: {0}`, error.message))
 
 		instance.unsubscribeWatcher?.dispose()
 		instance.sourceFileWatcher?.dispose()
@@ -447,7 +453,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 					// 		funcSendContent(text)
 
 					// 	}, error => {
-					// 		vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
+					// 		vscode.window.showErrorMessage(tFormat(`could not read the source file, error: {0}`, error?.message));
 					// 	})
 
 					//TODO
@@ -467,7 +473,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 								// debugLog(`content send`, content.split('\n')[0])
 								funcSendContent(content)
 							}, error => {
-								vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
+								vscode.window.showErrorMessage(tFormat(`could not read the source file, error: {0}`, error?.message));
 							}
 						)
 
@@ -483,7 +489,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 								// debugLog(`content send`, content.split('\n')[0])
 								funcSendContent(content)
 							}, error => {
-								vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
+								vscode.window.showErrorMessage(tFormat(`could not read the source file, error: {0}`, error?.message));
 							}
 						)
 
@@ -562,7 +568,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 		try {
 			instanceManager.removeInstance(instance)
 		} catch (error: any) {
-			vscode.window.showErrorMessage(`Could not destroy an editor instance, error: ${error.message}`);
+			vscode.window.showErrorMessage(tFormat(`Could not destroy an editor instance, error: {0}`, error.message));
 		}
 
 		try {
@@ -571,7 +577,7 @@ function createNewEditorInstance(context: vscode.ExtensionContext, activeTextEdi
 			instance.sourceFileWatcher?.dispose()
 
 		} catch (error: any) {
-			vscode.window.showErrorMessage(`Could not dispose source file watcher for file ${instance.document.uri.fsPath}, error: ${error.message}`);
+			vscode.window.showErrorMessage(tFormat(`Could not dispose source file watcher for file {0}, error: {1}`, instance.document.uri.fsPath, error.message));
 		}
 
 	}, null, context.subscriptions)
@@ -650,7 +656,7 @@ function applyContent(instance: Instance, newContent: string, saveSourceFile: bo
 					(reason) => {
 						console.warn(`Error applying edits`)
 						console.warn(reason)
-						vscode.window.showErrorMessage(`Error applying edits`)
+						vscode.window.showErrorMessage(t(`Error applying edits`))
 					})
 
 			// vscode.window.showTextDocument(document)
@@ -682,7 +688,7 @@ function applyContent(instance: Instance, newContent: string, saveSourceFile: bo
 				vscode.workspace.fs.stat(instance.sourceUri).
 					then(fileStat => {
 						//file exists and can be accessed
-						vscode.window.showErrorMessage(`Could apply changed because the source file could not be found`)
+						vscode.window.showErrorMessage(t(`Could apply changed because the source file could not be found`))
 
 					}, error => {
 
@@ -699,7 +705,7 @@ function _afterEditsApplied(instance: Instance, document: vscode.TextDocument, e
 	const afterShowDocument = () => {
 		if (!editsApplied) {
 			console.warn(`Edits could not be applied`)
-			vscode.window.showErrorMessage(`Edits could not be applied`)
+			vscode.window.showErrorMessage(t(`Edits could not be applied`))
 			return
 		}
 
@@ -722,7 +728,7 @@ function _afterEditsApplied(instance: Instance, document: vscode.TextDocument, e
 
 						if (!wasSaved) {
 							console.warn(`Could not save csv file`)
-							vscode.window.showErrorMessage(`Could not save csv file`)
+							vscode.window.showErrorMessage(t(`Could not save csv file`))
 							return
 						}
 
@@ -734,7 +740,7 @@ function _afterEditsApplied(instance: Instance, document: vscode.TextDocument, e
 						// }, 500)
 						console.warn(`Error saving csv file`)
 						console.warn(reason); //will be null e.g. no permission denied when saved manually
-						vscode.window.showErrorMessage(`Error saving csv file`)
+						vscode.window.showErrorMessage(t(`Error saving csv file`))
 					})
 			return
 		}
@@ -790,24 +796,24 @@ function createNewSourceFile(instance: Instance, newContent: string, openSourceF
 					newFile.save().then(successSave => {
 
 						if (!successSave) {
-							vscode.window.showErrorMessage(`Could not save new source file (old was deleted)`)
+							vscode.window.showErrorMessage(t(`Could not save new source file (old was deleted)`))
 							return
 						}
 
 						//successfully saved
 
 					}, error => {
-						vscode.window.showErrorMessage(`Could not save new source file (old was deleted), error: ${error?.message}`)
+						vscode.window.showErrorMessage(tFormat(`Could not save new source file (old was deleted), error: {0}`, error?.message))
 					})
 				}
 
 
 			}, error => {
-				vscode.window.showErrorMessage(`Could not create new source file (old was deleted), error: ${error?.message}`)
+				vscode.window.showErrorMessage(tFormat(`Could not create new source file (old was deleted), error: {0}`, error?.message))
 			})
 
 		}, error => {
-			vscode.window.showErrorMessage(`Could not open new source file, error: ${error?.message}`)
+			vscode.window.showErrorMessage(tFormat(`Could not open new source file, error: {0}`, error?.message))
 		})
 
 }
@@ -821,7 +827,7 @@ function createNewSourceFile(instance: Instance, newContent: string, openSourceF
 function getActiveEditorInstance(instanceManager: InstanceManager): Instance | null {
 
 	if (vscode.window.activeTextEditor) { //a web view is no text editor...
-		vscode.window.showInformationMessage("Open a csv editor first to apply changes")
+		vscode.window.showInformationMessage(t("Open a csv editor first to apply changes"))
 		return null
 	}
 
@@ -829,7 +835,7 @@ function getActiveEditorInstance(instanceManager: InstanceManager): Instance | n
 	try {
 		instance = instanceManager.getActiveEditorInstance()
 	} catch (error: any) {
-		vscode.window.showErrorMessage(`Could not find the editor instance, error: ${error.message}`)
+		vscode.window.showErrorMessage(tFormat(`Could not find the editor instance, error: {0}`, error.message))
 		return null
 	}
 
@@ -877,7 +883,7 @@ function onWatcherChangeDetecedHandler(e: vscode.Uri, instanceManager: InstanceM
 				onSourceFileChanged(e.fsPath, instance)
 
 			}, error => {
-				vscode.window.showErrorMessage(`could not read the source file, error: ${error?.message}`);
+				vscode.window.showErrorMessage(tFormat(`could not read the source file, error: {0}`, error?.message));
 			}
 		)
 	

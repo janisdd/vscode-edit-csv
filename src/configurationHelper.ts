@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { editorUriScheme } from './extension';
 import { limitSingleCharacterString } from "./util";
+import { tFormat } from './i18n';
 
 
 
@@ -83,7 +84,7 @@ export function getExtensionConfiguration(): EditCsvConfig {
 		const optionValue = configObj.get(key)
 
 		if (optionValue === undefined) {
-			vscode.window.showWarningMessage(`Could not find option: ${key} in csv-edit configuration`)
+			vscode.window.showWarningMessage(tFormat(`Could not find option: {0} in csv-edit configuration`, key))
 			continue
 		}
 
@@ -107,7 +108,7 @@ export function overwriteConfiguration(currentConfig: EditCsvConfig, overwriteCo
 	for (const key in overwriteConfigObj) {
 
 		if (!currentConfig.hasOwnProperty(key)) {
-			vscode.window.showWarningMessage(`unknown setting '${key}', skipping this setting`)
+			vscode.window.showWarningMessage(tFormat(`unknown setting '{0}', skipping this setting`, key))
 			continue
 		}
 

@@ -50,6 +50,13 @@ if (typeof initialConfig === 'undefined') {
 
 }
 
+//the language must be set before the first call to t() (used by the ui texts below)
+//prioritize the language injected by VS Code; on the web, use the browser's navigator.language
+const currentAppLang = (typeof initialLanguage !== 'undefined' && initialLanguage)
+	? initialLanguage
+	: (typeof navigator !== 'undefined' ? navigator.language : 'en')
+setLanguage(currentAppLang)
+
 declare const dayjs: typeof import('dayjs')
 declare type Dayjs = import('dayjs').Dayjs
 
@@ -333,7 +340,7 @@ const btnApplyChangesToFileAndSave = _getById(`btn-apply-changes-to-file-and-sav
 const btnApplyChangesToFile = vscode ? _getById(`btn-apply-changes-to-file`) : null as HTMLElement | null
 
 const readDelimiterTooltip = _getById('read-delimiter-tooltip')
-const readDelimiterTooltipText = "Empty to auto detect"
+const readDelimiterTooltipText = t("Empty to auto detect")
 
 const receivedCsvProgBar = _getById('received-csv-prog-bar') as HTMLProgressElement
 const receivedCsvProgBarWrapper = _getById('received-csv-prog-bar-wrapper') as HTMLDivElement
@@ -351,11 +358,11 @@ const showCommentsBtn = _getById('show-comments-btn') as HTMLButtonElement
 const hideCommentsBtn = _getById('hide-comments-btn') as HTMLButtonElement
 
 const newlineSameSsInputOption = _getById('newline-same-as-input-option') as HTMLOptionElement
-const newlineSameSsInputOptionText = `Same as input`
+const newlineSameSsInputOptionText = t(`Same as input`)
 updateNewLineSelect()
 
 //add this to the first wrong column
-const warningTooltipTextWhenCommentRowNotFirstCellIsUsed = `Please use only the first cell in comment row (others are not exported)`
+const warningTooltipTextWhenCommentRowNotFirstCellIsUsed = t(`Please use only the first cell in comment row (others are not exported)`)
 
 const unsavedChangesIndicator = _getById('unsaved-changes-indicator') as HTMLSpanElement
 const reloadFileSpan = _getById('reload-file') as HTMLSpanElement //reread the file content...
@@ -542,9 +549,4 @@ function setupGlobalShortcutsInVs() {
 
 }
 
-//prioritize the language injected by VS Code; on the web, use the browser's navigator.language
-const currentAppLang = (typeof initialLanguage !== 'undefined' && initialLanguage) 
-    ? initialLanguage 
-    : (typeof navigator !== 'undefined' ? navigator.language : 'en')
-setLanguage(currentAppLang)
 translateDom()

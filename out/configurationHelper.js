@@ -4,6 +4,7 @@ exports.overwriteConfiguration = exports.getExtensionConfiguration = void 0;
 const vscode = require("vscode");
 const extension_1 = require("./extension");
 const util_1 = require("./util");
+const i18n_1 = require("./i18n");
 const defaultConfig = {
     highlightCsvComments: true,
     lastRowEnterBehavior: 'default',
@@ -77,7 +78,7 @@ function getExtensionConfiguration() {
     for (const key in defaultConfig) {
         const optionValue = configObj.get(key);
         if (optionValue === undefined) {
-            vscode.window.showWarningMessage(`Could not find option: ${key} in csv-edit configuration`);
+            vscode.window.showWarningMessage((0, i18n_1.tFormat)(`Could not find option: {0} in csv-edit configuration`, key));
             continue;
         }
         //@ts-ignore
@@ -95,7 +96,7 @@ exports.getExtensionConfiguration = getExtensionConfiguration;
 function overwriteConfiguration(currentConfig, overwriteConfigObj) {
     for (const key in overwriteConfigObj) {
         if (!currentConfig.hasOwnProperty(key)) {
-            vscode.window.showWarningMessage(`unknown setting '${key}', skipping this setting`);
+            vscode.window.showWarningMessage((0, i18n_1.tFormat)(`unknown setting '{0}', skipping this setting`, key));
             continue;
         }
         //@ts-ignore
